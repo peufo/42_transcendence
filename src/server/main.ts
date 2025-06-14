@@ -2,15 +2,19 @@ import path from 'node:path'
 import fastify from 'fastify'
 import fastifyStaic from '@fastify/static'
 import { env } from './env.js'
+import { engine } from '../lib/engine.js'
 
 const server = fastify()
-
 server.register(fastifyStaic, {
-    root: path.resolve('public')
+    root: [
+        path.resolve('public'),
+        path.resolve('build/public'),
+    ]
 })
 
 server.get('/ping', async () => {
-    return 'pong sad\n'
+    engine()
+    return 'pong\n'
 })
 
 server.listen({ port: env.PORT }, (err, address) => {

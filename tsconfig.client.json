@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "./src/client/**/*"
+  ],
+  "compilerOptions": {
+    "module": "esnext",
+    "outDir": "./build/public"
+  }
+}
