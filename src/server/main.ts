@@ -1,20 +1,27 @@
 import path from 'node:path'
 import fastify from 'fastify'
-import fastifyStaic from '@fastify/static'
+import fastifyStatic from '@fastify/static'
+import fastifyView from '@fastify/view'
+import handlebars from 'handlebars'
 import { env } from './env.js'
-import { engine } from '../lib/engine.js'
 
 const server = fastify()
-server.register(fastifyStaic, {
+server.register(fastifyStatic, {
     root: [
         path.resolve('public'),
         path.resolve('build/public'),
     ]
 })
 
-server.get('/ping', async () => {
-    engine()
-    return 'pong\n'
+server.register(fastifyView, {
+    engine: {
+        handlebars
+    },
+    root: './src/server/templates'
+})
+
+server.get('/layout', async (req, res) => {
+    return res.view("layout.hbs", { text: "HELLO" });
 })
 
 server.listen({ port: env.PORT }, (err, address) => {
