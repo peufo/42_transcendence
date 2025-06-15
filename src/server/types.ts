@@ -10,7 +10,7 @@ declare module '@fastify/secure-session' {
 declare module "fastify" {
     interface FastifyReply {
         locals: {
-            user?: string
+            user?: string // TODO: id, name, avatar
         };
     }
 }

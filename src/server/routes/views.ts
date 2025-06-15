@@ -17,11 +17,11 @@ const views: FastifyPluginCallback = (server, options, done) => {
     })
 
     server.get('/', async (req, res) => {
-        res.locals.user = 'Alice' // TODO: handle with hook
+        res.locals.user = 'Alice' // TODO: handle with auth hook
         return res.view('index');
     })
     server.get('/stats', async (req, res) => {
-        res.locals.user = 'Alice'
+        res.locals.user = 'Alice' // TODO: handle with auth hook
         return res.view('stats');
     })
 
@@ -29,8 +29,9 @@ const views: FastifyPluginCallback = (server, options, done) => {
     server.get('/local/new', async (req, res) => {
         return res.view('local/new');
     })
-    server.get<{ Querystring: { playerA: string, playerB: string } }>('/local/play', (req, res) => {
-        // TODO: check if players are defined
+    server.get<{ Querystring: { playerA: string, playerB: string, bot: string } }>('/local/play', (req, res) => {
+        // TODO: check if query is correct
+        // https://fastify.dev/docs/latest/Reference/Validation-and-Serialization/#validation
         return res.view('local/play', req.query)
     })
 
