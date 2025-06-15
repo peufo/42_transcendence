@@ -1,15 +1,31 @@
 <div class="flex min-h-full flex-col justify-center p-6 lg:px-8">
 
-    <div class="flex flex-col gap-6 mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+    <div class="flex flex-col gap-10 mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
 
         <div>
-            <h3 class="font-semibold text-gray-900 text-center my-4">
-                Hey {{ @root.user }} 👋
-            </h3>
+            <div class="py-6 flex items-center">
 
-            <a href="/game/new" class="btn btn-border">
-                Create a game
-            </a>
+                <h3 class="font-semibold text-xl text-gray-900 ">
+                    Welcome {{ @root.user }}
+                </h3>
+                <div class="flex-grow"></div>
+                <a href="/stats" class="btn btn-border" title="Ratio">
+                    <i data-lucide="star" class="h-4 w-4 mr-1"></i>
+                    <span>0.65</span>
+                    <span class="badge-dark translate-x-2">6 / 9</span>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <a href="/game/local" class="btn btn-primary">
+                    <i data-lucide="swords" class="h-5 w-5 mr-1"></i>
+                    Local game
+                </a>
+                <a href="/game/new" class="btn btn-primary">
+                    <i data-lucide="trophy" class="h-5 w-5 mr-1"></i>
+                    New tournament
+                </a>
+            </div>
         </div>
 
         <div class="flex flex-col gap-3">
@@ -18,24 +34,16 @@
             </h3>
 
             <div class="flex pl-4 p-2 items-center gap-2 border border-gray-200 rounded-xl">
-                <div class="flex flex-col">
-                    <span>Bob</span>
-                    <span class="text-xs text-green-600 leading-3">Online</span>
-                </div>
+                <span>Bob</span>
+                <span class="badge-green">Online</span>
                 <div class="flex-grow"></div>
-                <a href="/game/gameId" class="btn btn-border">Join game</a>
+                <a href="/game/gameId" class="btn btn-border">Join</a>
             </div>
 
-            <div class="flex pl-4 p-2 items-center gap-2 border bg-gray-100 border-gray-200 rounded-xl">
-                <div class="flex flex-col">
-                    <span>Clélie</span>
-                    <span class="text-xs text-gray-500 leading-3">Offline</span>
-                </div>
+            <div class="flex pl-4 p-2 items-center gap-2 border bg-gray-5 border-gray-200 rounded-xl">
+                <span>Clélie</span>
+                <span class="badge-dark">Offline</span>
                 <div class="flex-grow"></div>
-            </div>
-
-            <div class="text-center">
-                ...
             </div>
         </div>
 
@@ -59,12 +67,8 @@
                 </div>
                 <div class="flex-grow"></div>
                 <!-- TODO: need to form method="post" -->
-                <a href="/invitations/reject" class="btn btn-green">Reject</a>
-                <a href="/invitations/accept" class="btn btn-red">Accept</a>
-            </div>
-
-            <div class="text-center">
-                ...
+                <a href="/invitations/reject" class="btn btn-red">Reject</a>
+                <a href="/invitations/accept" class="btn btn-green">Accept</a>
             </div>
         </div>
 
@@ -84,27 +88,17 @@
             </form>
 
             <div class="flex pl-4 p-2 items-center gap-2 border border-gray-200 rounded-xl">
-                <div class="flex flex-col">
-                    <span>Jean</span>
-                    <span class="text-xs text-gray-900 leading-3">Sended at 18:12</span>
-                </div>
+                <span>Jean</span>
                 <div class="flex-grow"></div>
                 <!-- TODO: need to form method="post" -->
                 <a href="/invitations/new" class="btn btn-border">Invite</a>
             </div>
 
             <div class="flex pl-4 p-2 items-center gap-2 border border-gray-200 rounded-xl">
-                <div class="flex flex-col">
-                    <span>Claude</span>
-                    <span class="text-xs text-gray-900 leading-3">Sended at 18:12</span>
-                </div>
+                <span>Claude</span>
                 <div class="flex-grow"></div>
                 <!-- TODO: need to form method="post" -->
                 <a href="/invitations/new" class="btn btn-border">Invite</a>
-            </div>
-
-            <div class="text-center">
-                ...
             </div>
         </div>
 
