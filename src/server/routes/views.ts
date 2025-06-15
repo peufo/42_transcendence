@@ -1,6 +1,7 @@
 import fastifyView from '@fastify/view';
 import handlebars from 'handlebars'
 import { FastifyPluginCallback } from 'fastify'
+import '../types.js'
 
 const views: FastifyPluginCallback = (server, options, done) => {
 
@@ -16,13 +17,33 @@ const views: FastifyPluginCallback = (server, options, done) => {
     })
 
     server.get('/', async (req, res) => {
-        res.locals.user = 'Alice'
-        return res.view("index");
+        res.locals.user = 'Alice' // TODO: handle with hook
+        return res.view('index');
     })
-    server.get('/login', async (req, res) => {
+    server.get('/stats', async (req, res) => {
         res.locals.user = 'Alice'
-        return res.view("login");
+        return res.view('stats');
     })
+
+    // Local games
+    server.get('/local/new', async (req, res) => {
+        return res.view('local/new');
+    })
+    server.get<{ Querystring: { playerA: string, playerB: string } }>('/local/play', (req, res) => {
+        // TODO: check if players are defined
+        return res.view('local/play', req.query)
+    })
+
+    // Online games
+    server.get('/game/new', async (req, res) => {
+        return res.view('game/new');
+    })
+    server.get<{ Params: { gameId: string } }>('/game/play/:gameId', (req, res) => {
+        // TODO: check if user can join this game
+        const { gameId } = req.params
+        return res.view('game/play', { gameId })
+    })
+
     done()
 }
 
