@@ -1,1 +1,113 @@
-<h2>Hey, I m index</h2>
+<div class="flex min-h-full flex-col justify-center p-6 lg:px-8">
+
+    <div class="flex flex-col gap-6 mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+
+        <div>
+            <h3 class="font-semibold text-gray-900 text-center my-4">
+                Hey {{ @root.user }} 👋
+            </h3>
+
+            <a href="/game/new" class="btn btn-border">
+                Create a game
+            </a>
+        </div>
+
+        <div class="flex flex-col gap-3">
+            <h3 class="text-sm/6 font-semibold text-gray-900">
+                My friends
+            </h3>
+
+            <div class="flex pl-4 p-2 items-center gap-2 border border-gray-200 rounded-xl">
+                <div class="flex flex-col">
+                    <span>Bob</span>
+                    <span class="text-xs text-green-600 leading-3">Online</span>
+                </div>
+                <div class="flex-grow"></div>
+                <a href="/game/gameId" class="btn btn-border">Join game</a>
+            </div>
+
+            <div class="flex pl-4 p-2 items-center gap-2 border bg-gray-100 border-gray-200 rounded-xl">
+                <div class="flex flex-col">
+                    <span>Clélie</span>
+                    <span class="text-xs text-gray-500 leading-3">Offline</span>
+                </div>
+                <div class="flex-grow"></div>
+            </div>
+
+            <div class="text-center">
+                ...
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-3">
+            <h3 class="text-sm/6 font-semibold text-gray-900">
+                Invitations
+            </h3>
+
+            <div class="flex pl-4 p-2 items-center gap-2 border border-gray-200 rounded-xl">
+                <div class="flex flex-col">
+                    <span>Jonas</span>
+                    <span class="text-xs text-gray-900 leading-3">Sended at 18:12</span>
+                </div>
+                <div class="flex-grow"></div>
+            </div>
+
+            <div class="flex pl-4 p-2 items-center gap-2 border border-gray-200 rounded-xl">
+                <div class="flex flex-col">
+                    <span>Léonard</span>
+                    <span class="text-xs text-gray-900 leading-3">Recieved at 19:32</span>
+                </div>
+                <div class="flex-grow"></div>
+                <!-- TODO: need to form method="post" -->
+                <a href="/invitations/reject" class="btn btn-green">Reject</a>
+                <a href="/invitations/accept" class="btn btn-red">Accept</a>
+            </div>
+
+            <div class="text-center">
+                ...
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-3">
+
+            <form class="flex items-center w-full">
+                <div class="relative w-full">
+                    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                        <i data-lucide="user search" class="h-5 w-5 text-gray-500 dark:text-gray-400"
+                            aria-hidden="true"></i>
+                    </div>
+                    <input type="text"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        placeholder="Looking for new friends" required />
+                </div>
+
+            </form>
+
+            <div class="flex pl-4 p-2 items-center gap-2 border border-gray-200 rounded-xl">
+                <div class="flex flex-col">
+                    <span>Jean</span>
+                    <span class="text-xs text-gray-900 leading-3">Sended at 18:12</span>
+                </div>
+                <div class="flex-grow"></div>
+                <!-- TODO: need to form method="post" -->
+                <a href="/invitations/new" class="btn btn-border">Invite</a>
+            </div>
+
+            <div class="flex pl-4 p-2 items-center gap-2 border border-gray-200 rounded-xl">
+                <div class="flex flex-col">
+                    <span>Claude</span>
+                    <span class="text-xs text-gray-900 leading-3">Sended at 18:12</span>
+                </div>
+                <div class="flex-grow"></div>
+                <!-- TODO: need to form method="post" -->
+                <a href="/invitations/new" class="btn btn-border">Invite</a>
+            </div>
+
+            <div class="text-center">
+                ...
+            </div>
+        </div>
+
+    </div>
+
+</div>

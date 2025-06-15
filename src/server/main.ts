@@ -1,24 +1,9 @@
 import path from 'node:path'
 import fastify from 'fastify'
 import fastifyStatic from '@fastify/static'
-import fastifyView from '@fastify/view'
-import fastifySession, { type Session } from '@fastify/secure-session'
-import handlebars from 'handlebars'
+import fastifySession from '@fastify/secure-session'
 import { env } from './env.js'
-
-declare module '@fastify/secure-session' {
-    interface SessionData {
-        userId: string;
-    }
-}
-
-declare module "fastify" {
-    interface FastifyReply {
-        locals: {
-            user?: string
-        };
-    }
-}
+import routes from './routes/index.js'
 
 const server = fastify()
 server.register(fastifyStatic, {
@@ -33,22 +18,8 @@ server.register(fastifySession, {
         path: '/'
     }
 })
-server.register(fastifyView, {
-    engine: {
-        handlebars
-    },
-    root: './src/views',
-    layout: 'layout.hbs',
-    options: {
-        useDataVariables: true,
-    }
-})
 
-server.get('/', async (req, res) => {
-    req.session.set('userId', 'Jonas')
-    res.locals.user = req.session.get('user')
-    return res.view("index", { text: "HELLO" });
-})
+server.register(routes)
 
 server.listen({ port: env.PORT }, (err, address) => {
     if (err) {
