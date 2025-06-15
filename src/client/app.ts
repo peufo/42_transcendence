@@ -1,5 +1,3 @@
-import { log } from './utils.js'
-import { engine } from '../lib/engine.js'
+import { test } from '../lib/test.js'
 
-log()
-engine()
+test()

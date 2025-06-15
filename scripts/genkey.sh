@@ -1,0 +1,1 @@
+./node_modules/@fastify/secure-session/genkey.js | xxd -p -c 256
