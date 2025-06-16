@@ -11,7 +11,7 @@ server.register(fastifyStatic, {
 
 server.register(routes)
 
-server.listen({ port: env.PORT }, (err, address) => {
+server.listen({ port: env.PORT, host: env.APP_HOST }, (err, address) => {
 	if (err) {
 		console.error(err)
 		process.exit(1)

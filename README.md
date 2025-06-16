@@ -2,7 +2,7 @@
 
 ## Node et Package manager
 
-Au lieu d'installer directement `node`, il préférable de passer par `volta` qui permet de choisir quelle version de node on veut utilisé:
+Au lieu d'installer directement `node`, il est préférable de passer par `volta` qui permet de choisir quelle version de node on veut utilisé:
 
 A faire dans $HOME :
 ```sh
@@ -78,5 +78,5 @@ Puis lancer l'app avec:
 pn start
 ```
 
-TODO: Dockerfile et Makfile pour le déploiement et pour le dev.
+TODO: Dockerfile pour le déploiement et pour le dev.
 
