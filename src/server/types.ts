@@ -1,5 +1,6 @@
 import 'fastify'
 import '@fastify/secure-session'
+import type { sessions, users } from './db/schema'
 
 declare module '@fastify/secure-session' {
 	interface SessionData {
@@ -14,3 +15,6 @@ declare module 'fastify' {
 		}
 	}
 }
+
+export type User = typeof users.$inferSelect
+export type Session = typeof sessions.$inferSelect

@@ -1,7 +1,7 @@
 import path from 'node:path'
-import fastify from 'fastify'
-import fastifyStatic from '@fastify/static'
 import fastifySession from '@fastify/secure-session'
+import fastifyStatic from '@fastify/static'
+import fastify from 'fastify'
 import { env } from './env.js'
 import routes from './routes/index.js'
 
