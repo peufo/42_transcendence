@@ -1,11 +1,9 @@
 {
-  "extends": "./tsconfig.json",
-  "include": [
-    "./src/server/**/*"
-  ],
-  "compilerOptions": {
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
-    "outDir": "./build"
-  }
+	"extends": "./tsconfig.json",
+	"include": ["./src/server/**/*"],
+	"compilerOptions": {
+		"module": "nodenext",
+		"moduleResolution": "nodenext",
+		"outDir": "./build"
+	}
 }

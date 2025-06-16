@@ -1,11 +1,13 @@
-import { FastifyPluginCallback } from 'fastify'
 import '../types'
+import type { FastifyPluginCallback } from 'fastify'
+import { createSession, validateSessionToken } from '../controllers/session'
 
 const auth: FastifyPluginCallback = (server, options, done) => {
+	server.post('/register', (req, res) => {})
 	server.get('/login', (req, res) => {
 		req.session.set('userId', 'Jonas')
 		res.locals.user = req.session.get('userId')
-		res.send('LOGIN ' + res.locals.user)
+		res.send(`LOGIN ${res.locals.user}`)
 	})
 	done()
 }
