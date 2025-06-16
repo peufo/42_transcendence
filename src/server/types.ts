@@ -1,6 +1,6 @@
 import 'fastify'
 import '@fastify/secure-session'
-import type { sessions, users } from './db/schema'
+import type { sessions, users } from './db/schema.js'
 
 declare module '@fastify/secure-session' {
 	interface SessionData {

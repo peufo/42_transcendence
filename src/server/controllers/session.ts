@@ -1,7 +1,7 @@
 import crypto from 'node:crypto'
 import { eq } from 'drizzle-orm'
 import { db, sessions } from '../db/index.js'
-import type { Session } from '../types'
+import type { Session } from '../types.js'
 
 const SESSION_INACTIVITY_TIMOUT = 1000 * 60 * 60 * 24 // 1 days
 const SESSION_ACTIVITY_CHECK_INTERVAL = 1000 * 60 * 60 // 1 hour
