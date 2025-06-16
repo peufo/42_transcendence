@@ -68,7 +68,7 @@ pn db:push
 
 ### Déploiement
 
-Pour déployer, on simplement peut compiler avec:
+Pour déployer, on peut compiler avec:
 ```sh
 pn build
 ````
