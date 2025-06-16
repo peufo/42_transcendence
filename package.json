@@ -4,6 +4,10 @@
 	"description": "42 common core final project",
 	"main": "build/server/main.js",
 	"type": "module",
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"packageManager": "pnpm@10.11.0",
 	"scripts": {
 		"start": "node .",
 		"build": "rm -rf build && run-s build:*",
@@ -17,12 +21,10 @@
 		"dev:style": "tailwindcss -i ./src/client/style.css -o ./build/public/style.css --watch",
 		"db:push": "drizzle-kit push",
 		"db:studio": "drizzle-kit studio",
-		"check": "biome check"
+		"check": "biome check",
+		"postinstall": "drizzle-kit push"
 	},
-	"keywords": [],
-	"author": "",
-	"license": "ISC",
-	"packageManager": "pnpm@10.11.0",
+
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
 		"@tailwindcss/cli": "^4.1.10",

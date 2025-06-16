@@ -1,17 +1,16 @@
 # Setup
 
-## VScode
-
-L'extension `Biome` est utilisé comme linter et parser pour uniformiser le code.
-Les settings de base sont définis dans `.vscode/settings.json`.
-VScode devrait te proposer d'installer l'extension lors de l'ouverture du projet.
-
 ## Node et Package manager
 
-Au lieu d'installer directement `node`, il préférable de passer par volta qui permet de choisir quelle version de node on veut utilisé:
+Au lieu d'installer directement `node`, il préférable de passer par `volta` qui permet de choisir quelle version de node on veut utilisé:
 
+A faire dans $HOME :
 ```sh
 curl https://get.volta.sh | bash
+```
+
+A faire dans un nouveau terminal :
+```sh
 volta install node
 ```
 
@@ -25,7 +24,21 @@ echo 'alias px="pnpx"' >> ~/.zshrc
 source ~/.zshrc
 ```
 
+Check:
+```sh
+node -v
+pn -v
+```
+
+## VScode
+
+L'extension `Biome` est utilisé comme linter et parser pour uniformiser le code.
+Les settings de base sont définis dans `.vscode/settings.json`.
+VScode devrait te proposer d'installer l'extension lors de l'ouverture du projet.
+
 ## Script du package.json
+
+### Initialisation
 
 Le fichier `.env` définit les variables d'environment utils à l'application. Vue qu'il peut contenir des infos sensible, il est ignorer par git.
 Il faut copier `.env.example` dans `.env` et les mettre a jour si nécéssaire.
@@ -34,17 +47,26 @@ Il faut copier `.env.example` dans `.env` et les mettre a jour si nécéssaire.
 cp .env.example .env
 ```
 
-A faire quand les shemas de la DB définit dans `src/server/db/schema.ts` ont changer ou lors d'une première mise en place.
-On demande a l'ORM drizzle de créer ou de mettre à jour la structure de la DB:
+Installation des dépendances et initalisation de la DB :
 ```sh
-pn db:push
+pn i
 ```
+
+### Développement
 
 Pour coder, on veut que le typescript et le css de tailwind soit compiler à chaque changement de la codebase:
 
 ```sh
 pn dev
 ```
+
+A faire quand les shemas de la DB définit dans `src/server/db/schema.ts` ont changer.
+On demande a l'ORM drizzle de créer ou de mettre à jour la structure de la DB :
+```sh
+pn db:push
+```
+
+### Déploiement
 
 Pour déployer, on simplement peut compiler avec:
 ```sh
@@ -56,5 +78,5 @@ Puis lancer l'app avec:
 pn start
 ```
 
-TODO: Dockerfile et Makfile pour le déploiement.
+TODO: Dockerfile et Makfile pour le déploiement et pour le dev.
 
