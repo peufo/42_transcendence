@@ -1,6 +1,5 @@
-import '../types'
 import type { FastifyPluginCallback } from 'fastify'
-import { createSession, validateSessionToken } from '../controllers/session'
+import { createSession, validateSessionToken } from '../controllers/session.js'
 
 const auth: FastifyPluginCallback = (server, options, done) => {
 	server.post('/register', (req, res) => {})
