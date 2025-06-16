@@ -1,0 +1,53 @@
+# Setup
+
+## VScode
+
+L'extension `Biome` est utilisé comme linter et parser pour uniformiser le code.
+Les settings de base sont définis dans `.vscode/settings.json`.
+VScode devrait te proposer d'installer l'extension lors de l'ouverture du projet.
+
+## Package manager
+
+On utilise pnpm au lieu npm. C'est plus rapide et plus éficient niveau stockage.
+Vue que c'est un commande qu'on utilise souvent, on ajoute les alias `pn` -> `pnpm` et `px` -> `pnpx` dans .zshrc. (ou .bashrc si tu préfère).
+
+```sh
+npm install -g pnpm@latest
+echo 'alias pn="pnpm"' >> ~/.zshrc
+echo 'alias px="pnpx"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+## Script du package.json
+
+Le fichier `.env` définit les variables d'environment utils à l'application. Vue qu'il peut contenir des infos sensible, il est ignorer par git.
+Il faut copier `.env.example` dans `.env` et les mettre a jour si nécéssaire.
+
+```sh
+cp .env.example .env
+```
+
+A faire quand les shemas de la DB définit dans `src/server/db/schema.ts` ont changer ou lors d'une première mise en place.
+On demande a l'ORM drizzle de créer ou de mettre à jour la structure de la DB:
+```sh
+pn db:push
+```
+
+Pour coder, on veut que le typescript et le css de tailwind soit compiler à chaque changement de la codebase:
+
+```sh
+pn dev
+```
+
+Pour déployer, on simplement peut compiler avec:
+```sh
+pn build
+````
+
+Puis lancer l'app avec:
+```sh
+pn start
+```
+
+TODO: Dockerfile et Makfile pour le déploiement.
+
