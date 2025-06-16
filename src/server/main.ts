@@ -1,10 +1,18 @@
 import path from 'node:path'
+import {
+	serializerCompiler,
+	validatorCompiler,
+} from 'fastify-type-provider-zod'
 import fastifyStatic from '@fastify/static'
 import fastify from 'fastify'
 import { env } from './env.js'
 import routes from './routes/index.js'
 
 const server = fastify()
+
+server.setValidatorCompiler(validatorCompiler)
+server.setSerializerCompiler(serializerCompiler)
+
 server.register(fastifyStatic, {
 	root: [path.resolve('build/public')],
 })
