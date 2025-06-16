@@ -6,5 +6,6 @@ if (!process.env.DB_FILE_NAME)
 
 export const env = {
 	PORT: +(process.env.PORT || 8000),
+	APP_HOST: process.env.APP_HOST || '0.0.0.0',
 	DB_FILE_NAME: process.env.DB_FILE_NAME,
 }
