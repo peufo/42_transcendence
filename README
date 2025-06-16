@@ -6,7 +6,14 @@ L'extension `Biome` est utilisé comme linter et parser pour uniformiser le code
 Les settings de base sont définis dans `.vscode/settings.json`.
 VScode devrait te proposer d'installer l'extension lors de l'ouverture du projet.
 
-## Package manager
+## Node et Package manager
+
+Au lieu d'installer directement `node`, il préférable de passer par volta qui permet de choisir quelle version de node on veut utilisé:
+
+```sh
+curl https://get.volta.sh | bash
+volta install node
+```
 
 On utilise pnpm au lieu npm. C'est plus rapide et plus éficient niveau stockage.
 Vue que c'est un commande qu'on utilise souvent, on ajoute les alias `pn` -> `pnpm` et `px` -> `pnpx` dans .zshrc. (ou .bashrc si tu préfère).
