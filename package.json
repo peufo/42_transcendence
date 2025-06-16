@@ -15,7 +15,6 @@
 		"dev:server": "tsc -p tsconfig.server.json -w --preserveWatchOutput",
 		"dev:client": "tsc -p tsconfig.client.json -w --preserveWatchOutput",
 		"dev:style": "tailwindcss -i ./src/client/style.css -o ./build/public/style.css --watch",
-		"addkey": "echo \"SESSION_KEY=$(./scripts/genkey.sh)\" >> .env",
 		"db:push": "drizzle-kit push",
 		"db:studio": "drizzle-kit studio",
 		"check": "biome check"
@@ -35,7 +34,6 @@
 		"typescript": "^5.8.3"
 	},
 	"dependencies": {
-		"@fastify/secure-session": "^8.2.0",
 		"@fastify/static": "^8.2.0",
 		"@fastify/view": "^11.1.0",
 		"@libsql/client": "^0.15.9",
