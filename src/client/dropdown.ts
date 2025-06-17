@@ -10,15 +10,16 @@ export function initDropdownElements() {
 
 function useDropdown(node: HTMLDivElement) {
 	let isActive = false
+	let timeoutId: NodeJS.Timeout | null = null
 	const button = node.querySelector<HTMLButtonElement>('button')
 	const box = node.querySelector<HTMLDivElement>('.dropdown-box')
 	if (!button || !box) {
 		return
 	}
 
-	button.addEventListener('click', (event) => {
-		isActive = !isActive
-		console.log(isActive)
+	function setActive(value: boolean) {
+		isActive = value
+		if (!box) return
 		if (isActive) {
 			box.classList.add('block')
 			box.classList.remove('hidden')
@@ -26,5 +27,23 @@ function useDropdown(node: HTMLDivElement) {
 			box.classList.remove('block')
 			box.classList.add('hidden')
 		}
+	}
+
+	button.addEventListener('click', () => {
+		setActive(!isActive)
+	})
+
+	node.addEventListener('mouseenter', () => {
+		if (timeoutId) {
+			clearTimeout(timeoutId)
+			timeoutId = null
+		}
+	})
+
+	node.addEventListener('mouseleave', () => {
+		if (timeoutId) {
+			clearTimeout(timeoutId)
+		}
+		timeoutId = setTimeout(() => setActive(false), 500)
 	})
 }

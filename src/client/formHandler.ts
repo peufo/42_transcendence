@@ -13,6 +13,16 @@ async function handleFormSubmit(event: SubmitEvent) {
 	})
 
 	if (!res.ok) {
+		if (res.status === 401) {
+			const submitButton = form.querySelector<HTMLElement>(
+				'button[type=submit]',
+			)
+			if (submitButton) {
+				setError(submitButton, 'Unauthorized')
+			}
+			parseErrorMessage()
+			return
+		}
 		const json = await res.json()
 		parseErrorMessage(json.message)
 		return
@@ -46,7 +56,7 @@ async function handleFormSubmit(event: SubmitEvent) {
 		}
 	}
 
-	async function setError(input: HTMLInputElement, error?: string) {
+	async function setError(input: HTMLElement, error?: string) {
 		let div = input.parentElement?.querySelector(
 			'div.badge-red',
 		) as HTMLDivElement | null
@@ -69,7 +79,6 @@ async function handleFormSubmit(event: SubmitEvent) {
 		div = document.createElement('div')
 		div.classList.add('badge', 'badge-red', 'w-max', 'my-1')
 		div.textContent = error
-		div.parentElement
 		input.parentElement?.appendChild(div)
 		transitionIn(div, slide, 250)
 	}
