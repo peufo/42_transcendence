@@ -4,6 +4,8 @@ export const users = sqliteTable('users', {
 	id: int().primaryKey({ autoIncrement: true }),
 	name: text().notNull().unique(),
 	passwordHash: text().notNull(),
+	avatar: text(),
+	avatarPlaceholder: text().notNull(),
 	createdAt: int({ mode: 'timestamp' }).notNull().default(new Date()),
 })
 
