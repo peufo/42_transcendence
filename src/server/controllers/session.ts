@@ -10,9 +10,9 @@ type SessionWithToken = Session & {
 	token: string
 }
 
-function generateSecureRandomString(): string {
+function generateSecureRandomString(len = 24): string {
 	const alphabet = 'abcdefghijklmnpqrstuvwxyz23456789'
-	const bytes = new Uint8Array(24)
+	const bytes = new Uint8Array(len)
 	crypto.getRandomValues(bytes)
 	let id = ''
 	for (const byte of bytes) {

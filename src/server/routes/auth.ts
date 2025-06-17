@@ -1,6 +1,10 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod/v4'
-import '../types.js'
+import { eq } from 'drizzle-orm'
+import argon2 from 'argon2'
+import { db, users } from '../db/index.js'
+import { createSession } from '../controllers/session.js'
+import '@fastify/cookie'
 
 const auth: FastifyPluginCallbackZod = (server, options, done) => {
 	server.post(
@@ -13,11 +17,48 @@ const auth: FastifyPluginCallbackZod = (server, options, done) => {
 				}),
 			},
 		},
-		(req, res) => {
-			console.log(`To somthing with ${req.body.name}`)
-			res.send('Hello')
+		async (req, res) => {
+			const { name, password } = req.body
+			let [user] = await db.select().from(users).where(eq(users.name, name))
+
+			if (!user) {
+				await db.insert(users).values({
+					name,
+					passwordHash: await argon2.hash(password),
+				})
+				const [newUser] = await db
+					.select()
+					.from(users)
+					.where(eq(users.name, name))
+				user = newUser
+			} else {
+				const passwordCorrect = await argon2.verify(user.passwordHash, password)
+				if (!passwordCorrect) {
+					return res.status(401).send({ message: 'Error' })
+				}
+			}
+
+			const { token } = await createSession(user.id)
+			console.log({ token })
+			res.setCookie('session', token, {
+				path: '/',
+				signed: true,
+			})
+			res.locals = { user }
+			res.redirect('/')
 		},
 	)
+	server.post('/logout', async (req, res) => {
+		const now = new Date()
+		res.setCookie('session', '', {
+			path: '/',
+			expires: now,
+		})
+		if (res.locals) {
+			res.locals.user = undefined
+		}
+		res.redirect('/')
+	})
 	done()
 }
 
