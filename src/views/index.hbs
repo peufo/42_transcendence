@@ -3,15 +3,19 @@
     <div class="flex flex-col gap-10 mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
 
         <div>
-            <div class="py-6 flex items-center">
+
+            {{#if @root.user}}
+            <div class="py-8 flex items-center gap-2">
+                {{#if @root.user.avatar }}
+                <img src="/media/{{ @root.user.avatar }}" alt="Avatar de l'utilisateur" class="h-12 w-12 rounded">
+                {{else }}
+                <img src="{{ @root.user.avatarPlaceholder }}" alt="Avatar de l'utilisateur" class="h-12 w-12 rounded">
+                {{/if}}
 
                 <h3 class="font-semibold text-xl text-gray-900 ">
-                    {{#if @root.user}}
                     {{ @root.user.name }}
-                    {{else}}
-                    Welcome
-                    {{/if}}
                 </h3>
+
                 <div class="flex-grow"></div>
                 <a href="/stats" class="btn btn-border" title="Ratio">
                     <i data-lucide="star" class="h-4 w-4 mr-1"></i>
@@ -19,6 +23,12 @@
                     <span class="badge badge-dark translate-x-2">6 / 9</span>
                 </a>
             </div>
+            {{else}}
+            <h3 class="font-semibold text-xl text-gray-900 text-center my-8">
+                Welcome
+            </h3>
+            {{/if}}
+
 
             <div class="grid grid-cols-2 gap-2">
                 <a href="/local/new" class="btn btn-primary">

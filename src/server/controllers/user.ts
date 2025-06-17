@@ -18,12 +18,11 @@ export const userSessionHook: preHandlerAsyncHookHandler = async (req, res) => {
 		if (!session) {
 			return
 		}
-		// TODO: user.name est pas toujours nécéssaire...
+		// TODO: user est pas toujours nécéssaire...
 		const user = await db.query.users.findFirst({
 			where: (users, { eq }) => eq(users.id, session?.userId),
 			columns: {
-				id: true,
-				name: true,
+				passwordHash: false,
 			},
 		})
 		res.locals = { user }

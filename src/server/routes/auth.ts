@@ -4,6 +4,7 @@ import { eq } from 'drizzle-orm'
 import argon2 from 'argon2'
 import { db, users } from '../db/index.js'
 import { createSession } from '../controllers/session.js'
+import { createAvatarPlaceholder } from '../controllers/avatar.js'
 import '@fastify/cookie'
 
 const auth: FastifyPluginCallbackZod = (server, options, done) => {
@@ -25,6 +26,7 @@ const auth: FastifyPluginCallbackZod = (server, options, done) => {
 				await db.insert(users).values({
 					name,
 					passwordHash: await argon2.hash(password),
+					avatarPlaceholder: createAvatarPlaceholder(),
 				})
 				const [newUser] = await db
 					.select()
