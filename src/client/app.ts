@@ -1,3 +1,3 @@
-import { test } from '../lib/test.js'
+import { initDropdownElements } from './dropdown.js'
 
-test()
+initDropdownElements()

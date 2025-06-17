@@ -1,3 +1,4 @@
+import { goto } from './goto.js'
 import { transitionIn, slide, transitionOut } from './transition.js'
 
 async function handleFormSubmit(event: SubmitEvent) {
@@ -13,11 +14,12 @@ async function handleFormSubmit(event: SubmitEvent) {
 
 	if (!res.ok) {
 		const json = await res.json()
-		if (json.message) parseErrorMessage(json.message)
+		parseErrorMessage(json.message)
 		return
 	}
 
-	// TODO: Handle success
+	if (res.redirected) goto(res.url)
+	parseErrorMessage()
 
 	function getFormBody(): string | FormData {
 		const formData = new FormData(form)
@@ -33,7 +35,7 @@ async function handleFormSubmit(event: SubmitEvent) {
 		return urlEncoded.toString()
 	}
 
-	function parseErrorMessage(msg: string) {
+	function parseErrorMessage(msg = '') {
 		const inputs = form.querySelectorAll('input')
 		const errors: Record<string, string> = {}
 		for (const [, name, error] of msg.matchAll(/body\/(\w+) ([^,]+)/g)) {

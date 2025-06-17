@@ -20,11 +20,9 @@ const views: FastifyPluginCallback = (server, options, done) => {
 	})
 
 	server.get('/', async (req, res) => {
-		res.locals.user = 'Alice' // TODO: handle with auth hook
 		return res.view('index')
 	})
 	server.get('/stats', async (req, res) => {
-		res.locals.user = 'Alice' // TODO: handle with auth hook
 		return res.view('stats')
 	})
 
