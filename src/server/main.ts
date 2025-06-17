@@ -4,19 +4,20 @@ import {
 	validatorCompiler,
 } from 'fastify-type-provider-zod'
 import fastifyStatic from '@fastify/static'
+import fastifyFormbody from '@fastify/formbody'
+import fastifyMultipart from '@fastify/multipart'
 import fastify from 'fastify'
 import { env } from './env.js'
 import routes from './routes/index.js'
 
 const server = fastify()
-
 server.setValidatorCompiler(validatorCompiler)
 server.setSerializerCompiler(serializerCompiler)
-
+server.register(fastifyFormbody)
+server.register(fastifyMultipart)
 server.register(fastifyStatic, {
 	root: [path.resolve('build/public')],
 })
-
 server.register(routes)
 
 server.listen({ port: env.PORT, host: env.APP_HOST }, (err, address) => {
