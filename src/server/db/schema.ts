@@ -2,7 +2,7 @@ import { blob, int, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
 export const users = sqliteTable('users', {
 	id: int().primaryKey({ autoIncrement: true }),
-	name: text().notNull(),
+	name: text().notNull().unique(),
 	createdAt: int({ mode: 'timestamp' }).notNull().default(new Date()),
 })
 
