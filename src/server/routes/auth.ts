@@ -41,7 +41,6 @@ const auth: FastifyPluginCallbackZod = (server, options, done) => {
 			}
 
 			const { token } = await createSession(user.id)
-			console.log({ token })
 			res.setCookie('session', token, {
 				path: '/',
 				signed: true,
