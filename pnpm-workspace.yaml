@@ -1,3 +1,6 @@
 onlyBuiltDependencies:
+  - '@biomejs/biome'
+  - '@parcel/watcher'
+  - '@tailwindcss/oxide'
   - argon2
   - esbuild
