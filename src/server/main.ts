@@ -20,7 +20,7 @@ server.register(fastifyCookie, {
 	secret: env.COOKIE_SECRET,
 })
 server.register(fastifyStatic, {
-	root: [path.resolve('build/public')],
+	root: [path.resolve('build/public'), path.resolve('static')],
 })
 
 server.register(routes)
