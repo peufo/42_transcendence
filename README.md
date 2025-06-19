@@ -66,6 +66,8 @@ On demande a l'ORM drizzle de créer ou de mettre à jour la structure de la DB 
 pn db:push
 ```
 
+> Un container de dev peut etre lancer avec `./dev_container.sh`
+
 ### Déploiement
 
 Pour déployer, on peut compiler avec:
@@ -77,6 +79,4 @@ Puis lancer l'app avec:
 ```sh
 pn start
 ```
-
-TODO: Dockerfile pour le déploiement et pour le dev.
 
