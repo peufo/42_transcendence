@@ -1,5 +1,7 @@
 # Setup
 
+> Un container de dev peut etre lancé avec `./dev_container.sh`
+
 ## Node et Package manager
 
 Au lieu d'installer directement `node`, il est préférable de passer par `volta` qui permet de choisir quelle version de node on veut utilisé:
@@ -65,8 +67,6 @@ On demande a l'ORM drizzle de créer ou de mettre à jour la structure de la DB 
 ```sh
 pn db:push
 ```
-
-> Un container de dev peut etre lancer avec `./dev_container.sh`
 
 ### Déploiement
 
