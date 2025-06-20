@@ -2,6 +2,7 @@
 	"extends": "./tsconfig.json",
 	"include": ["./src/client/**/*"],
 	"compilerOptions": {
+		"lib": ["dom", "ESNext"],
 		"module": "esnext",
 		"outDir": "./build/public"
 	}

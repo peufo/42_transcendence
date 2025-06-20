@@ -19,9 +19,9 @@ const views: FastifyPluginCallback = (server, options, done) => {
 		return res.view('login')
 	})
 
-	server.get('/', async (req, res) => {
-		return res.view('index')
-	})
+	// server.get('/', async (req, res) => {
+	// 	return res.view('index')
+	// })
 	server.get('/stats', async (req, res) => {
 		return res.view('stats')
 	})

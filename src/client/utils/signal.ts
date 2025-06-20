@@ -30,13 +30,3 @@ export function createEffect(func: () => void) {
 	}
 	effect()
 }
-
-export function subscribe<T>(func: () => T): T {
-	const effect = () => {
-		effectToSubscribe = effect
-		const result = func()
-		effectToSubscribe = null
-		return result
-	}
-	return effect()
-}

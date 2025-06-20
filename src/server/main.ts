@@ -21,7 +21,8 @@ server.register(fastifyCookie, {
 })
 
 server.register(fastifyStatic, {
-	root: [path.resolve('build/public'), path.resolve('static')],
+	root: [path.resolve('public'), path.resolve('build/public')],
+	prefix: '/public',
 })
 
 if (env.dev) {
@@ -33,6 +34,10 @@ if (env.dev) {
 }
 
 server.register(routes)
+
+server.get('/*', { exposeHeadRoute: false }, (req, reply) => {
+	reply.sendFile('index.html')
+})
 
 server.listen({ port: env.PORT, host: env.APP_HOST }, (err, address) => {
 	if (err) {
