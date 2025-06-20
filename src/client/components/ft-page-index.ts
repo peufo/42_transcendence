@@ -1,5 +1,6 @@
+import { jsonParseOrThrow } from '../utils/jsonParse.js'
 import { createEffect } from '../utils/signal.js'
-import { getUser } from '../utils/store.js'
+import { getUser, type Friend, type User } from '../utils/store.js'
 
 customElements.define(
 	'ft-page-index',
@@ -13,34 +14,17 @@ customElements.define(
 
 							<div class="grid grid-cols-2 gap-2">
 								<a href="/local/new" class="btn btn-primary">
-									<i data-lucide="swords" class="h-5 w-5 mr-1"></i>
+									<ft-icon name="swords" class="h-5 w-5 mr-1"></ft-icon>
 									Local game
 								</a>
 								<a href="/game/new" class="btn btn-primary">
-									<i data-lucide="trophy" class="h-5 w-5 mr-1"></i>
+									<ft-icon name="trophy" class="h-5 w-5 mr-1"></ft-icon>
 									New tournament
 								</a>
 							</div>
 						</div>
 
-						<div class="flex flex-col gap-3">
-							<h3 class="text-sm/6 font-semibold text-gray-900">
-								My friends
-							</h3>
-
-							<div class="flex pl-4 p-2 items-center gap-2 border border-gray-200 rounded-xl">
-								<span>Bob</span>
-								<span class="badge badge-green">Online</span>
-								<div class="flex-grow"></div>
-								<a href="/game/play/aRandomGameId" class=" btn btn-border">Join</a>
-							</div>
-
-							<div class="flex pl-4 p-2 items-center gap-2 border bg-gray-5 border-gray-200 rounded-xl">
-								<span>Clélie</span>
-								<span class="badge badge-dark">Offline</span>
-								<div class="flex-grow"></div>
-							</div>
-						</div>
+						<ft-friends></ft-friends>
 
 						<div class="flex flex-col gap-3">
 							<h3 class="text-sm/6 font-semibold text-gray-900">
@@ -103,6 +87,97 @@ customElements.define(
 )
 
 customElements.define(
+	'ft-friends',
+	class extends HTMLElement {
+		connectedCallback() {
+			this.classList.add('flex', 'flex-col', 'gap-3')
+			// TODO: place it in createEffect() depend of friends[]
+			this.innerHTML = this.renderContent()
+		}
+
+		renderContent(): string {
+			const friends: Friend[] = [
+				{
+					id: 2,
+					name: 'Bob',
+					avatarPlaceholder:
+						'https://api.dicebear.com/9.x/bottts-neutral/svg?seed=0.1',
+					isOnline: true,
+					gameId: '/game/play/gameId',
+				},
+				{
+					id: 3,
+					name: 'Alice',
+					avatarPlaceholder:
+						'https://api.dicebear.com/9.x/bottts-neutral/svg?seed=0.2',
+					isOnline: true,
+				},
+				{
+					id: 4,
+					name: 'Clélie',
+					avatarPlaceholder:
+						'https://api.dicebear.com/9.x/bottts-neutral/svg?seed=0.3',
+					isOnline: true,
+				},
+			]
+
+			let html = /*html*/ `
+				<h3 class="text-sm/6 font-semibold text-gray-900">
+					My friends
+				</h3>
+			`
+			for (const friend of friends) {
+				html += /*html*/ `
+					<ft-friend>
+						<script type="application/json">${JSON.stringify(friend)}</script>
+					</ft-friend>
+				`
+			}
+
+			return html
+		}
+	},
+)
+
+customElements.define(
+	'ft-friend',
+	class extends HTMLElement {
+		connectedCallback() {
+			this.classList.add(
+				'flex',
+				'p-2',
+				'items-center',
+				'gap-2',
+				'border',
+				'border-gray-200',
+				'rounded-xl',
+			)
+			this.renderContent()
+		}
+
+		renderContent() {
+			const friend = jsonParseOrThrow<Friend>(this.children[0].textContent)
+			const badge = friend.isOnline
+				? /*html*/ `<span class="badge badge-green">Online</span>`
+				: /*html*/ `<span class="badge badge-dark">Offline</span>`
+
+			let joinBtn = ''
+			if (friend.gameId) {
+				joinBtn = /*html*/ `<a href="/game/play/${friend.gameId}" class="btn btn-border">Join</a>`
+			}
+
+			this.innerHTML = /*html*/ `
+				<img src="${getAvatarSrc(friend)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
+				<span>${friend.name}</span>
+				${badge}
+				<div class="flex-grow"></div>
+				${joinBtn}
+			`
+		}
+	},
+)
+
+customElements.define(
 	'ft-welcome',
 	class extends HTMLElement {
 		connectedCallback() {
@@ -122,20 +197,16 @@ customElements.define(
 				`
 			}
 
-			const avatarSrc = user.avatar
-				? `/media/${user.avatar}`
-				: user.avatarPlaceholder
-
 			return /*html*/ `
 				<div class="py-8 flex items-center gap-2">
-					<img src="${avatarSrc}" alt="Avatar de l'utilisateur" class="h-12 w-12 rounded">
+					<img src="${getAvatarSrc(user)}" alt="Avatar de l'utilisateur" class="h-12 w-12 rounded">
 					<h3 class="font-semibold text-xl text-gray-900 ">
 						${user.name}
 					</h3>
 					
 					<div class="flex-grow"></div>
 					<a href="/stats" class="btn btn-border" title="Ratio">
-						<i data-lucide="star" class="h-4 w-4 mr-1"></i>
+						<ft-icon name="star" class="h-4 w-4 mr-1"></ft-icon>
 						<span>0.65</span>
 						<span class="badge badge-dark translate-x-2">6 / 9</span>
 					</a>
@@ -144,3 +215,10 @@ customElements.define(
 		}
 	},
 )
+
+function getAvatarSrc(user: User): string {
+	if (user.avatar) {
+		return user.avatar
+	}
+	return user.avatarPlaceholder
+}
