@@ -40,6 +40,7 @@ customElements.define(
 		connectedCallback() {
 			document.addEventListener('submit', onSubmitForm)
 			document.addEventListener('click', onClickLink)
+			window.addEventListener('popstate', onPopState)
 			createEffect(() => {
 				this.innerHTML = this.render()
 			})
@@ -54,6 +55,10 @@ customElements.define(
 		}
 	},
 )
+
+function onPopState(event: PopStateEvent) {
+	setUrl(new URL(document.location.href))
+}
 
 function findAnchor(eventTarget: EventTarget | null): HTMLAnchorElement | null {
 	let el: HTMLElement | null = eventTarget as HTMLElement
@@ -118,7 +123,7 @@ export async function onSubmitForm(event: SubmitEvent) {
 			return formData
 		}
 		const urlEncoded = new URLSearchParams()
-		for (const [key, value] of formData) {
+		for (const [key, value] of formData.entries()) {
 			if (typeof value === 'object')
 				throw new Error('Please, set enctype="multipart/formdata"')
 			urlEncoded.append(key, value)

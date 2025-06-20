@@ -21,13 +21,15 @@
 		"dev:style": "tailwindcss -i ./src/client/style.css -o ./build/public/style.css --watch",
 		"db:push": "drizzle-kit push",
 		"db:studio": "drizzle-kit studio",
-		"check": "biome check",
-		"postinstall": "drizzle-kit push"
+		"db:generate": "drizzle-kit generate",
+		"db:migrate": "drizzle-kit migrate",
+		"db:up": "drizzle-kit up",
+		"check": "biome check"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
 		"@tailwindcss/cli": "^4.1.10",
-		"@types/node": "^24.0.1",
+		"@types/node": "^24.0.3",
 		"@types/web": "^0.0.243",
 		"drizzle-kit": "^0.31.1",
 		"nodemon": "^3.1.10",
@@ -48,6 +50,6 @@
 		"fastify-plugin": "^5.0.1",
 		"fastify-type-provider-zod": "^5.0.1",
 		"handlebars": "^4.7.8",
-		"zod": "^3.25.64"
+		"zod": "^3.25.67"
 	}
 }
