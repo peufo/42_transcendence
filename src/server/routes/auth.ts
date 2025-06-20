@@ -6,6 +6,7 @@ import { db, users } from '../db/index.js'
 import { createSession } from '../controllers/session.js'
 import { createAvatarPlaceholder } from '../controllers/avatar.js'
 import '@fastify/cookie'
+import '../types.js'
 
 const auth: FastifyPluginCallbackZod = (server, options, done) => {
 	server.post(
@@ -60,6 +61,11 @@ const auth: FastifyPluginCallbackZod = (server, options, done) => {
 		}
 		res.redirect('/')
 	})
+
+	server.get('/user', (req, res) => {
+		return res.send({ data: res.locals?.user })
+	})
+
 	done()
 }
 

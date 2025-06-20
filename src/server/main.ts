@@ -19,9 +19,18 @@ server.register(fastifyMultipart)
 server.register(fastifyCookie, {
 	secret: env.COOKIE_SECRET,
 })
+
 server.register(fastifyStatic, {
 	root: [path.resolve('build/public'), path.resolve('static')],
 })
+
+if (env.dev) {
+	server.register(fastifyStatic, {
+		root: path.resolve('src'),
+		prefix: '/src',
+		decorateReply: false,
+	})
+}
 
 server.register(routes)
 

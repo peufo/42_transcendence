@@ -8,7 +8,7 @@ export type SessionCreate = typeof sessions.$inferInsert
 
 declare module 'fastify' {
 	interface FastifyReply {
-		locals: {
+		locals?: {
 			user?: Omit<User, 'passwordHash'>
 		}
 	}

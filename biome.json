@@ -23,6 +23,10 @@
 			"style": {
 				"recommended": true,
 				"useConsistentBuiltinInstantiation": "warn"
+			},
+			"correctness": {
+				"recommended": true,
+				"useImportExtensions": "error"
 			}
 		}
 	},
