@@ -117,7 +117,7 @@ customElements.define(
 					name: 'Clélie',
 					avatarPlaceholder:
 						'https://api.dicebear.com/9.x/bottts-neutral/svg?seed=0.3',
-					isOnline: true,
+					isOnline: false,
 				},
 			]
 
@@ -127,52 +127,27 @@ customElements.define(
 				</h3>
 			`
 			for (const friend of friends) {
+				const badge = friend.isOnline
+					? /*html*/ `<span class="badge badge-green">Online</span>`
+					: /*html*/ `<span class="badge badge-dark">Offline</span>`
+
+				let joinBtn = ''
+				if (friend.gameId) {
+					joinBtn = /*html*/ `<a href="/game/play?gameId=${friend.gameId}" class="btn btn-border">Join</a>`
+				}
+
 				html += /*html*/ `
-					<ft-friend>
-						<script type="application/json">${JSON.stringify(friend)}</script>
-					</ft-friend>
+					<div class="flex p-2 items-center gap-2 border border-gray-200 rounded-xl">
+						<img src="${getAvatarSrc(friend)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
+						<span>${friend.name}</span>
+						${badge}
+						<div class="flex-grow"></div>
+						${joinBtn}
+					</div>
 				`
 			}
 
 			return html
-		}
-	},
-)
-
-customElements.define(
-	'ft-friend',
-	class extends HTMLElement {
-		connectedCallback() {
-			this.classList.add(
-				'flex',
-				'p-2',
-				'items-center',
-				'gap-2',
-				'border',
-				'border-gray-200',
-				'rounded-xl',
-			)
-			this.renderContent()
-		}
-
-		renderContent() {
-			const friend = jsonParseOrThrow<Friend>(this.children[0].textContent)
-			const badge = friend.isOnline
-				? /*html*/ `<span class="badge badge-green">Online</span>`
-				: /*html*/ `<span class="badge badge-dark">Offline</span>`
-
-			let joinBtn = ''
-			if (friend.gameId) {
-				joinBtn = /*html*/ `<a href="/game/play?gameId=${friend.gameId}" class="btn btn-border">Join</a>`
-			}
-
-			this.innerHTML = /*html*/ `
-				<img src="${getAvatarSrc(friend)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
-				<span>${friend.name}</span>
-				${badge}
-				<div class="flex-grow"></div>
-				${joinBtn}
-			`
 		}
 	},
 )
