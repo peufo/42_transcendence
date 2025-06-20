@@ -1,9 +1,15 @@
 import { slide, transitionIn, transitionOut } from '../utils/transition.js'
 import { createEffect, createSignal } from '../utils/signal.js'
 import { api } from '../api.js'
-import './ft-page-index.js'
 import './ft-page-404.js'
+import './ft-page-index.js'
 import './ft-page-login.js'
+import './ft-page-stats.js'
+import './ft-page-account.js'
+import './ft-page-local-new.js'
+import './ft-page-local-play.js'
+import './ft-page-game-new.js'
+import './ft-page-game-play.js'
 
 const [getUrl, setUrl] = createSignal<URL>(new URL(document.location.href))
 
@@ -23,6 +29,12 @@ customElements.define(
 		routes: Record<string, string> = {
 			'/': 'ft-page-index',
 			'/login': 'ft-page-login',
+			'/stats': 'ft-page-stats',
+			'/account': 'ft-page-account',
+			'/local/new': 'ft-page-local-new',
+			'/local/play': 'ft-page-local-play',
+			'/game/new': 'ft-page-game-new',
+			'/game/play': 'ft-page-game-play',
 		}
 
 		connectedCallback() {

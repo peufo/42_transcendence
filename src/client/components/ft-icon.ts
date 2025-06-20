@@ -3,7 +3,6 @@ customElements.define(
 	class extends HTMLElement {
 		name: string
 		svgClass: string
-		svgContent: string
 
 		constructor() {
 			super()
