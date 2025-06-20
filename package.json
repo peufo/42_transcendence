@@ -15,7 +15,7 @@
 		"build:client": "tsc -p tsconfig.client.json",
 		"build:style": "tailwindcss -i ./src/client/style.css -o ./build/public/style.css",
 		"dev": "rm -rf build && run-p -l dev:*",
-		"dev:run": "sleep 1.5 && nodemon",
+		"dev:run": "sleep 1.5 && export NODE_ENV=development && nodemon",
 		"dev:server": "tsc -p tsconfig.server.json -w --preserveWatchOutput",
 		"dev:client": "tsc -p tsconfig.client.json -w --preserveWatchOutput",
 		"dev:style": "tailwindcss -i ./src/client/style.css -o ./build/public/style.css --watch",
