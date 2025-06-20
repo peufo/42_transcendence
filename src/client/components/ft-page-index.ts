@@ -103,7 +103,7 @@ customElements.define(
 					avatarPlaceholder:
 						'https://api.dicebear.com/9.x/bottts-neutral/svg?seed=0.1',
 					isOnline: true,
-					gameId: '/game/play/gameId',
+					gameId: '12344321',
 				},
 				{
 					id: 3,
@@ -163,7 +163,7 @@ customElements.define(
 
 			let joinBtn = ''
 			if (friend.gameId) {
-				joinBtn = /*html*/ `<a href="/game/play/${friend.gameId}" class="btn btn-border">Join</a>`
+				joinBtn = /*html*/ `<a href="/game/play?gameId=${friend.gameId}" class="btn btn-border">Join</a>`
 			}
 
 			this.innerHTML = /*html*/ `

@@ -20,9 +20,6 @@ importers:
       '@fastify/static':
         specifier: ^8.2.0
         version: 8.2.0
-      '@fastify/view':
-        specifier: ^11.1.0
-        version: 11.1.0
       '@libsql/client':
         specifier: ^0.15.9
         version: 0.15.9
@@ -475,9 +472,6 @@ packages:
 
   '@fastify/swagger@9.5.1':
     resolution: {integrity: sha512-EGjYLA7vDmCPK7XViAYMF6y4+K3XUy5soVTVxsyXolNe/Svb4nFQxvtuQvvoQb2Gzc9pxiF3+ZQN/iZDHhKtTg==}
-
-  '@fastify/view@11.1.0':
-    resolution: {integrity: sha512-ab8LG5V8srCdnknYlufaSusrjkYLYf5TUWm3DTdPFr5m1C9tI7KNl78UCcP0BJiaGaZj1udsyzAC67JCf5Ol/g==}
 
   '@isaacs/balanced-match@4.0.1':
     resolution: {integrity: sha512-yzMTt9lEb8Gv7zRioUilSglI0c0smZ9k5D65677DLWLtWJaXIS3CqcGyUFByYKlnUj6TkjLVs54fBl6+TiGQDQ==}
@@ -2318,11 +2312,6 @@ snapshots:
       yaml: 2.8.0
     transitivePeerDependencies:
       - supports-color
-
-  '@fastify/view@11.1.0':
-    dependencies:
-      fastify-plugin: 5.0.1
-      toad-cache: 3.7.0
 
   '@isaacs/balanced-match@4.0.1': {}
 
