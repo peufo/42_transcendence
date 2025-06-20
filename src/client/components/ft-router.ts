@@ -1,7 +1,68 @@
-import { goto } from './goto.js'
-import { transitionIn, slide, transitionOut } from './transition.js'
+import { slide, transitionIn, transitionOut } from '../utils/transition.js'
+import { createEffect, createSignal } from '../utils/signal.js'
+import './ft-page-index.js'
+import './ft-page-404.js'
+import './ft-page-login.js'
 
-async function handleFormSubmit(event: SubmitEvent) {
+const [getUrl, setUrl] = createSignal<URL>(new URL(document.location.href))
+
+function goto(url: URL) {
+	window.history.pushState({}, '', url)
+	setUrl(url)
+}
+
+customElements.define(
+	'ft-router',
+	class extends HTMLElement {
+		routes: Record<string, string> = {
+			'/': 'ft-page-index',
+			'/login': 'ft-page-login',
+		}
+
+		connectedCallback() {
+			document.addEventListener('submit', onSubmitForm)
+			document.addEventListener('click', onClickLink)
+			createEffect(() => {
+				this.innerHTML = this.render()
+			})
+		}
+
+		render(): string {
+			const url = getUrl()
+			const componentName = this.routes[url.pathname] || 'ft-page-404'
+			return /*html*/ `
+				<${componentName}></${componentName}>
+			`
+		}
+	},
+)
+
+function findAnchor(eventTarget: EventTarget | null): HTMLAnchorElement | null {
+	let el: HTMLElement | null = eventTarget as HTMLElement
+	while (el && el !== document.body) {
+		if (el.nodeName.toUpperCase() === 'A' && el.hasAttribute('href')) {
+			return el as HTMLAnchorElement
+		}
+		el = el.parentElement
+	}
+	return null
+}
+
+function onClickLink(event: MouseEvent) {
+	if (event.button) return
+	if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+	if (event.defaultPrevented) return
+
+	const a = findAnchor(event.target)
+	if (!a) {
+		return
+	}
+	const url = new URL(a.href, document.baseURI)
+	event.preventDefault()
+	goto(url)
+}
+
+export async function onSubmitForm(event: SubmitEvent) {
 	event.preventDefault()
 	const form = event.target as HTMLFormElement
 	const res = await fetch(form.action, {
@@ -28,7 +89,9 @@ async function handleFormSubmit(event: SubmitEvent) {
 		return
 	}
 
-	if (res.redirected) goto(res.url)
+	if (res.redirected) {
+		return goto(new URL(res.url))
+	}
 	parseErrorMessage()
 
 	function getFormBody(): string | FormData {
@@ -75,7 +138,7 @@ async function handleFormSubmit(event: SubmitEvent) {
 			setTimeout(() => div?.classList.remove('animate-shakeX'), 600)
 			return
 		}
-
+		// TODO use a Component instead
 		div = document.createElement('div')
 		div.classList.add('badge', 'badge-red', 'w-max', 'my-1')
 		div.textContent = error
@@ -83,5 +146,3 @@ async function handleFormSubmit(event: SubmitEvent) {
 		transitionIn(div, slide, 250)
 	}
 }
-
-window.handleFormSubmit = handleFormSubmit

@@ -1,5 +1,5 @@
-import { createEffect } from '../signal.js'
-import { getUser } from '../store.js'
+import { createEffect } from '../utils/signal.js'
+import { getUser } from '../utils/store.js'
 
 customElements.define(
 	'ft-header',
@@ -20,8 +20,7 @@ customElements.define(
 customElements.define(
 	'ft-user-menu',
 	class extends HTMLElement {
-		constructor() {
-			super()
+		connectedCallback() {
 			createEffect(() => {
 				this.innerHTML = this.render()
 			})
@@ -29,11 +28,10 @@ customElements.define(
 
 		render(): string {
 			const user = getUser()
-
 			if (!user) {
 				return /*html*/ `
 					<a href="/login" class="btn btn-border flex shrink-0 flex-nowrap">
-						<i data-lucide="user"></i>
+						<ft-icon src="user"></ft-icon>
 						<span>Login</span>
 					</a>`
 			}
@@ -41,7 +39,7 @@ customElements.define(
 			return /*html*/ `
 				<div class="relative" data-dropdown="container">
 					<button class="btn btn-border flex shrink-0 flex-nowrap">
-						<i data-lucide="user"></i>
+						<ft-icon src="user"></ft-icon>
 						<span>${user.name}</span>
 					</button>
 					<div class="dropdown-box hidden absolute w-36 right-0 rounded-md my-1" role="menu"

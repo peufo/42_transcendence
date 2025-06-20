@@ -5,7 +5,7 @@ import { userSessionHook } from '../controllers/user.js'
 
 export default fp((server, options, done) => {
 	server.addHook('preHandler', userSessionHook)
-	server.register(views)
+	//server.register(views)
 	server.register(auth, { prefix: '/auth' })
 	done()
 })

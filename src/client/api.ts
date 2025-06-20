@@ -1,4 +1,4 @@
-import { setUser } from './store.js'
+import { setUser } from './utils/store.js'
 
 function useApiGetter<Result>(
 	route: string,
@@ -6,10 +6,8 @@ function useApiGetter<Result>(
 ): () => Promise<void> {
 	return async () => {
 		const res = await fetch(route)
-
 		if (!res.ok) {
 			console.warn('TODO: handle fetch failed... Notifiy ?')
-			// Set null ?
 			return
 		}
 		const json = (await res.json()) as { data: Result }

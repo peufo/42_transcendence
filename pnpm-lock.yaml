@@ -60,6 +60,9 @@ importers:
       '@types/node':
         specifier: ^24.0.1
         version: 24.0.1
+      '@types/web':
+        specifier: ^0.0.243
+        version: 0.0.243
       drizzle-kit:
         specifier: ^0.31.1
         version: 0.31.1
@@ -755,6 +758,9 @@ packages:
 
   '@types/node@24.0.1':
     resolution: {integrity: sha512-MX4Zioh39chHlDJbKmEgydJDS3tspMP/lnQC67G3SWsTnb9NeYVWOjkxpOSy4oMfPs4StcWHwBrvUb4ybfnuaw==}
+
+  '@types/web@0.0.243':
+    resolution: {integrity: sha512-fYVKx/7oxQTGNl0hkYO2N/cMdqrr41MWUZi2QavYIdK3ufiPr9nakCgQ4s+2kvdR0LflNKGcOvCUaHPGUAprtw==}
 
   '@types/ws@8.18.1':
     resolution: {integrity: sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==}
@@ -2559,6 +2565,8 @@ snapshots:
   '@types/node@24.0.1':
     dependencies:
       undici-types: 7.8.0
+
+  '@types/web@0.0.243': {}
 
   '@types/ws@8.18.1':
     dependencies:
