@@ -1,14 +1,20 @@
 import { slide, transitionIn, transitionOut } from '../utils/transition.js'
 import { createEffect, createSignal } from '../utils/signal.js'
+import { api } from '../api.js'
 import './ft-page-index.js'
 import './ft-page-404.js'
 import './ft-page-login.js'
 
 const [getUrl, setUrl] = createSignal<URL>(new URL(document.location.href))
 
-function goto(url: URL) {
+function goto(url: URL, invalidateAll = false) {
 	window.history.pushState({}, '', url)
 	setUrl(url)
+	if (invalidateAll) {
+		// TODO More granularity ? More generic ?
+		api.user()
+		// ... other api calls
+	}
 }
 
 customElements.define(
@@ -90,7 +96,7 @@ export async function onSubmitForm(event: SubmitEvent) {
 	}
 
 	if (res.redirected) {
-		return goto(new URL(res.url))
+		return goto(new URL(res.url), true)
 	}
 	parseErrorMessage()
 
