@@ -1,8 +1,8 @@
 {
-	"include": ["./src/lib/**/*"],
+    "include": ["../src/**/*"],
+
 	"compilerOptions": {
 		"target": "esnext" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
-		"rootDir": "./src" /* Specify the root folder within your source files. */,
 		/* Emit */
 		"sourceMap": true /* Create source map files for emitted JavaScript files. */,
 		"esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */,
