@@ -8,14 +8,18 @@ export const ctx = can.getContext("2d");
 let lastFrameTime: number;
 
 // Ball properties
-const baseBallSize = 10;
-const baseBallPosition = new Vector2(can.width / 2, can.height / 2);
+export const ballSpeedRamp = 1.07;
+export const ballMaxBounceAngle = (4 * Math.PI) / 12; // radians
+export const baseBallSpeed = 0.35;
+const baseBallSize = 12;
+const baseBallPosition = new Vector2(can.width / 2 - baseBallSize / 2, can.height / 2 - baseBallSize / 2);
 export let ball: Ball;
 
 // Paddle properties
+export const basePaddleSpeed = 0.5
 const basePaddleHeight = can.height / 5;
-const basePaddleWidth = can.width / 80;
-const paddleOffsetFromWall = 10;
+const basePaddleWidth = can.width / 60;
+const paddleOffsetFromWall = basePaddleWidth;
 const basePaddleP1Position = new Vector2(
 	paddleOffsetFromWall,
 	can.height / 2 - basePaddleHeight / 2,
@@ -26,7 +30,7 @@ const basePaddleP2Position = new Vector2(
 );
 
 type Player = "p1" | "p2";
-type Move = "down" | "up";
+export type Move = "down" | "up";
 type StateInput = Record<Player, Record<Move, boolean>>;
 
 type Paddles = Record<Player, Paddle | null>;
@@ -46,7 +50,7 @@ const scores: Scores = {
 	p2: 0,
 };
 
-const inputs: StateInput = {
+export const inputs: StateInput = {
 	p1: { down: false, up: false },
 	p2: { down: false, up: false },
 };
@@ -91,22 +95,15 @@ function drawAll() {
 	ball.draw();
 	paddles.p1.draw();
 	paddles.p2.draw();
-	ctx.textAlign = "center";
+
 	const str = `Player 1: ${scores.p1} | Player 2: ${scores.p2}`;
+	ctx.textAlign = "center";
 	ctx.fillText(str, can.width / 2, 10);
 }
 
-function handleInputs(delta: number) {
-	// TODO: check bounds
-	if (inputs.p1.up) paddles.p1.position.y -= delta * paddles.p1.speed;
-	if (inputs.p1.down) paddles.p1.position.y += delta * paddles.p1.speed;
-	if (inputs.p2.up) paddles.p2.position.y -= delta * paddles.p2.speed;
-	if (inputs.p2.down) paddles.p2.position.y += delta * paddles.p2.speed;
-}
-
 function updateAll(delta: number) {
-	// TODO: put logic in paddle class
-	handleInputs(delta);
+	paddles.p1?.update(delta, inputs.p1);
+	paddles.p2?.update(delta, inputs.p2);
 	ball.update(delta);
 	drawAll();
 }
