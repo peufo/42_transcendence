@@ -1,12 +1,12 @@
 import { Vector2 } from './Vector2.js'
 import { Paddle } from './Paddle.js'
-import { can, ctx, paddles, scorePoint } from './index.js'
+import { ballMaxBounceAngle, ballSpeedRamp, baseBallSpeed, can, ctx, paddles, scorePoint } from './index.js'
 
 export class Ball {
-	#speed = 0.35 // const initial speed
+	#speed = baseBallSpeed;
 	#position: Vector2
 	#size: number
-	#velocity = new Vector2(1, 0.2) // randomize initial dir
+	#velocity = new Vector2(Math.random() < 0.5 ? 1 : -1, 0)
 
 	get size() {
 		return this.#size
@@ -21,15 +21,15 @@ export class Ball {
 		this.#size = size
 	}
 
-	bounceWall() {}
+	bounceWall() { }
 
 	#bouncePaddle(paddle: Paddle) {
 		const relativeInsersectY =
 			paddle.position.y + paddle.height / 2 - (this.#position.y + this.size / 2)
 		const normalizedRelativeInsersectionY =
 			relativeInsersectY / (paddle.height / 2)
-		this.#speed *= 1.07 // const speed ramp ?
-		const bounceAngle = normalizedRelativeInsersectionY * ((4 * Math.PI) / 12) // MAXBOUNCEANGLE const ?
+		this.#speed *= ballSpeedRamp;
+		const bounceAngle = normalizedRelativeInsersectionY * ballMaxBounceAngle;
 		const vSign = Math.sign(this.#velocity.x)
 		this.#velocity.x = Math.cos(bounceAngle)
 		this.#velocity.y = -Math.sin(bounceAngle)
@@ -48,15 +48,27 @@ export class Ball {
 	}
 
 	wallCollision() {
-		if (this.#position.y <= 0 || this.#position.y + this.#size >= can.height)
-			this.#velocity.y = -this.#velocity.y
+		if (this.#position.y <= 0) {
+			this.#position.y = 0;
+			this.#velocity.y = -this.#velocity.y;
+		}
+		else if (this.#position.y + this.#size >= can.height) {
+			this.#position.y = can.height - this.#size;
+			this.#velocity.y = -this.#velocity.y;
+		}
 		else if (this.#position.x <= 0) scorePoint('p2')
 		else if (this.#position.x + this.#size >= can.width) scorePoint('p1')
 	}
 
 	#handleCollisions() {
-		if (this.paddleCollision(paddles.p1)) this.#bouncePaddle(paddles.p1)
-		else if (this.paddleCollision(paddles.p2)) this.#bouncePaddle(paddles.p2)
+		if (this.paddleCollision(paddles.p1)) {
+			this.#position.x = paddles.p1?.position.x + paddles.p1?.width;
+			this.#bouncePaddle(paddles.p1)
+		}
+		else if (this.paddleCollision(paddles.p2)) {
+			this.#position.x = paddles.p2?.position.x - this.#size;
+			this.#bouncePaddle(paddles.p2)
+		}
 		this.wallCollision()
 	}
 
