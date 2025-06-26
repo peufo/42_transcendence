@@ -2,20 +2,21 @@ import { Vector2 } from './Vector2.js'
 import type { Paddle } from './Paddle.js'
 import {
 	BALL_MAX_BOUNCE_ANGLE,
-	BALL_SPEED_RAMP,
 	BALL_BASE_SPEED,
-	paddles,
-	scorePoint,
 	ARENA_HEIGHT,
 	ARENA_WIDTH,
 	TICK_INTERVAL,
+	type Player,
+	type Engine,
 } from './index.js'
+import { cubicOut } from '../easing.js'
 
 export class Ball {
 	#speed = BALL_BASE_SPEED
 	#position: Vector2
 	#size: number
 	#velocity = new Vector2(Math.random() < 0.5 ? 1 : -1, 0)
+	#engine: Engine
 
 	get size() {
 		return this.#size
@@ -25,7 +26,8 @@ export class Ball {
 		return this.#position
 	}
 
-	constructor(position: Vector2, size: number) {
+	constructor(position: Vector2, size: number, engine: Engine) {
+		this.#engine = engine
 		this.#position = new Vector2(position.x, position.y)
 		this.#size = size
 	}
@@ -42,8 +44,10 @@ export class Ball {
 		this.#velocity.x = Math.cos(bounceAngle)
 		this.#velocity.y = -Math.sin(bounceAngle)
 		this.#velocity.x *= -vSign
-		this.#speed *= BALL_SPEED_RAMP
-		console.log(this.#speed)
+		const t = (Date.now() - this.#engine.startTime) / 60000
+		const ADD_SPEED = 0.8
+		if (t <= 1) this.#speed = BALL_BASE_SPEED + ADD_SPEED * cubicOut(t)
+		console.log({ t, speed: this.#speed })
 	}
 
 	#paddleCollision(paddle: Paddle): boolean {
@@ -57,26 +61,51 @@ export class Ball {
 		return false
 	}
 
-	#wallCollision() {
+	#verticalWallCollision() {
 		if (this.#position.y <= 0) {
 			this.#position.y = 0
 			this.#velocity.y = -this.#velocity.y
 		} else if (this.#position.y + this.#size >= ARENA_HEIGHT) {
 			this.#position.y = ARENA_HEIGHT - this.#size
 			this.#velocity.y = -this.#velocity.y
-		} else if (this.#position.x <= 0) scorePoint('p2')
-		else if (this.#position.x + this.#size >= ARENA_WIDTH) scorePoint('p1')
+		}
 	}
 
 	#handleCollisions() {
+		const { paddles } = this.#engine
 		if (this.#paddleCollision(paddles.p1)) {
-			this.#position.x = paddles.p1?.position.x + paddles.p1?.width
+			this.#position.x = paddles.p1.position.x + paddles.p1?.width
 			this.#bouncePaddle(paddles.p1)
 		} else if (this.#paddleCollision(paddles.p2)) {
 			this.#position.x = paddles.p2?.position.x - this.#size
 			this.#bouncePaddle(paddles.p2)
 		}
-		this.#wallCollision()
+		this.#verticalWallCollision()
+	}
+
+	playerScoring(): Player | null {
+		const { paddles } = this.#engine
+		if (this.#position.x <= 0) {
+			if (
+				this.#position.y + this.#size >= paddles.p1.position.y &&
+				this.#position.y <= paddles.p1.position.y + paddles.p1.height
+			) {
+				this.#bouncePaddle(paddles.p1)
+				return null
+			}
+			return 'p2' // left side
+		}
+		if (this.#position.x + this.#size >= ARENA_WIDTH) {
+			if (
+				this.#position.y + this.#size >= paddles.p2.position.y &&
+				this.#position.y <= paddles.p2.position.y + paddles.p2.height
+			) {
+				this.#bouncePaddle(paddles.p2)
+				return null
+			}
+			return 'p1' // right side
+		}
+		return null
 	}
 
 	update() {

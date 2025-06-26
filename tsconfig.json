@@ -1,6 +1,7 @@
 {
 	"include": ["./src/lib/**/*"],
 	"compilerOptions": {
+		"strictPropertyInitialization": false,
 		"target": "esnext" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
 		"rootDir": "./src" /* Specify the root folder within your source files. */,
 		/* Emit */

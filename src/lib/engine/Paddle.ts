@@ -7,7 +7,6 @@ export class Paddle {
 	#speed = PADDLE_BASE_SPEED
 	#width: number
 	#height: number
-	// acceleration ?
 
 	get position() {
 		return this.#position
@@ -27,7 +26,7 @@ export class Paddle {
 		this.#height = height
 	}
 
-	#move(direction: Move) {
+	move(direction: Move) {
 		const displ = TICK_INTERVAL * this.#speed
 		if (direction === 'up') {
 			if (this.#position.y - displ < 0) this.#position.y = 0
@@ -37,10 +36,5 @@ export class Paddle {
 				this.#position.y = ARENA_HEIGHT - this.#height
 			else this.#position.y += displ
 		}
-	}
-
-	update(inputs: Record<Move, boolean>) {
-		if (inputs.up) this.#move('up')
-		if (inputs.down) this.#move('down')
 	}
 }
