@@ -1,3 +1,5 @@
+import { cubicIn, cubicOut } from '../../lib/easing.js'
+
 type Transition = {
 	start?: () => void
 	step(t: number): void
@@ -86,13 +88,4 @@ export function transitionOut(
 		}
 		requestAnimationFrame(step)
 	})
-}
-
-function cubicIn(t: number) {
-	return t * t * t
-}
-
-function cubicOut(t: number) {
-	const f = t - 1.0
-	return f * f * f + 1.0
 }
