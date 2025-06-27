@@ -95,7 +95,7 @@ export const versusRelations = relations(versus, ({ one }) => ({
 }))
 
 export type gamestat = {
-	ballX: typeof reals
+	ballX: typeof real
 	ballY: typeof real
 	player1PaddleY: typeof real
 	player2PaddleY: typeof real
