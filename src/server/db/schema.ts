@@ -1,7 +1,8 @@
 import { Many, relations } from 'drizzle-orm'
-import { boolean } from 'drizzle-orm/gel-core'
+import { real } from 'drizzle-orm/gel-core'
 import { mysqlEnum } from 'drizzle-orm/mysql-core'
 import { blob, int, sqliteTable, text } from 'drizzle-orm/sqlite-core'
+import { json } from 'stream/consumers'
 
 export const users = sqliteTable('users', {
 	id: int().primaryKey({ autoIncrement: true }),
@@ -11,7 +12,7 @@ export const users = sqliteTable('users', {
 	avatarPlaceholder: text().notNull(),
 	createdAt: int({ mode: 'timestamp' }).notNull().default(new Date()),
 	lastLogin: int({ mode: 'timestamp' }).notNull().default(new Date()),
-	isActive: boolean().notNull().default(false),
+	isActive: int({ mode: 'boolean' }).notNull().default(false),
 	userStatid: int().unique(),
 })
 
@@ -36,7 +37,7 @@ export const match = sqliteTable('match', {
 		.references(() => users.id()),
 	player2Id: int().references(() => users.id()),
 	botDifficulty: mysqlEnum(['Baby', 'Kevin', 'Terminator']).default('Kevin'),
-	finished: boolean().notNull().default(false),
+	finished: int({ mode: 'boolean' }).notNull().default(false),
 	pointsToWin: int().notNull(),
 })
 
@@ -54,10 +55,10 @@ export const tournament = sqliteTable('tournament', {
 	botDifficulty: mysqlEnum(['Baby', 'Kevin', 'Terminator'])
 		.notNull()
 		.default('Kevin'),
-	lobbyLocked: boolean().notNull().default(false),
+	lobbyLocked: int({ mode: 'boolean' }).notNull().default(false),
 	createdAt: int({ mode: 'timestamp' }).notNull(),
 	startedAt: int({ mode: 'timestamp' }).notNull(),
-	finished: boolean().default(false),
+	finished: int({ mode: 'boolean' }).default(false),
 })
 
 export const tournamentRelations = relations(tournament, ({ many }) => ({
@@ -93,11 +94,29 @@ export const versusRelations = relations(versus, ({ one }) => ({
 	}),
 }))
 
+export type gamestat = {
+	ballX: typeof reals
+	ballY: typeof real
+	player1PaddleY: typeof real
+	player2PaddleY: typeof real
+	tickNumber: typeof int
+}
+
+export type arenaSettings = {
+	arenaWidth: typeof int
+	arenaHeight: typeof int
+	ballSize: typeof int
+	paddleWith: typeof int
+	paddleHeight: typeof int
+	paddle1X: typeof int
+	paddle2X: typeof int
+}
+
 export const round = sqliteTable('round', {
 	id: int().primaryKey({ autoIncrement: true }),
 	player1Score: int().default(0),
 	player2Score: int().default(0),
 	matchId: int().references(() => match.id()),
-	//Need to add gamestats
-	//Need to add arenaSettings
+	//gamestat: json().$type<gamestats>;
+	//arenaSettings: json().$type<arenaSettings>;
 })
