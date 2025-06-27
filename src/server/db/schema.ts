@@ -2,7 +2,6 @@ import { Many, relations } from 'drizzle-orm'
 import { real } from 'drizzle-orm/gel-core'
 import { mysqlEnum } from 'drizzle-orm/mysql-core'
 import { blob, int, sqliteTable, text } from 'drizzle-orm/sqlite-core'
-import { json } from 'stream/consumers'
 
 export const users = sqliteTable('users', {
 	id: int().primaryKey({ autoIncrement: true }),
@@ -94,7 +93,7 @@ export const versusRelations = relations(versus, ({ one }) => ({
 	}),
 }))
 
-export type gamestat = {
+export type gamestate = {
 	ballX: typeof real
 	ballY: typeof real
 	player1PaddleY: typeof real
@@ -117,6 +116,6 @@ export const round = sqliteTable('round', {
 	player1Score: int().default(0),
 	player2Score: int().default(0),
 	matchId: int().references(() => match.id()),
-	//gamestat: json().$type<gamestats>;
+	gamestates: json().$type<gamestate>,
 	//arenaSettings: json().$type<arenaSettings>;
 })
