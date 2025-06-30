@@ -1,9 +1,18 @@
 import {
-	Engine,
-	type State,
+	ENGINE_EVENT,
 	ARENA_WIDTH,
 	ARENA_HEIGHT,
+	type Player,
+	type Move,
+	type Scores,
+	PADDLE_BASE_P1_POSITION,
+	PADDLE_BASE_WIDTH,
+	PADDLE_BASE_HEIGHT,
+	PADDLE_BASE_P2_POSITION,
+	BALL_BASE_SIZE,
+	type EngineEventData,
 } from '../../lib/engine/index.js'
+import { useInterpolate } from '../../lib/engine/interpolate.js'
 
 customElements.define(
 	'ft-pong-remote',
@@ -11,6 +20,11 @@ customElements.define(
 		canvas: HTMLCanvasElement
 		ctx: CanvasRenderingContext2D
 		socket: WebSocket
+		interpolate = useInterpolate()
+		scores: Scores = {
+			p1: 0,
+			p2: 0,
+		}
 
 		constructor() {
 			super()
@@ -24,35 +38,35 @@ customElements.define(
 			if (!ctx) throw new Error('Canvas context failed')
 			this.ctx = ctx
 			this.ctx.textAlign = 'center'
-			// websocket is still connected if pressing previous
-			this.socket = new WebSocket('ws://localhost:8000/ws') // correct address
-			// this.socket.addEventListener('message', async (event) => {
-			// 	await new Promise((resolve) => setTimeout(resolve, 100)) // version avec latence artificielle
-			// 	this.render(JSON.parse(event.data))
-			// })
+			this.socket = new WebSocket(`ws://${document.location.host}/ws`)
 			this.socket.addEventListener('message', (event) => {
-				this.render(JSON.parse(event.data))
+				const data: EngineEventData = JSON.parse(event.data)
+				const newState = data[ENGINE_EVENT.TICK]
+				const newScores = data[ENGINE_EVENT.SCORE]
+				if (newState) {
+					this.interpolate.updateState(newState)
+				}
+				if (newScores) {
+					this.scores = newScores
+				}
 			})
+			requestAnimationFrame(this.render.bind(this))
+		}
+
+		disconnectedCallback() {
+			this.socket.close()
 		}
 
 		connectedCallback() {
+			const setInput = (player: Player, move: Move, value: boolean) => {
+				this.socket.send(JSON.stringify({ player, move, value }))
+			}
+
 			const keyHandlers: Record<string, (value: boolean) => void> = {
-				w: (value) =>
-					this.socket.send(
-						JSON.stringify({ player: 'p1', move: 'up', value: value }),
-					),
-				s: (value) =>
-					this.socket.send(
-						JSON.stringify({ player: 'p1', move: 'down', value: value }),
-					),
-				i: (value) =>
-					this.socket.send(
-						JSON.stringify({ player: 'p2', move: 'up', value: value }),
-					),
-				k: (value) =>
-					this.socket.send(
-						JSON.stringify({ player: 'p2', move: 'down', value: value }),
-					),
+				w: (value) => setInput('p1', 'up', value),
+				s: (value) => setInput('p1', 'down', value),
+				i: (value) => setInput('p2', 'up', value),
+				k: (value) => setInput('p2', 'down', value),
 			}
 
 			document.addEventListener('keydown', (event) => {
@@ -64,25 +78,36 @@ customElements.define(
 			})
 		}
 
-		render({ ball, paddles: { p1, p2 }, scores }: State) {
-			// rendering
+		render() {
+			const state = this.interpolate.getState()
 			this.ctx.clearRect(0, 0, ARENA_WIDTH, ARENA_HEIGHT)
 
 			// ball
 			this.ctx.beginPath()
-			this.ctx.rect(ball.position.x, ball.position.y, ball.size, ball.size)
+			this.ctx.rect(state.b.x, state.b.y, BALL_BASE_SIZE, BALL_BASE_SIZE)
 			this.ctx.fill()
 
 			// // paddle
 			this.ctx.beginPath()
-			this.ctx.rect(p1.position.x, p1.position.y, p1.width, p1.height)
+			this.ctx.rect(
+				PADDLE_BASE_P1_POSITION.x,
+				state.p1,
+				PADDLE_BASE_WIDTH,
+				PADDLE_BASE_HEIGHT,
+			)
 			this.ctx.fill()
 			this.ctx.beginPath()
-			this.ctx.rect(p2.position.x, p2.position.y, p2.width, p2.height)
+			this.ctx.rect(
+				PADDLE_BASE_P2_POSITION.x,
+				state.p2,
+				PADDLE_BASE_WIDTH,
+				PADDLE_BASE_HEIGHT,
+			)
 			this.ctx.fill()
 
-			const str = `Player 1: ${scores.p1} | Player 2: ${scores.p2}`
+			const str = `Player 1: ${this.scores.p1} | Player 2: ${this.scores.p2}`
 			this.ctx.fillText(str, ARENA_WIDTH / 2, 10)
+			requestAnimationFrame(this.render.bind(this))
 		}
 	},
 )

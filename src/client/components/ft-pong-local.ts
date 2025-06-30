@@ -1,9 +1,15 @@
 import {
 	Engine,
-	type State,
+	type Scores,
 	ARENA_WIDTH,
 	ARENA_HEIGHT,
+	BALL_BASE_SIZE,
+	PADDLE_BASE_WIDTH,
+	PADDLE_BASE_HEIGHT,
+	PADDLE_BASE_P1_POSITION,
+	PADDLE_BASE_P2_POSITION,
 } from '../../lib/engine/index.js'
+import { useInterpolate } from '../../lib/engine/interpolate.js'
 
 customElements.define(
 	'ft-pong-local',
@@ -11,6 +17,12 @@ customElements.define(
 		canvas: HTMLCanvasElement
 		ctx: CanvasRenderingContext2D
 		engine: Engine
+		frameId: number
+		interpolate = useInterpolate()
+		scores: Scores = {
+			p1: 0,
+			p2: 0,
+		}
 
 		constructor() {
 			super()
@@ -24,8 +36,15 @@ customElements.define(
 			if (!ctx) throw new Error('Canvas context failed')
 			this.ctx = ctx
 			this.ctx.textAlign = 'center'
-			this.engine = new Engine(this.render.bind(this))
+			this.engine = new Engine(this.interpolate.updateState, (scores) => {
+				this.scores = scores
+			})
 			this.engine.startGame()
+			this.frameId = requestAnimationFrame(this.render.bind(this))
+		}
+
+		disconnectedCallback() {
+			cancelAnimationFrame(this.frameId)
 		}
 
 		connectedCallback() {
@@ -45,25 +64,36 @@ customElements.define(
 			})
 		}
 
-		render({ ball, paddles: { p1, p2 }, scores }: State) {
-			// rendering
+		render() {
+			const state = this.interpolate.getState()
 			this.ctx.clearRect(0, 0, ARENA_WIDTH, ARENA_HEIGHT)
 
 			// ball
 			this.ctx.beginPath()
-			this.ctx.rect(ball.position.x, ball.position.y, ball.size, ball.size)
+			this.ctx.rect(state.b.x, state.b.y, BALL_BASE_SIZE, BALL_BASE_SIZE)
 			this.ctx.fill()
 
 			// // paddle
 			this.ctx.beginPath()
-			this.ctx.rect(p1.position.x, p1.position.y, p1.width, p1.height)
+			this.ctx.rect(
+				PADDLE_BASE_P1_POSITION.x,
+				state.p1,
+				PADDLE_BASE_WIDTH,
+				PADDLE_BASE_HEIGHT,
+			)
 			this.ctx.fill()
 			this.ctx.beginPath()
-			this.ctx.rect(p2.position.x, p2.position.y, p2.width, p2.height)
+			this.ctx.rect(
+				PADDLE_BASE_P2_POSITION.x,
+				state.p2,
+				PADDLE_BASE_WIDTH,
+				PADDLE_BASE_HEIGHT,
+			)
 			this.ctx.fill()
 
-			const str = `Player 1: ${scores.p1} | Player 2: ${scores.p2}`
+			const str = `Player 1: ${this.scores.p1} | Player 2: ${this.scores.p2}`
 			this.ctx.fillText(str, ARENA_WIDTH / 2, 10)
+			this.frameId = requestAnimationFrame(this.render.bind(this))
 		}
 	},
 )

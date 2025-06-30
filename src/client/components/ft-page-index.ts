@@ -1,4 +1,3 @@
-import { jsonParseOrThrow } from '../utils/jsonParse.js'
 import { createEffect } from '../utils/signal.js'
 import { getUser, type Friend, type User } from '../utils/store.js'
 
