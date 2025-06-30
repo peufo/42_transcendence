@@ -3,7 +3,7 @@ customElements.define(
 	class extends HTMLElement {
 		connectedCallback() {
 			this.innerHTML = /*html*/ `
-			    <ft-pong></ft-pong>
+			    <ft-pong-local></ft-pong-local>
 			`
 		}
 	},

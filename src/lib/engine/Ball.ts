@@ -8,6 +8,9 @@ import {
 	TICK_INTERVAL,
 	type Player,
 	type Engine,
+	BALL_MAX_SPEED,
+	BALL_TIME_TO_REACH_MAX_SPEED,
+	BALL_SUBSTEPS,
 } from './index.js'
 import { cubicOut } from '../easing.js'
 
@@ -44,10 +47,14 @@ export class Ball {
 		this.#velocity.x = Math.cos(bounceAngle)
 		this.#velocity.y = -Math.sin(bounceAngle)
 		this.#velocity.x *= -vSign
-		const t = (Date.now() - this.#engine.startTime) / 60000
-		const ADD_SPEED = 0.8
-		if (t <= 1) this.#speed = BALL_BASE_SPEED + ADD_SPEED * cubicOut(t)
-		console.log({ t, speed: this.#speed })
+		if (this.#speed !== BALL_MAX_SPEED) {
+			const t =
+				(Date.now() - this.#engine.startTime) / BALL_TIME_TO_REACH_MAX_SPEED
+			if (t <= 1)
+				this.#speed =
+					BALL_BASE_SPEED + (BALL_MAX_SPEED - BALL_BASE_SPEED) * cubicOut(t)
+			else this.#speed = BALL_MAX_SPEED
+		}
 	}
 
 	#paddleCollision(paddle: Paddle): boolean {
@@ -83,35 +90,31 @@ export class Ball {
 		this.#verticalWallCollision()
 	}
 
+	toJSON() {
+		return {
+			position: this.#position,
+			size: this.#size,
+		}
+	}
+
 	playerScoring(): Player | null {
-		const { paddles } = this.#engine
 		if (this.#position.x <= 0) {
-			if (
-				this.#position.y + this.#size >= paddles.p1.position.y &&
-				this.#position.y <= paddles.p1.position.y + paddles.p1.height
-			) {
-				this.#bouncePaddle(paddles.p1)
-				return null
-			}
 			return 'p2' // left side
 		}
 		if (this.#position.x + this.#size >= ARENA_WIDTH) {
-			if (
-				this.#position.y + this.#size >= paddles.p2.position.y &&
-				this.#position.y <= paddles.p2.position.y + paddles.p2.height
-			) {
-				this.#bouncePaddle(paddles.p2)
-				return null
-			}
 			return 'p1' // right side
 		}
 		return null
 	}
 
 	update() {
-		this.#handleCollisions()
-		this.#velocity.normalize()
-		this.#position.x += this.#velocity.x * TICK_INTERVAL * this.#speed
-		this.#position.y += this.#velocity.y * TICK_INTERVAL * this.#speed
+		for (let i = 0; i < BALL_SUBSTEPS; i++) {
+			this.#velocity.normalize()
+			this.#position.x +=
+				((this.#velocity.x * TICK_INTERVAL) / BALL_SUBSTEPS) * this.#speed
+			this.#position.y +=
+				((this.#velocity.y * TICK_INTERVAL) / BALL_SUBSTEPS) * this.#speed
+			this.#handleCollisions()
+		}
 	}
 }
