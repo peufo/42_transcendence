@@ -11,37 +11,38 @@ import {
 	BALL_MAX_SPEED,
 	BALL_TIME_TO_REACH_MAX_SPEED,
 	BALL_SUBSTEPS,
+	BALL_BASE_SIZE,
+	PADDLE_BASE_HEIGHT,
+	PADDLE_BASE_WIDTH,
 } from './index.js'
 import { cubicOut } from '../easing.js'
 
 export class Ball {
 	#speed = BALL_BASE_SPEED
 	#position: Vector2
-	#size: number
 	#velocity = new Vector2(Math.random() < 0.5 ? 1 : -1, 0)
 	#engine: Engine
-
-	get size() {
-		return this.#size
-	}
 
 	get position() {
 		return this.#position
 	}
 
-	constructor(position: Vector2, size: number, engine: Engine) {
+	get velocity() {
+		return this.#velocity
+	}
+
+	constructor(position: Vector2, engine: Engine) {
 		this.#engine = engine
 		this.#position = new Vector2(position.x, position.y)
-		this.#size = size
 	}
 
 	#bouncePaddle(paddle: Paddle) {
 		const relativeInsersectY =
 			paddle.position.y +
-			paddle.height / 2 -
-			(this.#position.y + this.#size / 2)
+			PADDLE_BASE_HEIGHT / 2 -
+			(this.#position.y + BALL_BASE_SIZE / 2)
 		const normalizedRelativeInsersectionY =
-			relativeInsersectY / (paddle.height / 2)
+			relativeInsersectY / (PADDLE_BASE_HEIGHT / 2)
 		const bounceAngle = normalizedRelativeInsersectionY * BALL_MAX_BOUNCE_ANGLE
 		const vSign = Math.sign(this.#velocity.x)
 		this.#velocity.x = Math.cos(bounceAngle)
@@ -57,51 +58,51 @@ export class Ball {
 		}
 	}
 
-	#paddleCollision(paddle: Paddle): boolean {
+	#handleVerticalWallCollision(): boolean {
+		if (this.#position.y <= 0) {
+			this.#position.y = 0
+			this.#velocity.y = -this.#velocity.y
+			return true
+		}
+		if (this.#position.y + BALL_BASE_SIZE >= ARENA_HEIGHT) {
+			this.#position.y = ARENA_HEIGHT - BALL_BASE_SIZE
+			this.#velocity.y = -this.#velocity.y
+			return true
+		}
+		return false
+	}
+
+	#isCollidingWithPaddle(paddle: Paddle): boolean {
 		if (
-			this.#position.x + this.#size >= paddle.position.x &&
-			this.#position.x <= paddle.position.x + paddle.width &&
-			this.#position.y + this.#size >= paddle.position.y &&
-			this.#position.y <= paddle.position.y + paddle.height
+			this.#position.x + BALL_BASE_SIZE >= paddle.position.x &&
+			this.#position.x <= paddle.position.x + PADDLE_BASE_WIDTH &&
+			this.#position.y + BALL_BASE_SIZE >= paddle.position.y &&
+			this.#position.y <= paddle.position.y + PADDLE_BASE_HEIGHT
 		)
 			return true
 		return false
 	}
 
-	#verticalWallCollision() {
-		if (this.#position.y <= 0) {
-			this.#position.y = 0
-			this.#velocity.y = -this.#velocity.y
-		} else if (this.#position.y + this.#size >= ARENA_HEIGHT) {
-			this.#position.y = ARENA_HEIGHT - this.#size
-			this.#velocity.y = -this.#velocity.y
-		}
-	}
-
-	#handleCollisions() {
+	#handlePaddlesCollisions(): boolean {
 		const { paddles } = this.#engine
-		if (this.#paddleCollision(paddles.p1)) {
-			this.#position.x = paddles.p1.position.x + paddles.p1?.width
+		if (this.#isCollidingWithPaddle(paddles.p1)) {
+			this.#position.x = paddles.p1.position.x + PADDLE_BASE_WIDTH
 			this.#bouncePaddle(paddles.p1)
-		} else if (this.#paddleCollision(paddles.p2)) {
-			this.#position.x = paddles.p2?.position.x - this.#size
+			return true
+		}
+		if (this.#isCollidingWithPaddle(paddles.p2)) {
+			this.#position.x = paddles.p2.position.x - BALL_BASE_SIZE
 			this.#bouncePaddle(paddles.p2)
+			return true
 		}
-		this.#verticalWallCollision()
-	}
-
-	toJSON() {
-		return {
-			position: this.#position,
-			size: this.#size,
-		}
+		return false
 	}
 
 	playerScoring(): Player | null {
 		if (this.#position.x <= 0) {
 			return 'p2' // left side
 		}
-		if (this.#position.x + this.#size >= ARENA_WIDTH) {
+		if (this.#position.x + BALL_BASE_SIZE >= ARENA_WIDTH) {
 			return 'p1' // right side
 		}
 		return null
@@ -111,10 +112,14 @@ export class Ball {
 		for (let i = 0; i < BALL_SUBSTEPS; i++) {
 			this.#velocity.normalize()
 			this.#position.x +=
-				((this.#velocity.x * TICK_INTERVAL) / BALL_SUBSTEPS) * this.#speed
+				this.#velocity.x * (TICK_INTERVAL / BALL_SUBSTEPS) * this.#speed
 			this.#position.y +=
-				((this.#velocity.y * TICK_INTERVAL) / BALL_SUBSTEPS) * this.#speed
-			this.#handleCollisions()
+				this.#velocity.y * (TICK_INTERVAL / BALL_SUBSTEPS) * this.#speed
+			if (
+				this.#handlePaddlesCollisions() ||
+				this.#handleVerticalWallCollision()
+			)
+				return
 		}
 	}
 }

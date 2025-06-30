@@ -7,13 +7,6 @@ export class Vector2 {
 		this.y = y
 	}
 
-	toJSON() {
-		return {
-			x: this.x,
-			y: this.y,
-		}
-	}
-
 	magnitude() {
 		return Math.sqrt(this.x * this.x + this.y * this.y)
 	}

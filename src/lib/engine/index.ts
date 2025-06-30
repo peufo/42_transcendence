@@ -1,18 +1,25 @@
 import { Paddle } from './Paddle.js'
 import { Ball } from './Ball.js'
 import { Vector2 } from './Vector2.js'
-// import { Bot } from './Ai.js'
 
 // types
 export type Player = 'p1' | 'p2'
 export type Move = 'down' | 'up'
 type Paddles = Record<Player, Paddle>
 type Inputs = Record<Player, Record<Move, boolean>>
-type Scores = Record<Player, number>
+export type Scores = Record<Player, number>
+export enum ENGINE_EVENT {
+	TICK = 0,
+	SCORE = 1,
+}
+export type EngineEventData = {
+	[ENGINE_EVENT.TICK]?: State
+	[ENGINE_EVENT.SCORE]?: Scores
+}
 export type State = {
-	ball: Ball
-	paddles: Paddles
-	scores: Scores
+	b: { x: number; y: number }
+	p1: number
+	p2: number
 }
 
 // Game properties
@@ -27,22 +34,22 @@ export const BALL_MAX_BOUNCE_ANGLE = (4 * Math.PI) / 12 // <- 60 degrees in radi
 export const BALL_BASE_SPEED = 0.35
 export const BALL_MAX_SPEED = 1.2
 export const BALL_TIME_TO_REACH_MAX_SPEED = 50000
-const BALL_BASE_SIZE = ARENA_WIDTH / 70
-const BALL_BASE_POSITION = new Vector2(
+export const BALL_BASE_SIZE = ARENA_WIDTH / 70
+export const BALL_BASE_POSITION = new Vector2(
 	ARENA_WIDTH / 2 - BALL_BASE_SIZE / 2,
 	ARENA_HEIGHT / 2 - BALL_BASE_SIZE / 2,
 )
 
 // Paddle properties
 export const PADDLE_BASE_SPEED = 0.55
-const PADDLE_BASE_HEIGHT = ARENA_HEIGHT / 5
-const PADDLE_BASE_WIDTH = BALL_BASE_SIZE
+export const PADDLE_BASE_HEIGHT = ARENA_HEIGHT / 5
+export const PADDLE_BASE_WIDTH = BALL_BASE_SIZE
 const PADDLE_OFFSET_FROM_WALL = PADDLE_BASE_WIDTH * 4
-const PADDLE_BASE_P1_POSITION = new Vector2(
+export const PADDLE_BASE_P1_POSITION = new Vector2(
 	PADDLE_OFFSET_FROM_WALL,
 	ARENA_HEIGHT / 2 - PADDLE_BASE_HEIGHT / 2,
 )
-const PADDLE_BASE_P2_POSITION = new Vector2(
+export const PADDLE_BASE_P2_POSITION = new Vector2(
 	ARENA_WIDTH - PADDLE_BASE_WIDTH - PADDLE_OFFSET_FROM_WALL,
 	ARENA_HEIGHT / 2 - PADDLE_BASE_HEIGHT / 2,
 )
@@ -50,19 +57,12 @@ const PADDLE_BASE_P2_POSITION = new Vector2(
 export class Engine {
 	#startTime: number
 	#tickCallback: (state: State) => void
+	#scoreCallback: (scores: Scores) => void
 	#paddles: Paddles = {
-		p1: new Paddle(
-			PADDLE_BASE_P1_POSITION,
-			PADDLE_BASE_WIDTH,
-			PADDLE_BASE_HEIGHT,
-		),
-		p2: new Paddle(
-			PADDLE_BASE_P2_POSITION,
-			PADDLE_BASE_WIDTH,
-			PADDLE_BASE_HEIGHT,
-		),
+		p1: new Paddle(PADDLE_BASE_P1_POSITION),
+		p2: new Paddle(PADDLE_BASE_P2_POSITION),
 	}
-	#ball: Ball = new Ball(BALL_BASE_POSITION, BALL_BASE_SIZE, this)
+	#ball: Ball = new Ball(BALL_BASE_POSITION, this)
 	#scores: Scores = {
 		p1: 0,
 		p2: 0,
@@ -73,8 +73,6 @@ export class Engine {
 	}
 	gameOver = false
 
-	// #bot = new Bot('p2', this) // test
-
 	get paddles() {
 		return this.#paddles
 	}
@@ -83,23 +81,19 @@ export class Engine {
 		return this.#startTime
 	}
 
-	constructor(tickCallback: (state: State) => void) {
+	constructor(
+		tickCallback: (state: State) => void,
+		scoreCallback: (scores: Scores) => void,
+	) {
 		this.#tickCallback = tickCallback
+		this.#scoreCallback = scoreCallback
 	}
 
 	#resetState() {
 		this.#startTime = Date.now()
-		this.#paddles.p1 = new Paddle(
-			PADDLE_BASE_P1_POSITION,
-			PADDLE_BASE_WIDTH,
-			PADDLE_BASE_HEIGHT,
-		)
-		this.#paddles.p2 = new Paddle(
-			PADDLE_BASE_P2_POSITION,
-			PADDLE_BASE_WIDTH,
-			PADDLE_BASE_HEIGHT,
-		)
-		this.#ball = new Ball(BALL_BASE_POSITION, BALL_BASE_SIZE, this)
+		this.#paddles.p1 = new Paddle(PADDLE_BASE_P1_POSITION)
+		this.#paddles.p2 = new Paddle(PADDLE_BASE_P2_POSITION)
+		this.#ball = new Ball(BALL_BASE_POSITION, this)
 		this.#inputs = {
 			p1: { down: false, up: false },
 			p2: { down: false, up: false },
@@ -115,6 +109,7 @@ export class Engine {
 		const scorer = this.#ball.playerScoring()
 		if (scorer) {
 			this.#scores[scorer]++
+			this.#scoreCallback(this.#scores)
 			this.#resetState()
 		}
 	}
@@ -123,15 +118,10 @@ export class Engine {
 		const tickStart = Date.now()
 		this.#updateState()
 		this.#tickCallback({
-			ball: this.#ball,
-			paddles: this.#paddles,
-			scores: this.#scores,
+			b: { x: this.#ball.position.x, y: this.#ball.position.y },
+			p1: this.paddles.p1.position.y,
+			p2: this.paddles.p2.position.y,
 		})
-		// this.#bot.update({
-		// 	ball: this.#ball,
-		// 	paddles: this.#paddles,
-		// 	scores: this.#scores,
-		// })
 		const processTime = Date.now() - tickStart
 		const delay = Math.max(0, TICK_INTERVAL - processTime)
 		if (!this.gameOver) setTimeout(this.#loop.bind(this), delay)
