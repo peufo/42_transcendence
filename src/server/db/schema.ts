@@ -1,5 +1,4 @@
-import { Many, relations } from 'drizzle-orm'
-import { real } from 'drizzle-orm/gel-core'
+import { relations } from 'drizzle-orm'
 import { mysqlEnum } from 'drizzle-orm/mysql-core'
 import { blob, int, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
@@ -93,29 +92,11 @@ export const versusRelations = relations(versus, ({ one }) => ({
 	}),
 }))
 
-export type gamestate = {
-	ballX: typeof real
-	ballY: typeof real
-	player1PaddleY: typeof real
-	player2PaddleY: typeof real
-	tickNumber: typeof int
-}
-
-export type arenaSettings = {
-	arenaWidth: typeof int
-	arenaHeight: typeof int
-	ballSize: typeof int
-	paddleWith: typeof int
-	paddleHeight: typeof int
-	paddle1X: typeof int
-	paddle2X: typeof int
-}
-
 export const round = sqliteTable('round', {
 	id: int().primaryKey({ autoIncrement: true }),
 	player1Score: int().default(0),
 	player2Score: int().default(0),
 	matchId: int().references(() => match.id()),
-	gamestates: json().$type<gamestate>,
-	//arenaSettings: json().$type<arenaSettings>;
+	gamestates: text('', { mode: 'json' }),
+	arenaSettings: text('', { mode: 'json' }),
 })
