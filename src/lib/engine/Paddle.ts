@@ -26,6 +26,14 @@ export class Paddle {
 		this.#height = height
 	}
 
+	toJSON() {
+		return {
+			position: this.#position,
+			width: this.#width,
+			height: this.#height,
+		}
+	}
+
 	move(direction: Move) {
 		const displ = TICK_INTERVAL * this.#speed
 		if (direction === 'up') {

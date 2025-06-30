@@ -6,11 +6,11 @@ import {
 } from '../../lib/engine/index.js'
 
 customElements.define(
-	'ft-pong',
+	'ft-pong-remote',
 	class extends HTMLElement {
 		canvas: HTMLCanvasElement
 		ctx: CanvasRenderingContext2D
-		engine: Engine
+		socket: WebSocket
 
 		constructor() {
 			super()
@@ -24,16 +24,35 @@ customElements.define(
 			if (!ctx) throw new Error('Canvas context failed')
 			this.ctx = ctx
 			this.ctx.textAlign = 'center'
-			this.engine = new Engine(this.render.bind(this))
-			this.engine.startGame()
+			// websocket is still connected if pressing previous
+			this.socket = new WebSocket('ws://localhost:8000/ws') // correct address
+			// this.socket.addEventListener('message', async (event) => {
+			// 	await new Promise((resolve) => setTimeout(resolve, 100)) // version avec latence artificielle
+			// 	this.render(JSON.parse(event.data))
+			// })
+			this.socket.addEventListener('message', (event) => {
+				this.render(JSON.parse(event.data))
+			})
 		}
 
 		connectedCallback() {
 			const keyHandlers: Record<string, (value: boolean) => void> = {
-				w: (value) => this.engine.setInput('p1', 'up', value),
-				s: (value) => this.engine.setInput('p1', 'down', value),
-				i: (value) => this.engine.setInput('p2', 'up', value),
-				k: (value) => this.engine.setInput('p2', 'down', value),
+				w: (value) =>
+					this.socket.send(
+						JSON.stringify({ player: 'p1', move: 'up', value: value }),
+					),
+				s: (value) =>
+					this.socket.send(
+						JSON.stringify({ player: 'p1', move: 'down', value: value }),
+					),
+				i: (value) =>
+					this.socket.send(
+						JSON.stringify({ player: 'p2', move: 'up', value: value }),
+					),
+				k: (value) =>
+					this.socket.send(
+						JSON.stringify({ player: 'p2', move: 'down', value: value }),
+					),
 			}
 
 			document.addEventListener('keydown', (event) => {
