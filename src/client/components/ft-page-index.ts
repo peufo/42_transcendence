@@ -120,7 +120,7 @@ customElements.define(
 					name: 'Bob',
 					avatarPlaceholder:
 						'https://api.dicebear.com/9.x/bottts-neutral/svg?seed=0.1',
-					isOnline: true,
+					isActive: true,
 					gameId: '12344321',
 				},
 				{
@@ -128,14 +128,14 @@ customElements.define(
 					name: 'Alice',
 					avatarPlaceholder:
 						'https://api.dicebear.com/9.x/bottts-neutral/svg?seed=0.2',
-					isOnline: true,
+					isActive: true,
 				},
 				{
 					id: 4,
 					name: 'Clélie',
 					avatarPlaceholder:
 						'https://api.dicebear.com/9.x/bottts-neutral/svg?seed=0.3',
-					isOnline: false,
+					isActive: false,
 				},
 			]
 
