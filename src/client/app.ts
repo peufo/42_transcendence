@@ -3,3 +3,4 @@ import { api } from './api.js'
 
 // TODO: Invalidate system in router instead
 api.user()
+api.users()

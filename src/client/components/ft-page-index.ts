@@ -1,5 +1,5 @@
 import { createEffect } from '../utils/signal.js'
-import { getUser, type Friend, type User } from '../utils/store.js'
+import { getUser, getUsers, type Friend, type User } from '../utils/store.js'
 
 customElements.define(
 	'ft-page-index',
@@ -22,7 +22,7 @@ customElements.define(
 								</a>
 							</div>
 						</div>
-
+						<!--
 						<ft-friends></ft-friends>
 
 						<div class="flex flex-col gap-3">
@@ -44,43 +44,62 @@ customElements.define(
 									<span class="text-xs text-gray-900 leading-3">Recieved at 19:32</span>
 								</div>
 								<div class="flex-grow"></div>
-								<!-- TODO: need to form method="post" -->
 								<a href="/invitations/reject" class="btn btn-red">Reject</a>
 								<a href="/invitations/accept" class="btn btn-green">Accept</a>
 							</div>
 						</div>
+						-->
 
 						<div class="flex flex-col gap-3">
 
-							<form class="flex items-center w-full">
+							<form class="flex items-center w-full" data-api="users" method="get">
 								<div class="relative w-full">
 									<div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-										<i data-lucide="user search" class="h-5 w-5 text-gray-500" aria-hidden="true"></i>
+										<ft-icon name="user-search" class="h-5 w-5 text-gray-500"></ft-icon>
 									</div>
 									<input type="text"
+										name="search"
+										autocomplete="off"
 										class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 "
-										placeholder="Looking for new friends" required />
+										placeholder="Looking for new friends" />
 								</div>
-
 							</form>
 
-							<div class="flex pl-4 p-2 items-center gap-2 border border-gray-200 rounded-xl">
-								<span>Jean</span>
-								<div class="flex-grow"></div>
-								<!-- TODO: need to form method="post" -->
-								<a href="/invitations/new" class="btn btn-border">Invite</a>
-							</div>
+							<ft-users></ft-users>
 
-							<div class="flex pl-4 p-2 items-center gap-2 border border-gray-200 rounded-xl">
-								<span>Claude</span>
-								<div class="flex-grow"></div>
-								<!-- TODO: need to form method="post" -->
-								<a href="/invitations/new" class="btn btn-border">Invite</a>
-							</div>
 						</div>
 					</div>
 				</div>
 			`
+		}
+	},
+)
+
+customElements.define(
+	'ft-users',
+	class extends HTMLElement {
+		connectedCallback() {
+			this.classList.add('contents')
+			createEffect(() => {
+				this.innerHTML = this.render()
+			})
+		}
+		render() {
+			const users = getUsers()
+
+			let html = ''
+
+			for (const user of users) {
+				html += /*html*/ `
+					<div class="flex pl-4 p-2 items-center gap-2 border border-gray-200 rounded-xl">
+						<span>${user.name}</span>
+						<div class="flex-grow"></div>
+						<!-- TODO: need to form method="post" -->
+						<a href="/invitations/new?userId=${user.id}" class="btn btn-border">Invite</a>
+					</div>
+				`
+			}
+			return html
 		}
 	},
 )
@@ -177,7 +196,7 @@ customElements.define(
 					<h3 class="font-semibold text-xl text-gray-900 ">
 						${user.name}
 					</h3>
-					
+
 					<div class="flex-grow"></div>
 					<a href="/stats" class="btn btn-border" title="Ratio">
 						<ft-icon name="star" class="h-4 w-4 mr-1"></ft-icon>
