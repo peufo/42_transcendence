@@ -12,4 +12,4 @@ export const env = {
 	DB_FILE_NAME: process.env.DB_FILE_NAME,
 	COOKIE_SECRET: process.env.COOKIE_SECRET,
 	dev: process.env.NODE_ENV === 'development',
-}
+} as const
