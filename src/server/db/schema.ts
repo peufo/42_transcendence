@@ -1,5 +1,4 @@
 import { relations } from 'drizzle-orm'
-import { mysqlEnum } from 'drizzle-orm/mysql-core'
 import { blob, int, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
 export const users = sqliteTable('users', {
@@ -15,11 +14,12 @@ export const users = sqliteTable('users', {
 })
 
 export const usersRelations = relations(users, ({ many }) => ({
-	friends: many(users),
+	friends: many(friendShips),
+	tournaments: many(tournamentsParticipants),
 }))
 
 export const sessions = sqliteTable('sessions', {
-	id: int().primaryKey({ autoIncrement: true }),
+	id: text().primaryKey(),
 	userId: int()
 		.notNull()
 		.references(() => users.id),
@@ -28,29 +28,44 @@ export const sessions = sqliteTable('sessions', {
 	createdAt: int({ mode: 'timestamp' }).notNull(),
 })
 
-export const match = sqliteTable('match', {
+export const friendShips = sqliteTable('userRelation', {
+	user1Id: int()
+		.notNull()
+		.references(() => users.id),
+	user2Id: int()
+		.notNull()
+		.references(() => users.id),
+	state: text({ enum: ['invited', 'friend'] }),
+})
+
+export const matches = sqliteTable('matches', {
 	id: int().primaryKey({ autoIncrement: true }),
 	player1Id: int()
 		.notNull()
-		.references(() => users.id()),
-	player2Id: int().references(() => users.id()),
-	botDifficulty: mysqlEnum(['Baby', 'Kevin', 'Terminator']).default('Kevin'),
+		.references(() => users.id),
+	player2Id: int().references(() => users.id),
+	botDifficulty: text({ enum: ['Baby', 'Kevin', 'Terminator'] })
+		.notNull()
+		.default('Kevin'),
 	finished: int({ mode: 'boolean' }).notNull().default(false),
 	pointsToWin: int().notNull(),
+	versusdId: int()
+		.unique()
+		.references(() => versus.id),
 })
 
-export const matchRelations = relations(match, ({ one }) => ({
-	pointsToWin: one(versus, {
-		fields: [match.pointsToWin],
+export const matchVersusRelations = relations(matches, ({ one }) => ({
+	versus: one(versus, {
+		fields: [matches.versusdId],
 		references: [versus.id],
 	}),
 }))
 
-export const tournament = sqliteTable('tournament', {
+export const tournaments = sqliteTable('tournament', {
 	id: int().primaryKey({ autoIncrement: true }),
 	numberOfPlayers: int().notNull(),
 	pointsToWin: int().notNull(),
-	botDifficulty: mysqlEnum(['Baby', 'Kevin', 'Terminator'])
+	botDifficulty: text({ enum: ['Baby', 'Kevin', 'Terminator'] })
 		.notNull()
 		.default('Kevin'),
 	lobbyLocked: int({ mode: 'boolean' }).notNull().default(false),
@@ -59,8 +74,18 @@ export const tournament = sqliteTable('tournament', {
 	finished: int({ mode: 'boolean' }).default(false),
 })
 
-export const tournamentRelations = relations(tournament, ({ many }) => ({
-	playersId: many(users),
+// TODO: add relation type ? owner, etc..
+export const tournamentsParticipants = sqliteTable('tournamentsParticipants', {
+	tournamentId: int()
+		.notNull()
+		.references(() => tournaments.id),
+	userId: int()
+		.notNull()
+		.references(() => users.id),
+})
+
+export const tournamentRelations = relations(tournaments, ({ many }) => ({
+	users: many(tournamentsParticipants),
 }))
 
 export const versus = sqliteTable('versus', {
@@ -68,27 +93,26 @@ export const versus = sqliteTable('versus', {
 	matchId: int()
 		.unique()
 		.notNull()
-		.references(() => match.id()),
-	pointsToWin: int().notNull(),
+		.references(() => matches.id),
 	tournamentId: int()
 		.unique()
 		.notNull()
-		.references(() => tournament.id()),
+		.references(() => tournaments.id),
 	player1Id: int()
 		.notNull()
 		.unique()
-		.references(() => users.id()),
+		.references(() => users.id),
 	player2Id: int()
 		.notNull()
 		.unique()
-		.references(() => users.id()),
+		.references(() => users.id),
 	stage: int().notNull(),
 })
 
 export const versusRelations = relations(versus, ({ one }) => ({
-	pointsToWin: one(tournament, {
-		fields: [versus.pointsToWin],
-		references: [tournament.id],
+	pointsToWin: one(tournaments, {
+		fields: [versus.id],
+		references: [tournaments.id],
 	}),
 }))
 
@@ -96,7 +120,7 @@ export const round = sqliteTable('round', {
 	id: int().primaryKey({ autoIncrement: true }),
 	player1Score: int().default(0),
 	player2Score: int().default(0),
-	matchId: int().references(() => match.id()),
+	matchId: int().references(() => matches.id),
 	gamestates: text('', { mode: 'json' }),
 	arenaSettings: text('', { mode: 'json' }),
 })
