@@ -27,7 +27,7 @@ export const sessions = sqliteTable('sessions', {
 	createdAt: int({ mode: 'timestamp' }).notNull(),
 })
 
-export const friendShips = sqliteTable('userRelation', {
+export const friendShips = sqliteTable('friend_ships', {
 	user1Id: int()
 		.notNull()
 		.references(() => users.id),
@@ -54,7 +54,7 @@ export const matchesRelations = relations(matches, ({ one }) => ({
 	versus: one(versus),
 }))
 
-export const tournaments = sqliteTable('tournament', {
+export const tournaments = sqliteTable('tournaments', {
 	id: int().primaryKey({ autoIncrement: true }),
 	numberOfPlayers: int().notNull(),
 	pointsToWin: int().notNull(),
@@ -68,7 +68,7 @@ export const tournaments = sqliteTable('tournament', {
 })
 
 // TODO: add relation type ? owner, etc..
-export const tournamentsParticipants = sqliteTable('tournamentsParticipants', {
+export const tournamentsParticipants = sqliteTable('tournaments_participants', {
 	tournamentId: int()
 		.notNull()
 		.references(() => tournaments.id),
@@ -107,7 +107,7 @@ export const versusRelations = relations(versus, ({ one }) => ({
 	match: one(matches),
 }))
 
-export const round = sqliteTable('round', {
+export const rounds = sqliteTable('rounds', {
 	id: int().primaryKey({ autoIncrement: true }),
 	player1Score: int().default(0),
 	player2Score: int().default(0),

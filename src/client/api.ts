@@ -12,7 +12,6 @@ function useApiGetter<Result>(
 			return
 		}
 		const json = (await res.json()) as { data: Result }
-		console.log(json)
 		setter(json.data)
 	}
 }
