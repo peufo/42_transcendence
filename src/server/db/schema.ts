@@ -49,16 +49,10 @@ export const matches = sqliteTable('matches', {
 		.default('Kevin'),
 	finished: int({ mode: 'boolean' }).notNull().default(false),
 	pointsToWin: int().notNull(),
-	versusdId: int()
-		.unique()
-		.references(() => versus.id),
 })
 
-export const matchVersusRelations = relations(matches, ({ one }) => ({
-	versus: one(versus, {
-		fields: [matches.versusdId],
-		references: [versus.id],
-	}),
+export const matchesRelations = relations(matches, ({ one }) => ({
+	versus: one(versus),
 }))
 
 export const tournaments = sqliteTable('tournament', {
@@ -110,10 +104,8 @@ export const versus = sqliteTable('versus', {
 })
 
 export const versusRelations = relations(versus, ({ one }) => ({
-	pointsToWin: one(tournaments, {
-		fields: [versus.id],
-		references: [tournaments.id],
-	}),
+	tournament: one(tournaments),
+	match: one(matches),
 }))
 
 export const round = sqliteTable('round', {
