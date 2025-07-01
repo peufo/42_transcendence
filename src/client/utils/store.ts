@@ -9,7 +9,6 @@ export type User = {
 }
 
 export type Friend = User & {
-	isOnline: boolean
 	gameId?: string
 }
 
