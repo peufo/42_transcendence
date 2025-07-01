@@ -24,7 +24,7 @@ customElements.define(
 						</div>
 						<!--
 						<ft-friends></ft-friends>
-
+						-->
 						<div class="flex flex-col gap-3">
 							<h3 class="text-sm/6 font-semibold text-gray-900">
 								Invitations
@@ -48,7 +48,7 @@ customElements.define(
 								<a href="/invitations/accept" class="btn btn-green">Accept</a>
 							</div>
 						</div>
-						-->
+
 
 						<div class="flex flex-col gap-3">
 
@@ -92,10 +92,14 @@ customElements.define(
 			for (const user of users) {
 				html += /*html*/ `
 					<div class="flex pl-4 p-2 items-center gap-2 border border-gray-200 rounded-xl">
+						<img src="${getAvatarSrc(user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
 						<span>${user.name}</span>
 						<div class="flex-grow"></div>
-						<!-- TODO: need to form method="post" -->
-						<a href="/invitations/new?userId=${user.id}" class="btn btn-border">Invite</a>
+						<!-- TODO: create route -->
+						<form action="/invitations/new" method="post" class="btn btn-border">
+							<input type="hidden" name="userId" value="${user.id}"></input>
+							<input type="submit">Invite</input>
+						</form>
 					</div>
 				`
 			}
@@ -145,7 +149,7 @@ customElements.define(
 				</h3>
 			`
 			for (const friend of friends) {
-				const badge = friend.isOnline
+				const badge = friend.isActive
 					? /*html*/ `<span class="badge badge-green">Online</span>`
 					: /*html*/ `<span class="badge badge-dark">Offline</span>`
 
