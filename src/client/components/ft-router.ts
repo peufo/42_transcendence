@@ -18,8 +18,9 @@ function goto(url: URL, invalidateAll = false) {
 	setUrl(url)
 	if (invalidateAll) {
 		// TODO More granularity ? More generic ?
-		api.user()
-		// ... other api calls
+		for (const callApi of Object.values(api)) {
+			callApi()
+		}
 	}
 }
 
