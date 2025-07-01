@@ -46,7 +46,6 @@ const auth: FastifyPluginCallbackZod = (server, options, done) => {
 				path: '/',
 				signed: true,
 			})
-			res.locals = { user }
 			res.redirect('/')
 		},
 	)

@@ -88,6 +88,19 @@ function onClickLink(event: MouseEvent) {
 export async function onSubmitForm(event: SubmitEvent) {
 	event.preventDefault()
 	const form = event.target as HTMLFormElement
+	if (form.method === 'get') {
+		const apikey = form.dataset.api
+		if (!apikey)
+			throw new Error(
+				`Attribute data-api="resource" is needed in form element when method="get"`,
+			)
+		if (!api[apikey])
+			throw new Error(
+				`form data-api="${apikey}" does not exist in client/api.ts`,
+			)
+		return api[apikey](getFormBody())
+	}
+
 	const res = await fetch(form.action, {
 		method: form.method,
 		headers: {
