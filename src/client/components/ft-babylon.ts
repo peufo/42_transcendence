@@ -3,6 +3,7 @@ import {
   type State,
   ARENA_WIDTH,
   ARENA_HEIGHT,
+  Scores,  
 } from '../../lib/engine/index.js'
 
 import { createCamera } from '../graphics/camera.js'
@@ -12,7 +13,7 @@ import {
   createMatwall,
   createBallMaterial,
 } from '../graphics/materials.js'
-import { createArena } from '../graphics/arena.js'
+import { createArena, createScore } from '../graphics/arena.js'
 import { createPaddles } from '../graphics/paddles.js'
 import { createBall } from '../graphics/ball.js'
 import { toRenderPosition } from '../graphics/utils.js'
@@ -32,7 +33,6 @@ customElements.define(
     paddle1: BABYLON.Mesh
     paddle2: BABYLON.Mesh
     gameLogicEngine: GameEngine
-
     constructor() {
       super()
       this.classList.add('w-full', 'h-full')
@@ -44,6 +44,7 @@ customElements.define(
       this.setupShadows()
       this.startGameEngine()
       this.setupControls()
+      this.setupScore()
 
       this.babylonEngine.runRenderLoop(() => this.scene.render())
     }
@@ -66,16 +67,27 @@ customElements.define(
     }
 
     setupScene() {
-      this.camera = createCamera(this.scene, this.canvas)
-      this.light = createLights(this.scene)
-
-      const pipeline = new BABYLON.DefaultRenderingPipeline('defaultPipeline', true, this.scene, [this.camera])
-      pipeline.bloomEnabled = true
-      pipeline.bloomIntensity = 1
-      pipeline.imageProcessingEnabled = true
-      pipeline.fxaaEnabled = true
+        this.camera = createCamera(this.scene, this.canvas)
+        this.light = createLights(this.scene)
+        const pipeline = new BABYLON.DefaultRenderingPipeline('defaultPipeline', true, this.scene, [this.camera])
+        pipeline.bloomEnabled = true
+        pipeline.bloomIntensity = 1
+        pipeline.imageProcessingEnabled = true
+        pipeline.fxaaEnabled = true
       }
 
+      setupScore()
+      {
+        this.guiTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, this.scene);
+        this.scoreText = new BABYLON.GUI.TextBlock();
+        this.scoreText.text = "0 : 0";
+        this.scoreText.color = "blue";
+        this.scoreText.fontSize = 48;
+        this.scoreText.top = "-440px";
+        this.scoreText.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+        this.scoreText.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+        this.guiTexture.addControl(this.scoreText);
+      }
     createGameObjects() {
       const wallMaterial = createMatwall(this.scene)
       const paddleMaterial = createPaddleMaterial(this.scene)
@@ -124,8 +136,15 @@ customElements.define(
     }
 
     startGameEngine() {
-      this.gameLogicEngine = new GameEngine(this.renderGameState.bind(this))
-      this.gameLogicEngine.startGame()
+        this.gameLogicEngine = new GameEngine(
+        this.renderGameState.bind(this),
+        this.handleScoreUpdate.bind(this) // a cree
+)
+        this.gameLogicEngine.startGame()
+    }
+    handleScoreUpdate(scores: Scores) {
+        console.log("Score updated:", scores)
+        this.scoreText.text = `${scores.p1} : ${scores.p2}`;
     }
 
     setupControls() {
