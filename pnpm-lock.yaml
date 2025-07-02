@@ -29,6 +29,9 @@ importers:
       argon2:
         specifier: ^0.43.0
         version: 0.43.0
+      babylonjs:
+        specifier: ^8.14.0
+        version: 8.14.0
       dotenv:
         specifier: ^16.5.0
         version: 16.5.0
@@ -57,6 +60,9 @@ importers:
       '@tailwindcss/cli':
         specifier: ^4.1.10
         version: 4.1.10
+      '@types/babylonjs':
+        specifier: ^2.4.5
+        version: 2.4.5
       '@types/node':
         specifier: ^24.0.3
         version: 24.0.3
@@ -759,6 +765,10 @@ packages:
     resolution: {integrity: sha512-v0C43s7Pjw+B9w21htrQwuFObSkio2aV/qPx/mhrRldbqxbWJK6KizM+q7BF1/1CmuLqZqX3CeYF7s7P9fbA8Q==}
     engines: {node: '>= 10'}
 
+  '@types/babylonjs@2.4.5':
+    resolution: {integrity: sha512-hHImUhEeDk8OAhhwXeEsDo3osfF+zTREhSOQgAoj5E0iJL2/bN2ojavSyYFdm7vXK8WNhf7i4YEF6B3ix/WL+Q==}
+    deprecated: This is a stub types definition. babylonjs provides its own type definitions, so you do not need this installed.
+
   '@types/node@24.0.3':
     resolution: {integrity: sha512-R4I/kzCYAdRLzfiCabn9hxWfbuHS573x+r0dJMkkzThEa7pbrcDWK+9zu3e7aBOouf+rQAciqPFMnxwr0aWgKg==}
 
@@ -832,6 +842,9 @@ packages:
 
   avvio@9.1.0:
     resolution: {integrity: sha512-fYASnYi600CsH/j9EQov7lECAniYiBFiiAtBNuZYLA2leLe9qOvZzqYHFjtIj6gD2VMoMLP14834LFWvr4IfDw==}
+
+  babylonjs@8.14.0:
+    resolution: {integrity: sha512-HBzseLwz9+dOFZsc8CTLYPiuQRpVuCZVKQ2mneDkD77if9Hcxl4DNOfKtRYf3aDitePTd1wSoJ7/H2mcdcS2AA==}
 
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
@@ -2594,6 +2607,10 @@ snapshots:
       '@tailwindcss/oxide-win32-arm64-msvc': 4.1.10
       '@tailwindcss/oxide-win32-x64-msvc': 4.1.10
 
+  '@types/babylonjs@2.4.5':
+    dependencies:
+      babylonjs: 8.14.0
+
   '@types/node@24.0.3':
     dependencies:
       undici-types: 7.8.0
@@ -2669,6 +2686,8 @@ snapshots:
     dependencies:
       '@fastify/error': 4.2.0
       fastq: 1.19.1
+
+  babylonjs@8.14.0: {}
 
   balanced-match@1.0.2: {}
 

@@ -10,7 +10,7 @@ import './ft-page-local-new.js'
 import './ft-page-local-play.js'
 import './ft-page-game-new.js'
 import './ft-page-game-play.js'
-
+import './ft-page-local-play-babylon.js'
 const [getUrl, setUrl] = createSignal<URL>(new URL(document.location.href))
 
 function goto(url: URL, invalidateAll = false) {
@@ -35,7 +35,8 @@ customElements.define(
 			'/local/play': 'ft-page-local-play',
 			'/game/new': 'ft-page-game-new',
 			'/game/play': 'ft-page-game-play',
-		}
+		    '/local/play/babylon': 'ft-page-local-play-babylon',
+        }
 
 		connectedCallback() {
 			document.addEventListener('submit', onSubmitForm)
