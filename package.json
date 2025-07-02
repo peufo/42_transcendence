@@ -30,6 +30,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
 		"@tailwindcss/cli": "^4.1.10",
+		"@types/babylonjs": "^2.4.5",
 		"@types/node": "^24.0.3",
 		"@types/web": "^0.0.243",
 		"@types/ws": "^8.18.1",
@@ -47,6 +48,7 @@
 		"@fastify/websocket": "^11.1.0",
 		"@libsql/client": "^0.15.9",
 		"argon2": "^0.43.0",
+		"babylonjs": "^8.14.0",
 		"dotenv": "^16.5.0",
 		"drizzle-orm": "^0.44.2",
 		"drizzle-seed": "^0.3.1",
