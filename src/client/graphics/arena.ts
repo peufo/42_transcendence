@@ -5,16 +5,16 @@ export function createArena(scene: BABYLON.Scene, material: BABYLON.Material, AR
 
     const hl = new BABYLON.HighlightLayer("hl1", scene);
   const ground = BABYLON.MeshBuilder.CreateBox("ground", {
-    width: ARENA_WIDTH,
+    width: ARENA_HEIGHT,
     height: 1, // mince
-    depth: ARENA_HEIGHT
+    depth: ARENA_WIDTH
   }, scene)
 
   ground.position.y = -10.4
   ground.material = material
 
     const wall = BABYLON.MeshBuilder.CreateBox('wall', {
-        width: ARENA_WIDTH,
+        width: ARENA_HEIGHT,
         height: 16,
         depth: 10
     }, scene)
@@ -46,13 +46,13 @@ export function createArena(scene: BABYLON.Scene, material: BABYLON.Material, AR
     //        faceColors: faceColors
         })
     wall3.position.z = 0;
-    wall3.position.x = ARENA_WIDTH / 2 
+    wall3.position.x = ARENA_HEIGHT / 2 
     wall3.position.y = -7
 
 
     hl.addMesh(wall3, BABYLON.Color3.Blue());
     const wall4 = wall3.clone('wall4');
-    wall4.position.x = -ARENA_WIDTH /2 
+    wall4.position.x = -ARENA_HEIGHT /2 
     
     hl.addMesh(wall4, BABYLON.Color3.Blue());
 }
