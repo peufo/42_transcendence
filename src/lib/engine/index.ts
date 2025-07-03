@@ -23,7 +23,7 @@ export type State = {
 }
 
 // Game properties
-const TICK_RATE = 30
+const TICK_RATE = 10
 export const BALL_SUBSTEPS = 3
 export const TICK_INTERVAL = 1000 / TICK_RATE
 export const ARENA_WIDTH = 1000

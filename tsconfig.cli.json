@@ -1,0 +1,9 @@
+{
+	"extends": "./tsconfig.json",
+	"include": ["./src/cli/**/*"],
+	"compilerOptions": {
+		"module": "nodenext",
+		"moduleResolution": "nodenext",
+		"outDir": "./build"
+	}
+}
