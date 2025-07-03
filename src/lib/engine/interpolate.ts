@@ -2,8 +2,8 @@ import {
 	BALL_BASE_POSITION,
 	PADDLE_BASE_P1_POSITION,
 	PADDLE_BASE_P2_POSITION,
-	TICK_INTERVAL,
 	type State,
+	TICK_INTERVAL,
 } from './index.js'
 
 export function useInterpolate() {

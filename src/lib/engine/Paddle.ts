@@ -1,3 +1,4 @@
+import { Vector2 } from './Vector2.js'
 import {
 	ARENA_HEIGHT,
 	PADDLE_BASE_HEIGHT,
@@ -5,7 +6,6 @@ import {
 	TICK_INTERVAL,
 } from './index.js'
 import type { Move } from './index.js'
-import { Vector2 } from './Vector2.js'
 export class Paddle {
 	#position: Vector2
 	#speed = PADDLE_BASE_SPEED
@@ -20,7 +20,7 @@ export class Paddle {
 
 	move(direction: Move) {
 		const displ = TICK_INTERVAL * this.#speed
-        if (direction === 'up') {
+		if (direction === 'up') {
 			if (this.#position.y - displ < 0) this.#position.y = 0
 			else this.#position.y -= displ
 		} else if (direction === 'down') {

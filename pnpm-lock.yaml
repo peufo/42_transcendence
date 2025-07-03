@@ -32,6 +32,9 @@ importers:
       babylonjs:
         specifier: ^8.14.0
         version: 8.14.0
+      babylonjs-gui:
+        specifier: ^8.14.2
+        version: 8.14.2
       dotenv:
         specifier: ^16.5.0
         version: 16.5.0
@@ -846,8 +849,14 @@ packages:
   avvio@9.1.0:
     resolution: {integrity: sha512-fYASnYi600CsH/j9EQov7lECAniYiBFiiAtBNuZYLA2leLe9qOvZzqYHFjtIj6gD2VMoMLP14834LFWvr4IfDw==}
 
+  babylonjs-gui@8.14.2:
+    resolution: {integrity: sha512-5I73wXbqZOV7cqnXJnsQ9Kw69qa5psoXHBqrZ3NFcuFIvowHU879t40gBa/LoDqtZ4rk0uPjOp7RiI2LKT90RQ==}
+
   babylonjs@8.14.0:
     resolution: {integrity: sha512-HBzseLwz9+dOFZsc8CTLYPiuQRpVuCZVKQ2mneDkD77if9Hcxl4DNOfKtRYf3aDitePTd1wSoJ7/H2mcdcS2AA==}
+
+  babylonjs@8.14.2:
+    resolution: {integrity: sha512-WUmVBGNcS11vj8lUm/vR4hFcXP5JoRdQMfZ5Hss2u7u956PzUIUUgeHA+AmO+oxl8ho6QOpcU7dWmwEKy3G7xQ==}
 
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
@@ -2701,7 +2710,13 @@ snapshots:
       '@fastify/error': 4.2.0
       fastq: 1.19.1
 
+  babylonjs-gui@8.14.2:
+    dependencies:
+      babylonjs: 8.14.2
+
   babylonjs@8.14.0: {}
+
+  babylonjs@8.14.2: {}
 
   balanced-match@1.0.2: {}
 
