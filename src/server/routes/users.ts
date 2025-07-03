@@ -1,7 +1,7 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod/v4'
 import { db, friendships, users } from '../db/index.js'
-import { ne, and, or, eq, like } from 'drizzle-orm'
+import { ne, and, or, eq, like, notInArray } from 'drizzle-orm'
 import { getTableColumns } from 'drizzle-orm'
 import '@fastify/cookie'
 import '../types.js'
@@ -24,27 +24,55 @@ const auth: FastifyPluginCallbackZod = (server, options, done) => {
 			const { passwordHash, isActive, lastLogin, createdAt, ...columns } =
 				getTableColumns(users)
 
+			const friendsId = await db
+				.select()
+				.from(friendships)
+				.where(
+					or(
+						eq(friendships.user1Id, user.id),
+						eq(friendships.user2Id, user.id),
+					),
+				)
+				.then((res) =>
+					res.map((friendship) =>
+						friendship.user1Id === user.id
+							? friendship.user2Id
+							: friendship.user1Id,
+					),
+				)
+
 			const results = await db
 				.select(columns)
 				.from(users)
-				.rightJoin(
-					friendships,
-					or(
-						eq(friendships.user1Id, users.id),
-						eq(friendships.user2Id, users.id),
-					),
-				)
 				.where(
 					and(
 						like(users.name, `%${search}%`),
 						ne(users.id, user.id),
-						or(
-							ne(friendships.user1Id, users.id),
-							ne(friendships.user2Id, users.id),
-						),
+						notInArray(users.id, friendsId),
 					),
 				)
-				.groupBy(users.id)
+
+			// const results = await db
+			// 	.select(columns)
+			// 	.from(users)
+			// 	.rightJoin(
+			// 		friendships,
+			// 		or(
+			// 			eq(friendships.user1Id, users.id),
+			// 			eq(friendships.user2Id, users.id),
+			// 		),
+			// 	)
+			// 	.where(
+			// 		and(
+			// 			like(users.name, `%${search}%`),
+			// 			ne(users.id, user.id),
+			// 			or(
+			// 				ne(friendships.user1Id, users.id),
+			// 				ne(friendships.user2Id, users.id),
+			// 			),
+			// 		),
+			// 	)
+			// 	.groupBy(users.id)
 
 			return res.send({ data: results })
 		},
