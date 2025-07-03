@@ -150,10 +150,10 @@ customElements.define(
 		}
 
 		startGameEngine() {
-			this.gameLogicEngine = new GameEngine(
-				this.renderGameState.bind(this),
-				this.handleScoreUpdate.bind(this), // a cree
-			)
+			this.gameLogicEngine = new GameEngine({
+				onTick: this.renderGameState.bind(this),
+				onScore: this.handleScoreUpdate.bind(this),
+			})
 			this.gameLogicEngine.startGame()
 		}
 		handleScoreUpdate(scores: Scores) {
