@@ -167,19 +167,24 @@ customElements.define(
 			})
 
 			for (const invitation of invitations) {
+				const formButton = (
+					action: string,
+					label: string,
+					color: string,
+				) => /*html*/ `
+					<form action="/invitations/${action}" method="post">
+						<input type="hidden" name="friendshipId" value="${invitation.friendshipId}">
+						<input class="btn ${color}" type="submit" value="${label}">
+					</form>
+				`
+
 				const createdByMe = invitation.createdBy === user.id
 				const buttons: string[] = []
 				if (createdByMe) {
-					buttons.push(
-						'<a href="/invitations/cancel" class="btn btn-red">Cancel</a>',
-					)
+					buttons.push(formButton('cancel', 'Cancel', 'btn-red'))
 				} else {
-					buttons.push(
-						'<a href="/invitations/accept" class="btn btn-green">Accept</a>',
-					)
-					buttons.push(
-						'<a href="/invitations/reject" class="btn btn-red">Reject</a>',
-					)
+					buttons.push(formButton('accept', 'Accept', 'btn-green'))
+					buttons.push(formButton('reject', 'Reject', 'btn-red'))
 				}
 
 				html += /*html*/ `

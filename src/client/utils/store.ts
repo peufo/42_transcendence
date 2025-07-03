@@ -22,6 +22,7 @@ export type Friend = UserBasic & {
 export type Invitation = UserBasic & {
 	createdBy: number
 	createdAt: string
+	friendshipId: number
 }
 
 export const [getUser, setUser] = createSignal<User | undefined>(undefined)

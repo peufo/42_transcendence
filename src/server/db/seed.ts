@@ -46,12 +46,15 @@ async function main() {
 		},
 	}))
 
-	await db.insert(friendships).values({
-		user1Id: 2,
-		user2Id: 7,
-		state: 'invited',
-		createdBy: 7,
-	})
+	const invits = [3, 6, 9, 10, 13, 14]
+	for (const invitId of invits) {
+		await db.insert(friendships).values({
+			user1Id: 2,
+			user2Id: invitId,
+			state: 'invited',
+			createdBy: invitId,
+		})
+	}
 }
 
 main()

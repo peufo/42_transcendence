@@ -37,6 +37,7 @@ export const sessions = sqliteTable('sessions', {
 export const friendships = sqliteTable(
 	'friendships',
 	{
+		id: int().primaryKey({ autoIncrement: true }),
 		user1Id: int()
 			.notNull()
 			.references(() => users.id),
