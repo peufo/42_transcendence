@@ -8,7 +8,7 @@ import { createAvatarPlaceholder } from '../controllers/avatar.js'
 import '@fastify/cookie'
 import '../types.js'
 
-const auth: FastifyPluginCallbackZod = (server, options, done) => {
+export const authRoute: FastifyPluginCallbackZod = (server, options, done) => {
 	server.post(
 		'/login',
 		{
@@ -67,5 +67,3 @@ const auth: FastifyPluginCallbackZod = (server, options, done) => {
 
 	done()
 }
-
-export default auth

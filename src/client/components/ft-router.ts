@@ -13,14 +13,18 @@ import './ft-page-game-play.js'
 
 const [getUrl, setUrl] = createSignal<URL>(new URL(document.location.href))
 
+function apiCallAll() {
+	for (const callApi of Object.values(api)) {
+		callApi()
+	}
+}
+
 function goto(url: URL, invalidateAll = false) {
 	window.history.pushState({}, '', url)
 	setUrl(url)
 	if (invalidateAll) {
 		// TODO More granularity ? More generic ?
-		for (const callApi of Object.values(api)) {
-			callApi()
-		}
+		apiCallAll()
 	}
 }
 
@@ -130,6 +134,7 @@ export async function onSubmitForm(event: SubmitEvent) {
 		return goto(new URL(res.url), true)
 	}
 	parseErrorMessage()
+	apiCallAll()
 
 	function getFormBody(): string | FormData {
 		const formData = new FormData(form)
