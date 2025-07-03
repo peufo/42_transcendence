@@ -66,9 +66,6 @@ importers:
       '@tailwindcss/cli':
         specifier: ^4.1.10
         version: 4.1.10
-      '@types/babylonjs':
-        specifier: ^2.4.5
-        version: 2.4.5
       '@types/node':
         specifier: ^24.0.3
         version: 24.0.3
@@ -770,10 +767,6 @@ packages:
   '@tailwindcss/oxide@4.1.10':
     resolution: {integrity: sha512-v0C43s7Pjw+B9w21htrQwuFObSkio2aV/qPx/mhrRldbqxbWJK6KizM+q7BF1/1CmuLqZqX3CeYF7s7P9fbA8Q==}
     engines: {node: '>= 10'}
-
-  '@types/babylonjs@2.4.5':
-    resolution: {integrity: sha512-hHImUhEeDk8OAhhwXeEsDo3osfF+zTREhSOQgAoj5E0iJL2/bN2ojavSyYFdm7vXK8WNhf7i4YEF6B3ix/WL+Q==}
-    deprecated: This is a stub types definition. babylonjs provides its own type definitions, so you do not need this installed.
 
   '@types/node@24.0.3':
     resolution: {integrity: sha512-R4I/kzCYAdRLzfiCabn9hxWfbuHS573x+r0dJMkkzThEa7pbrcDWK+9zu3e7aBOouf+rQAciqPFMnxwr0aWgKg==}
@@ -2629,10 +2622,6 @@ snapshots:
       '@tailwindcss/oxide-wasm32-wasi': 4.1.10
       '@tailwindcss/oxide-win32-arm64-msvc': 4.1.10
       '@tailwindcss/oxide-win32-x64-msvc': 4.1.10
-
-  '@types/babylonjs@2.4.5':
-    dependencies:
-      babylonjs: 8.14.0
 
   '@types/node@24.0.3':
     dependencies:
