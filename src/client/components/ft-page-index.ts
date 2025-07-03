@@ -3,14 +3,43 @@ import {
 	getUser,
 	getUsers,
 	type UserBasic,
-	type Friend,
+	getFriends,
+	getInvitations,
 } from '../utils/store.js'
 
 customElements.define(
 	'ft-page-index',
 	class extends HTMLElement {
 		connectedCallback() {
-			this.innerHTML = /*html*/ `
+			this.innerHTML = this.render()
+		}
+
+		render(): string {
+			const user = getUser()
+
+			let userContent = ''
+			if (user)
+				userContent = /*html*/ `
+					<ft-friends></ft-friends>
+					<ft-invitations></ft-invitations>
+					<div class="flex flex-col gap-3">
+						<form class="flex items-center w-full" data-api="users" method="get">
+							<div class="relative w-full">
+								<div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+									<ft-icon name="user-search" class="h-5 w-5 text-gray-500"></ft-icon>
+								</div>
+								<input type="text"
+									name="search"
+									autocomplete="off"
+									class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 "
+									placeholder="Looking for new friends" />
+							</div>
+						</form>
+						<ft-users></ft-users>
+					</div>
+				`
+
+			return /*html*/ `
 				<div class="flex min-h-full flex-col justify-center p-6 lg:px-8">
 					<div class="flex flex-col gap-10 mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
 						<div>
@@ -27,52 +56,7 @@ customElements.define(
 								</a>
 							</div>
 						</div>
-						<!--
-						<ft-friends></ft-friends>
-						-->
-						<div class="flex flex-col gap-3">
-							<h3 class="text-sm/6 font-semibold text-gray-900">
-								Invitations
-							</h3>
-
-							<div class="flex pl-4 p-2 items-center gap-2 border border-gray-200 rounded-xl">
-								<div class="flex flex-col">
-									<span>Jonas</span>
-									<span class="text-xs text-gray-900 leading-3">Sended at 18:12</span>
-								</div>
-								<div class="flex-grow"></div>
-							</div>
-
-							<div class="flex pl-4 p-2 items-center gap-2 border border-gray-200 rounded-xl">
-								<div class="flex flex-col">
-									<span>Léonard</span>
-									<span class="text-xs text-gray-900 leading-3">Recieved at 19:32</span>
-								</div>
-								<div class="flex-grow"></div>
-								<a href="/invitations/reject" class="btn btn-red">Reject</a>
-								<a href="/invitations/accept" class="btn btn-green">Accept</a>
-							</div>
-						</div>
-
-
-						<div class="flex flex-col gap-3">
-
-							<form class="flex items-center w-full" data-api="users" method="get">
-								<div class="relative w-full">
-									<div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-										<ft-icon name="user-search" class="h-5 w-5 text-gray-500"></ft-icon>
-									</div>
-									<input type="text"
-										name="search"
-										autocomplete="off"
-										class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 "
-										placeholder="Looking for new friends" />
-								</div>
-							</form>
-
-							<ft-users></ft-users>
-
-						</div>
+						${userContent}
 					</div>
 				</div>
 			`
@@ -119,37 +103,14 @@ customElements.define(
 		connectedCallback() {
 			this.classList.add('flex', 'flex-col', 'gap-3')
 			// TODO: place it in createEffect() depend of friends[]
-			this.innerHTML = this.renderContent()
+			createEffect(() => {
+				this.innerHTML = this.renderContent()
+			})
 		}
 
 		renderContent(): string {
-			const friends: Friend[] = [
-				{
-					id: 2,
-					name: 'Bob',
-					avatarPlaceholder:
-						'https://api.dicebear.com/9.x/bottts-neutral/svg?seed=0.1',
-					isActive: true,
-					lastLogin: '',
-					gameId: '12344321',
-				},
-				{
-					id: 3,
-					name: 'Alice',
-					avatarPlaceholder:
-						'https://api.dicebear.com/9.x/bottts-neutral/svg?seed=0.2',
-					isActive: true,
-					lastLogin: '',
-				},
-				{
-					id: 4,
-					name: 'Clélie',
-					avatarPlaceholder:
-						'https://api.dicebear.com/9.x/bottts-neutral/svg?seed=0.3',
-					isActive: false,
-					lastLogin: '',
-				},
-			]
+			const friends = getFriends()
+			if (!friends) return 'you have no friends :('
 
 			let html = /*html*/ `
 				<h3 class="text-sm/6 font-semibold text-gray-900">
@@ -177,6 +138,64 @@ customElements.define(
 				`
 			}
 
+			return html
+		}
+	},
+)
+
+customElements.define(
+	'ft-invitations',
+	class extends HTMLElement {
+		connectedCallback() {
+			this.classList.add('flex', 'flex-col', 'gap-3')
+			createEffect(() => {
+				this.innerHTML = this.render()
+			})
+		}
+		render(): string {
+			const user = getUser()
+			const invitations = getInvitations()
+			if (!user || !invitations.length) return ''
+
+			let html = /*html*/ `
+				<h3 class="text-sm/6 font-semibold text-gray-900">
+					Invitations
+				</h3>`
+
+			const formater = new Intl.DateTimeFormat('fr-CH', {
+				dateStyle: 'short',
+			})
+
+			for (const invitation of invitations) {
+				const createdByMe = invitation.createdBy === user.id
+				const buttons: string[] = []
+				if (createdByMe) {
+					buttons.push(
+						'<a href="/invitations/cancel" class="btn btn-red">Cancel</a>',
+					)
+				} else {
+					buttons.push(
+						'<a href="/invitations/accept" class="btn btn-green">Accept</a>',
+					)
+					buttons.push(
+						'<a href="/invitations/reject" class="btn btn-red">Reject</a>',
+					)
+				}
+
+				html += /*html*/ `
+					<div class="flex pl-4 p-2 items-center gap-2 border border-gray-200 rounded-xl">
+					<img src="${getAvatarSrc(invitation)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
+						<div class="flex flex-col">
+							<span>${invitation.name}</span>
+							<span class="text-xs text-gray-900 leading-3">
+								${createdByMe ? 'Sent' : 'Received'} a ${formater.format(new Date(invitation.createdAt))}
+							</span>
+						</div>
+						<div class="flex-grow"></div>
+						${buttons.join('')}
+					</div>
+				`
+			}
 			return html
 		}
 	},
