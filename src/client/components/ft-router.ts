@@ -99,7 +99,7 @@ export async function onSubmitForm(event: SubmitEvent) {
 			throw new Error(
 				`form data-api="${apikey}" does not exist in client/api.ts`,
 			)
-		return api[apikey](getFormBody())
+		return api[apikey](getFormQuery(new FormData(form)))
 	}
 
 	const res = await fetch(form.action, {
@@ -136,6 +136,10 @@ export async function onSubmitForm(event: SubmitEvent) {
 		if (form.enctype === 'multipart/formdata') {
 			return formData
 		}
+		return getFormQuery(formData)
+	}
+
+	function getFormQuery(formData: FormData): string {
 		const urlEncoded = new URLSearchParams()
 		for (const [key, value] of formData.entries()) {
 			if (typeof value === 'object')

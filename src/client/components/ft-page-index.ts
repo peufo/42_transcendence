@@ -1,5 +1,10 @@
 import { createEffect } from '../utils/signal.js'
-import { getUser, getUsers, type Friend, type User } from '../utils/store.js'
+import {
+	getUser,
+	getUsers,
+	type UserBasic,
+	type Friend,
+} from '../utils/store.js'
 
 customElements.define(
 	'ft-page-index',
@@ -125,6 +130,7 @@ customElements.define(
 					avatarPlaceholder:
 						'https://api.dicebear.com/9.x/bottts-neutral/svg?seed=0.1',
 					isActive: true,
+					lastLogin: '',
 					gameId: '12344321',
 				},
 				{
@@ -133,6 +139,7 @@ customElements.define(
 					avatarPlaceholder:
 						'https://api.dicebear.com/9.x/bottts-neutral/svg?seed=0.2',
 					isActive: true,
+					lastLogin: '',
 				},
 				{
 					id: 4,
@@ -140,6 +147,7 @@ customElements.define(
 					avatarPlaceholder:
 						'https://api.dicebear.com/9.x/bottts-neutral/svg?seed=0.3',
 					isActive: false,
+					lastLogin: '',
 				},
 			]
 
@@ -213,7 +221,7 @@ customElements.define(
 	},
 )
 
-function getAvatarSrc(user: User): string {
+function getAvatarSrc(user: UserBasic): string {
 	if (user.avatar) {
 		return user.avatar
 	}
