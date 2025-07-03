@@ -18,7 +18,7 @@ import {
 import { createPaddles } from '../graphics/paddles.js'
 import { updateGraphics } from '../graphics/scene.js'
 
-/// <reference types="babylonjs" />
+declare const BABYLON: any;
 
 customElements.define(
 	'ft-babylon',
