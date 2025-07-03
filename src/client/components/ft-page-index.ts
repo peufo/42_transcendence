@@ -1,5 +1,5 @@
 import { createEffect } from '../utils/signal.js'
-import { getUser, type Friend, type User } from '../utils/store.js'
+import { type Friend, type User, getUser } from '../utils/store.js'
 
 customElements.define(
 	'ft-page-index',

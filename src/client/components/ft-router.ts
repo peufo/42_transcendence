@@ -1,6 +1,6 @@
-import { slide, transitionIn, transitionOut } from '../utils/transition.js'
-import { createEffect, createSignal } from '../utils/signal.js'
 import { api } from '../api.js'
+import { createEffect, createSignal } from '../utils/signal.js'
+import { slide, transitionIn, transitionOut } from '../utils/transition.js'
 import './ft-page-404.js'
 import './ft-page-index.js'
 import './ft-page-login.js'
@@ -35,8 +35,8 @@ customElements.define(
 			'/local/play': 'ft-page-local-play',
 			'/game/new': 'ft-page-game-new',
 			'/game/play': 'ft-page-game-play',
-		    '/local/play/babylon': 'ft-page-local-play-babylon',
-        }
+			'/local/play/babylon': 'ft-page-local-play-babylon',
+		}
 
 		connectedCallback() {
 			document.addEventListener('submit', onSubmitForm)

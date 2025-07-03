@@ -1,5 +1,5 @@
-import { Paddle } from './Paddle.js'
 import { Ball } from './Ball.js'
+import { Paddle } from './Paddle.js'
 import { Vector2 } from './Vector2.js'
 
 // types
