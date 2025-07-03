@@ -4,6 +4,7 @@
 	"compilerOptions": {
 		"lib": ["dom", "ESNext"],
 		"module": "esnext",
-		"outDir": "./build/public"
+		"outDir": "./build/public",
+		
 	}
 }
