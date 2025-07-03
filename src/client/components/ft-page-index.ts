@@ -1,10 +1,10 @@
 import { createEffect } from '../utils/signal.js'
 import {
-	getUser,
-	getUsers,
 	type UserBasic,
 	getFriends,
 	getInvitations,
+	getUser,
+	getUsers,
 } from '../utils/store.js'
 
 customElements.define(
