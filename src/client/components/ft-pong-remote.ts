@@ -1,16 +1,16 @@
 import {
-	ENGINE_EVENT,
-	ARENA_WIDTH,
 	ARENA_HEIGHT,
-	type Player,
-	type Move,
-	type Scores,
-	PADDLE_BASE_P1_POSITION,
-	PADDLE_BASE_WIDTH,
-	PADDLE_BASE_HEIGHT,
-	PADDLE_BASE_P2_POSITION,
+	ARENA_WIDTH,
 	BALL_BASE_SIZE,
+	ENGINE_EVENT,
 	type EngineEventData,
+	type Move,
+	PADDLE_BASE_HEIGHT,
+	PADDLE_BASE_P1_POSITION,
+	PADDLE_BASE_P2_POSITION,
+	PADDLE_BASE_WIDTH,
+	type Player,
+	type Scores,
 } from '../../lib/engine/index.js'
 import { useInterpolate } from '../../lib/engine/interpolate.js'
 
