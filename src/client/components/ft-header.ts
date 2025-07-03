@@ -28,6 +28,7 @@ customElements.define(
 
 		render(): string {
 			const user = getUser()
+
 			if (!user) {
 				return /*html*/ `
 					<a href="/login" class="btn btn-border flex shrink-0 flex-nowrap">

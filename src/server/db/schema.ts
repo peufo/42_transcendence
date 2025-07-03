@@ -1,5 +1,12 @@
-import { relations } from 'drizzle-orm'
-import { blob, int, sqliteTable, text } from 'drizzle-orm/sqlite-core'
+import { relations, sql } from 'drizzle-orm'
+import {
+	blob,
+	int,
+	sqliteTable,
+	text,
+	unique,
+	check,
+} from 'drizzle-orm/sqlite-core'
 
 export const users = sqliteTable('users', {
 	id: int().primaryKey({ autoIncrement: true }),
@@ -13,7 +20,7 @@ export const users = sqliteTable('users', {
 })
 
 export const usersRelations = relations(users, ({ many }) => ({
-	friends: many(friendShips),
+	friends: many(friendships),
 	tournaments: many(tournamentsParticipants),
 }))
 
@@ -27,15 +34,22 @@ export const sessions = sqliteTable('sessions', {
 	createdAt: int({ mode: 'timestamp' }).notNull(),
 })
 
-export const friendShips = sqliteTable('friend_ships', {
-	user1Id: int()
-		.notNull()
-		.references(() => users.id),
-	user2Id: int()
-		.notNull()
-		.references(() => users.id),
-	state: text({ enum: ['invited', 'friend'] }),
-})
+export const friendships = sqliteTable(
+	'friendships',
+	{
+		user1Id: int()
+			.notNull()
+			.references(() => users.id),
+		user2Id: int()
+			.notNull()
+			.references(() => users.id),
+		state: text({ enum: ['invited', 'friend'] }).default('invited'),
+	},
+	(table) => [
+		unique().on(table.user1Id, table.user2Id),
+		check('user1Id_lower_user2Id', sql`${table.user2Id} > ${table.user1Id}`),
+	],
+)
 
 export const matches = sqliteTable('matches', {
 	id: int().primaryKey({ autoIncrement: true }),
