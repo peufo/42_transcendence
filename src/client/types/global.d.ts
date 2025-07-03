@@ -1,2 +1,1 @@
-declare const BABYLON: any;
-
+declare const BABYLON: any

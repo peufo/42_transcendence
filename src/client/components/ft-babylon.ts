@@ -18,7 +18,6 @@ import {
 import { createPaddles } from '../graphics/paddles.js'
 import { updateGraphics } from '../graphics/scene.js'
 
-
 customElements.define(
 	'ft-babylon',
 	class extends HTMLElement {
