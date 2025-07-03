@@ -1,13 +1,13 @@
 import {
-	Engine,
-	type Scores,
-	ARENA_WIDTH,
 	ARENA_HEIGHT,
+	ARENA_WIDTH,
 	BALL_BASE_SIZE,
-	PADDLE_BASE_WIDTH,
+	Engine,
 	PADDLE_BASE_HEIGHT,
 	PADDLE_BASE_P1_POSITION,
 	PADDLE_BASE_P2_POSITION,
+	PADDLE_BASE_WIDTH,
+	type Scores,
 } from '../../lib/engine/index.js'
 import { useInterpolate } from '../../lib/engine/interpolate.js'
 

@@ -9,6 +9,8 @@
 	"license": "ISC",
 	"packageManager": "pnpm@10.11.0",
 	"scripts": {
+		"format": "biome format .",
+		"lint": "biome lint .",
 		"start": "node .",
 		"build": "rm -rf build && run-s build:*",
 		"build:server": "tsc -p tsconfig.server.json",
@@ -49,6 +51,7 @@
 		"@libsql/client": "^0.15.9",
 		"argon2": "^0.43.0",
 		"babylonjs": "^8.14.0",
+		"babylonjs-gui": "^8.14.2",
 		"dotenv": "^16.5.0",
 		"drizzle-orm": "^0.44.2",
 		"drizzle-seed": "^0.3.1",

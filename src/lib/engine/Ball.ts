@@ -1,21 +1,21 @@
-import { Vector2 } from './Vector2.js'
+import { cubicOut } from '../easing.js'
 import type { Paddle } from './Paddle.js'
+import { Vector2 } from './Vector2.js'
 import {
-	BALL_MAX_BOUNCE_ANGLE,
-	BALL_BASE_SPEED,
 	ARENA_HEIGHT,
 	ARENA_WIDTH,
-	TICK_INTERVAL,
-	type Player,
-	type Engine,
-	BALL_MAX_SPEED,
-	BALL_TIME_TO_REACH_MAX_SPEED,
-	BALL_SUBSTEPS,
 	BALL_BASE_SIZE,
+	BALL_BASE_SPEED,
+	BALL_MAX_BOUNCE_ANGLE,
+	BALL_MAX_SPEED,
+	BALL_SUBSTEPS,
+	BALL_TIME_TO_REACH_MAX_SPEED,
+	type Engine,
 	PADDLE_BASE_HEIGHT,
 	PADDLE_BASE_WIDTH,
+	type Player,
+	TICK_INTERVAL,
 } from './index.js'
-import { cubicOut } from '../easing.js'
 
 export class Ball {
 	#speed = BALL_BASE_SPEED

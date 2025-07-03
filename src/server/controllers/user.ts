@@ -1,6 +1,6 @@
-import { validateSessionToken } from './session.js'
-import { db } from '../db/index.js'
 import type { preHandlerAsyncHookHandler } from 'fastify'
+import { db } from '../db/index.js'
+import { validateSessionToken } from './session.js'
 import '@fastify/cookie'
 
 export const userSessionHook: preHandlerAsyncHookHandler = async (req, res) => {
