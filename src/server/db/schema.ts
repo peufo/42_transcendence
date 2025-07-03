@@ -44,12 +44,31 @@ export const friendships = sqliteTable(
 			.notNull()
 			.references(() => users.id),
 		state: text({ enum: ['invited', 'friend'] }).default('invited'),
+		createdBy: int()
+			.notNull()
+			.references(() => users.id),
+		createdAt: int({ mode: 'timestamp' }).notNull().default(new Date()),
 	},
 	(table) => [
 		unique().on(table.user1Id, table.user2Id),
 		check('user1Id_lower_user2Id', sql`${table.user2Id} > ${table.user1Id}`),
+		check(
+			'creator_is_in_relations',
+			sql`${table.createdBy} = ${table.user1Id} OR ${table.createdBy} = ${table.user2Id}`,
+		),
 	],
 )
+
+export const friendshipsRelations = relations(friendships, ({ one }) => ({
+	user1: one(users, {
+		fields: [friendships.user1Id],
+		references: [users.id],
+	}),
+	user2: one(users, {
+		fields: [friendships.user2Id],
+		references: [users.id],
+	}),
+}))
 
 export const matches = sqliteTable('matches', {
 	id: int().primaryKey({ autoIncrement: true }),

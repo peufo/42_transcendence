@@ -22,26 +22,36 @@ async function main() {
 					defaultValue: passwordHash,
 				}),
 			},
-			count: 10,
+			count: 20,
 		},
 	}))
 
 	await seed(db, { friendships }).refine((f) => ({
 		friendships: {
 			columns: {
-				user1Id: f.valuesFromArray({
-					values: [1, 2, 3],
+				user1Id: f.default({
+					defaultValue: 2,
 				}),
 				user2Id: f.valuesFromArray({
-					values: [4, 5, 6, 7, 8, 9, 10],
+					values: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20],
 				}),
 				state: f.valuesFromArray({
 					values: ['invited', 'friend'],
 				}),
+				createdBy: f.default({
+					defaultValue: 2,
+				}),
 			},
-			count: 12,
+			count: 6,
 		},
 	}))
+
+	await db.insert(friendships).values({
+		user1Id: 2,
+		user2Id: 7,
+		state: 'invited',
+		createdBy: 7,
+	})
 }
 
 main()
