@@ -69,6 +69,12 @@ importers:
       '@types/ws':
         specifier: ^8.18.1
         version: 8.18.1
+      babylonjs:
+        specifier: ^8.15.0
+        version: 8.15.0
+      babylonjs-gui:
+        specifier: ^8.15.0
+        version: 8.15.0
       drizzle-kit:
         specifier: ^0.31.1
         version: 0.31.1
@@ -835,6 +841,12 @@ packages:
 
   avvio@9.1.0:
     resolution: {integrity: sha512-fYASnYi600CsH/j9EQov7lECAniYiBFiiAtBNuZYLA2leLe9qOvZzqYHFjtIj6gD2VMoMLP14834LFWvr4IfDw==}
+
+  babylonjs-gui@8.15.0:
+    resolution: {integrity: sha512-sn0fg8kh9t29/OY9uO8utNIv2YFRG0P9AOUuEOVJ0BZJikmvrefMuqdd6OERCiPU3plutrSN1sEus8SmLdb5og==}
+
+  babylonjs@8.15.0:
+    resolution: {integrity: sha512-fWma5TnVGIoNSR3Jno7j48bYsFl59tGZ3ALryx6BzwOunFLWHPONzULKi7T7adpGsJxSZU7ramMUUHv+/H18IA==}
 
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
@@ -2683,6 +2695,12 @@ snapshots:
     dependencies:
       '@fastify/error': 4.2.0
       fastq: 1.19.1
+
+  babylonjs-gui@8.15.0:
+    dependencies:
+      babylonjs: 8.15.0
+
+  babylonjs@8.15.0: {}
 
   balanced-match@1.0.2: {}
 

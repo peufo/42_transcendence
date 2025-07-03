@@ -1,3 +1,6 @@
+/// <reference path="../../../node_modules/babylonjs/babylon.d.ts" />
+/// <reference path="../../../node_modules/babylonjs-gui/babylon.gui.d.ts" />
+
 import {
 	ARENA_HEIGHT,
 	ARENA_WIDTH,
@@ -24,12 +27,15 @@ customElements.define(
 		canvas: HTMLCanvasElement
 		babylonEngine: BABYLON.Engine
 		scene: BABYLON.Scene
-		camera: BABYLON.FreeCamera
-		light: BABYLON.HemisphericLight
+		camera: BABYLON.Camera
+		light: BABYLON.DirectionalLight
 		ballMesh: BABYLON.Mesh
 		paddle1: BABYLON.Mesh
 		paddle2: BABYLON.Mesh
 		gameLogicEngine: GameEngine
+		guiTexture: BABYLON.GUI.AdvancedDynamicTexture
+		scoreText: BABYLON.GUI.TextBlock
+
 		constructor() {
 			super()
 			this.classList.add('w-full', 'h-full')
@@ -60,7 +66,7 @@ customElements.define(
 				stencil: true,
 			})
 			this.scene = new BABYLON.Scene(this.babylonEngine)
-			this.scene.clearColor = new BABYLON.Color3(0.6, 1, 0.8)
+			this.scene.clearColor = new BABYLON.Color4(0.6, 1, 0.8)
 			this.scene.lightsEnabled = true
 			this.scene.ambientColor = new BABYLON.Color3(0.7, 0.7, 0.7)
 		}
@@ -75,7 +81,6 @@ customElements.define(
 				[this.camera],
 			)
 			pipeline.bloomEnabled = true
-			pipeline.bloomIntensity = 1
 			pipeline.imageProcessingEnabled = true
 			pipeline.fxaaEnabled = true
 		}
@@ -104,12 +109,7 @@ customElements.define(
 
 			createArena(this.scene, wallMaterial, ARENA_WIDTH, ARENA_HEIGHT)
 
-			const paddles = createPaddles(
-				this.scene,
-				paddleMaterial,
-				ARENA_WIDTH,
-				ARENA_HEIGHT,
-			)
+			const paddles = createPaddles(this.scene, paddleMaterial)
 			this.paddle1 = paddles.paddle1
 			this.paddle2 = paddles.paddle2
 
