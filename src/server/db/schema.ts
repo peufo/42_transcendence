@@ -1,11 +1,11 @@
 import { relations, sql } from 'drizzle-orm'
 import {
 	blob,
+	check,
 	int,
 	sqliteTable,
 	text,
 	unique,
-	check,
 } from 'drizzle-orm/sqlite-core'
 
 export const users = sqliteTable('users', {

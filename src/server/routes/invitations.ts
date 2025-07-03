@@ -1,7 +1,7 @@
+import { and, eq, or } from 'drizzle-orm'
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod/v4'
 import { db, friendships } from '../db/index.js'
-import { and, or, eq } from 'drizzle-orm'
 import '@fastify/cookie'
 import '../types.js'
 

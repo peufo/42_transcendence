@@ -1,9 +1,9 @@
+import argon2 from 'argon2'
 import { drizzle } from 'drizzle-orm/libsql'
 import { seed } from 'drizzle-seed'
-import { users, friendships } from './schema.js'
-import { env } from '../env.js'
-import argon2 from 'argon2'
 import { createAvatarPlaceholder } from '../controllers/avatar.js'
+import { env } from '../env.js'
+import { friendships, users } from './schema.js'
 
 async function main() {
 	const db = drizzle(env.DB_FILE_NAME)
