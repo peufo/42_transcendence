@@ -1,8 +1,9 @@
 import 'fastify'
-import type { sessions, users } from '../server/db/schema.js'
+import type { sessions, users, friendships } from '../server/db/schema.js'
 
 export type User = typeof users.$inferSelect
 export type UserCreate = typeof users.$inferInsert
+export type Friendship = typeof friendships.$inferInsert
 export type Session = typeof sessions.$inferSelect
 export type SessionCreate = typeof sessions.$inferInsert
 
