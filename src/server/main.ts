@@ -9,12 +9,7 @@ import {
 	serializerCompiler,
 	validatorCompiler,
 } from 'fastify-type-provider-zod'
-import {
-	ENGINE_EVENT,
-	Engine,
-	type Scores,
-	type State,
-} from '../lib/engine/index.js'
+import { Engine } from '../lib/engine/index.js'
 import { env } from './env.js'
 import routes from './routes/index.js'
 
@@ -57,14 +52,9 @@ server.listen({ port: env.PORT, host: env.APP_HOST }, (err, address) => {
 server.register(fastifyWebsocket)
 server.register((fastify) => {
 	fastify.get('/ws', { websocket: true }, (socket, req) => {
-		const engine = new Engine(
-			(state: State) => {
-				socket.send(JSON.stringify({ [ENGINE_EVENT.TICK]: state }))
-			},
-			(scores: Scores) => {
-				socket.send(JSON.stringify({ [ENGINE_EVENT.SCORE]: scores }))
-			},
-		)
+		const engine = new Engine({
+			onEvent: (event) => socket.send(JSON.stringify(event)),
+		})
 		engine.startGame()
 		socket.on('message', (message) => {
 			const input = JSON.parse(message.toString('utf-8'))

@@ -54,10 +54,15 @@ export const PADDLE_BASE_P2_POSITION = new Vector2(
 	ARENA_HEIGHT / 2 - PADDLE_BASE_HEIGHT / 2,
 )
 
+type EngineOption = {
+	onEvent?: (event: EngineEventData) => void
+	onTick?: (state: State) => void
+	onScore?: (scores: Scores) => void
+}
+
 export class Engine {
 	#startTime: number
-	#tickCallback: (state: State) => void
-	#scoreCallback: (scores: Scores) => void
+	#options: EngineOption
 	#paddles: Paddles = {
 		p1: new Paddle(PADDLE_BASE_P1_POSITION),
 		p2: new Paddle(PADDLE_BASE_P2_POSITION),
@@ -81,12 +86,8 @@ export class Engine {
 		return this.#startTime
 	}
 
-	constructor(
-		tickCallback: (state: State) => void,
-		scoreCallback: (scores: Scores) => void,
-	) {
-		this.#tickCallback = tickCallback
-		this.#scoreCallback = scoreCallback
+	constructor(options: EngineOption = {}) {
+		this.#options = options
 	}
 
 	#resetState() {
@@ -109,7 +110,7 @@ export class Engine {
 		const scorer = this.#ball.playerScoring()
 		if (scorer) {
 			this.#scores[scorer]++
-			this.#scoreCallback(this.#scores)
+			this.#onEvent(ENGINE_EVENT.SCORE, this.#scores)
 			this.#resetState()
 		}
 	}
@@ -117,7 +118,7 @@ export class Engine {
 	#loop() {
 		const tickStart = Date.now()
 		this.#updateState()
-		this.#tickCallback({
+		this.#onEvent(ENGINE_EVENT.TICK, {
 			b: { x: this.#ball.position.x, y: this.#ball.position.y },
 			p1: this.paddles.p1.position.y,
 			p2: this.paddles.p2.position.y,
@@ -125,6 +126,16 @@ export class Engine {
 		const processTime = Date.now() - tickStart
 		const delay = Math.max(0, TICK_INTERVAL - processTime)
 		if (!this.gameOver) setTimeout(this.#loop.bind(this), delay)
+	}
+
+	#onEvent<T extends ENGINE_EVENT>(eventType: T, data: EngineEventData[T]) {
+		this.#options.onEvent?.({ [eventType]: data })
+		if (eventType === ENGINE_EVENT.TICK) {
+			this.#options.onTick?.(data as State)
+		}
+		if (eventType === ENGINE_EVENT.SCORE) {
+			this.#options.onScore?.(data as Scores)
+		}
 	}
 
 	setInput(player: Player, move: Move, value: boolean) {
