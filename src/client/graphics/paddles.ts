@@ -1,10 +1,10 @@
-import { toRenderPosition } from './utils.js'
 import {
 	PADDLE_BASE_HEIGHT,
 	PADDLE_BASE_P1_POSITION,
 	PADDLE_BASE_P2_POSITION,
 	PADDLE_BASE_WIDTH,
 } from '../../lib/engine/index.js'
+import { toRenderPosition } from './utils.js'
 export function createPaddles(
 	scene: BABYLON.Scene,
 	material: BABYLON.Material,
