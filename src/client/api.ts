@@ -12,11 +12,12 @@ function useApiGetter<Result>(
 			return
 		}
 		const json = (await res.json()) as { data: Result }
+		console.log(json.data)
 		setter(json.data)
 	}
 }
 
-export const api = {
+export const api: Record<string, (query?: string) => Promise<void>> = {
 	user: useApiGetter('/auth/user', setUser),
 	users: useApiGetter('/users', setUsers),
 } as const
