@@ -13,13 +13,14 @@ customElements.define(
 
                         <a href="/local/play?playerA=Bob&playerB=Alice" class="btn btn-border">
                             <ft-icon name="swords" class="mr-1"></ft-icon>
-                            <span>Play versus CUKA</span>
+                            <span>Play versus 2D</span>
                             <ft-icon name="swords" class="ml-1"></ft-icon>
                         </a>
                     </div>
                     <div>
                         <a href="/local/play/babylon" class="btn btn-border">
-                        <span> Play versus Babylon version </span>
+                            <span> Play versus Babylon version </span>
+                        </a >
                     </div>
                     <div>
                         <h3 class="text-sm/6 font-semibold text-gray-900 my-3">
