@@ -21,5 +21,5 @@ export const api: Record<string, (query?: string) => Promise<void>> = {
 	user: useApiGetter('/auth/user', setUser),
 	users: useApiGetter('/users', setUsers),
 	friends: useApiGetter('/users/friends', setFriends),
-	invitations: useApiGetter('/users/invitations', setInvitations),
+	invitations: useApiGetter('/invitations', setInvitations),
 } as const
