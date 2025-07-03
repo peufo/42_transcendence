@@ -1,8 +1,8 @@
+import { and, eq, inArray, like, ne, notInArray, or } from 'drizzle-orm'
+import { getTableColumns } from 'drizzle-orm'
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod/v4'
 import { db, friendships, users } from '../db/index.js'
-import { ne, and, or, eq, like, notInArray, inArray } from 'drizzle-orm'
-import { getTableColumns } from 'drizzle-orm'
 import '@fastify/cookie'
 import type { Friendship } from '../types.js'
 
