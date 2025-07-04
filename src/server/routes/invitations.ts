@@ -82,6 +82,27 @@ export const invitationsRoute: FastifyPluginCallbackZod = (
 				})
 		},
 	)
+	server.post(
+		'/cancel',
+		{
+			schema: {
+				body: z.object({
+					friendshipId: z.coerce.number(),
+				}),
+			},
+		},
+		async (req, res) => {
+			const user = res.locals?.user
+			if (!user) return res.code(401).send()
+			const { friendshipId } = req.body
+			const result = await db
+				.delete(friendships)
+				.where(eq(friendships.id, friendshipId))
+			console.log(result)
+			if (!result.rowsAffected) return res.code(400).send()
+			return res.send({ success: true })
+		},
+	)
 	done()
 }
 
