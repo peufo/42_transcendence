@@ -66,20 +66,26 @@ export const invitationsRoute: FastifyPluginCallbackZod = (
 			if (!user) return res.code(401).send()
 			const { invitedUserId } = req.body
 			console.log(invitedUserId)
-			if (user.id < invitedUserId)
-				await db.insert(friendships).values({
+			if (user.id < invitedUserId) {
+				const result = await db.insert(friendships).values({
 					user1Id: user.id,
 					user2Id: invitedUserId,
 					state: 'invited',
 					createdBy: user.id,
 				})
-			else
-				await db.insert(friendships).values({
-					user1Id: invitedUserId,
-					user2Id: user.id,
-					state: 'invited',
-					createdBy: user.id,
-				})
+				console.log(result)
+				if (!result.rowsAffected) return res.code(400).send()
+				return res.send({ success: true })
+			}
+			const result = await db.insert(friendships).values({
+				user1Id: invitedUserId,
+				user2Id: user.id,
+				state: 'invited',
+				createdBy: user.id,
+			})
+			console.log(result)
+			if (!result.rowsAffected) return res.code(400).send()
+			return res.send({ success: true })
 		},
 	)
 	server.post(
