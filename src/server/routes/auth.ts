@@ -49,7 +49,7 @@ export const authRoute: FastifyPluginCallbackZod = (server, options, done) => {
 			})
 			res.send({
 				success: true,
-				redirect: '/',
+				redirectTo: '/',
 				invalidate: ['user'],
 			})
 		},

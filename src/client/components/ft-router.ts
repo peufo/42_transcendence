@@ -134,6 +134,11 @@ export async function onSubmitForm(event: SubmitEvent) {
 	if (res.redirected) {
 		return goto(new URL(res.url), true)
 	}
+	const json = await res.json()
+	console.log('TODO: type and handle standard response', json)
+	if (json.redirectTo) {
+		return goto(new URL(json.redirectTo, document.location.origin), true)
+	}
 	parseErrorMessage()
 	apiCallAll()
 
