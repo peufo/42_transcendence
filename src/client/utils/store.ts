@@ -1,29 +1,5 @@
 import { createSignal } from './signal.js'
-
-export type UserBasic = {
-	id: number
-	name: string
-	avatar?: string
-	avatarPlaceholder: string
-}
-
-export type User = UserBasic & {
-	isActive: boolean
-	lastLogin: string
-	createdAt: string
-}
-
-export type Friend = UserBasic & {
-	isActive: boolean
-	lastLogin: string
-	gameId?: string
-}
-
-export type Invitation = UserBasic & {
-	createdBy: number
-	createdAt: string
-	friendshipId: number
-}
+import type { User, UserBasic, Friend, Invitation } from '../../lib/type.js'
 
 export const [getUser, setUser] = createSignal<User | undefined>(undefined)
 export const [getUsers, setUsers] = createSignal<UserBasic[]>([])
