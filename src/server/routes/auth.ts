@@ -1,7 +1,7 @@
 import argon2 from 'argon2'
 import { eq } from 'drizzle-orm'
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
-import { z } from 'zod/v4'
+import { success, z } from 'zod/v4'
 import { createAvatarPlaceholder } from '../controllers/avatar.js'
 import { createSession } from '../controllers/session.js'
 import { db, users } from '../db/index.js'
@@ -42,19 +42,20 @@ export const authRoute: FastifyPluginCallbackZod = (server, options, done) => {
 			}
 
 			const { token } = await createSession(user.id)
+			console.log({ token })
 			res.setCookie('session', token, {
 				path: '/',
 				signed: true,
 			})
-			res.redirect('/')
+			res.send({
+				success: true,
+				redirect: '/',
+				invalidate: ['user'],
+			})
 		},
 	)
 	server.post('/logout', async (req, res) => {
-		const now = new Date()
-		res.setCookie('session', '', {
-			path: '/',
-			expires: now,
-		})
+		res.clearCookie('session')
 		if (res.locals) {
 			res.locals.user = undefined
 		}

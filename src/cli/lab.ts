@@ -1,4 +1,4 @@
-import { stdin, stdout, exit } from 'node:process'
+import { exit, stdin, stdout } from 'node:process'
 import rl from 'node:readline'
 rl.emitKeypressEvents(stdin)
 stdin.setRawMode(true)
