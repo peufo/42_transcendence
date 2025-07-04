@@ -76,6 +76,9 @@ customElements.define(
 		render() {
 			const users = getUsers()
 
+			if (!users)
+				return 'no users can be found that are not already your friends!'
+
 			let html = ''
 
 			for (const user of users) {
@@ -84,10 +87,9 @@ customElements.define(
 						<img src="${getAvatarSrc(user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
 						<span>${user.name}</span>
 						<div class="flex-grow"></div>
-						<!-- TODO: create route -->
 						<form action="/invitations/new" method="post" class="btn btn-border">
-							<input type="hidden" name="userId" value="${user.id}"></input>
-							<input type="submit">Invite</input>
+							<input type="hidden" name="invitedUserId" value="${user.id}"></input>
+							<input type="submit" value="Invite"></input>
 						</form>
 					</div>
 				`
