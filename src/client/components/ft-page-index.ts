@@ -125,6 +125,11 @@ customElements.define(
 					: /*html*/ `<span class="badge badge-dark">Offline</span>`
 
 				let joinBtn = ''
+				const removeBtn = /*html*/ `
+				<form action="/invitations/remove" method="post">
+						<input type="hidden" name="friendId" value="${friend.id}">
+						<input class="btn btn-red" type="submit" value="Remove">
+					</form>`
 				if (friend.gameId) {
 					joinBtn = /*html*/ `<a href="/game/play?gameId=${friend.gameId}" class="btn btn-border">Join</a>`
 				}
@@ -136,6 +141,7 @@ customElements.define(
 						${badge}
 						<div class="flex-grow"></div>
 						${joinBtn}
+						${removeBtn}
 					</div>
 				`
 			}
