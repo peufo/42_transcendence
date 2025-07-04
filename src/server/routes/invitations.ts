@@ -4,6 +4,7 @@ import { z } from 'zod/v4'
 import { db, friendships } from '../db/index.js'
 import '@fastify/cookie'
 import '../types.js'
+import { UniqueConstraintBuilder } from 'drizzle-orm/gel-core'
 
 export const invitationsRoute: FastifyPluginCallbackZod = (
 	server,
@@ -109,6 +110,46 @@ export const invitationsRoute: FastifyPluginCallbackZod = (
 			return res.send({ success: true })
 		},
 	)
+	server.post(
+		'/remove',
+		{
+			schema: {
+				body: z.object({
+					friendId: z.coerce.number(),
+				}),
+			},
+		},
+		async (req, res) => {
+			const user = res.locals?.user
+			if (!user) return res.code(401).send()
+			const { friendId } = req.body
+			if (user.id < friendId) {
+				const result = await db
+					.delete(friendships)
+					.where(
+						and(
+							eq(friendships.user1Id, user.id),
+							eq(friendships.user2Id, friendId),
+						),
+					)
+				console.log(result)
+				if (!result.rowsAffected) return res.code(400).send()
+				return res.send({ success: true })
+			}
+			const result = await db
+				.delete(friendships)
+				.where(
+					and(
+						eq(friendships.user1Id, friendId),
+						eq(friendships.user2Id, user.id),
+					),
+				)
+			console.log(result)
+			if (!result.rowsAffected) return res.code(400).send()
+			return res.send({ success: true })
+		},
+	)
+
 	done()
 }
 
