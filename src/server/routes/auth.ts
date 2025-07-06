@@ -51,8 +51,28 @@ export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 			})
 		},
 	)
+
+	// signup
+	// server.post(
+	// 	'/signup',
+	// 	{
+	// 		schema: {
+	// 			body: z.object({
+	// 				username: z.string(),
+	// 				password: z.string(),
+	// 				avatar: z.string(),
+	// 			}),
+	// 		},
+	// 	},
+	// 	signupUser,
+	// )
+
 	server.post('/logout', async (_req, res) => {
-		res.clearCookie('session')
+		const now = new Date()
+		res.setCookie('session', '', {
+			path: '/',
+			expires: now,
+		})
 		if (res.locals) {
 			res.locals.user = undefined
 		}
