@@ -32,39 +32,37 @@ export const userSessionHook: preHandlerAsyncHookHandler = async (req, res) => {
 	}
 }
 
-
-import { createSession } from './session.js'
 import type { FastifyReply, FastifyRequest } from 'fastify'
+import { createSession } from './session.js'
 
 interface SignupBody {
-  username: string
-  password: string
-  avatar: string
+	username: string
+	password: string
+	avatar: string
 }
 
 export async function signupUser(
-  req: FastifyRequest<{ Body: SignupBody }>,
-  res: FastifyReply,
+	req: FastifyRequest<{ Body: SignupBody }>,
+	res: FastifyReply,
 ) {
-  const { username, password, avatar } = req.body
+	const { username, password, avatar } = req.body
 
-  try {
-    const user = await signupService(username, password, avatar)
+	try {
+		const user = await signupService(username, password, avatar)
 
-    const { token } = await createSession(user.id)
+		const { token } = await createSession(user.id)
 
-    res.setCookie('session', token, {
-      path: '/',
-      signed: true,
-    })
+		res.setCookie('session', token, {
+			path: '/',
+			signed: true,
+		})
 
-    res.send({
-      status: 200,
-      message: 'Inscription réussie !',
-      user,
-    })
-  } catch (err: unknown) {
-    res.status(410).send({ message: 'Erreur' })
-  }
+		res.send({
+			status: 200,
+			message: 'Inscription réussie !',
+			user,
+		})
+	} catch (err: unknown) {
+		res.status(410).send({ message: 'Erreur' })
+	}
 }
-
