@@ -2,7 +2,9 @@ import type { preHandlerAsyncHookHandler } from 'fastify'
 import { db } from '../db/index.js'
 import { validateSessionToken } from './session.js'
 import '@fastify/cookie'
+import type { FastifyReply, FastifyRequest } from 'fastify'
 import { signupService } from '../services/userService.js'
+import { createSession } from './session.js'
 
 export const userSessionHook: preHandlerAsyncHookHandler = async (req, res) => {
 	try {
@@ -32,9 +34,6 @@ export const userSessionHook: preHandlerAsyncHookHandler = async (req, res) => {
 	}
 }
 
-import type { FastifyReply, FastifyRequest } from 'fastify'
-import { createSession } from './session.js'
-
 interface SignupBody {
 	username: string
 	password: string
@@ -62,7 +61,7 @@ export async function signupUser(
 			message: 'Inscription réussie !',
 			user,
 		})
-	} catch (err: unknown) {
+	} catch (_err: unknown) {
 		res.status(410).send({ message: 'Erreur' })
 	}
 }
