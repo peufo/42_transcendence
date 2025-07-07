@@ -22,3 +22,10 @@ export type Invitation = UserBasic & {
 	createdAt: string
 	friendshipId: number
 }
+
+export type Match = {
+	player1Id: number
+	player2Id: number
+	botDifficulty: string
+	finishedAt: string
+}

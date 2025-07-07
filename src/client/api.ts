@@ -1,4 +1,10 @@
-import { setFriends, setInvitations, setUser, setUsers } from './utils/store.js'
+import {
+	setFriends,
+	setInvitations,
+	setMatches,
+	setUser,
+	setUsers,
+} from './utils/store.js'
 
 function useApiGetter<Result>(
 	route: string,
@@ -22,4 +28,5 @@ export const api: Record<string, (query?: string) => Promise<void>> = {
 	users: useApiGetter('/users', setUsers),
 	friends: useApiGetter('/users/friends', setFriends),
 	invitations: useApiGetter('/invitations', setInvitations),
+	matches: useApiGetter('/stats', setMatches),
 } as const

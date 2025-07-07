@@ -3,7 +3,7 @@ import { drizzle } from 'drizzle-orm/libsql'
 import { seed } from 'drizzle-seed'
 import { createAvatarPlaceholder } from '../controllers/avatar.js'
 import { env } from '../env.js'
-import { friendships, users } from './schema.js'
+import { friendships, users, matches } from './schema.js'
 
 async function main() {
 	const db = drizzle(env.DB_FILE_NAME)
@@ -43,6 +43,25 @@ async function main() {
 				}),
 			},
 			count: 3,
+		},
+	}))
+
+	await seed(db, { matches }).refine((f) => ({
+		matches: {
+			columns: {
+				player1Id: f.valuesFromArray({
+					values: [2, 3, 4, 5, 6, 7, 8, 9, 10],
+				}),
+				player2Id: f.valuesFromArray({
+					values: [11, 12, 13, 14, 15, 16, 17, 18, 19],
+				}),
+				botDifficulty: f.valuesFromArray({
+					values: ['Baby', 'Kevin', 'Terminator'],
+				}),
+				pointsToWin: f.default({
+					defaultValue: 5,
+				}),
+			},
 		},
 	}))
 }
