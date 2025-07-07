@@ -1,7 +1,7 @@
 import argon2 from 'argon2'
 import { eq } from 'drizzle-orm'
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
-import { success, z } from 'zod/v4'
+import { z } from 'zod/v4'
 import { createAvatarPlaceholder } from '../controllers/avatar.js'
 import { createSession } from '../controllers/session.js'
 import { db, users } from '../db/index.js'

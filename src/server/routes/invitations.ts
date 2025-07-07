@@ -4,7 +4,6 @@ import { z } from 'zod/v4'
 import { db, friendships } from '../db/index.js'
 import '@fastify/cookie'
 import '../types.js'
-import { UniqueConstraintBuilder } from 'drizzle-orm/gel-core'
 
 export const invitationsRoute: FastifyPluginCallbackZod = (
 	server,

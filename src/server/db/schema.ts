@@ -80,7 +80,7 @@ export const matches = sqliteTable('matches', {
 	botDifficulty: text({ enum: ['Baby', 'Kevin', 'Terminator'] })
 		.notNull()
 		.default('Kevin'),
-	finished: int({ mode: 'boolean' }).notNull().default(false),
+	finishedAt: int({ mode: 'timestamp' }),
 	pointsToWin: int().notNull(),
 })
 
