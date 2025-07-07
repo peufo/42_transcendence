@@ -7,6 +7,8 @@ import { createSession } from '../controllers/session.js'
 import { db, users } from '../db/index.js'
 import '@fastify/cookie'
 import '../types.js'
+import { signupUser } from '../controllers/user.js'
+import { signupSchema } from '../schemas/auth.js'
 
 export const authRoute: FastifyPluginCallbackZod = (server, options, done) => {
 	server.post(
@@ -49,6 +51,10 @@ export const authRoute: FastifyPluginCallbackZod = (server, options, done) => {
 			res.redirect('/')
 		},
 	)
+
+	// signup
+	server.post('/signup', { schema: { body: signupSchema } }, signupUser)
+
 	server.post('/logout', async (req, res) => {
 		const now = new Date()
 		res.setCookie('session', '', {
