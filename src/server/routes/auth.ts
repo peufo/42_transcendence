@@ -54,7 +54,7 @@ export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 		},
 	)
 
-	server.post('/signup', { schema: signupSchema }, signupUser)
+	server.post('/signup', { schema: { body: signupSchema } }, signupUser)
 
 	server.post('/logout', async (_req, res) => {
 		const now = new Date()
