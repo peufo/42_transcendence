@@ -29,7 +29,9 @@ customElements.define(
 								</button>
 							</div>
 						</form>
+						
 					</div>
+					<a href="/signup" class="text-blue-500 text-sm hover:underline mt-4 block text-center">Create an account</a>
 				</div>
 			`
 		}

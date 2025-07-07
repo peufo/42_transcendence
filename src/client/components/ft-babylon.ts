@@ -66,9 +66,9 @@ customElements.define(
 				stencil: true,
 			})
 			this.scene = new BABYLON.Scene(this.babylonEngine)
-			this.scene.clearColor = new BABYLON.Color4(0.6, 1, 0.8)
+			this.scene.clearColor = new BABYLON.Color4(0.6, 1, 1)
 			this.scene.lightsEnabled = true
-			this.scene.ambientColor = new BABYLON.Color3(0.7, 0.7, 0.7)
+			this.scene.ambientColor = new BABYLON.Color3(1, 1, 1)
 		}
 
 		setupScene() {
@@ -83,6 +83,20 @@ customElements.define(
 			pipeline.bloomEnabled = true
 			pipeline.imageProcessingEnabled = true
 			pipeline.fxaaEnabled = true
+			//this.scene.fogMode = BABYLON.Scene.FOGMODE_EXP;
+			//BABYLON.Scene.FOGMODE_NONE;
+			//BABYLON.Scene.FOGMODE_EXP;
+			//BABYLON.Scene.FOGMODE_EXP2;
+			//BABYLON.Scene.FOGMODE_LINEAR;
+
+			//this.scene.fogColor = new BABYLON.Color3(0.9, 0.9, 0.85);
+			//this.scene.fogDensity = 0.01;
+
+			//Only if LINEAR
+			//scene.fogStart = 20.0;
+			//scene.fogEnd = 60.0;
+
+			// Skybox
 		}
 
 		setupScore() {

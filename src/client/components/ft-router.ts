@@ -11,6 +11,7 @@ import './ft-page-local-play.js'
 import './ft-page-game-new.js'
 import './ft-page-game-play.js'
 import './ft-page-local-play-babylon.js'
+import './ft-page-signup.js'
 const [getUrl, setUrl] = createSignal<URL>(new URL(document.location.href))
 
 function apiCallAll() {
@@ -41,6 +42,7 @@ customElements.define(
 			'/game/new': 'ft-page-game-new',
 			'/game/play': 'ft-page-game-play',
 			'/local/play/babylon': 'ft-page-local-play-babylon',
+			'/signup': 'ft-page-signup',
 		}
 
 		connectedCallback() {
