@@ -4,19 +4,22 @@ import { db } from '../db/index.js'
 import { users } from '../db/schema.js'
 
 export async function createUser(
-	username: string,
-	password: string,
-	avatar: string,
+  username: string,
+  password: string,
+  avatar: string,
 ) {
-	const avatarPh = createAvatarPlaceholder()
-	await db.insert(users).values({
-		name: username,
-		passwordHash: password,
-		avatar: avatar,
-		avatarPlaceholder: avatarPh,
-	})
-	if (await checkUserExists(username)) return 1
-	return 0
+  const avatarPh = createAvatarPlaceholder()
+  const result = await db
+    .insert(users)
+    .values({
+      name: username,
+      passwordHash: password,
+      avatar,
+      avatarPlaceholder: avatarPh,
+    })
+    .returning()
+
+  return result[0]
 }
 
 export async function checkUserExists(username: string): Promise<boolean> {
