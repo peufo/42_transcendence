@@ -4,7 +4,7 @@ import {
 	PADDLE_BASE_P2_POSITION,
 	type State,
 	TICK_INTERVAL,
-} from './index.js'
+} from './engine/index.js'
 
 const baseState = {
 	b: {

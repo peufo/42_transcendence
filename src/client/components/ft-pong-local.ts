@@ -9,7 +9,7 @@ import {
 	PADDLE_BASE_WIDTH,
 	type Scores,
 } from '../../lib/engine/index.js'
-import { useInterpolate } from '../../lib/engine/interpolate.js'
+import { useInterpolate } from '../../lib/interpolate.js'
 
 customElements.define(
 	'ft-pong-local',

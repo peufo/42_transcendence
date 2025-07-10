@@ -55,13 +55,13 @@ server.register((fastify) => {
 		const engine = new Engine({
 			onEvent: (event) => socket.send(JSON.stringify(event)),
 		})
-		engine.start()
+		engine.start() // event ?
 		socket.on('message', (message) => {
 			const input = JSON.parse(message.toString('utf-8'))
 			engine.setInput(input.player, input.move, input.value)
 		})
 		socket.on('close', (message) => {
-			engine.gameOver = true
+			engine.stop()
 		})
 	})
 })
