@@ -6,6 +6,7 @@ import {
 	TICK_INTERVAL,
 } from './index.js'
 import type { Move } from './index.js'
+
 export class Paddle {
 	#position: Vector2
 	#speed = PADDLE_BASE_SPEED
@@ -21,12 +22,15 @@ export class Paddle {
 	move(direction: Move) {
 		const displ = TICK_INTERVAL * this.#speed
 		if (direction === 'up') {
-			if (this.#position.y - displ < 0) this.#position.y = 0
-			else this.#position.y -= displ
+			this.#position.y -= displ
+			if (this.#position.y < 0) {
+				this.#position.y = 0
+			}
 		} else if (direction === 'down') {
-			if (this.#position.y + PADDLE_BASE_HEIGHT + displ > ARENA_HEIGHT)
+			this.#position.y += displ
+			if (this.#position.y + PADDLE_BASE_HEIGHT > ARENA_HEIGHT) {
 				this.#position.y = ARENA_HEIGHT - PADDLE_BASE_HEIGHT
-			else this.#position.y += displ
+			}
 		}
 	}
 }

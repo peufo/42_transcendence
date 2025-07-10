@@ -8,13 +8,18 @@ export type Move = 'down' | 'up'
 type Paddles = Record<Player, Paddle>
 type Inputs = Record<Player, Record<Move, boolean>>
 export type Scores = Record<Player, number>
-export enum ENGINE_EVENT {
+export enum EVENT_TYPE {
 	TICK = 0,
 	SCORE = 1,
 }
 export type EngineEventData = {
-	[ENGINE_EVENT.TICK]?: State
-	[ENGINE_EVENT.SCORE]?: Scores
+	[EVENT_TYPE.TICK]?: State
+	[EVENT_TYPE.SCORE]?: Scores
+}
+type EngineOption = {
+	onEvent?: (event: EngineEventData) => void
+	onTick?: (state: State) => void
+	onScore?: (scores: Scores) => void
 }
 export type State = {
 	b: { x: number; y: number }
@@ -23,7 +28,7 @@ export type State = {
 }
 
 // Game properties
-const TICK_RATE = 10
+const TICK_RATE = 30
 export const BALL_SUBSTEPS = 3
 export const TICK_INTERVAL = 1000 / TICK_RATE
 export const ARENA_WIDTH = 1000
@@ -54,46 +59,48 @@ export const PADDLE_BASE_P2_POSITION = new Vector2(
 	ARENA_HEIGHT / 2 - PADDLE_BASE_HEIGHT / 2,
 )
 
-type EngineOption = {
-	onEvent?: (event: EngineEventData) => void
-	onTick?: (state: State) => void
-	onScore?: (scores: Scores) => void
+const rules = {
+	scoreToWin: 3,
 }
 
 export class Engine {
-	#startTime: number
 	#options: EngineOption
-	#paddles: Paddles = {
-		p1: new Paddle(PADDLE_BASE_P1_POSITION),
-		p2: new Paddle(PADDLE_BASE_P2_POSITION),
-	}
-	#ball: Ball = new Ball(BALL_BASE_POSITION, this)
+
+	#roundStartTime: number
+	#paddles: Paddles
+	#ball: Ball
+	#inputs: Inputs
 	#scores: Scores = {
 		p1: 0,
 		p2: 0,
 	}
-	#inputs: Inputs = {
-		p1: { down: false, up: false },
-		p2: { down: false, up: false },
-	}
-	gameOver = false
+	#gameOver: boolean
 
 	get paddles() {
 		return this.#paddles
 	}
 
-	get startTime() {
-		return this.#startTime
+	get roundStartTime() {
+		return this.#roundStartTime
 	}
 
 	constructor(options: EngineOption = {}) {
 		this.#options = options
 	}
 
-	#resetState() {
-		this.#startTime = Date.now()
-		this.#paddles.p1 = new Paddle(PADDLE_BASE_P1_POSITION)
-		this.#paddles.p2 = new Paddle(PADDLE_BASE_P2_POSITION)
+	#timer(seconds: number, timeoutCallback: () => void) {
+		console.log(seconds) // event ?
+		setTimeout(() => {
+			if (seconds > 1) this.#timer(seconds - 1, timeoutCallback)
+			else timeoutCallback()
+		}, 1000)
+	}
+
+	#initState() {
+		this.#paddles = {
+			p1: new Paddle(PADDLE_BASE_P1_POSITION),
+			p2: new Paddle(PADDLE_BASE_P2_POSITION),
+		}
 		this.#ball = new Ball(BALL_BASE_POSITION, this)
 		this.#inputs = {
 			p1: { down: false, up: false },
@@ -106,44 +113,62 @@ export class Engine {
 		if (this.#inputs.p1.down) this.#paddles.p1.move('down')
 		if (this.#inputs.p2.up) this.#paddles.p2.move('up')
 		if (this.#inputs.p2.down) this.#paddles.p2.move('down')
-		this.#ball.update()
-		const scorer = this.#ball.playerScoring()
+		const scorer = this.#ball.update()
 		if (scorer) {
+			this.#endRound()
 			this.#scores[scorer]++
-			this.#onEvent(ENGINE_EVENT.SCORE, this.#scores)
-			this.#resetState()
+			this.#onEvent(EVENT_TYPE.SCORE, this.#scores)
+			if (this.#scores[scorer] >= rules.scoreToWin)
+				console.log(`${scorer} won the game !`) // event
+			else this.#newRound()
 		}
 	}
 
-	#loop() {
+	#tickLoop() {
 		const tickStart = Date.now()
 		this.#updateState()
-		this.#onEvent(ENGINE_EVENT.TICK, {
+		this.#onEvent(EVENT_TYPE.TICK, {
 			b: { x: this.#ball.position.x, y: this.#ball.position.y },
 			p1: this.paddles.p1.position.y,
 			p2: this.paddles.p2.position.y,
 		})
 		const processTime = Date.now() - tickStart
 		const delay = Math.max(0, TICK_INTERVAL - processTime)
-		if (!this.gameOver) setTimeout(this.#loop.bind(this), delay)
+		if (!this.#gameOver) setTimeout(this.#tickLoop.bind(this), delay)
 	}
 
-	#onEvent<T extends ENGINE_EVENT>(eventType: T, data: EngineEventData[T]) {
+	#onEvent<T extends EVENT_TYPE>(eventType: T, data: EngineEventData[T]) {
 		this.#options.onEvent?.({ [eventType]: data })
-		if (eventType === ENGINE_EVENT.TICK) {
+		if (eventType === EVENT_TYPE.TICK) {
 			this.#options.onTick?.(data as State)
 		}
-		if (eventType === ENGINE_EVENT.SCORE) {
+		if (eventType === EVENT_TYPE.SCORE) {
 			this.#options.onScore?.(data as Scores)
 		}
+	}
+
+	#endRound() {
+		this.#gameOver = true
+	}
+
+	#newRound() {
+		this.#initState()
+		this.#timer(1, () => {
+			this.#gameOver = false
+			this.#roundStartTime = Date.now()
+			this.#tickLoop()
+		})
 	}
 
 	setInput(player: Player, move: Move, value: boolean) {
 		this.#inputs[player][move] = value
 	}
 
-	startGame() {
-		this.#startTime = Date.now()
-		this.#loop()
+	start() {
+		this.#newRound()
+	}
+
+	stop() {
+		this.#gameOver = true
 	}
 }

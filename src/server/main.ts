@@ -55,7 +55,7 @@ server.register((fastify) => {
 		const engine = new Engine({
 			onEvent: (event) => socket.send(JSON.stringify(event)),
 		})
-		engine.startGame()
+		engine.start()
 		socket.on('message', (message) => {
 			const input = JSON.parse(message.toString('utf-8'))
 			engine.setInput(input.player, input.move, input.value)

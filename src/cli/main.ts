@@ -1,5 +1,5 @@
 import * as p from '@clack/prompts'
-import { startGame } from './game.js'
+import { start } from './game.js'
 import { getSessionCookie, getHost } from './login.js'
 import { useApi } from './api.js'
 import { exit } from 'node:process'
@@ -15,7 +15,7 @@ async function mainMenu() {
 		message: 'What you want to do ?',
 		options: [
 			{ value: listFriends, label: 'List friends' },
-			{ value: startGame, label: 'Start game' },
+			{ value: start, label: 'Start game' },
 			{ value: exit, label: 'Give up' },
 		],
 	})

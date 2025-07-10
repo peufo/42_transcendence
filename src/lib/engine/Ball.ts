@@ -20,7 +20,7 @@ import {
 export class Ball {
 	#speed = BALL_BASE_SPEED
 	#position: Vector2
-	#velocity = new Vector2(Math.random() < 0.5 ? 1 : -1, 0)
+	#velocity = new Vector2(Math.random() < 0.5 ? 1 : -1, 0) // TODO: randomize y
 	#engine: Engine
 
 	get position() {
@@ -34,28 +34,6 @@ export class Ball {
 	constructor(position: Vector2, engine: Engine) {
 		this.#engine = engine
 		this.#position = new Vector2(position.x, position.y)
-	}
-
-	#bouncePaddle(paddle: Paddle) {
-		const relativeInsersectY =
-			paddle.position.y +
-			PADDLE_BASE_HEIGHT / 2 -
-			(this.#position.y + BALL_BASE_SIZE / 2)
-		const normalizedRelativeInsersectionY =
-			relativeInsersectY / (PADDLE_BASE_HEIGHT / 2)
-		const bounceAngle = normalizedRelativeInsersectionY * BALL_MAX_BOUNCE_ANGLE
-		const vSign = Math.sign(this.#velocity.x)
-		this.#velocity.x = Math.cos(bounceAngle)
-		this.#velocity.y = -Math.sin(bounceAngle)
-		this.#velocity.x *= -vSign
-		if (this.#speed !== BALL_MAX_SPEED) {
-			const t =
-				(Date.now() - this.#engine.startTime) / BALL_TIME_TO_REACH_MAX_SPEED
-			if (t <= 1)
-				this.#speed =
-					BALL_BASE_SPEED + (BALL_MAX_SPEED - BALL_BASE_SPEED) * cubicOut(t)
-			else this.#speed = BALL_MAX_SPEED
-		}
 	}
 
 	#handleVerticalWallCollision(): boolean {
@@ -83,6 +61,29 @@ export class Ball {
 		return false
 	}
 
+	#bouncePaddle(paddle: Paddle) {
+		const relativeInsersectY =
+			paddle.position.y +
+			PADDLE_BASE_HEIGHT / 2 -
+			(this.#position.y + BALL_BASE_SIZE / 2)
+		const normalizedRelativeInsersectionY =
+			relativeInsersectY / (PADDLE_BASE_HEIGHT / 2)
+		const bounceAngle = normalizedRelativeInsersectionY * BALL_MAX_BOUNCE_ANGLE
+		const vSign = Math.sign(this.#velocity.x)
+		this.#velocity.x = Math.cos(bounceAngle)
+		this.#velocity.y = -Math.sin(bounceAngle)
+		this.#velocity.x *= -vSign
+		if (this.#speed !== BALL_MAX_SPEED) {
+			const t =
+				(Date.now() - this.#engine.roundStartTime) /
+				BALL_TIME_TO_REACH_MAX_SPEED
+			if (t <= 1)
+				this.#speed =
+					BALL_BASE_SPEED + (BALL_MAX_SPEED - BALL_BASE_SPEED) * cubicOut(t)
+			else this.#speed = BALL_MAX_SPEED
+		}
+	}
+
 	#handlePaddlesCollisions(): boolean {
 		const { paddles } = this.#engine
 		if (this.#isCollidingWithPaddle(paddles.p1)) {
@@ -98,17 +99,18 @@ export class Ball {
 		return false
 	}
 
-	playerScoring(): Player | null {
-		if (this.#position.x <= 0) {
+	#playerScoring(): Player | null {
+		const outOfBoundsOffset = BALL_BASE_SIZE * 3
+		if (this.#position.x <= -outOfBoundsOffset) {
 			return 'p2' // left side
 		}
-		if (this.#position.x + BALL_BASE_SIZE >= ARENA_WIDTH) {
+		if (this.#position.x + BALL_BASE_SIZE >= ARENA_WIDTH + outOfBoundsOffset) {
 			return 'p1' // right side
 		}
 		return null
 	}
 
-	update() {
+	update(): Player | null {
 		for (let i = 0; i < BALL_SUBSTEPS; i++) {
 			this.#velocity.normalize()
 			this.#position.x +=
@@ -119,7 +121,8 @@ export class Ball {
 				this.#handlePaddlesCollisions() ||
 				this.#handleVerticalWallCollision()
 			)
-				return
+				return null
 		}
+		return this.#playerScoring()
 	}
 }
