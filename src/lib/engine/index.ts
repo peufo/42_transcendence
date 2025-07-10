@@ -33,6 +33,9 @@ export const BALL_SUBSTEPS = 3
 export const TICK_INTERVAL = 1000 / TICK_RATE
 export const ARENA_WIDTH = 1000
 export const ARENA_HEIGHT = 700
+const rules = {
+	scoreToWin: 3,
+}
 
 // Ball properties
 export const BALL_MAX_BOUNCE_ANGLE = (4 * Math.PI) / 12 // <- 60 degrees in radians
@@ -58,10 +61,6 @@ export const PADDLE_BASE_P2_POSITION = new Vector2(
 	ARENA_WIDTH - PADDLE_BASE_WIDTH - PADDLE_OFFSET_FROM_WALL,
 	ARENA_HEIGHT / 2 - PADDLE_BASE_HEIGHT / 2,
 )
-
-const rules = {
-	scoreToWin: 3,
-}
 
 export class Engine {
 	#options: EngineOption

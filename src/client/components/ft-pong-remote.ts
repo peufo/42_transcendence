@@ -12,7 +12,7 @@ import {
 	type Player,
 	type Scores,
 } from '../../lib/engine/index.js'
-import { useInterpolate } from '../../lib/engine/interpolate.js'
+import { useInterpolate } from '../../lib/interpolate.js'
 
 customElements.define(
 	'ft-pong-remote',

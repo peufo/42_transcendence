@@ -1,4 +1,5 @@
 import { cubicOut } from '../easing.js'
+import { getRandomArbitrary } from '../utils.js'
 import type { Paddle } from './Paddle.js'
 import { Vector2 } from './Vector2.js'
 import {
@@ -20,7 +21,10 @@ import {
 export class Ball {
 	#speed = BALL_BASE_SPEED
 	#position: Vector2
-	#velocity = new Vector2(Math.random() < 0.5 ? 1 : -1, 0) // TODO: randomize y
+	#velocity = new Vector2(
+		Math.random() < 0.5 ? 1 : -1,
+		getRandomArbitrary(-0.3, 0.3),
+	)
 	#engine: Engine
 
 	get position() {
