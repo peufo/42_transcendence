@@ -42,12 +42,13 @@ customElements.define(
 					this.scores = scores
 				},
 			})
-			this.engine.startGame()
+			this.engine.start()
 			this.frameId = requestAnimationFrame(this.render.bind(this))
 		}
 
 		disconnectedCallback() {
 			cancelAnimationFrame(this.frameId)
+			this.engine.stop()
 		}
 
 		connectedCallback() {
@@ -94,8 +95,18 @@ customElements.define(
 			)
 			this.ctx.fill()
 
-			const str = `Player 1: ${this.scores.p1} | Player 2: ${this.scores.p2}`
-			this.ctx.fillText(str, ARENA_WIDTH / 2, 10)
+			const fontSize = 40
+			this.ctx.font = `${fontSize}px sans-serif`
+			this.ctx.fillText(
+				`${this.scores.p1}`,
+				ARENA_WIDTH / 2 - ARENA_WIDTH / 4,
+				fontSize,
+			)
+			this.ctx.fillText(
+				`${this.scores.p2}`,
+				ARENA_WIDTH / 2 + ARENA_WIDTH / 4,
+				fontSize,
+			)
 			this.frameId = requestAnimationFrame(this.render.bind(this))
 		}
 	},

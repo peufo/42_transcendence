@@ -2,7 +2,7 @@ import {
 	ARENA_HEIGHT,
 	ARENA_WIDTH,
 	BALL_BASE_SIZE,
-	ENGINE_EVENT,
+	EVENT_TYPE,
 	type EngineEventData,
 	type Move,
 	PADDLE_BASE_HEIGHT,
@@ -41,8 +41,8 @@ customElements.define(
 			this.socket = new WebSocket(`ws://${document.location.host}/ws`)
 			this.socket.addEventListener('message', (event) => {
 				const data: EngineEventData = JSON.parse(event.data)
-				const newState = data[ENGINE_EVENT.TICK]
-				const newScores = data[ENGINE_EVENT.SCORE]
+				const newState = data[EVENT_TYPE.TICK]
+				const newScores = data[EVENT_TYPE.SCORE]
 				if (newState) {
 					this.interpolate.updateState(newState)
 				}

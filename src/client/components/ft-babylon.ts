@@ -45,7 +45,7 @@ customElements.define(
 			this.createGameObjects()
 			this.setupVisualEffects()
 			this.setupShadows()
-			this.startGameEngine()
+			this.startEngine()
 			this.setupControls()
 			this.setupScore()
 
@@ -149,12 +149,12 @@ customElements.define(
 			if (ground) ground.receiveShadows = true
 		}
 
-		startGameEngine() {
+		startEngine() {
 			this.gameLogicEngine = new GameEngine({
 				onTick: this.renderGameState.bind(this),
 				onScore: this.handleScoreUpdate.bind(this),
 			})
-			this.gameLogicEngine.startGame()
+			this.gameLogicEngine.start()
 		}
 		handleScoreUpdate(scores: Scores) {
 			console.log('Score updated:', scores)

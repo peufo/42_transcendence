@@ -1,13 +1,13 @@
 import { exit, stdin, stdout } from 'node:process'
 import { emitKeypressEvents, createInterface } from 'node:readline'
 import {
-	ENGINE_EVENT,
+	EVENT_TYPE,
 	type Move,
 	type Player,
 	type EngineEventData,
 } from '../lib/engine/index.js'
 
-export function startGame() {
+export function start() {
 	emitKeypressEvents(stdin)
 	const rl = createInterface({ input: stdin, terminal: true })
 	rl.once('SIGINT', terminate)
@@ -59,8 +59,8 @@ function connectEngine(): WebSocket {
 	socket.addEventListener('message', (event) => {
 		const data: EngineEventData = JSON.parse(event.data)
 		console.log(data)
-		const newState = data[ENGINE_EVENT.TICK]
-		const newScores = data[ENGINE_EVENT.SCORE]
+		const newState = data[EVENT_TYPE.TICK]
+		const newScores = data[EVENT_TYPE.SCORE]
 		if (newState) {
 			console.log(newState)
 		}

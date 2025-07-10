@@ -6,6 +6,15 @@ import {
 	TICK_INTERVAL,
 } from './index.js'
 
+const baseState = {
+	b: {
+		x: BALL_BASE_POSITION.x,
+		y: BALL_BASE_POSITION.y,
+	},
+	p1: PADDLE_BASE_P1_POSITION.y,
+	p2: PADDLE_BASE_P2_POSITION.y,
+}
+
 export function useInterpolate() {
 	let previousState: State
 	let currentState: State
@@ -18,15 +27,7 @@ export function useInterpolate() {
 			lastUpdateTime = Date.now()
 		},
 		getState(): State {
-			if (!previousState || !currentState)
-				return {
-					b: {
-						x: BALL_BASE_POSITION.x,
-						y: BALL_BASE_POSITION.y,
-					},
-					p1: PADDLE_BASE_P1_POSITION.y,
-					p2: PADDLE_BASE_P2_POSITION.y,
-				}
+			if (!previousState || !currentState) return baseState
 			const timeSinceLastUpdate = Date.now() - lastUpdateTime
 			const t = Math.min(1, timeSinceLastUpdate / TICK_INTERVAL)
 			return {
