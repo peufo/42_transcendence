@@ -15,12 +15,13 @@ import { createCamera } from '../graphics/camera.js'
 import { createLights } from '../graphics/lights.js'
 import {
 	createBallMaterial,
+	createBallMaterial2,
 	createMatwall,
 	createPaddleMaterial,
 } from '../graphics/materials.js'
 import { createPaddles } from '../graphics/paddles.js'
 import { updateGraphics } from '../graphics/scene.js'
-
+export const RENDER_SCALE = 0.1 
 customElements.define(
 	'ft-babylon',
 	class extends HTMLElement {
@@ -66,9 +67,9 @@ customElements.define(
 				stencil: true,
 			})
 			this.scene = new BABYLON.Scene(this.babylonEngine)
-			this.scene.clearColor = new BABYLON.Color4(0.6, 1, 1)
+			//this.scene.clearColor = new BABYLON.Color4(0.6, 1, 1)
 			this.scene.lightsEnabled = true
-			this.scene.ambientColor = new BABYLON.Color3(1, 1, 1)
+			//this.scene.ambientColor = new BABYLON.Color3(1, 1, 1)
 		}
 
 		setupScene() {
@@ -83,21 +84,24 @@ customElements.define(
 			pipeline.bloomEnabled = true
 			pipeline.imageProcessingEnabled = true
 			pipeline.fxaaEnabled = true
-			//this.scene.fogMode = BABYLON.Scene.FOGMODE_EXP;
+			//this.scene.fogMode = BABYLON.Scene.FOGMODE_LINEAR;
 			//BABYLON.Scene.FOGMODE_NONE;
 			//BABYLON.Scene.FOGMODE_EXP;
 			//BABYLON.Scene.FOGMODE_EXP2;
 			//BABYLON.Scene.FOGMODE_LINEAR;
 
-			//this.scene.fogColor = new BABYLON.Color3(0.9, 0.9, 0.85);
-			//this.scene.fogDensity = 0.01;
+		//	this.scene.fogColor = new BABYLON.Color3(0.7, 0.85, 1);
+		//	this.scene.fogDensity = 0.001;
 
-			//Only if LINEAR
-			//scene.fogStart = 20.0;
-			//scene.fogEnd = 60.0;
-
-			// Skybox
+/*
+*/			
+			if (!this.scene.getMeshByName("BackgroundSkybox")) {
+    			const envTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("/public/textures/polyhaven/cloud8k.env", this.scene);
+    			this.scene.environmentTexture = envTexture;
+    			this.scene.createDefaultSkybox(envTexture, true, 5000);
+			}
 		}
+
 
 		setupScore() {
 			this.guiTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI(
@@ -131,12 +135,11 @@ customElements.define(
 		}
 
 		setupVisualEffects() {
-			const trail = new BABYLON.TrailMesh('trail', this.ballMesh, this.scene, {
-				diameter: 6,
-				length: 10,
-				segments: 1,
-				sections: 4,
-				doNotTaper: false,
+			const trail = new BABYLON.TrailMesh('new', this.ballMesh, this.scene, {
+				diameter: 1,
+				length: 20,
+				segments: 20,
+				sections: 8,
 				autoStart: true,
 			})
 
@@ -146,6 +149,38 @@ customElements.define(
 
 			const glow = new BABYLON.GlowLayer('glow', this.scene)
 			glow.addIncludedOnlyMesh(this.ballMesh)
+			const myParticleSystem = new BABYLON.ParticleSystem("particles", 2000, this.scene);
+			myParticleSystem.particleTexture = new BABYLON.Texture("https://assets.babylonjs.com/textures/flare.png");
+/*
+			myParticleSystem.emitter = new BABYLON.Vector3(0, 10, 0)
+			myParticleSystem.minSize = 0.5;
+myParticleSystem.maxSize = 5.5;
+myParticleSystem.minLifeTime = 0.3;
+myParticleSystem.maxLifeTime = 1.2;
+myParticleSystem.emitRate = 500;
+myParticleSystem.color1 = new BABYLON.Color4(1, 0.5, 0, 1);
+myParticleSystem.color2 = new BABYLON.Color4(1, 1, 0, 1);
+myParticleSystem.direction1 = new BABYLON.Vector3(-1, 1, 0);
+myParticleSystem.direction2 = new BABYLON.Vector3(1, 1, 0);
+myParticleSystem.minEmitBox = new BABYLON.Vector3(-0.5, 0, -0.5); // position de spawn aléatoire
+myParticleSystem.maxEmitBox = new BABYLON.Vector3(0.5, 0, 0.5);
+
+myParticleSystem.direction1 = new BABYLON.Vector3(0, 1, 0); // monte tout droit
+myParticleSystem.direction2 = new BABYLON.Vector3(0, 1.5, 0); // ou plus vite
+
+myParticleSystem.minEmitPower = 1;
+myParticleSystem.maxEmitPower = 3;
+
+myParticleSystem.updateSpeed = 0.01;
+
+myParticleSystem.gravity = new BABYLON.Vector3(0, -1, 0); // tire vers le bas (effet feu)
+
+
+
+			myParticleSystem.start();
+			console.log("Fire system started:", myParticleSystem);
+
+*/
 		}
 
 		setupShadows() {
@@ -190,5 +225,33 @@ customElements.define(
 		renderGameState(state: State) {
 			updateGraphics(state, this.ballMesh, this.paddle1, this.paddle2)
 		}
+		
+		disconnectedCallback() {
+    console.log("Disposing Babylon properly");
+
+    if (this.scene.environmentTexture) {
+        const envTex = this.scene.environmentTexture;
+
+        if (envTex instanceof BABYLON.CubeTexture && envTex.name.startsWith("blob:")) {
+            URL.revokeObjectURL(envTex.name);
+        }
+
+        envTex.dispose();
+        this.scene.environmentTexture = null;
+    }
+
+    const skybox = this.scene.getMeshByName("BackgroundSkybox");
+    skybox?.dispose();
+
+    this.babylonEngine?.stopRenderLoop();
+    this.scene?.dispose();
+    this.babylonEngine?.dispose();
+    this.canvas?.remove();
+
+    window.removeEventListener('resize', () => this.babylonEngine.resize());
+
+    console.log("Babylon cleaned");
+}
+
 	},
 )
