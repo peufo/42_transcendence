@@ -5,7 +5,15 @@ import {
 	type Move,
 	type Player,
 	type EngineEventData,
+	type State,
+	ARENA_WIDTH,
+	ARENA_HEIGHT,
+	PADDLE_BASE_P1_POSITION,
+	PADDLE_BASE_HEIGHT,
+	PADDLE_BASE_P2_POSITION,
 } from '../lib/engine/index.js'
+import { ReadStream } from 'node:fs'
+import { WriteStream } from 'node:tty'
 
 export function start() {
 	emitKeypressEvents(stdin)
@@ -46,6 +54,10 @@ export function start() {
 		keyHandlers[key]?.()
 	})
 
+	stdout.on('resize', () => {
+		if (!checkSizeRequirements()) terminate() // handle
+	})
+
 	function terminate() {
 		rl.close()
 		socket.close()
@@ -54,15 +66,63 @@ export function start() {
 	}
 }
 
+const horizontal = '─'
+const vertical = '│'
+const topLeft = '┌'
+const topRight = '┐'
+const bottomLeft = '└'
+const bottomRight = '┘'
+const ball = '●'
+
+function checkSizeRequirements(): boolean {
+	const windowSize = stdout.getWindowSize() // 0: width, 1: height
+	if (windowSize[0] < ARENA_WIDTH / 10 || windowSize[1] < ARENA_HEIGHT / 20)
+		return false
+	return true
+}
+
+function render(state: State) {
+	const width = Math.floor(ARENA_WIDTH / 10)
+	const height = Math.floor(ARENA_HEIGHT / 20)
+	stdout.write('\x1bc')
+	let str = ''
+	for (let y = 0; y < height; y++) {
+		for (let x = 0; x < width; x++) {
+			if (y === 0 && x === 0) str += topLeft
+			else if (y === 0 && x === width - 1) str += topRight
+			else if (y === height - 1 && x === 0) str += bottomLeft
+			else if (y === height - 1 && x === width - 1) str += bottomRight
+			else if (y === 0 || y === height - 1) str += horizontal
+			else if (x === 0 || x === width - 1) str += vertical
+			else if (
+				(x === Math.floor(PADDLE_BASE_P1_POSITION.x / 10) &&
+					y >= Math.floor(state.p1 / 20) &&
+					y <= Math.floor((state.p1 + PADDLE_BASE_HEIGHT) / 20)) ||
+				(x === Math.floor(PADDLE_BASE_P2_POSITION.x / 10) &&
+					y >= Math.floor(state.p2 / 20) &&
+					y <= Math.floor((state.p2 + PADDLE_BASE_HEIGHT) / 20))
+			)
+				str += vertical
+			else if (
+				x === Math.floor(state.b.x / 10) &&
+				y === Math.floor(state.b.y / 20)
+			)
+				str += ball
+			else str += ' '
+		}
+		str += '\n'
+	}
+	stdout.write(str)
+}
+
 function connectEngine(): WebSocket {
 	const socket = new WebSocket('ws://localhost:8000/ws')
 	socket.addEventListener('message', (event) => {
 		const data: EngineEventData = JSON.parse(event.data)
-		console.log(data)
 		const newState = data[EVENT_TYPE.TICK]
 		const newScores = data[EVENT_TYPE.SCORE]
 		if (newState) {
-			console.log(newState)
+			render(newState)
 		}
 		if (newScores) {
 			console.log(newScores)
