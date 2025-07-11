@@ -11,6 +11,7 @@ import {
 	PADDLE_BASE_P1_POSITION,
 	PADDLE_BASE_HEIGHT,
 	PADDLE_BASE_P2_POSITION,
+	PADDLE_BASE_WIDTH,
 } from '../lib/engine/index.js'
 import { ReadStream } from 'node:fs'
 import { WriteStream } from 'node:tty'
@@ -95,7 +96,8 @@ function render(state: State) {
 			else if (y === 0 || y === height - 1) str += horizontal
 			else if (x === 0 || x === width - 1) str += vertical
 			else if (
-				(x === Math.floor(PADDLE_BASE_P1_POSITION.x / 10) &&
+				(x ===
+					Math.floor((PADDLE_BASE_P1_POSITION.x + PADDLE_BASE_WIDTH) / 10) &&
 					y >= Math.floor(state.p1 / 20) &&
 					y <= Math.floor((state.p1 + PADDLE_BASE_HEIGHT) / 20)) ||
 				(x === Math.floor(PADDLE_BASE_P2_POSITION.x / 10) &&
