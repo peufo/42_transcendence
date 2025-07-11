@@ -28,7 +28,7 @@ export type State = {
 }
 
 // Game properties
-const TICK_RATE = 30
+const TICK_RATE = 20
 export const BALL_SUBSTEPS = 3
 export const TICK_INTERVAL = 1000 / TICK_RATE
 export const ARENA_WIDTH = 1000
@@ -39,8 +39,8 @@ const rules = {
 
 // Ball properties
 export const BALL_MAX_BOUNCE_ANGLE = (4 * Math.PI) / 12 // <- 60 degrees in radians
-export const BALL_BASE_SPEED = 0.35
-export const BALL_MAX_SPEED = 1.2
+export const BALL_BASE_SPEED = 0.2
+export const BALL_MAX_SPEED = 0.7
 export const BALL_TIME_TO_REACH_MAX_SPEED = 50000
 export const BALL_BASE_SIZE = ARENA_WIDTH / 70
 export const BALL_BASE_POSITION = new Vector2(

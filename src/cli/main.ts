@@ -5,9 +5,9 @@ import { useApi } from './api.js'
 import { exit } from 'node:process'
 
 p.intro('Welcome to transcendance')
-const host = await getHost()
-const sessionCookie = await getSessionCookie(host)
-const api = useApi(host, sessionCookie)
+// const host = await getHost()
+// const sessionCookie = await getSessionCookie(host)
+// const api = useApi(host, sessionCookie)
 mainMenu()
 
 async function mainMenu() {
