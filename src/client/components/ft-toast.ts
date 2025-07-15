@@ -49,7 +49,6 @@ customElements.define(
 				this.classList.remove(...TOAST_CLASSES_ALL)
 				this.classList.add(...TOAST_CLASSES[toast.type])
 				this.classList.remove(TOAST_HIDE)
-				console.log(this.timeoutId)
 				if (this.timeoutId) clearTimeout(this.timeoutId)
 				this.timeoutId = setTimeout(() => {
 					this.classList.add(TOAST_HIDE)
