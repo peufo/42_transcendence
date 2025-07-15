@@ -86,8 +86,8 @@ customElements.define(
 						<div class="flex-grow"></div>
 						<!-- TODO: create route -->
 						<form action="/invitations/new" method="post" class="btn btn-border">
-							<input type="hidden" name="userId" value="${user.id}"></input>
-							<input type="submit">Invite</input>
+							<input type="hidden" name="userId" value="${user.id}" />
+							<input type="submit" value="Invite" />
 						</form>
 					</div>
 				`
