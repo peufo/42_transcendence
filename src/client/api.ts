@@ -1,3 +1,4 @@
+import { toast } from './components/ft-toast.js'
 import {
 	setFriends,
 	setInvitations,
@@ -6,28 +7,31 @@ import {
 	setUsers,
 } from './utils/store.js'
 
+type ApiGetter<Result = unknown> = (query?: string) => Promise<Result | null>
+
 function useApiGetter<Result>(
 	route: string,
 	setter: (value: Result) => void,
-): (query?: string) => Promise<void> {
+): ApiGetter<Result> {
 	return async (query) => {
 		const url = query ? `${route}?${query}` : route
 		const res = await fetch(url)
 		if (!res.ok) {
-			console.warn('TODO: handle fetch failed... Notifiy ?')
-			return
+			toast.error(`Error ${res.status} in "${route}"`, res.statusText)
+			return null
 		}
-
 		const json = (await res.json()) as { data: Result }
-		console.log(json.data)
 		setter(json.data)
+		return json.data
 	}
 }
 
-export const api: Record<string, (query?: string) => Promise<void>> = {
+export const api = {
 	user: useApiGetter('/auth/user', setUser),
 	users: useApiGetter('/users', setUsers),
 	friends: useApiGetter('/users/friends', setFriends),
 	invitations: useApiGetter('/invitations', setInvitations),
 	matches: useApiGetter('/userstats', setMatches),
-} as const
+} satisfies Record<string, ApiGetter>
+
+export type ApiKey = keyof typeof api

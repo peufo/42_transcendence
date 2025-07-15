@@ -22,10 +22,10 @@ export function createSignal<T>(
 }
 
 // TODO: return unsunbscriber ?
-export function createEffect(func: () => void) {
-	const effect = () => {
+export function createEffect(func: () => void | Promise<void>) {
+	const effect = async () => {
 		effectToSubscribe = effect
-		func()
+		await func()
 		effectToSubscribe = null
 	}
 	effect()

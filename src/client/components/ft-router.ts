@@ -1,4 +1,4 @@
-import { api } from '../api.js'
+import { type ApiKey, api } from '../api.js'
 import { createEffect, createSignal } from '../utils/signal.js'
 import { slide, transitionIn, transitionOut } from '../utils/transition.js'
 import './ft-page-404.js'
@@ -11,6 +11,29 @@ import './ft-page-local-play.js'
 import './ft-page-game-new.js'
 import './ft-page-game-play.js'
 import './ft-page-local-play-babylon.js'
+
+type PageOption = {
+	component: string
+	pageData?: ApiKey[]
+	layoutData?: ApiKey[]
+}
+
+const PAGES: Record<string, PageOption> = {
+	'/': {
+		component: 'ft-page-index',
+		layoutData: ['user'],
+		pageData: ['friends', 'invitations'],
+	},
+	'/login': { component: 'ft-page-login' },
+	'/stats': { component: 'ft-page-stats', pageData: ['matches'] },
+	'/account': { component: 'ft-page-account' },
+	'/local/new': { component: 'ft-page-local-new' },
+	'/local/play': { component: 'ft-page-local-play' },
+	'/game/new': { component: 'ft-page-game-new' },
+	'/game/play': { component: 'ft-page-game-play' },
+	'/local/play/babylon': { component: 'ft-page-local-play-babylon' },
+} as const
+
 const [getUrl, setUrl] = createSignal<URL>(new URL(document.location.href))
 
 function apiCallAll() {
@@ -31,33 +54,38 @@ function goto(url: URL, invalidateAll = false) {
 customElements.define(
 	'ft-router',
 	class extends HTMLElement {
-		routes: Record<string, string> = {
-			'/': 'ft-page-index',
-			'/login': 'ft-page-login',
-			'/stats': 'ft-page-stats',
-			'/account': 'ft-page-account',
-			'/local/new': 'ft-page-local-new',
-			'/local/play': 'ft-page-local-play',
-			'/game/new': 'ft-page-game-new',
-			'/game/play': 'ft-page-game-play',
-			'/local/play/babylon': 'ft-page-local-play-babylon',
-		}
-
 		connectedCallback() {
 			document.addEventListener('submit', onSubmitForm)
 			document.addEventListener('click', onClickLink)
 			window.addEventListener('popstate', onPopState)
-			createEffect(() => {
-				this.innerHTML = this.render()
+			createEffect(async () => {
+				this.innerHTML = await this.render()
 			})
 		}
 
-		render(): string {
+		async render(): Promise<string> {
 			const url = getUrl()
-			const componentName = this.routes[url.pathname] || 'ft-page-404'
+			const { component, callsApi } = this.getPage(url.pathname)
+
+			// TODO: A beautiful loader ?
+			await Promise.all(callsApi.map((call) => api[call]()))
 			return /*html*/ `
-				<${componentName}></${componentName}>
+				<${component}></${component}>
 			`
+		}
+
+		getPage(pathname: string): { component: string; callsApi: ApiKey[] } {
+			if (!PAGES[pathname]) {
+				return { component: 'ft-page-404', callsApi: [] }
+			}
+			const { component, pageData = [] } = PAGES[pathname]
+			const callsApi: ApiKey[] = [...pageData]
+			for (const [path, { layoutData = [] }] of Object.entries(PAGES)) {
+				if (pathname.startsWith(path)) {
+					callsApi.push(...layoutData)
+				}
+			}
+			return { component, callsApi }
 		}
 	},
 )
@@ -95,7 +123,7 @@ export async function onSubmitForm(event: SubmitEvent) {
 	event.preventDefault()
 	const form = event.target as HTMLFormElement
 	if (form.method === 'get') {
-		const apikey = form.dataset.api
+		const apikey = form.dataset.api as ApiKey
 		if (!apikey)
 			throw new Error(
 				`Attribute data-api="resource" is needed in form element when method="get"`,
