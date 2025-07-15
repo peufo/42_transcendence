@@ -1,20 +1,20 @@
+import { ReadStream } from 'node:fs'
 import { exit, stdin, stdout } from 'node:process'
 import { createInterface, emitKeypressEvents } from 'node:readline'
+import { WriteStream } from 'node:tty'
 import {
-	EVENT_TYPE,
-	type Move,
-	type Player,
-	type EngineEventData,
-	type State,
-	ARENA_WIDTH,
 	ARENA_HEIGHT,
-	PADDLE_BASE_P1_POSITION,
+	ARENA_WIDTH,
+	EVENT_TYPE,
+	type EngineEventData,
+	type Move,
 	PADDLE_BASE_HEIGHT,
+	PADDLE_BASE_P1_POSITION,
 	PADDLE_BASE_P2_POSITION,
 	PADDLE_BASE_WIDTH,
+	type Player,
+	type State,
 } from '../lib/engine/index.js'
-import { ReadStream } from 'node:fs'
-import { WriteStream } from 'node:tty'
 
 export function start() {
 	emitKeypressEvents(stdin)

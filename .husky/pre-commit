@@ -1,4 +1,1 @@
-pnpm format
-pnpm lint
-pnpm check --write
-exit 1
+pnpm check
