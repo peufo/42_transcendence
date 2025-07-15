@@ -1,8 +1,8 @@
-import * as p from '@clack/prompts'
-import { start } from './game.js'
-import { getSessionCookie, getHost } from './login.js'
-import { useApi } from './api.js'
 import { exit } from 'node:process'
+import * as p from '@clack/prompts'
+import { useApi } from './api.js'
+import { start } from './game.js'
+import { getHost, getSessionCookie } from './login.js'
 
 p.intro('Welcome to transcendance')
 // const host = await getHost()

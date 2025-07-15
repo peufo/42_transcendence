@@ -17,6 +17,7 @@ function useApiGetter<Result>(
 			console.warn('TODO: handle fetch failed... Notifiy ?')
 			return
 		}
+
 		const json = (await res.json()) as { data: Result }
 		console.log(json.data)
 		setter(json.data)
@@ -28,5 +29,5 @@ export const api: Record<string, (query?: string) => Promise<void>> = {
 	users: useApiGetter('/users', setUsers),
 	friends: useApiGetter('/users/friends', setFriends),
 	invitations: useApiGetter('/invitations', setInvitations),
-	matches: useApiGetter('/stats', setMatches),
+	matches: useApiGetter('/userstats', setMatches),
 } as const

@@ -1,11 +1,11 @@
-import { createSignal } from './signal.js'
 import type {
-	User,
-	UserBasic,
 	Friend,
 	Invitation,
 	Match,
+	User,
+	UserBasic,
 } from '../../lib/type.js'
+import { createSignal } from './signal.js'
 
 export const [getUser, setUser] = createSignal<User | undefined>(undefined)
 export const [getUsers, setUsers] = createSignal<UserBasic[]>([])

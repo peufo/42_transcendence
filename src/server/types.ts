@@ -1,9 +1,9 @@
 import 'fastify'
 import type {
 	friendships,
+	matches,
 	sessions,
 	users,
-	matches,
 } from '../server/db/schema.js'
 
 export type User = typeof users.$inferSelect

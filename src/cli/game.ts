@@ -1,5 +1,5 @@
 import { exit, stdin, stdout } from 'node:process'
-import { emitKeypressEvents, createInterface } from 'node:readline'
+import { createInterface, emitKeypressEvents } from 'node:readline'
 import {
 	EVENT_TYPE,
 	type Move,

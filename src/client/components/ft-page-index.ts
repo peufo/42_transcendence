@@ -91,6 +91,7 @@ customElements.define(
 							<input type="hidden" name="userId" value="${user.id}" />
 							<input type="submit" value="Invite" />
 						</form>
+
 					</div>
 				`
 			}

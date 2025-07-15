@@ -3,7 +3,7 @@ import { drizzle } from 'drizzle-orm/libsql'
 import { seed } from 'drizzle-seed'
 import { createAvatarPlaceholder } from '../controllers/avatar.js'
 import { env } from '../env.js'
-import { friendships, users, matches } from './schema.js'
+import { friendships, matches, users } from './schema.js'
 
 async function main() {
 	const db = drizzle(env.DB_FILE_NAME)
