@@ -37,7 +37,7 @@ if (env.dev) {
 
 server.register(routes)
 
-server.get('/*', { exposeHeadRoute: false }, (req, reply) => {
+server.get('/*', { exposeHeadRoute: false }, (_req, reply) => {
 	reply.sendFile('index.html')
 })
 
@@ -51,7 +51,7 @@ server.listen({ port: env.PORT, host: env.APP_HOST }, (err, address) => {
 
 server.register(fastifyWebsocket)
 server.register((fastify) => {
-	fastify.get('/ws', { websocket: true }, (socket, req) => {
+	fastify.get('/ws', { websocket: true }, (socket, _req) => {
 		const engine = new Engine({
 			onEvent: (event) => socket.send(JSON.stringify(event)),
 		})
@@ -60,7 +60,7 @@ server.register((fastify) => {
 			const input = JSON.parse(message.toString('utf-8'))
 			engine.setInput(input.player, input.move, input.value)
 		})
-		socket.on('close', (message) => {
+		socket.on('close', (_message) => {
 			engine.stop()
 		})
 	})

@@ -1,5 +1,6 @@
 import { exit, stdin, stdout } from 'node:process'
 import rl from 'node:readline'
+
 rl.emitKeypressEvents(stdin)
 stdin.setRawMode(true)
 
@@ -21,10 +22,11 @@ const keyHandler = {
 	right: () => dot.x++,
 }
 
-stdin.on('keypress', (str, { name }) => {
+stdin.on('keypress', (str, { name }: { name: string }) => {
 	if (str === 'q') exit(0)
-	if (keyHandler[name]) {
-		keyHandler[name]()
+	if (name in keyHandler) {
+		const key = name as keyof typeof keyHandler
+		keyHandler[key]()
 		render()
 		return
 	}

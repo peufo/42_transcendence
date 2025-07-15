@@ -5,7 +5,7 @@ import { invitationsRoute } from './invitations.js'
 import { statsRoute } from './userStats.js'
 import { usersRoute } from './users.js'
 
-export default fp((server, options, done) => {
+export default fp((server, _options, done) => {
 	server.addHook('preHandler', userSessionHook)
 	server.register(authRoute, { prefix: '/auth' })
 	server.register(usersRoute, { prefix: '/users' })

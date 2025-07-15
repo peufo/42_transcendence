@@ -8,7 +8,7 @@ import { db, users } from '../db/index.js'
 import '@fastify/cookie'
 import '../types.js'
 
-export const authRoute: FastifyPluginCallbackZod = (server, options, done) => {
+export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 	server.post(
 		'/login',
 		{
@@ -54,7 +54,7 @@ export const authRoute: FastifyPluginCallbackZod = (server, options, done) => {
 			})
 		},
 	)
-	server.post('/logout', async (req, res) => {
+	server.post('/logout', async (_req, res) => {
 		res.clearCookie('session')
 		if (res.locals) {
 			res.locals.user = undefined
@@ -62,7 +62,7 @@ export const authRoute: FastifyPluginCallbackZod = (server, options, done) => {
 		res.redirect('/')
 	})
 
-	server.get('/user', (req, res) => {
+	server.get('/user', (_req, res) => {
 		return res.send({ data: res.locals?.user })
 	})
 

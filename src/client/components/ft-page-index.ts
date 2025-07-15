@@ -1,6 +1,6 @@
+import type { UserBasic } from '../../lib/type.js'
 import { createEffect } from '../utils/signal.js'
 import {
-	type UserBasic,
 	getFriends,
 	getInvitations,
 	getUser,

@@ -1,4 +1,3 @@
-import { Vector2 } from '../../lib/engine/Vector2.js'
 import {
 	BALL_BASE_SIZE,
 	PADDLE_BASE_HEIGHT,
@@ -7,6 +6,7 @@ import {
 	PADDLE_BASE_WIDTH,
 	type State,
 } from '../../lib/engine/index.js'
+import { Vector2 } from '../../lib/engine/Vector2.js'
 import { toRenderPosition } from './utils.js'
 
 export function updateGraphics(

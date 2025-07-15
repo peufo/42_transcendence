@@ -1,12 +1,10 @@
-import { ReadStream } from 'node:fs'
 import { exit, stdin, stdout } from 'node:process'
 import { createInterface, emitKeypressEvents } from 'node:readline'
-import { WriteStream } from 'node:tty'
 import {
 	ARENA_HEIGHT,
 	ARENA_WIDTH,
-	EVENT_TYPE,
 	type EngineEventData,
+	EVENT_TYPE,
 	type Move,
 	PADDLE_BASE_HEIGHT,
 	PADDLE_BASE_P1_POSITION,
@@ -51,7 +49,7 @@ export function start() {
 		},
 	}
 
-	stdin.on('keypress', (key, state) => {
+	stdin.on('keypress', (key) => {
 		keyHandlers[key]?.()
 	})
 

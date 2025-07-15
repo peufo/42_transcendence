@@ -43,7 +43,7 @@ export async function transitionIn(
 	useTransition: UseTransition,
 	duration = 400,
 ) {
-	let start: number | undefined = undefined
+	let start: number | undefined
 	const transition = useTransition(node)
 	return new Promise<void>((resolve) => {
 		function step(timestamp: number) {
@@ -69,7 +69,7 @@ export function transitionOut(
 	useTransition: UseTransition,
 	duration = 400,
 ) {
-	let start: number | undefined = undefined
+	let start: number | undefined
 	const transition = useTransition(node)
 	return new Promise<void>((resolve) => {
 		function step(timestamp: number) {

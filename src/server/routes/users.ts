@@ -1,12 +1,24 @@
-import { and, eq, inArray, like, ne, notInArray, or } from 'drizzle-orm'
-import { getTableColumns } from 'drizzle-orm'
+import {
+	and,
+	eq,
+	getTableColumns,
+	inArray,
+	like,
+	ne,
+	notInArray,
+	or,
+} from 'drizzle-orm'
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod/v4'
 import { db, friendships, users } from '../db/index.js'
 import '@fastify/cookie'
 import type { Friendship } from '../types.js'
 
-export const usersRoute: FastifyPluginCallbackZod = (server, options, done) => {
+export const usersRoute: FastifyPluginCallbackZod = (
+	server,
+	_options,
+	done,
+) => {
 	server.get(
 		'/',
 		{
@@ -42,7 +54,7 @@ export const usersRoute: FastifyPluginCallbackZod = (server, options, done) => {
 		},
 	)
 
-	server.get('/friends', async (req, res) => {
+	server.get('/friends', async (_req, res) => {
 		const user = res.locals?.user
 		if (!user) return res.code(401).send()
 

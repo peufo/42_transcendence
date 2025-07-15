@@ -1,11 +1,11 @@
-import { Vector2 } from './Vector2.js'
+import type { Move } from './index.js'
 import {
 	ARENA_HEIGHT,
 	PADDLE_BASE_HEIGHT,
 	PADDLE_BASE_SPEED,
 	TICK_INTERVAL,
 } from './index.js'
-import type { Move } from './index.js'
+import { Vector2 } from './Vector2.js'
 
 export class Paddle {
 	#position: Vector2

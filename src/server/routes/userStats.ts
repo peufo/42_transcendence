@@ -3,8 +3,12 @@ import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { db, matches } from '../db/index.js'
 import '../types.js'
 
-export const statsRoute: FastifyPluginCallbackZod = (server, options, done) => {
-	server.get('/', async (req, res) => {
+export const statsRoute: FastifyPluginCallbackZod = (
+	server,
+	_options,
+	done,
+) => {
+	server.get('/', async (_req, res) => {
 		const user = res.locals?.user
 		if (!user) return res.code(401).send()
 		const matches = await getMatches(user.id)

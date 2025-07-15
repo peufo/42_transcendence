@@ -1,7 +1,5 @@
 import { cubicOut } from '../easing.js'
 import { getRandomArbitrary } from '../utils.js'
-import type { Paddle } from './Paddle.js'
-import { Vector2 } from './Vector2.js'
 import {
 	ARENA_HEIGHT,
 	ARENA_WIDTH,
@@ -17,6 +15,8 @@ import {
 	type Player,
 	TICK_INTERVAL,
 } from './index.js'
+import type { Paddle } from './Paddle.js'
+import { Vector2 } from './Vector2.js'
 
 export class Ball {
 	#speed = BALL_BASE_SPEED

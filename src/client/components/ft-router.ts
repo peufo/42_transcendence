@@ -62,7 +62,7 @@ customElements.define(
 	},
 )
 
-function onPopState(event: PopStateEvent) {
+function onPopState() {
 	setUrl(new URL(document.location.href))
 }
 

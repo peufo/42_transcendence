@@ -31,7 +31,6 @@ export async function getSessionCookie(host: string): Promise<string> {
 	const s = p.spinner()
 	s.start('Connection')
 	try {
-		// await sleep(1000)
 		const res = await fetch(`${host}/auth/login`, {
 			method: 'post',
 			headers: {
@@ -52,14 +51,9 @@ export async function getSessionCookie(host: string): Promise<string> {
 			throw new Error('cookie "session" not found')
 		s.stop('Connected with success')
 		return sessionCookie.slice(0, -1)
-	} catch (error) {
-		s.stop(error.message, 1)
+	} catch (error: unknown) {
+		if (error instanceof Error) s.stop(error.message, 1)
+		else s.stop('Unkown error', 1)
 		exit()
 	}
-}
-
-async function sleep(ms: number) {
-	return new Promise((resolve) => {
-		setTimeout(resolve, ms)
-	})
 }

@@ -7,10 +7,10 @@ import '../types.js'
 
 export const invitationsRoute: FastifyPluginCallbackZod = (
 	server,
-	options,
+	_options,
 	done,
 ) => {
-	server.get('/', async (req, res) => {
+	server.get('/', async (_req, res) => {
 		const user = res.locals?.user
 		if (!user) return res.code(401).send()
 		const invitations = await getInvitations(user.id)
