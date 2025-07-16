@@ -16,6 +16,8 @@ export type ApiPostOption = {
 	redirect?: RoutePage
 	invalidate?: RouteApiGet[]
 }
+
+// TODO: add auth: boolean
 export type PageOption = {
 	component: string
 	pageData?: RouteApiGet[]

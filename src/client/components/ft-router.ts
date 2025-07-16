@@ -28,6 +28,10 @@ function goto(url: URL) {
 	setUrl(url)
 }
 
+function onPopState() {
+	setUrl(new URL(document.location.href))
+}
+
 customElements.define(
 	'ft-router',
 	class extends HTMLElement {
@@ -42,7 +46,9 @@ customElements.define(
 
 		async render(): Promise<string> {
 			const url = getUrl()
-			const { component, routesApi } = this.getPage(url.pathname)
+			const { component, routesApi } = this.getRoutesApi(url.pathname)
+
+			// TODO: Call 'auth/user' before ?
 
 			// TODO: A beautiful loader ?
 			await Promise.all(routesApi.map((route) => api.get(route)))
@@ -51,26 +57,25 @@ customElements.define(
 			`
 		}
 
-		getPage(pathname: string): { component: string; routesApi: RouteApiGet[] } {
+		getRoutesApi(pathname: string): {
+			component: string
+			routesApi: RouteApiGet[]
+		} {
 			const routePage = pathname as RoutePage
 			if (!PAGES[routePage]) {
 				return { component: 'ft-page-404', routesApi: [] }
 			}
 			const { component, pageData = [] } = PAGES[routePage] as PageOption
-			const callsApi: RouteApiGet[] = [...pageData]
+			const routesApi: RouteApiGet[] = [...pageData]
 			for (const [path, options] of Object.entries(PAGES)) {
 				if ('layoutData' in options && pathname.startsWith(path)) {
-					callsApi.push(...options.layoutData)
+					routesApi.push(...options.layoutData)
 				}
 			}
-			return { component, routesApi: callsApi }
+			return { component, routesApi }
 		}
 	},
 )
-
-function onPopState() {
-	setUrl(new URL(document.location.href))
-}
 
 function findAnchor(eventTarget: EventTarget | null): HTMLAnchorElement | null {
 	let el: HTMLElement | null = eventTarget as HTMLElement

@@ -8,18 +8,26 @@ export type Move = 'down' | 'up'
 type Paddles = Record<Player, Paddle>
 type Inputs = Record<Player, Record<Move, boolean>>
 export type Scores = Record<Player, number>
+export type Round = {
+	scorer: Player
+	rallyCount: number
+	ballPositionY: number
+}
 export enum EVENT_TYPE {
 	TICK = 0,
 	SCORE = 1,
+	ROUND = 2,
 }
 export type EngineEventData = {
 	[EVENT_TYPE.TICK]?: State
 	[EVENT_TYPE.SCORE]?: Scores
+	[EVENT_TYPE.ROUND]?: Round
 }
 type EngineOption = {
 	onEvent?: (event: EngineEventData) => void
 	onTick?: (state: State) => void
 	onScore?: (scores: Scores) => void
+	onRoundEnd?: (round: Round) => void
 }
 export type State = {
 	b: { x: number; y: number }
@@ -112,11 +120,13 @@ export class Engine {
 		if (this.#inputs.p1.down) this.#paddles.p1.move('down')
 		if (this.#inputs.p2.up) this.#paddles.p2.move('up')
 		if (this.#inputs.p2.down) this.#paddles.p2.move('down')
-		const scorer = this.#ball.update()
-		if (scorer) {
+		const round = this.#ball.update()
+		if (round) {
+			const { scorer } = round
 			this.#endRound()
 			this.#scores[scorer]++
 			this.#onEvent(EVENT_TYPE.SCORE, this.#scores)
+			this.#onEvent(EVENT_TYPE.ROUND, round)
 			if (this.#scores[scorer] >= rules.scoreToWin)
 				console.log(`${scorer} won the game !`) // event
 			else this.#newRound()
@@ -143,6 +153,9 @@ export class Engine {
 		}
 		if (eventType === EVENT_TYPE.SCORE) {
 			this.#options.onScore?.(data as Scores)
+		}
+		if (eventType === EVENT_TYPE.ROUND) {
+			this.#options.onRoundEnd?.(data as Round)
 		}
 	}
 

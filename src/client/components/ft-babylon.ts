@@ -48,12 +48,16 @@ customElements.define(
 			this.startEngine()
 			this.setupControls()
 			this.setupScore()
-
 			this.babylonEngine.runRenderLoop(() => this.scene.render())
+			this.disconnectedCallback
 		}
 
 		connectedCallback() {
 			window.addEventListener('resize', () => this.babylonEngine.resize())
+		}
+
+		disconnectedCallback() {
+			console.log('BYE')
 		}
 
 		initCanvasAndEngine() {

@@ -13,6 +13,7 @@ import {
 	PADDLE_BASE_HEIGHT,
 	PADDLE_BASE_WIDTH,
 	type Player,
+	type Round,
 	TICK_INTERVAL,
 } from './index.js'
 import type { Paddle } from './Paddle.js'
@@ -26,6 +27,7 @@ export class Ball {
 		getRandomArbitrary(-0.3, 0.3),
 	)
 	#engine: Engine
+	#rallyCount: number
 
 	get position() {
 		return this.#position
@@ -103,30 +105,41 @@ export class Ball {
 		return false
 	}
 
-	#playerScoring(): Player | null {
+	#checkPlayerScoring(): Round | null {
 		const outOfBoundsOffset = BALL_BASE_SIZE * 3
 		if (this.#position.x <= -outOfBoundsOffset) {
-			return 'p2' // left side
+			return this.#createRoundEnd('p2')
 		}
 		if (this.#position.x + BALL_BASE_SIZE >= ARENA_WIDTH + outOfBoundsOffset) {
-			return 'p1' // right side
+			return this.#createRoundEnd('p1')
 		}
 		return null
 	}
 
-	update(): Player | null {
+	#createRoundEnd(scorer: Player): Round {
+		return {
+			scorer,
+			rallyCount: this.#rallyCount,
+			ballPositionY: this.position.y,
+		}
+	}
+	update(): Round | null {
 		for (let i = 0; i < BALL_SUBSTEPS; i++) {
 			this.#velocity.normalize()
 			this.#position.x +=
 				this.#velocity.x * (TICK_INTERVAL / BALL_SUBSTEPS) * this.#speed
 			this.#position.y +=
 				this.#velocity.y * (TICK_INTERVAL / BALL_SUBSTEPS) * this.#speed
-			if (
-				this.#handlePaddlesCollisions() ||
-				this.#handleVerticalWallCollision()
-			)
+			if (this.#handlePaddlesCollisions()) {
+				this.#rallyCount++
 				return null
+			}
+
+			if (this.#handleVerticalWallCollision()) {
+				return null
+			}
 		}
-		return this.#playerScoring()
+		this.#rallyCount = 0
+		return this.#checkPlayerScoring()
 	}
 }
