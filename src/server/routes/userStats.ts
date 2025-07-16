@@ -24,9 +24,22 @@ function getMatches(userId: number) {
 			isNotNull(matches.finishedAt),
 		),
 		with: {
-			player1: { columns: { id: true, name: true } },
-			player2: { columns: { id: true, name: true } },
+			player1: {
+				columns: {
+					id: true,
+					name: true,
+					avatar: true,
+					avatarPlaceholder: true,
+				},
+			},
+			player2: {
+				columns: {
+					id: true,
+					name: true,
+					avatar: true,
+					avatarPlaceholder: true,
+				},
+			},
 		},
-		limit: 5,
 	})
 }

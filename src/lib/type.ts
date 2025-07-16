@@ -1,3 +1,5 @@
+import { StringifyOptions } from 'querystring'
+
 export type UserBasic = {
 	id: number
 	name: string
@@ -28,4 +30,6 @@ export type Match = {
 	player2Id: number
 	botDifficulty: string
 	finishedAt: string
+	player1: UserBasic
+	player2: UserBasic
 }
