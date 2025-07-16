@@ -1,4 +1,4 @@
-import { type ApiKey, api } from '../api.js'
+import { api } from '../api.js'
 import { createEffect, createSignal } from '../utils/signal.js'
 import { slide, transitionIn, transitionOut } from '../utils/transition.js'
 import './ft-page-404.js'
@@ -11,44 +11,21 @@ import './ft-page-local-play.js'
 import './ft-page-game-new.js'
 import './ft-page-game-play.js'
 import './ft-page-local-play-babylon.js'
-
-type PageOption = {
-	component: string
-	pageData?: ApiKey[]
-	layoutData?: ApiKey[]
-}
-
-const PAGES: Record<string, PageOption> = {
-	'/': {
-		component: 'ft-page-index',
-		layoutData: ['user'],
-		pageData: ['friends', 'invitations'],
-	},
-	'/login': { component: 'ft-page-login' },
-	'/stats': { component: 'ft-page-stats', pageData: ['matches'] },
-	'/account': { component: 'ft-page-account' },
-	'/local/new': { component: 'ft-page-local-new' },
-	'/local/play': { component: 'ft-page-local-play' },
-	'/game/new': { component: 'ft-page-game-new' },
-	'/game/play': { component: 'ft-page-game-play' },
-	'/local/play/babylon': { component: 'ft-page-local-play-babylon' },
-} as const
+import {
+	API_POST,
+	type ApiPostOption,
+	PAGES,
+	type PageOption,
+	type RouteApiGet,
+	type RouteApiPost,
+	type RoutePage,
+} from '../routes.js'
 
 const [getUrl, setUrl] = createSignal<URL>(new URL(document.location.href))
 
-function apiCallAll() {
-	for (const callApi of Object.values(api)) {
-		callApi()
-	}
-}
-
-function goto(url: URL, invalidateAll = false) {
+function goto(url: URL) {
 	window.history.pushState({}, '', url)
 	setUrl(url)
-	if (invalidateAll) {
-		// TODO More granularity ? More generic ?
-		apiCallAll()
-	}
 }
 
 customElements.define(
@@ -65,27 +42,28 @@ customElements.define(
 
 		async render(): Promise<string> {
 			const url = getUrl()
-			const { component, callsApi } = this.getPage(url.pathname)
+			const { component, routesApi } = this.getPage(url.pathname)
 
 			// TODO: A beautiful loader ?
-			await Promise.all(callsApi.map((call) => api[call]()))
+			await Promise.all(routesApi.map((route) => api.get(route)))
 			return /*html*/ `
 				<${component}></${component}>
 			`
 		}
 
-		getPage(pathname: string): { component: string; callsApi: ApiKey[] } {
-			if (!PAGES[pathname]) {
-				return { component: 'ft-page-404', callsApi: [] }
+		getPage(pathname: string): { component: string; routesApi: RouteApiGet[] } {
+			const routePage = pathname as RoutePage
+			if (!PAGES[routePage]) {
+				return { component: 'ft-page-404', routesApi: [] }
 			}
-			const { component, pageData = [] } = PAGES[pathname]
-			const callsApi: ApiKey[] = [...pageData]
-			for (const [path, { layoutData = [] }] of Object.entries(PAGES)) {
-				if (pathname.startsWith(path)) {
-					callsApi.push(...layoutData)
+			const { component, pageData = [] } = PAGES[routePage] as PageOption
+			const callsApi: RouteApiGet[] = [...pageData]
+			for (const [path, options] of Object.entries(PAGES)) {
+				if ('layoutData' in options && pathname.startsWith(path)) {
+					callsApi.push(...options.layoutData)
 				}
 			}
-			return { component, callsApi }
+			return { component, routesApi: callsApi }
 		}
 	},
 )
@@ -119,20 +97,22 @@ function onClickLink(event: MouseEvent) {
 	goto(url)
 }
 
-export async function onSubmitForm(event: SubmitEvent) {
+async function onSubmitForm(event: SubmitEvent) {
 	event.preventDefault()
 	const form = event.target as HTMLFormElement
 	if (form.method === 'get') {
-		const apikey = form.dataset.api as ApiKey
-		if (!apikey)
-			throw new Error(
-				`Attribute data-api="resource" is needed in form element when method="get"`,
-			)
-		if (!api[apikey])
-			throw new Error(
-				`form data-api="${apikey}" does not exist in client/api.ts`,
-			)
-		return api[apikey](getFormQuery(new FormData(form)))
+		// TODO: use action instead
+		// const apikey = form.dataset.api as RouteApiGet
+		// if (!apikey)
+		// 	throw new Error(
+		// 		`Attribute data-api="resource" is needed in form element when method="get"`,
+		// 	)
+		// if (!api[apikey])
+		// 	throw new Error(
+		// 		`form data-api="${apikey}" does not exist in client/api.ts`,
+		// 	)
+		// return api[apikey](getFormQuery(new FormData(form)))
+		return
 	}
 
 	const res = await fetch(form.action, {
@@ -143,32 +123,36 @@ export async function onSubmitForm(event: SubmitEvent) {
 		body: getFormBody(),
 	})
 
-	if (!res.ok) {
-		if (res.status === 401) {
-			const submitButton = form.querySelector<HTMLElement>(
-				'button[type=submit]',
-			)
-			if (submitButton) {
-				setError(submitButton, 'Unauthorized')
-			}
-			parseErrorMessage()
-			return
+	if (res.status === 401) {
+		const submitButton = form.querySelector<HTMLElement>('button[type=submit]')
+		if (submitButton) {
+			setError(submitButton, 'Unauthorized')
 		}
+		parseErrorMessage()
+		return
+	}
+	if (!res.ok) {
 		const json = await res.json()
 		parseErrorMessage(json.message)
 		return
 	}
-
-	if (res.redirected) {
-		return goto(new URL(res.url), true)
-	}
 	const json = await res.json()
-	console.log('TODO: type and handle standard response', json)
-	if (json.redirectTo) {
-		return goto(new URL(json.redirectTo, document.location.origin), true)
-	}
 	parseErrorMessage()
-	apiCallAll()
+	const route = new URL(form.action).pathname
+	const options = API_POST[route as RouteApiPost] as ApiPostOption
+	if (!options) {
+		console.log('TODO: comportement par défaut')
+		return
+	}
+	options.onSuccess?.(json.data)
+	if (options.redirect) {
+		return goto(new URL(options.redirect, document.location.origin))
+	}
+	if (options.invalidate) {
+		for (const apiRoute of options.invalidate) {
+			api.get(apiRoute)
+		}
+	}
 
 	function getFormBody(): string | FormData {
 		const formData = new FormData(form)

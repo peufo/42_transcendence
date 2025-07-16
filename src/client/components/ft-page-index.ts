@@ -23,7 +23,7 @@ customElements.define(
 					<ft-friends></ft-friends>
 					<ft-invitations></ft-invitations>
 					<div class="flex flex-col gap-3">
-						<form class="flex items-center w-full" data-api="users" method="get">
+						<form method="get" data-api="users" class="flex items-center w-full">
 							<div class="relative w-full">
 								<div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
 									<ft-icon name="user-search" class="h-5 w-5 text-gray-500"></ft-icon>
@@ -87,7 +87,7 @@ customElements.define(
 						<img src="${getAvatarSrc(user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
 						<span>${user.name}</span>
 						<div class="flex-grow"></div>
-						<form action="/invitations/new" method="post" class="btn btn-border">
+						<form method="post" action="/invitations/new" class="btn btn-border">
 							<input type="hidden" name="userId" value="${user.id}" />
 							<input type="submit" value="Invite" />
 						</form>
@@ -127,7 +127,7 @@ customElements.define(
 
 				let joinBtn = ''
 				const removeBtn = /*html*/ `
-				<form action="/invitations/remove" method="post">
+				<form method="post" action="/invitations/remove">
 						<input type="hidden" name="friendId" value="${friend.id}">
 						<input class="btn btn-red" type="submit" value="Remove">
 					</form>`
@@ -181,7 +181,7 @@ customElements.define(
 					label: string,
 					color: string,
 				) => /*html*/ `
-					<form action="/invitations/${action}" method="post">
+					<form method="post" action="/invitations/${action}">
 						<input type="hidden" name="friendshipId" value="${invitation.friendshipId}">
 						<input class="btn ${color}" type="submit" value="${label}">
 					</form>

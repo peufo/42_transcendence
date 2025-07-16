@@ -42,15 +42,12 @@ export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 			}
 
 			const { token } = await createSession(user.id)
-			console.log({ token })
 			res.setCookie('session', token, {
 				path: '/',
 				signed: true,
 			})
 			res.send({
-				success: true,
-				redirectTo: '/',
-				invalidate: ['user'],
+				data: null,
 			})
 		},
 	)
@@ -59,7 +56,9 @@ export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 		if (res.locals) {
 			res.locals.user = undefined
 		}
-		res.redirect('/')
+		res.send({
+			data: null,
+		})
 	})
 
 	server.get('/user', (_req, res) => {

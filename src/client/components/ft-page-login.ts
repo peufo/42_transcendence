@@ -9,7 +9,7 @@ customElements.define(
 					</div>
 
 					<div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-						<form class="space-y-6" action="/auth/login" method="post">
+						<form method="post" action="/auth/login" class="space-y-6">
 							<div>
 								<label for="name" class="label">User name</label>
 								<div class="mt-2">
