@@ -29,6 +29,7 @@
 		"db:up": "drizzle-kit up",
 		"seed": "rm -f local.db && drizzle-kit push && tsc -p tsconfig.server.json && node ./build/server/db/seed.js",
 		"check": "biome check && run-s build:*",
+		"checkfix": "biome check --write",
 		"lint": "biome lint",
 		"format": "biome format",
 		"prepare": "husky"

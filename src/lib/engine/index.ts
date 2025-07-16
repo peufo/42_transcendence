@@ -13,6 +13,7 @@ export type Round = {
 	rallyCount: number
 	ballPositionY: number
 }
+
 export enum EVENT_TYPE {
 	TICK = 0,
 	SCORE = 1,

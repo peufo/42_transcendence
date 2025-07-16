@@ -3,6 +3,7 @@ import { createEffect, createSignal } from '../utils/signal.js'
 import { slide, transitionIn, transitionOut } from '../utils/transition.js'
 import './ft-page-404.js'
 import './ft-page-index.js'
+import './ft-page-me.js'
 import './ft-page-login.js'
 import './ft-page-stats.js'
 import './ft-page-account.js'
@@ -21,6 +22,7 @@ import {
 	type RouteApiPost,
 	type RoutePage,
 } from '../routes.js'
+import { getUser } from '../utils/store.js'
 
 const [getUrl, setUrl] = createSignal<URL>(new URL(document.location.href))
 
@@ -41,39 +43,42 @@ customElements.define(
 			document.addEventListener('click', onClickLink)
 			window.addEventListener('popstate', onPopState)
 			createEffect(async () => {
-				this.innerHTML = await this.render()
+				const url = getUrl()
+				const page = this.getPage(url.pathname)
+				if (page.layoutData) {
+					await Promise.all(page.layoutData.map((route) => api.get(route)))
+				}
+				const user = getUser()
+				if (!page.isPublic && !user) {
+					return goto(
+						new URL(`/login?redirectTo=${url.pathname}`, document.baseURI),
+					)
+				}
+				if (page.isPublic === 'only' && user) {
+					return goto(new URL(`/me`, document.baseURI))
+				}
+				if (page.pageData) {
+					await Promise.all(page.pageData.map((route) => api.get(route)))
+				}
+				this.innerHTML = /*html*/ `
+					<${page.component}></${page.component}>
+				`
 			})
 		}
 
-		async render(): Promise<string> {
-			const url = getUrl()
-			const { component, routesApi } = this.getRoutesApi(url.pathname)
-
-			// TODO: Call 'auth/user' before ?
-
-			// TODO: A beautiful loader ?
-			await Promise.all(routesApi.map((route) => api.get(route)))
-			return /*html*/ `
-				<${component}></${component}>
-			`
-		}
-
-		getRoutesApi(pathname: string): {
-			component: string
-			routesApi: RouteApiGet[]
-		} {
+		getPage(pathname: string): PageOption {
 			const routePage = pathname as RoutePage
 			if (!PAGES[routePage]) {
-				return { component: 'ft-page-404', routesApi: [] }
+				return { component: 'ft-page-404', isPublic: true }
 			}
-			const { component, pageData = [] } = PAGES[routePage] as PageOption
-			const routesApi: RouteApiGet[] = [...pageData]
+			const page = PAGES[routePage] as PageOption
+			const layoutData: RouteApiGet[] = []
 			for (const [path, options] of Object.entries(PAGES)) {
 				if ('layoutData' in options && pathname.startsWith(path)) {
-					routesApi.push(...options.layoutData)
+					layoutData.push(...options.layoutData)
 				}
 			}
-			return { component, routesApi }
+			return { ...page, layoutData }
 		}
 	},
 )
@@ -142,8 +147,9 @@ async function onSubmitForm(event: SubmitEvent) {
 		return
 	}
 	options.onSuccess?.(json.data)
-	if (options.redirect) {
-		return goto(new URL(options.redirect, document.location.origin))
+	if (options.redirectTo) {
+		const pathname = options.redirectTo()
+		return goto(new URL(pathname, document.location.origin))
 	}
 	if (options.invalidate) {
 		for (const apiRoute of options.invalidate) {

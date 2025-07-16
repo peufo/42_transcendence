@@ -13,15 +13,15 @@ export type RoutePage = keyof typeof PAGES
 
 export type ApiPostOption = {
 	onSuccess?<Result>(data: Result): void
-	redirect?: RoutePage
+	redirectTo?: () => RoutePage
 	invalidate?: RouteApiGet[]
 }
 
-// TODO: add auth: boolean
 export type PageOption = {
 	component: string
 	pageData?: RouteApiGet[]
 	layoutData?: RouteApiGet[]
+	isPublic?: boolean | 'only'
 }
 
 export const API_GET = {
@@ -35,11 +35,15 @@ export const API_GET = {
 export const API_POST = {
 	'/auth/login': {
 		onSuccess: () => toast.success('Hey, bienvenue'),
-		redirect: '/',
+		redirectTo: () => {
+			const searchParams = new URLSearchParams(document.location.search)
+			const redirectTo = searchParams.get('redirectTo') as RoutePage | null
+			return redirectTo || '/me'
+		},
 	},
 	'/auth/logout': {
 		onSuccess: () => toast.info('Bye'),
-		redirect: '/',
+		redirectTo: () => '/',
 	},
 	'/invitations/new': { invalidate: ['/invitations'] },
 	'/invitations/remove': { invalidate: ['/users/friends'] },
@@ -52,13 +56,20 @@ export const PAGES = {
 	'/': {
 		component: 'ft-page-index',
 		layoutData: ['/auth/user'],
+		isPublic: 'only',
+	},
+	'/me': {
+		component: 'ft-page-me',
 		pageData: ['/users/friends', '/invitations'],
 	},
-	'/login': { component: 'ft-page-login' },
+	'/login': {
+		component: 'ft-page-login',
+		isPublic: 'only',
+	},
 	'/stats': { component: 'ft-page-stats', pageData: ['/userstats'] },
 	'/account': { component: 'ft-page-account' },
-	'/local/new': { component: 'ft-page-local-new' },
-	'/local/play': { component: 'ft-page-local-play' },
+	'/local/new': { component: 'ft-page-local-new', isPublic: true },
+	'/local/play': { component: 'ft-page-local-play', isPublic: true },
 	'/game/new': { component: 'ft-page-game-new' },
 	'/game/play': { component: 'ft-page-game-play' },
 	'/local/play/babylon': { component: 'ft-page-local-play-babylon' },
