@@ -49,7 +49,7 @@ customElements.define(
 			this.startGameEngine()
 			this.setupControls()
 			this.setupScore()
-
+				
 			this.babylonEngine.runRenderLoop(() => this.scene.render())
 		}
 

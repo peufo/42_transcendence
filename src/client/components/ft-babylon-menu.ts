@@ -1,15 +1,16 @@
 /// <reference path="../../../node_modules/babylonjs/babylon.d.ts" />
 /// <reference path="../../../node_modules/babylonjs-gui/babylon.gui.d.ts" />
 
-/*
+import { eventBus } from '../utils/eventBus.js'
+import { resolve4 } from 'dns'
 import {
-        ARENA_HEIGHT,
-        ARENA_WIDTH,
-        Engine as GameEngine,
-        type Scores,
-        type State,
+	ARENA_HEIGHT,
+	ARENA_WIDTH,
+	Engine as GameEngine,
+	type Scores,
+	type State,
 } from '../../lib/engine/index.js'
-*/
+
 import { createArena } from '../graphics/arena.js'
 import { createBall } from '../graphics/ball.js'
 import { createCamera } from '../graphics/camera.js'
@@ -23,6 +24,12 @@ import {
 import { createPaddles } from '../graphics/paddles.js'
 import { updateGraphics } from '../graphics/scene.js'
 export const RENDER_SCALE = 0.1 
+
+
+   				interface config {
+                        skybox: string,
+                        paddle?: string, 
+	                }
 customElements.define(
         'ft-babylon-menu',
         class extends HTMLElement {
@@ -34,9 +41,10 @@ customElements.define(
                 ballMesh: BABYLON.Mesh
                 paddle1: BABYLON.Mesh
                 paddle2: BABYLON.Mesh
+				skybox?: BABYLON.Mesh
+
                 //gameLogicEngine: GameEngine
                 guiTexture: BABYLON.GUI.AdvancedDynamicTexture
-                scoreText: BABYLON.GUI.TextBlock
 
                 constructor() {
                         super()
@@ -45,13 +53,17 @@ customElements.define(
                         this.initCanvasAndEngine()
                         this.setupScene()
                         this.createGameObjects()
-                        //this.setupVisualEffects()
-                        //this.setupShadows()
+                        this.setupVisualEffects()
+                        this.setupShadows()
                         //this.startGameEngine()
-                        //this.setupControls()
-                        //this.setupScore()
+                        this.setupControls()
+						this.paddle1.position.x += 7
+						this.paddle2.position.x += 7
 
+						this.ballMesh.position.y += 5
                         this.babylonEngine.runRenderLoop(() => this.scene.render())
+						this.handleSceneChange();
+
                 }
 
                 connectedCallback() {
@@ -73,24 +85,73 @@ customElements.define(
                         //this.scene.ambientColor = new BABYLON.Color3(1, 1, 1)
                 }
 				handleSkyboxUpdate(SkyboxFile: string) {
-    				console.log('Changing skybox to:', SkyboxFile)
-    				const oldSkybox = this.scene.getMeshByName("BackgroundSkybox")
-    				oldSkybox?.dispose()
+					
+					this.skybox?.dispose() // si déjà existant
+					this.scene.environmentTexture?.dispose()
 
-    				if (this.scene.environmentTexture) {
-        				this.scene.environmentTexture.dispose()
-    				}
     				const skyboxTexture = BABYLON.CubeTexture.CreateFromPrefilteredData(
         				`/public/textures/polyhaven/${SkyboxFile}.env`, this.scene
     				)
+
+
     				this.scene.environmentTexture = skyboxTexture
-    				this.scene.createDefaultSkybox(skyboxTexture, true, 5000)
+    				const mesh = this.scene.createDefaultSkybox(skyboxTexture, true, 5000)
+					if (mesh) {
+    this.skybox = mesh
+					}
 				}
+				handlePaddleUpdate(paddleFile: string) {
+  console.log("🔁 Mise à jour du paddle avec :", paddleFile);
+
+  // Supprime l’ancien paddle si besoin
+  this.paddle1?.dispose();
+  this.paddle2?.dispose();
+
+  this.loadGLTFModel(paddleFile).then(mesh => {
+    // Positionne et clone le paddle pour p1 / p2
+    mesh.position = new BABYLON.Vector3(0, 0, 0);
+    mesh.scaling = new BABYLON.Vector3(1, 1, 1);
+
+    this.paddle1 = mesh.clone("paddle1", null);
+    this.paddle2 = mesh.clone("paddle2", null);
+
+    this.paddle1.position.x = 7;
+    this.paddle2.position.x = -7;
+
+    console.log("✅ Paddle mis à jour !");
+  });
+}
+
+
+				handleSceneChange()
+				{
+					eventBus.subscribe("Scenechange", (item: { newType: string, name: string }) => {
+  console.log("Reçu dans ft-babylon-menu :", item);
+
+  if (item.newType === "skybox") {
+    this.handleSkyboxUpdate(item.name);
+  } else if (item.newType === "paddle") {
+    this.handlePaddleUpdate(item.name);
+  }
+					});
+
+				}
+
+async loadGLTFModel(relativePath: string): Promise<BABYLON.Mesh> {
+  const result = await BABYLON.SceneLoader.ImportMeshAsync(
+    "", 
+    "/public/textures/paddle/", 
+    relativePath + ".gltf", 
+    this.scene
+  );
+
+  const mesh = result.meshes.find(m => m instanceof BABYLON.Mesh) as BABYLON.Mesh;
+  return mesh;
+}
 
 				setupScene() {
                         this.camera = createCamera(this.scene, this.canvas)
                         this.light = createLights(this.scene)
-                        /*
 						const pipeline = new BABYLON.DefaultRenderingPipeline(
                                 'defaultPipeline',
                                 true,
@@ -100,7 +161,6 @@ customElements.define(
                         pipeline.bloomEnabled = true
                         pipeline.imageProcessingEnabled = true
                         pipeline.fxaaEnabled = true
-                        */
 						//this.scene.fogMode = BABYLON.Scene.FOGMODE_LINEAR;
                         //BABYLON.Scene.FOGMODE_NONE;
                         //BABYLON.Scene.FOGMODE_EXP;
@@ -142,7 +202,7 @@ customElements.define(
                         const paddleMaterial = createPaddleMaterial(this.scene)
                         const ballMaterial = createBallMaterial(this.scene)
 
-                        createArena(this.scene, wallMaterial, 400, 400)
+                        createArena(this.scene, wallMaterial, ARENA_WIDTH, ARENA_HEIGHT)
 
                         const paddles = createPaddles(this.scene, paddleMaterial)
                         this.paddle1 = paddles.paddle1
