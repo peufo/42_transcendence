@@ -15,13 +15,12 @@ import { createCamera } from '../graphics/camera.js'
 import { createLights } from '../graphics/lights.js'
 import {
 	createBallMaterial,
-	createBallMaterial2,
 	createMatwall,
 	createPaddleMaterial,
 } from '../graphics/materials.js'
 import { createPaddles } from '../graphics/paddles.js'
 import { updateGraphics } from '../graphics/scene.js'
-export const RENDER_SCALE = 0.1 
+export const RENDER_SCALE = 0.1
 customElements.define(
 	'ft-babylon',
 	class extends HTMLElement {
@@ -57,10 +56,6 @@ customElements.define(
 			window.addEventListener('resize', () => this.babylonEngine.resize())
 		}
 
-		disconnectedCallback() {
-			console.log('BYE')
-		}
-
 		initCanvasAndEngine() {
 			this.canvas = document.createElement('canvas')
 			this.canvas.style.width = '100%'
@@ -94,18 +89,20 @@ customElements.define(
 			//BABYLON.Scene.FOGMODE_EXP2;
 			//BABYLON.Scene.FOGMODE_LINEAR;
 
-		//	this.scene.fogColor = new BABYLON.Color3(0.7, 0.85, 1);
-		//	this.scene.fogDensity = 0.001;
+			//	this.scene.fogColor = new BABYLON.Color3(0.7, 0.85, 1);
+			//	this.scene.fogDensity = 0.001;
 
-/*
-*/			
-			if (!this.scene.getMeshByName("BackgroundSkybox")) {
-    			const envTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("/public/textures/polyhaven/cloud8k.env", this.scene);
-    			this.scene.environmentTexture = envTexture;
-    			this.scene.createDefaultSkybox(envTexture, true, 5000);
+			/*
+			 */
+			if (!this.scene.getMeshByName('BackgroundSkybox')) {
+				const envTexture = BABYLON.CubeTexture.CreateFromPrefilteredData(
+					'/public/textures/polyhaven/cloud8k.env',
+					this.scene,
+				)
+				this.scene.environmentTexture = envTexture
+				this.scene.createDefaultSkybox(envTexture, true, 5000)
 			}
 		}
-
 
 		setupScore() {
 			this.guiTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI(
@@ -153,9 +150,15 @@ customElements.define(
 
 			const glow = new BABYLON.GlowLayer('glow', this.scene)
 			glow.addIncludedOnlyMesh(this.ballMesh)
-			const myParticleSystem = new BABYLON.ParticleSystem("particles", 2000, this.scene);
-			myParticleSystem.particleTexture = new BABYLON.Texture("https://assets.babylonjs.com/textures/flare.png");
-/*
+			const myParticleSystem = new BABYLON.ParticleSystem(
+				'particles',
+				2000,
+				this.scene,
+			)
+			myParticleSystem.particleTexture = new BABYLON.Texture(
+				'https://assets.babylonjs.com/textures/flare.png',
+			)
+			/*
 			myParticleSystem.emitter = new BABYLON.Vector3(0, 10, 0)
 			myParticleSystem.minSize = 0.5;
 myParticleSystem.maxSize = 5.5;
@@ -229,33 +232,35 @@ myParticleSystem.gravity = new BABYLON.Vector3(0, -1, 0); // tire vers le bas (e
 		renderGameState(state: State) {
 			updateGraphics(state, this.ballMesh, this.paddle1, this.paddle2)
 		}
-		
+
 		disconnectedCallback() {
-    console.log("Disposing Babylon properly");
+			console.log('Disposing Babylon properly')
 
-    if (this.scene.environmentTexture) {
-        const envTex = this.scene.environmentTexture;
+			if (this.scene.environmentTexture) {
+				const envTex = this.scene.environmentTexture
 
-        if (envTex instanceof BABYLON.CubeTexture && envTex.name.startsWith("blob:")) {
-            URL.revokeObjectURL(envTex.name);
-        }
+				if (
+					envTex instanceof BABYLON.CubeTexture &&
+					envTex.name.startsWith('blob:')
+				) {
+					URL.revokeObjectURL(envTex.name)
+				}
 
-        envTex.dispose();
-        this.scene.environmentTexture = null;
-    }
+				envTex.dispose()
+				this.scene.environmentTexture = null
+			}
 
-    const skybox = this.scene.getMeshByName("BackgroundSkybox");
-    skybox?.dispose();
+			const skybox = this.scene.getMeshByName('BackgroundSkybox')
+			skybox?.dispose()
 
-    this.babylonEngine?.stopRenderLoop();
-    this.scene?.dispose();
-    this.babylonEngine?.dispose();
-    this.canvas?.remove();
+			this.babylonEngine?.stopRenderLoop()
+			this.scene?.dispose()
+			this.babylonEngine?.dispose()
+			this.canvas?.remove()
 
-    window.removeEventListener('resize', () => this.babylonEngine.resize());
+			window.removeEventListener('resize', () => this.babylonEngine.resize())
 
-    console.log("Babylon cleaned");
-}
-
+			console.log('Babylon cleaned')
+		}
 	},
 )

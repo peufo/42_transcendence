@@ -4,7 +4,7 @@ import {
 	PADDLE_BASE_P2_POSITION,
 	PADDLE_BASE_WIDTH,
 } from '../../lib/engine/index.js'
-import { toRenderPosition } from './utils.js'
+import { toRenderPosition, scale } from './utils.js'
 export function createPaddles(
 	scene: BABYLON.Scene,
 	material: BABYLON.Material,
@@ -12,21 +12,20 @@ export function createPaddles(
 	const paddle1 = BABYLON.MeshBuilder.CreateBox(
 		'p1',
 		{
-			width: PADDLE_BASE_HEIGHT,
-			height: 20,
-			depth: PADDLE_BASE_WIDTH,
+			width: scale(PADDLE_BASE_HEIGHT),
+			height: scale(20),
+			depth: scale(PADDLE_BASE_WIDTH),
 		},
 		scene,
 	)
 	paddle1.material = material
 	paddle1.position = toRenderPosition(PADDLE_BASE_P1_POSITION)
-
 	const paddle2 = BABYLON.MeshBuilder.CreateBox(
 		'p2',
 		{
-			width: PADDLE_BASE_HEIGHT,
-			height: 20,
-			depth: PADDLE_BASE_WIDTH,
+			width: scale(PADDLE_BASE_HEIGHT),
+			height: scale(20),
+			depth: scale(PADDLE_BASE_WIDTH),
 		},
 		scene,
 	)
