@@ -43,7 +43,7 @@ export const TICK_INTERVAL = 1000 / TICK_RATE
 export const ARENA_WIDTH = 1000
 export const ARENA_HEIGHT = 700
 const rules = {
-	scoreToWin: 3,
+	scoreToWin: 10000,
 }
 
 // Ball properties
