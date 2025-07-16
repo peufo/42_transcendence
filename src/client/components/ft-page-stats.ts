@@ -1,4 +1,4 @@
-import { UserBasic, Match } from '../../lib/type.js'
+import type { Match, UserBasic } from '../../lib/type.js'
 import { createEffect } from '../utils/signal.js'
 import { getMatches, getUser } from '../utils/store.js'
 
@@ -13,7 +13,7 @@ customElements.define(
 
 			let userContent = ''
 			if (user)
-				userContent += /*html*/`
+				userContent += /*html*/ `
 					<div class="grid grid-cols-2 gap gap-4 p-10">
 						<ft-winrate></ft-winrate>
 						<ft-ranking></ft-ranking>
@@ -21,18 +21,25 @@ customElements.define(
 						<ft-goal-distribution></ft-goal-distribution>
 					</div>
 				`
-			else
-				userContent += /*html*/'No stats can be shown while logged out.'
+			else userContent += /*html*/ 'No stats can be shown while logged out.'
 			return userContent
 		}
-	}
+	},
 )
 
 customElements.define(
 	'ft-match-history',
 	class extends HTMLElement {
 		connectedCallback() {
-			this.classList.add('flex', 'flex-col', 'gap-3', 'border', 'border-gray-200', 'rounded-xl', 'p-5')
+			this.classList.add(
+				'flex',
+				'flex-col',
+				'gap-3',
+				'border',
+				'border-gray-200',
+				'rounded-xl',
+				'p-5',
+			)
 			createEffect(() => {
 				this.innerHTML = this.renderContent()
 			})
@@ -68,36 +75,56 @@ customElements.define(
 customElements.define(
 	'ft-ranking',
 	class extends HTMLElement {
-		connectedCallback(){
-			this.classList.add('flex', 'flex-col', 'gap-3', 'border', 'border-gray-200', 'rounded-xl', 'p-5')
+		connectedCallback() {
+			this.classList.add(
+				'flex',
+				'flex-col',
+				'gap-3',
+				'border',
+				'border-gray-200',
+				'rounded-xl',
+				'p-5',
+			)
 			createEffect(() => {
 				this.innerHTML = this.renderContent()
 			})
 		}
 		renderContent(): string {
-			let html = `
+			const html = `
 			<h2 class="flex flex-row p-2 items-center justify-center gap-2">Ranking</h2>`
 			return html
-		},
-	}
+		}
+	},
 )
 
 customElements.define(
 	'ft-winrate',
 	class extends HTMLElement {
-		connectedCallback(){
-			this.classList.add('flex', 'flex-row', 'items-center', 'justify-center', 'gap-3', 'border', 'border-gray-200', 'rounded-xl', 'p-5')
+		connectedCallback() {
+			this.classList.add(
+				'flex',
+				'flex-row',
+				'items-center',
+				'justify-center',
+				'gap-3',
+				'border',
+				'border-gray-200',
+				'rounded-xl',
+				'p-5',
+			)
 			createEffect(() => {
 				this.innerHTML = this.renderContent()
 			})
 		}
 		renderContent(): string {
 			const user = getUser()
-			if (!user)
-				return ''
+			if (!user) return ''
 			const matches = getMatches()
-			const winRate = ((getNumberOfWin(matches, user) / matches.length) * 100).toPrecision(3)
-			let html = `
+			const winRate = (
+				(getNumberOfWin(matches, user) / matches.length) *
+				100
+			).toPrecision(3)
+			const html = `
 			<div class="grid grid-flow-col grid-rows-2 gap-2">
 				<h2 class="flex flex-row p-2 items-center justify-center gap-2">Winrate</h2>
 				<span class="flex flex-row p-2 items-center justify-center gap-2">${winRate}</span>
@@ -105,45 +132,53 @@ customElements.define(
 				<span class="flex flex-row p-2 items-center justify-center gap-2">${getAverageRally(matches)}</span>
 			</div>`
 			return html
-		},
-	}
+		}
+	},
 )
 
 customElements.define(
 	'ft-goal-distribution',
 	class extends HTMLElement {
-		connectedCallback(){
-			this.classList.add('flex', 'flex-col', 'gap-3', 'border', 'border-gray-200', 'rounded-xl', 'p-5')
+		connectedCallback() {
+			this.classList.add(
+				'flex',
+				'flex-col',
+				'gap-3',
+				'border',
+				'border-gray-200',
+				'rounded-xl',
+				'p-5',
+			)
 			createEffect(() => {
 				this.innerHTML = this.renderContent()
 			})
 		}
 		renderContent(): string {
 			const user = getUser()
-			if (!user)
-				return ''
-			let html = `
+			if (!user) return ''
+			const html = `
 			<h2 class="flex flex-row p-2 items-center justify-center gap-2">Goal distribution</h2>`
 			return html
-		},
-	}
+		}
+	},
 )
 
-function getAverageRally(matches: Match[])
-{
+function getAverageRally(_matches: Match[]) {
 	return 0
 }
 
 function getNumberOfWin(matches: Match[], user: UserBasic): number {
 	let win = 0
-	for (const match of matches)
-	{
+	for (const match of matches) {
 		if (match.player1Id === user.id && match.player1Score > match.player2Score)
-			win++;
-		else if (match.player2Id === user.id && match.player2Score > match.player1Score)
-			win++;
+			win++
+		else if (
+			match.player2Id === user.id &&
+			match.player2Score > match.player1Score
+		)
+			win++
 	}
-	return (win)
+	return win
 }
 
 function getAvatarSrc(user: UserBasic): string {
