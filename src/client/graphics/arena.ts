@@ -5,22 +5,21 @@ export function createArena(
 	ARENA_WIDTH: number,
 	ARENA_HEIGHT: number,
 ): void {
-
 	const hl = new BABYLON.HighlightLayer('hl1', scene)
-	
-   const ground = BABYLON.MeshBuilder.CreateBox(
-    'ground',
-    {
-        width: scale(ARENA_HEIGHT),
-        height: 1,
-        depth: scale(ARENA_WIDTH),
-    },
-    scene,
-)
+
+	const ground = BABYLON.MeshBuilder.CreateBox(
+		'ground',
+		{
+			width: scale(ARENA_HEIGHT),
+			height: 1,
+			depth: scale(ARENA_WIDTH),
+		},
+		scene,
+	)
 	ground.position.y = 3.3
 	ground.material = material
 
-/*
+	/*
 const mirrorTexture = new BABYLON.MirrorTexture("mirror", 1024, scene, true)
 mirrorTexture.mirrorPlane = new BABYLON.Plane(0, -1.0, 0, -ground.position.y)
 mirrorTexture.renderList = scene.meshes 
@@ -35,9 +34,9 @@ ground.material = mirrorMaterial
 }
 
 */
-//ground.receiveShadows = false
-//ground.material.disableLighting = true 
-const wall = BABYLON.MeshBuilder.CreateBox(
+	//ground.receiveShadows = false
+	//ground.material.disableLighting = true
+	const wall = BABYLON.MeshBuilder.CreateBox(
 		'wall',
 		{
 			width: scale(ARENA_HEIGHT),
@@ -73,8 +72,8 @@ const wall = BABYLON.MeshBuilder.CreateBox(
 		//        faceColors: faceColors
 	})
 	wall3.position.z = 0
-	wall3.position.x = scale(ARENA_HEIGHT / 2) + 1;
-	wall3.position.y = 3.5;
+	wall3.position.x = scale(ARENA_HEIGHT / 2) + 1
+	wall3.position.y = 3.5
 
 	hl.addMesh(wall3, BABYLON.Color3.Blue())
 	const wall4 = wall3.clone('wall4')

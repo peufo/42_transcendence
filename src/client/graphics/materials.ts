@@ -1,14 +1,16 @@
 export function createBallMaterial2(scene: BABYLON.Scene): BABYLON.PBRMaterial {
-    const mat = new BABYLON.PBRMaterial("ballMat", scene);
-    mat.albedoTexture = new BABYLON.Texture("/public/textures/polyhaven/test/textures/aerial_rocks_02_diff_2k.jpg", scene);
+	const mat = new BABYLON.PBRMaterial('ballMat', scene)
+	mat.albedoTexture = new BABYLON.Texture(
+		'/public/textures/polyhaven/test/textures/aerial_rocks_02_diff_2k.jpg',
+		scene,
+	)
 
-    mat.metallic = 0;
-    mat.roughness = 1;
-    //mat.environmentTexture = scene.environmentTexture;
+	mat.metallic = 0
+	mat.roughness = 1
+	//mat.environmentTexture = scene.environmentTexture;
 
-    return mat;
+	return mat
 }
-
 
 export function createPaddleMaterial(
 	scene: BABYLON.Scene,
@@ -20,7 +22,9 @@ export function createPaddleMaterial(
 	return mat
 }
 
-export function createBallMaterial(scene: BABYLON.Scene): BABYLON.StandardMaterial {
+export function createBallMaterial(
+	scene: BABYLON.Scene,
+): BABYLON.StandardMaterial {
 	const ballMat = new BABYLON.StandardMaterial('ballMat', scene)
 	ballMat.diffuseColor = new BABYLON.Color3(1, 1, 1)
 	ballMat.roughness = 0.2

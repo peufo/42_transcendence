@@ -1,6 +1,6 @@
 import { ARENA_HEIGHT, ARENA_WIDTH } from '../../lib/engine/index.js'
-import  { RENDER_SCALE } from '../components/ft-babylon.js'
 import type { Vector2 } from '../../lib/engine/Vector2.js'
+import { RENDER_SCALE } from '../components/ft-babylon.js'
 
 export function toRenderPosition(
 	pos: Vector2,
@@ -14,7 +14,6 @@ export function toRenderPosition(
 	)
 }
 
-export function scale(val: number): number
-{
-	return RENDER_SCALE * val;
+export function scale(val: number): number {
+	return RENDER_SCALE * val
 }

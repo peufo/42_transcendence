@@ -26,7 +26,7 @@ async function main() {
 		},
 	}))
 
-	await seed(db, { friendships }).refine((f: any) => ({
+	await seed(db, { friendships }).refine((f) => ({
 		friendships: {
 			columns: {
 				user1Id: f.default({
