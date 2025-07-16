@@ -12,6 +12,7 @@ import './ft-page-game-new.js'
 import './ft-page-game-play.js'
 import './ft-page-local-play-babylon.js'
 import {
+	API_GET,
 	API_POST,
 	type ApiPostOption,
 	PAGES,
@@ -105,19 +106,10 @@ function onClickLink(event: MouseEvent) {
 async function onSubmitForm(event: SubmitEvent) {
 	event.preventDefault()
 	const form = event.target as HTMLFormElement
+	const route = new URL(form.action).pathname
 	if (form.method === 'get') {
-		// TODO: use action instead
-		// const apikey = form.dataset.api as RouteApiGet
-		// if (!apikey)
-		// 	throw new Error(
-		// 		`Attribute data-api="resource" is needed in form element when method="get"`,
-		// 	)
-		// if (!api[apikey])
-		// 	throw new Error(
-		// 		`form data-api="${apikey}" does not exist in client/api.ts`,
-		// 	)
-		// return api[apikey](getFormQuery(new FormData(form)))
-		return
+		if (!(route in API_GET)) throw new Error(`route "${route}" not exist`)
+		return api.get(route as RouteApiGet, getFormQuery(new FormData(form)))
 	}
 
 	const res = await fetch(form.action, {
@@ -143,7 +135,7 @@ async function onSubmitForm(event: SubmitEvent) {
 	}
 	const json = await res.json()
 	parseErrorMessage()
-	const route = new URL(form.action).pathname
+
 	const options = API_POST[route as RouteApiPost] as ApiPostOption
 	if (!options) {
 		console.log('TODO: comportement par défaut')

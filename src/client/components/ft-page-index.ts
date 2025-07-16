@@ -23,7 +23,7 @@ customElements.define(
 					<ft-friends></ft-friends>
 					<ft-invitations></ft-invitations>
 					<div class="flex flex-col gap-3">
-						<form method="get" data-api="users" class="flex items-center w-full">
+						<form method="get" action="/users" class="flex items-center w-full">
 							<div class="relative w-full">
 								<div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
 									<ft-icon name="user-search" class="h-5 w-5 text-gray-500"></ft-icon>
