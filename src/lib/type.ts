@@ -1,5 +1,3 @@
-import { StringifyOptions } from 'querystring'
-
 export type UserBasic = {
 	id: number
 	name: string
@@ -32,4 +30,6 @@ export type Match = {
 	finishedAt: string
 	player1: UserBasic
 	player2: UserBasic
+	player1Score: number
+	player2Score: number
 }

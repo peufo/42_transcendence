@@ -3,7 +3,7 @@ import { drizzle } from 'drizzle-orm/libsql'
 import { seed } from 'drizzle-seed'
 import { createAvatarPlaceholder } from '../controllers/avatar.js'
 import { env } from '../env.js'
-import { friendships, matches, users } from './schema.js'
+import { friendships, matches, rounds, users } from './schema.js'
 
 async function main() {
 	const db = drizzle(env.DB_FILE_NAME)
@@ -50,16 +50,50 @@ async function main() {
 		matches: {
 			columns: {
 				player1Id: f.valuesFromArray({
-					values: [2, 3, 4, 5, 6, 7, 8, 9, 10],
+					values: [2],
 				}),
 				player2Id: f.valuesFromArray({
 					values: [11, 12, 13, 14, 15, 16, 17, 18, 19],
+				}),
+				player1Score: f.valuesFromArray({
+					values: [0, 1, 2, 3, 4, 5],
+				}),
+				player2Score: f.valuesFromArray({
+					values: [0, 1, 2, 3, 4, 5],
 				}),
 				botDifficulty: f.valuesFromArray({
 					values: ['Baby', 'Kevin', 'Terminator'],
 				}),
 				pointsToWin: f.default({
 					defaultValue: 5,
+				}),
+			},
+			count: 11,
+		},
+	}))
+
+	await seed(db, { rounds }).refine((f) => ({
+		rounds: {
+			columns: {
+				scorer: f.valuesFromArray({
+					values: ['p1', 'p2'],
+				}),
+				rallyCount: f.int({
+					minValue: 2,
+					maxValue: 80,
+				}),
+				ballPositionY: f.int({
+					minValue: 0,
+					maxValue: 100,
+				}),
+				matchdId: f.valuesFromArray({
+					values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+				}),
+				gamestates: f.default({
+					defaultValue: '',
+				}),
+				arenaSettings: f.default({
+					defaultValue: '',
 				}),
 			},
 		},

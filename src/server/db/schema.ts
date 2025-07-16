@@ -77,6 +77,8 @@ export const matches = sqliteTable('matches', {
 		.notNull()
 		.references(() => users.id),
 	player2Id: int().references(() => users.id),
+	player1Score: int().default(0),
+	player2Score: int().default(0),
 	botDifficulty: text({ enum: ['Baby', 'Kevin', 'Terminator'] })
 		.notNull()
 		.default('Kevin'),
@@ -144,9 +146,10 @@ export const versusRelations = relations(versus, ({ one }) => ({
 }))
 
 export const rounds = sqliteTable('rounds', {
-	id: int().primaryKey({ autoIncrement: true }),
-	player1Score: int().default(0),
-	player2Score: int().default(0),
+	id: int().primaryKey(),
+	scorer: text({ enum: ['p1', 'p2'] }),
+	rallyCount: int().notNull(),
+	ballPositionY: int().notNull(),
 	matchId: int().references(() => matches.id),
 	gamestates: text('', { mode: 'json' }),
 	arenaSettings: text('', { mode: 'json' }),
