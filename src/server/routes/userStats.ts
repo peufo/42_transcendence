@@ -51,10 +51,3 @@ function getMatches(userId: number) {
 		},
 	})
 }
-
-function getAllMatches()
-{
-	return db.query.matches.findMany({
-		where: isNotNull(matches.finishedAt)
-	})
-}

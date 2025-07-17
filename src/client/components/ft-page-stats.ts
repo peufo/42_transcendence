@@ -1,6 +1,6 @@
-import type { Match, UserBasic } from '../../lib/type.js'
+import type { Match, UserBasic, Round } from '../../lib/type.js'
 import { createEffect } from '../utils/signal.js'
-import { getMatches, getUser, getAllMatches } from '../utils/store.js'
+import { getMatches, getUser } from '../utils/store.js'
 
 customElements.define(
 	'ft-page-stats',
@@ -147,6 +147,8 @@ customElements.define(
 			this.classList.add(
 				'flex',
 				'flex-col',
+				'items-center',
+				'justify-around',
 				'gap-3',
 				'border',
 				'border-gray-200',
@@ -158,16 +160,39 @@ customElements.define(
 			})
 		}
 		renderContent(): string {
-			const user = getUser()
-			if (!user) return ''
 			const html = `
-			<h2 class="flex flex-row p-2 items-center justify-center gap-2">Goal distribution</h2>`
+			<h2 class="flex flex-row p-2 items-center justify-center gap-2">Goal distribution</h2>
+			<div class="flex flex-col p-2 items-center justify-center gap-2">
+				<div class="p-30 border-s-black-2 h-max w-max"></div>
+			</div`
 			return html
 		}
 	},
 )
 
-function getAverageRally(matches: Match[]) {
+function drawPaddle(canvas: HTMLCanvasElement | null): void{
+	const drawPaddleHeight = 20
+	const drawPaddleWidth = 50
+	if (!canvas)
+		return
+
+	fillRect()
+}
+
+function getGoalTakenY(matches: Match[], user: UserBasic): number[]{
+	let goalTakenY: number[] = []
+	for (const match of matches)
+	{
+		for (const round of match.rounds)
+		{
+			if ((match.player1Id === user.id && round.scorer === 'p2') || (match.player2Id === user.id && round.scorer === 'p1'))
+				goalTakenY.push(round.ballPositionY)
+		}
+	}
+	return (goalTakenY)
+}
+
+function getAverageRally(matches: Match[]): number{
 	let roundCount = 0
 	let rallyCount = 0
 	for (const match of matches)
