@@ -90,11 +90,9 @@ customElements.define(
 			})
 		}
 		renderContent(): string {
-			const user = getUser()
+			const user = $user.get()
 			if (!user) return ''
-			const matches = getMatches()
-			const html = `
-			<h2 class="flex flex-row p-2 items-center justify-center gap-2">Ranking</h2>`
+			const html = /*html*/ `<h2 class="flex flex-row p-2 items-center justify-center gap-2">Ranking</h2>`
 			return html
 		}
 	},
@@ -147,6 +145,8 @@ customElements.define(
 			this.classList.add(
 				'flex',
 				'flex-col',
+				'items-center',
+				'justify-around',
 				'gap-3',
 				'border',
 				'border-gray-200',
@@ -158,16 +158,17 @@ customElements.define(
 			})
 		}
 		renderContent(): string {
-			const user = $user.get()
-			if (!user) return ''
 			const html = `
-			<h2 class="flex flex-row p-2 items-center justify-center gap-2">Goal distribution</h2>`
+			<h2 class="flex flex-row p-2 items-center justify-center gap-2">Goal distribution</h2>
+			<div class="flex flex-col p-2 items-center justify-center gap-2">
+				<div class="p-30 border-s-black-2 h-max w-max"></div>
+			</div`
 			return html
 		}
 	},
 )
 
-function getAverageRally(matches: Match[]) {
+function getAverageRally(matches: Match[]): number {
 	let roundCount = 0
 	let rallyCount = 0
 	for (const match of matches) {
