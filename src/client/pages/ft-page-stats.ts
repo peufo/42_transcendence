@@ -15,7 +15,7 @@ customElements.define(
 			if (user)
 				userContent += /*html*/ `
 					<div class="grid grid-cols-2 gap gap-4 p-10">
-						<div class="flex flex-col"><ft-winrate></ft-winrate></div>
+						<div class="flex flex-col"><ft-stats></ft-winrate></div>
 						<div class="flex flex-col"><ft-ranking></ft-ranking></div>
 						<div class="flex flex-col"><ft-match-history></ft-match-history></div>
 						<div class="flex flex-col"><ft-goal-distribution></ft-goal-distribution></div>
@@ -133,7 +133,7 @@ customElements.define(
 )
 
 customElements.define(
-	'ft-winrate',
+	'ft-stats',
 	class extends HTMLElement {
 		connectedCallback() {
 			this.classList.add(
@@ -162,10 +162,12 @@ customElements.define(
 			const averageRally = getAverageRally(userMatches).toPrecision(2)
 			const html = `
 			<div class="grid grid-flow-col grid-rows-2 gap-2">
-				<h2 class="flex flex-row p-2 items-center justify-center gap-2">Winrate</h2>
-				<span class="flex flex-row p-2 items-center justify-center gap-2">${winRate} %</span>
-				<h2 class="flex flex-row p-2 items-center justify-center gap-2">Average rally per round</h2>
-				<span class="flex flex-row p-2 items-center justify-center gap-2">${averageRally}</span>
+				<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2">Total match played</h2>
+				<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2">${userMatches.length}</h2>
+				<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2">Winrate</h2>
+				<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2">${winRate} %</h2>
+				<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2">Average rally per round</h2>
+				<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2">${averageRally}</h2>
 			</div>`
 			return html
 		}
