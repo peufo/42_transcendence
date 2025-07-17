@@ -40,6 +40,12 @@ export type SessionEvent = {
 	onFriendshipDeleted: { friendshipId: number }
 }
 
+export type Round = {
+	scorer: 'p1' | 'p2'
+	rallyCount: number
+	ballPositionY: number
+}
+
 export type Match = {
 	player1Id: number
 	player2Id: number
@@ -48,6 +54,7 @@ export type Match = {
 	player2: UserBasic
 	player1Score: number | null
 	player2Score: number | null
+	rounds: Round[]
 }
 
 export type Tournament = {

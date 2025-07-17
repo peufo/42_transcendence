@@ -11,6 +11,13 @@ export function getMatches(userId: number) {
 		with: {
 			player1: { columns: userBasicColumns },
 			player2: { columns: userBasicColumns },
+			rounds: {
+				columns: {
+					scorer: true,
+					rallyCount: true,
+					ballPositionY: true,
+				},
+			},
 		},
 	})
 }

@@ -3,7 +3,13 @@ import { drizzle } from 'drizzle-orm/libsql'
 import { seed } from 'drizzle-seed'
 import { env } from '../env.js'
 import { createAvatarPlaceholder } from '../routes/auth/model.js'
-import { friendships, matches, rounds, users } from './schema.js'
+import {
+	friendships,
+	matches,
+	rounds,
+	roundsRelations,
+	users,
+} from './schema.js'
 
 async function main() {
 	const db = drizzle(env.DB_FILE_NAME)
@@ -46,7 +52,7 @@ async function main() {
 		},
 	}))
 
-	await seed(db, { matches }).refine((f) => ({
+	await seed(db, { matches, roundsRelations }).refine((f) => ({
 		matches: {
 			columns: {
 				player1Id: f.valuesFromArray({
@@ -77,14 +83,11 @@ async function main() {
 				}),
 				rallyCount: f.int({
 					minValue: 2,
-					maxValue: 80,
+					maxValue: 12,
 				}),
 				ballPositionY: f.int({
 					minValue: 0,
 					maxValue: 100,
-				}),
-				matchdId: f.valuesFromArray({
-					values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
 				}),
 				gamestates: f.default({
 					defaultValue: '',
@@ -92,8 +95,12 @@ async function main() {
 				arenaSettings: f.default({
 					defaultValue: '',
 				}),
+				matchId: f.valuesFromArray({
+					values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+				}),
 			},
 		},
+		count: 10,
 	}))
 
 	const invits = [3, 6, 9, 10, 13, 14]
