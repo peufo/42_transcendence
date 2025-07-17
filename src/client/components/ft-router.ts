@@ -114,9 +114,18 @@ async function onSubmitForm(event: SubmitEvent) {
 	event.preventDefault()
 	const form = event.target as HTMLFormElement
 	const route = new URL(form.action).pathname
+	const options = API_POST[route as RouteApiPost] as ApiPostOption
 	if (form.method === 'get') {
 		if (!(route in API_GET)) throw new Error(`route "${route}" not exist`)
 		return api.get(route as RouteApiGet, getFormQuery(new FormData(form)))
+	}
+
+	if (options.validation) {
+		const errors = options.validation(form)
+		if (errors) {
+			setErrors(errors)
+			return
+		}
 	}
 
 	const res = await fetch(form.action, {
@@ -137,7 +146,6 @@ async function onSubmitForm(event: SubmitEvent) {
 
 	if ('message' in json) toast.success(json.message)
 
-	const options = API_POST[route as RouteApiPost] as ApiPostOption
 	if (!options) {
 		console.log('TODO: comportement par défaut')
 		return
@@ -180,18 +188,21 @@ async function onSubmitForm(event: SubmitEvent) {
 			return
 		}
 		setErrorSubmit()
-		const inputs = form.querySelectorAll('input')
 		const errors: Record<string, string> = {}
 		if (msg) {
 			for (const [, name, error] of msg.matchAll(/body\/(\w+) ([^,]+)/g)) {
 				errors[name] = error
 			}
 		}
+		setErrors(errors)
+	}
+
+	function setErrors(errors: Record<string, string>) {
+		const inputs = form.querySelectorAll('input')
 		for (const input of inputs) {
 			setError(input, errors[input.name])
 		}
 	}
-
 	function clearErrors() {
 		const inputs = form.querySelectorAll('input')
 		for (const input of inputs) {

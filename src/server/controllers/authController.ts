@@ -21,7 +21,7 @@ export async function signupUser(
 			user,
 		})
 	} catch (err: unknown) {
-		res.status(400).send({ message: 'Error while the inscription', err })
+		res.status(401).send({ message: 'Error while the inscription', err })
 	}
 }
 
@@ -42,6 +42,6 @@ export async function loginUser(
 			user,
 		})
 	} catch (_err: unknown) {
-		res.status(410).send({ message: 'Error while trying to connect' })
+		res.status(401).send({ message: 'Invalid name or password' })
 	}
 }

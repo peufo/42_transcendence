@@ -5,12 +5,14 @@ import {
 	setUser,
 	setUsers,
 } from './utils/store.js'
+import { validationSignup } from './validation.js'
 
 export type RouteApiGet = keyof typeof API_GET
 export type RouteApiPost = keyof typeof API_POST
 export type RoutePage = keyof typeof PAGES
 
 export type ApiPostOption = {
+	validation?: (form: HTMLFormElement) => null | Record<string, string>
 	onSuccess?<Result>(data: Result): void
 	redirectTo?: () => RoutePage
 	invalidate?: RouteApiGet[]
@@ -37,6 +39,7 @@ export const API_POST = {
 	},
 	'/auth/signup': {
 		redirectTo: redirectAfterLogin,
+		validation: validationSignup,
 	},
 	'/auth/logout': {
 		redirectTo: () => '/',
