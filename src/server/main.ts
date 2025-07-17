@@ -9,13 +9,16 @@ import {
 	serializerCompiler,
 	validatorCompiler,
 } from 'fastify-type-provider-zod'
+import z from 'zod/v4'
 import { Engine } from '../lib/engine/index.js'
 import { env } from './env.js'
 import routes from './routes/index.js'
+import { engineInputSchema } from './schemas/engine.js'
 
 const server = fastify()
 server.setValidatorCompiler(validatorCompiler)
 server.setSerializerCompiler(serializerCompiler)
+server.register(fastifyWebsocket)
 server.register(fastifyFormbody)
 server.register(fastifyMultipart)
 server.register(fastifyCookie, {
@@ -49,7 +52,6 @@ server.listen({ port: env.PORT, host: env.APP_HOST }, (err, address) => {
 	console.log(`Server listening at ${address}`)
 })
 
-server.register(fastifyWebsocket)
 server.register((fastify) => {
 	fastify.get('/ws', { websocket: true }, (socket, _req) => {
 		const engine = new Engine({
@@ -57,8 +59,14 @@ server.register((fastify) => {
 		})
 		engine.start() // event ?
 		socket.on('message', (message) => {
-			const input = JSON.parse(message.toString('utf-8'))
-			engine.setInput(input.player, input.move, input.value)
+			const json = JSON.parse(message.toString('utf-8'))
+			const input = z.safeParse(engineInputSchema, json)
+			if (input.error) {
+				console.error(input.error)
+				return
+			}
+			const { player, move, value } = input.data
+			engine.setInput(player, move, value)
 		})
 		socket.on('close', (_message) => {
 			engine.stop()
