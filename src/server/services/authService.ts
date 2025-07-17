@@ -1,3 +1,4 @@
+import { HttpError } from '../utils/HttpError.js'
 import argon2 from 'argon2'
 import {
 	checkUserExists,
@@ -6,25 +7,27 @@ import {
 	getUser,
 } from '../models/authModels.js'
 import type { LoginSchema, SignupSchema } from '../schemas/authSchema.js'
+
 export async function signupService(data: SignupSchema) {
 	if (await checkUserExists(data.name)) {
-		// TODO: use new Error() instead
-		throw { message: 'user already exists.' }
+		throw new HttpError('User already exists.', 409)
 	}
 	const passwordHash = await argon2.hash(data.password)
 	const user = await createUser({ passwordHash, name: data.name })
 
-	if (!user) throw { message: 'error while creating the account.' }
-	// TODO: dont' return user.passwordHash
-	return user
+	if (!user)
+		throw new HttpError('Error while creating account.', 500)
+	const { passwordHash: _, ...safeUser } = user
+	return safeUser
 }
 
 export async function loginService({ name, password }: LoginSchema) {
 	if ((await checkUserExists(name)) === false)
-		throw { message: `user ${name} doesn't exist.` }
-
+		throw new HttpError(`User ${name} doesn't exists.`, 404)
 	const passwordHash = await getPasswordHash(name)
-	if (!passwordHash) throw { message: 'password hash not found' }
-	if (await argon2.verify(passwordHash, password)) return getUser(name)
-	else throw { message: `password does not match.` }
+	if (!passwordHash)
+		throw new HttpError('Password hash not found.', 500)
+	if (!(await argon2.verify(passwordHash, password))) 
+		throw new HttpError('Password is incorrect.', 401)
+	return getUser(name)
 }

@@ -41,6 +41,14 @@ server.get('/*', { exposeHeadRoute: false }, (_req, reply) => {
 	reply.sendFile('index.html')
 })
 
+server.setErrorHandler((error, request, reply) => {
+	const status = error.statusCode || 500
+	reply.status(status).send({
+		error: error.name || 'Internal Server Error',
+		message: error.message || 'Something went wrong',
+	})
+})
+
 server.listen({ port: env.PORT, host: env.APP_HOST }, (err, address) => {
 	if (err) {
 		console.error(err)
