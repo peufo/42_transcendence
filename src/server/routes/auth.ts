@@ -7,10 +7,14 @@ import { createSession } from '../controllers/session.js'
 import { db, users } from '../db/index.js'
 import '@fastify/cookie'
 import '../types.js'
-import { signupUser } from '../controllers/user.js'
-import { signupSchema } from '../schemas/auth.js'
+import { signupUser, loginUser } from '../controllers/authController.js'
+import { signupSchema } from '../schemas/authSchema.js'
+import { loginSchema } from '../schemas/authSchema.js'
 
 export const authRoute: FastifyPluginCallbackZod = (server, options, done) => {
+	
+	server.post('/login', { schema : { body: loginSchema } }, loginUser )
+	/*
 	server.post(
 		'/login',
 		{
@@ -51,6 +55,7 @@ export const authRoute: FastifyPluginCallbackZod = (server, options, done) => {
 			res.redirect('/')
 		},
 	)
+	*/
 
 	// signup
 	server.post('/signup', { schema: { body: signupSchema } }, signupUser)
