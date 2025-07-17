@@ -28,3 +28,28 @@ export async function checkUserExists(username: string): Promise<boolean> {
 	if (results.length > 0) return true
 	return false
 }
+
+export async function getUser(username: string) {
+	const result = await db
+		.select({
+			id: users.id,
+			name: users.name,
+			avatar: users.avatar,
+			avatarPlaceholder: users.avatarPlaceholder,
+			isActive: users.isActive,
+		})
+		.from(users)
+		.where(eq(users.name, username))
+
+	return result[0] ?? null
+}
+
+export async function getPassword(username: string) {
+	const result = await db
+		.select({
+			password: users.passwordHash,
+		})
+		.from(users)
+		.where(eq(users.name, username))
+	return result[0] ?? null
+}

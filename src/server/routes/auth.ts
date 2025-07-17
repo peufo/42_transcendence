@@ -1,16 +1,12 @@
-import argon2 from 'argon2'
-import { eq } from 'drizzle-orm'
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
-import { z } from 'zod/v4'
-import { createAvatarPlaceholder } from '../controllers/avatar.js'
-import { createSession } from '../controllers/session.js'
-import { db, users } from '../db/index.js'
 import '@fastify/cookie'
 import '../types.js'
-import { signupUser } from '../controllers/user.js'
-import { signupSchema } from '../schemas/auth.js'
+import { loginUser, signupUser } from '../controllers/authController.js'
+import { loginSchema, signupSchema } from '../schemas/authSchema.js'
 
 export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
+	server.post('/login', { schema: { body: loginSchema } }, loginUser)
+	/*
 	server.post(
 		'/login',
 		{
@@ -53,6 +49,7 @@ export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 			})
 		},
 	)
+	*/
 
 	server.post('/signup', { schema: { body: signupSchema } }, signupUser)
 
