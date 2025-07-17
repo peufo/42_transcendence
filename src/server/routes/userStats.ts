@@ -2,7 +2,6 @@ import { and, eq, isNotNull, or } from 'drizzle-orm'
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { db, matches } from '../db/index.js'
 import '../types.js'
-import { findSourceMap } from 'module'
 
 export const statsRoute: FastifyPluginCallbackZod = (
 	server,

@@ -1,4 +1,4 @@
-import type { Match, UserBasic, Round } from '../../lib/type.js'
+import type { Match, UserBasic } from '../../lib/type.js'
 import { createEffect } from '../utils/signal.js'
 import { getMatches, getUser } from '../utils/store.js'
 
@@ -15,10 +15,10 @@ customElements.define(
 			if (user)
 				userContent += /*html*/ `
 					<div class="grid grid-cols-2 gap gap-4 p-10">
-						<ft-winrate></ft-winrate>
-						<ft-ranking></ft-ranking>
-						<ft-match-history></ft-match-history>
-						<ft-goal-distribution></ft-goal-distribution>
+						<div class="flex flex-col"><ft-winrate></ft-winrate></div>
+						<div class="flex flex-col"><ft-ranking></ft-ranking></div>
+						<div class="flex flex-col"><ft-match-history></ft-match-history></div>
+						<div class="flex flex-col"><ft-goal-distribution></ft-goal-distribution></div>
 					</div>
 				`
 			else userContent += /*html*/ 'No stats can be shown while logged out.'
@@ -92,7 +92,6 @@ customElements.define(
 		renderContent(): string {
 			const user = getUser()
 			if (!user) return ''
-			const matches = getMatches()
 			const html = `
 			<h2 class="flex flex-row p-2 items-center justify-center gap-2">Ranking</h2>`
 			return html
@@ -147,6 +146,8 @@ customElements.define(
 			this.classList.add(
 				'flex',
 				'flex-col',
+				'flex-wrap',
+				'overflow-hidden',
 				'items-center',
 				'justify-around',
 				'gap-3',
@@ -160,45 +161,61 @@ customElements.define(
 			})
 		}
 		renderContent(): string {
+			const matches = getMatches()
+			const user = getUser()
+			if (!user) return ''
+			const goalTakenY = getGoalTakenY(matches, user)
+			const distributionPercentage = convertToPercentage(goalTakenY)
 			const html = `
-			<h2 class="flex flex-row p-2 items-center justify-center gap-2">Goal distribution</h2>
-			<div class="flex flex-col p-2 items-center justify-center gap-2">
-				<div class="p-30 border-s-black-2 h-max w-max"></div>
+			<h2 class="flex flex-row p-2 items-center justify-center gap-2">Weaknesses</h2>
+			<div class="flex flex-col w-max items-center justify-center gap-2">
+				<div class="w-50 h-5 border-2 border-black"></div>
+				${drawRectangle(distributionPercentage)}
 			</div`
 			return html
 		}
 	},
 )
 
-function drawPaddle(canvas: HTMLCanvasElement | null): void{
-	const drawPaddleHeight = 20
-	const drawPaddleWidth = 50
-	if (!canvas)
-		return
-
-	fillRect()
+function drawRectangle(values: number[]): string {
+	let html = '<div class="flex items-center">'
+	for (const value of values) {
+		const color = `rgb(${255 - Math.ceil((value * 255) / 100)},${255 - Math.ceil((value * 255) / 100)}, 255)`
+		html += `
+		<div class="w-1 h-1" style="background-color:${color}"></div>
+		`
+	}
+	html += '</div>'
+	return html
 }
 
-function getGoalTakenY(matches: Match[], user: UserBasic): number[]{
-	let goalTakenY: number[] = []
-	for (const match of matches)
-	{
-		for (const round of match.rounds)
-		{
-			if ((match.player1Id === user.id && round.scorer === 'p2') || (match.player2Id === user.id && round.scorer === 'p1'))
+function convertToPercentage(goalTakenY: number[]): number[] {
+	let distribution: number[] = []
+	for (let i = 0; i < 100; i++) distribution.push(0)
+	for (const value of goalTakenY) distribution[value]++
+	distribution = distribution.map((e) => (e / Math.max(...distribution)) * 100)
+	return distribution
+}
+
+function getGoalTakenY(matches: Match[], user: UserBasic): number[] {
+	const goalTakenY: number[] = []
+	for (const match of matches) {
+		for (const round of match.rounds) {
+			if (
+				(match.player1Id === user.id && round.scorer === 'p2') ||
+				(match.player2Id === user.id && round.scorer === 'p1')
+			)
 				goalTakenY.push(round.ballPositionY)
 		}
 	}
-	return (goalTakenY)
+	return goalTakenY
 }
 
-function getAverageRally(matches: Match[]): number{
+function getAverageRally(matches: Match[]): number {
 	let roundCount = 0
 	let rallyCount = 0
-	for (const match of matches)
-	{
-		for (const round of match.rounds)
-		{
+	for (const match of matches) {
+		for (const round of match.rounds) {
 			rallyCount += round.rallyCount
 			roundCount++
 		}
