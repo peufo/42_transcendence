@@ -23,6 +23,12 @@ export type Invitation = UserBasic & {
 	friendshipId: number
 }
 
+export type Round = {
+	scorer: 'p1' | 'p2'
+	rallyCount: number
+	ballPositionY: number
+}
+
 export type Match = {
 	player1Id: number
 	player2Id: number
@@ -32,4 +38,5 @@ export type Match = {
 	player2: UserBasic
 	player1Score: number
 	player2Score: number
+	rounds: Round[]
 }

@@ -1,6 +1,6 @@
 import type { Match, UserBasic } from '../../lib/type.js'
 import { createEffect } from '../utils/signal.js'
-import { getMatches, getUser } from '../utils/store.js'
+import { getMatches, getUser, getAllMatches } from '../utils/store.js'
 
 customElements.define(
 	'ft-page-stats',
@@ -90,6 +90,9 @@ customElements.define(
 			})
 		}
 		renderContent(): string {
+			const user = getUser()
+			if (!user) return ''
+			const matches = getMatches()
 			const html = `
 			<h2 class="flex flex-row p-2 items-center justify-center gap-2">Ranking</h2>`
 			return html
@@ -119,17 +122,18 @@ customElements.define(
 		renderContent(): string {
 			const user = getUser()
 			if (!user) return ''
-			const matches = getMatches()
+			const userMatches = getMatches()
 			const winRate = (
-				(getNumberOfWin(matches, user) / matches.length) *
+				(getNumberOfWin(userMatches, user) / userMatches.length) *
 				100
 			).toPrecision(3)
+			const averageRally = getAverageRally(userMatches).toPrecision(2)
 			const html = `
 			<div class="grid grid-flow-col grid-rows-2 gap-2">
 				<h2 class="flex flex-row p-2 items-center justify-center gap-2">Winrate</h2>
-				<span class="flex flex-row p-2 items-center justify-center gap-2">${winRate}</span>
+				<span class="flex flex-row p-2 items-center justify-center gap-2">${winRate} %</span>
 				<h2 class="flex flex-row p-2 items-center justify-center gap-2">Average rally per round</h2>
-				<span class="flex flex-row p-2 items-center justify-center gap-2">${getAverageRally(matches)}</span>
+				<span class="flex flex-row p-2 items-center justify-center gap-2">${averageRally}</span>
 			</div>`
 			return html
 		}
@@ -163,8 +167,18 @@ customElements.define(
 	},
 )
 
-function getAverageRally(_matches: Match[]) {
-	return 0
+function getAverageRally(matches: Match[]) {
+	let roundCount = 0
+	let rallyCount = 0
+	for (const match of matches)
+	{
+		for (const round of match.rounds)
+		{
+			rallyCount += round.rallyCount
+			roundCount++
+		}
+	}
+	return rallyCount / roundCount
 }
 
 function getNumberOfWin(matches: Match[], user: UserBasic): number {
