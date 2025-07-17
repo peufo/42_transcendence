@@ -167,8 +167,8 @@ customElements.define(
 			const distributionPercentage = convertToPercentage(goalTakenY)
 			const html = `
 			<h2 class="flex flex-row p-2 items-center justify-center gap-2">Weaknesses</h2>
-			<div class="flex flex-col w-max items-center justify-center gap-2">
-				<div class="w-50 h-5 border-2 border-black"></div>
+			<div class="flex flex-col w-max items-center justify-center ps-1 pb-1 gap-4 border-black border-l-2 border-r-2 border-b-2">
+				<div class="w-50 h-5 border-2 border-black rounded-4xl shadow-lg"></div>
 				${drawRectangle(distributionPercentage)}
 			</div`
 			return html
@@ -176,12 +176,16 @@ customElements.define(
 	},
 )
 
-function drawPaddle(canvas: HTMLCanvasElement | null): void {
-	const drawPaddleHeight = 20
-	const drawPaddleWidth = 50
-	if (!canvas) return
-
-	fillRect()
+function drawRectangle(values: number[]): string {
+	let html = '<div class="flex items-center">'
+	for (const value of values) {
+		const color = `rgb(255, ${255 - Math.ceil((value * 255) / 100)}, ${255 - Math.ceil((value * 255) / 100)})`
+		html += `
+		<div class="w-1 h-1" style="background-color:${color}"></div>
+		`
+	}
+	html += '</div>'
+	return html
 }
 
 function getGoalTakenY(matches: Match[], user: UserBasic): number[] {
