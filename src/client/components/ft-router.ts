@@ -126,21 +126,13 @@ async function onSubmitForm(event: SubmitEvent) {
 		body: getFormBody(),
 	})
 
-	if (res.status === 401) {
-		const submitButton = form.querySelector<HTMLElement>('button[type=submit]')
-		if (submitButton) {
-			setError(submitButton, 'Unauthorized')
-		}
-		parseErrorMessage()
-		return
-	}
+	const json = await res.json()
 	if (!res.ok) {
-		const json = await res.json()
 		parseErrorMessage(json.message)
 		return
 	}
-	const json = await res.json()
-	parseErrorMessage()
+	clearErrors()
+	setErrorSubmit()
 
 	const options = API_POST[route as RouteApiPost] as ApiPostOption
 	if (!options) {
@@ -176,14 +168,37 @@ async function onSubmitForm(event: SubmitEvent) {
 		return urlEncoded.toString()
 	}
 
-	function parseErrorMessage(msg = '') {
+	function parseErrorMessage(msg: string) {
+		const isFieldsError = msg.startsWith('body/')
+		if (msg && !isFieldsError) {
+			clearErrors()
+			setErrorSubmit(msg)
+			return
+		}
+		setErrorSubmit()
 		const inputs = form.querySelectorAll('input')
 		const errors: Record<string, string> = {}
-		for (const [, name, error] of msg.matchAll(/body\/(\w+) ([^,]+)/g)) {
-			errors[name] = error
+		if (msg) {
+			for (const [, name, error] of msg.matchAll(/body\/(\w+) ([^,]+)/g)) {
+				errors[name] = error
+			}
 		}
 		for (const input of inputs) {
 			setError(input, errors[input.name])
+		}
+	}
+
+	function clearErrors() {
+		const inputs = form.querySelectorAll('input')
+		for (const input of inputs) {
+			setError(input, '')
+		}
+	}
+
+	function setErrorSubmit(error = '') {
+		const submitButton = form.querySelector<HTMLElement>('button[type=submit]')
+		if (submitButton) {
+			setError(submitButton, error)
 		}
 	}
 

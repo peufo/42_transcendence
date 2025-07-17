@@ -39,7 +39,7 @@ export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 			} else {
 				const passwordCorrect = await argon2.verify(user.passwordHash, password)
 				if (!passwordCorrect) {
-					return res.status(401).send({ message: 'Error' })
+					return res.status(401).send({ message: 'Wrong password or username' })
 				}
 			}
 
