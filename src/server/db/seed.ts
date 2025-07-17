@@ -87,7 +87,7 @@ async function main() {
 				}),
 				ballPositionY: f.int({
 					minValue: 0,
-					maxValue: 100,
+					maxValue: 99,
 				}),
 				gamestates: f.default({
 					defaultValue: '',
@@ -99,6 +99,7 @@ async function main() {
 					values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
 				}),
 			},
+			count: 200,
 		},
 		count: 10,
 	}))

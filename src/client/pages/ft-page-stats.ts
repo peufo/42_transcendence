@@ -15,10 +15,10 @@ customElements.define(
 			if (user)
 				userContent += /*html*/ `
 					<div class="grid grid-cols-2 gap gap-4 p-10">
-						<ft-winrate></ft-winrate>
-						<ft-ranking></ft-ranking>
-						<ft-match-history></ft-match-history>
-						<ft-goal-distribution></ft-goal-distribution>
+						<div class="flex flex-col"><ft-winrate></ft-winrate></div>
+						<div class="flex flex-col"><ft-ranking></ft-ranking></div>
+						<div class="flex flex-col"><ft-match-history></ft-match-history></div>
+						<div class="flex flex-col"><ft-goal-distribution></ft-goal-distribution></div>
 					</div>
 				`
 			else userContent += /*html*/ 'No stats can be shown while logged out.'
@@ -145,6 +145,8 @@ customElements.define(
 			this.classList.add(
 				'flex',
 				'flex-col',
+				'flex-wrap',
+				'overflow-hidden',
 				'items-center',
 				'justify-around',
 				'gap-3',
@@ -158,15 +160,43 @@ customElements.define(
 			})
 		}
 		renderContent(): string {
+			const matches = $matches.get()
+			const user = $user.get()
+			if (!user) return ''
+			const goalTakenY = getGoalTakenY(matches, user)
+			const distributionPercentage = convertToPercentage(goalTakenY)
 			const html = `
-			<h2 class="flex flex-row p-2 items-center justify-center gap-2">Goal distribution</h2>
-			<div class="flex flex-col p-2 items-center justify-center gap-2">
-				<div class="p-30 border-s-black-2 h-max w-max"></div>
+			<h2 class="flex flex-row p-2 items-center justify-center gap-2">Weaknesses</h2>
+			<div class="flex flex-col w-max items-center justify-center gap-2">
+				<div class="w-50 h-5 border-2 border-black"></div>
+				${drawRectangle(distributionPercentage)}
 			</div`
 			return html
 		}
 	},
 )
+
+function drawPaddle(canvas: HTMLCanvasElement | null): void {
+	const drawPaddleHeight = 20
+	const drawPaddleWidth = 50
+	if (!canvas) return
+
+	fillRect()
+}
+
+function getGoalTakenY(matches: Match[], user: UserBasic): number[] {
+	const goalTakenY: number[] = []
+	for (const match of matches) {
+		for (const round of match.rounds) {
+			if (
+				(match.player1Id === user.id && round.scorer === 'p2') ||
+				(match.player2Id === user.id && round.scorer === 'p1')
+			)
+				goalTakenY.push(round.ballPositionY)
+		}
+	}
+	return goalTakenY
+}
 
 function getAverageRally(matches: Match[]): number {
 	let roundCount = 0

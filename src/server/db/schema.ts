@@ -6,7 +6,6 @@ import {
 	sqliteTable,
 	text,
 	unique,
-	real
 } from 'drizzle-orm/sqlite-core'
 
 export const users = sqliteTable('users', {
@@ -20,19 +19,10 @@ export const users = sqliteTable('users', {
 	isActive: int({ mode: 'boolean' }).notNull().default(false),
 })
 
-export const usersRelations = relations(users, ({ many, one }) => ({
+export const usersRelations = relations(users, ({ many }) => ({
 	friends: many(friendships),
 	tournaments: many(tournamentsParticipants),
-	winRate: one(userWinrate)
 }))
-
-export const userWinrate = sqliteTable('userWinRate', {
-	id: int().primaryKey( { autoIncrement: true }),
-	userid: int().notNull().references(() => users.id),
-	winrate: real().generatedAlwaysAs(
-		(): SQL => sql``
-	)
-})
 
 export const sessions = sqliteTable('sessions', {
 	id: text().primaryKey(),
@@ -101,7 +91,7 @@ export const matchesRelations = relations(matches, ({ one, many }) => ({
 	versus: one(versus),
 	player1: one(users, { fields: [matches.player1Id], references: [users.id] }),
 	player2: one(users, { fields: [matches.player2Id], references: [users.id] }),
-	rounds: many(rounds)
+	rounds: many(rounds),
 }))
 
 export const tournaments = sqliteTable('tournaments', {
@@ -193,5 +183,5 @@ export const roundsRelations = relations(rounds, ({ one }) => ({
 	match: one(matches, {
 		fields: [rounds.matchId],
 		references: [matches.id],
-	})
+	}),
 }))
