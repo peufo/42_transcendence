@@ -21,6 +21,7 @@ export async function signupUser(
 			user,
 		})
 	} catch (err: unknown) {
+		// TODO: send message in err.message instead
 		res.status(401).send({ message: 'Error while the inscription', err })
 	}
 }
