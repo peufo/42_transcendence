@@ -45,8 +45,8 @@ function getMatches(userId: number) {
 					scorer: true,
 					rallyCount: true,
 					ballPositionY: true,
-				}
-			}
+				},
+			},
 		},
 	})
 }
