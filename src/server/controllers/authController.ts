@@ -1,34 +1,20 @@
 import '@fastify/cookie'
 import type { FastifyReply, FastifyRequest } from 'fastify'
+import type { LoginSchema, SignupSchema } from '../schemas/authSchema.js'
 import { loginService, signupService } from '../services/authService.js'
 import { createSession } from './session.js'
 
-interface SignupBody {
-	username: string
-	password: string
-	avatar: string
-}
-
-interface LoginBody {
-	username: string
-	password: string
-}
 export async function signupUser(
-	req: FastifyRequest<{ Body: SignupBody }>,
+	req: FastifyRequest<{ Body: SignupSchema }>,
 	res: FastifyReply,
 ) {
-	const { username, password, avatar } = req.body
-
 	try {
-		const user = await signupService(username, password, avatar)
-
+		const user = await signupService(req.body)
 		const { token } = await createSession(user.id)
-
 		res.setCookie('session', token, {
 			path: '/',
 			signed: true,
 		})
-
 		res.send({
 			status: 200,
 			message: 'Inscription réussie !',
@@ -40,13 +26,16 @@ export async function signupUser(
 }
 
 export async function loginUser(
-	req: FastifyRequest<{ Body: LoginBody }>,
+	req: FastifyRequest<{ Body: LoginSchema }>,
 	res: FastifyReply,
 ) {
-	const { username, password } = req.body
-
 	try {
-		const user = await loginService(username, password)
+		const user = await loginService(req.body)
+		const { token } = await createSession(user.id)
+		res.setCookie('session', token, {
+			path: '/',
+			signed: true,
+		})
 		res.send({
 			status: 200,
 			message: 'Connection Reussie !',

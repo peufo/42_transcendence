@@ -24,6 +24,7 @@ import {
 	type RoutePage,
 } from '../routes.js'
 import { getUser } from '../utils/store.js'
+import { toast } from './ft-toast.js'
 
 const [getUrl, setUrl] = createSignal<URL>(new URL(document.location.href))
 
@@ -134,12 +135,15 @@ async function onSubmitForm(event: SubmitEvent) {
 	clearErrors()
 	setErrorSubmit()
 
+	if ('message' in json) toast.success(json.message)
+
 	const options = API_POST[route as RouteApiPost] as ApiPostOption
 	if (!options) {
 		console.log('TODO: comportement par défaut')
 		return
 	}
-	options.onSuccess?.(json.data)
+
+	options.onSuccess?.(json)
 	if (options.redirectTo) {
 		const pathname = options.redirectTo()
 		return goto(new URL(pathname, document.location.origin))

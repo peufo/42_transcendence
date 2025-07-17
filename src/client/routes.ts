@@ -1,4 +1,3 @@
-import { toast } from './components/ft-toast.js'
 import {
 	setFriends,
 	setInvitations,
@@ -34,15 +33,12 @@ export const API_GET = {
 
 export const API_POST = {
 	'/auth/login': {
-		onSuccess: () => toast.success('Hey, bienvenue'),
-		redirectTo: () => {
-			const searchParams = new URLSearchParams(document.location.search)
-			const redirectTo = searchParams.get('redirectTo') as RoutePage | null
-			return redirectTo || '/me'
-		},
+		redirectTo: redirectAfterLogin,
+	},
+	'/auth/signup': {
+		redirectTo: redirectAfterLogin,
 	},
 	'/auth/logout': {
-		onSuccess: () => toast.info('Bye'),
 		redirectTo: () => '/',
 	},
 	'/invitations/new': { invalidate: ['/invitations'] },
@@ -62,10 +58,8 @@ export const PAGES = {
 		component: 'ft-page-me',
 		pageData: ['/users/friends', '/invitations'],
 	},
-	'/login': {
-		component: 'ft-page-login',
-		isPublic: 'only',
-	},
+	'/login': { component: 'ft-page-login', isPublic: 'only' },
+	'/signup': { component: 'ft-page-signup', isPublic: 'only' },
 	'/stats': { component: 'ft-page-stats', pageData: ['/userstats'] },
 	'/account': { component: 'ft-page-account' },
 	'/local/new': { component: 'ft-page-local-new', isPublic: true },
@@ -74,3 +68,9 @@ export const PAGES = {
 	'/game/play': { component: 'ft-page-game-play' },
 	'/local/play/babylon': { component: 'ft-page-local-play-babylon' },
 } as const satisfies Record<string, PageOption>
+
+function redirectAfterLogin() {
+	const searchParams = new URLSearchParams(document.location.search)
+	const redirectTo = searchParams.get('redirectTo') as RoutePage | null
+	return redirectTo || '/me'
+}

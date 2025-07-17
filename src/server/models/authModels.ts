@@ -2,20 +2,14 @@ import { eq } from 'drizzle-orm'
 import { createAvatarPlaceholder } from '../controllers/avatar.js'
 import { db } from '../db/index.js'
 import { users } from '../db/schema.js'
+import type { UserCreate } from '../types.js'
 
-export async function createUser(
-	username: string,
-	password: string,
-	avatar: string,
-) {
-	const avatarPh = createAvatarPlaceholder()
+export async function createUser(data: Omit<UserCreate, 'avatarPlaceholder'>) {
 	const result = await db
 		.insert(users)
 		.values({
-			name: username,
-			passwordHash: password,
-			avatar,
-			avatarPlaceholder: avatarPh,
+			...data,
+			avatarPlaceholder: createAvatarPlaceholder(),
 		})
 		.returning()
 
@@ -24,7 +18,6 @@ export async function createUser(
 
 export async function checkUserExists(username: string): Promise<boolean> {
 	const results = await db.select().from(users).where(eq(users.name, username))
-
 	if (results.length > 0) return true
 	return false
 }
@@ -44,12 +37,15 @@ export async function getUser(username: string) {
 	return result[0] ?? null
 }
 
-export async function getPassword(username: string) {
-	const result = await db
+export async function getPasswordHash(
+	username: string,
+): Promise<string | null> {
+	const [user] = await db
 		.select({
 			password: users.passwordHash,
 		})
 		.from(users)
 		.where(eq(users.name, username))
-	return result[0] ?? null
+	if (!user) return null
+	return user.password
 }

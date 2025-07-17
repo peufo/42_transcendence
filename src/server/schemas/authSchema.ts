@@ -1,13 +1,12 @@
 import { z } from 'zod'
 
 export const signupSchema = z.object({
-	username: z.string().min(3),
+	name: z.string().min(3),
 	password: z.string().min(8),
-	avatar: z.string(),
 })
 
 export const loginSchema = z.object({
-	username: z.string().min(3),
+	name: z.string().min(3),
 	password: z.string().min(8),
 })
 

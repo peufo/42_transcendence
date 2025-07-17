@@ -15,7 +15,7 @@ customElements.define(
                             <div>
                                 <label for="name" class="label">User name</label>
                                 <div class="mt-2">
-                                    <input type="text" name="username" id="username" autocomplete="off" class="input" required />
+                                    <input type="text" name="name" id="name" autocomplete="off" class="input" required />
                                 </div>
                             </div>
 
@@ -33,11 +33,11 @@ customElements.define(
                                 </div>
                             </div>
 							<div>
-    <label for="avatar" class="label">Avatar URL</label>
-    <div class="mt-2">
-        <input type="text" name="avatar" id="avatar" autocomplete="off" class="input" value="default.png" />
-    </div>
-</div>
+                                <label for="avatar" class="label">Avatar URL</label>
+                                <div class="mt-2">
+                                    <input type="text" name="avatar" id="avatar" autocomplete="off" class="input" value="default.png" />
+                                </div>
+                            </div>
 
                             <div class="flex flex-col items-center">
                                 <button type="submit" class="btn btn-primary w-full">
