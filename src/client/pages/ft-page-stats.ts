@@ -69,7 +69,7 @@ customElements.define(
 							match.player2Id === user.id)
 					)
 						html += /*html*/ `
-						<div class="flex pl-4 p-2 items-center justify-around gap-2 border border-gray-200 rounded-xl">
+						<div class="flex pl-4 p-2 items-center justify-between gap-2 border border-gray-200 rounded-xl">
 							<div class="flex pl-4 p-2 items-center gap-2">
 								<span> Against </span>
 								<img src="${getAvatarSrc(adversary)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
@@ -85,7 +85,7 @@ customElements.define(
 					`
 					else
 						html += /*html*/ `
-						<div class="flex pl-4 p-2 items-center justify-around gap-2 border border-gray-200 rounded-xl">
+						<div class="flex pl-4 p-2 items-center justify-between gap-2 border border-gray-200 rounded-xl">
 							<div class="flex pl-4 p-2 items-center gap-2">
 								<span> Against </span>
 								<img src="${getAvatarSrc(adversary)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
