@@ -2,7 +2,7 @@ import type { SessionEvent } from '../lib/type.js'
 import { toast } from './components/ft-toast.js'
 import './components/index.js'
 import { createEffect } from './utils/signal.js'
-import { getUser } from './utils/store.js'
+import { getUser, updateInvitations } from './utils/store.js'
 
 let sessionSocket: WebSocket | null = null
 
@@ -24,6 +24,7 @@ createEffect(() => {
 			const fromUser =
 				invitation.user1Id === user.id ? invitation.user2 : invitation.user1
 			toast.info(`New invitation from ${fromUser.name}`)
+			updateInvitations((invitations) => [...invitations, invitation])
 		}
 	})
 })

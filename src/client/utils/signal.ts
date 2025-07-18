@@ -1,24 +1,33 @@
 let effectToSubscribe: (() => unknown) | null = null
 
+type Getter<T> = () => T
+type Setter<T> = (newValue: T) => void
+type Updater<T> = (updater: (value: T) => T) => void
+
 export function createSignal<T>(
 	initialValue: T,
-): [() => T, (newValue: T) => void] {
+): [Getter<T>, Setter<T>, Updater<T>] {
 	const subscribes = new Set<() => void>()
 	let value = initialValue
 
-	const read = () => {
+	const read: Getter<T> = () => {
 		if (effectToSubscribe) subscribes.add(effectToSubscribe)
 		return value
 	}
 
-	const write = (newValue: T) => {
+	const write: Setter<T> = (newValue: T) => {
 		value = newValue
 		for (const observer of subscribes) {
 			observer()
 		}
 	}
 
-	return [read, write]
+	const update: Updater<T> = (updater) => {
+		const newValue = updater(value)
+		write(newValue)
+	}
+
+	return [read, write, update]
 }
 
 // TODO: return unsunbscriber ?
