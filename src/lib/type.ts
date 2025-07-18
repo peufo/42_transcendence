@@ -1,7 +1,7 @@
 export type UserBasic = {
 	id: number
 	name: string
-	avatar?: string
+	avatar: string | null
 	avatarPlaceholder: string
 }
 
@@ -17,10 +17,15 @@ export type Friend = UserBasic & {
 	gameId?: string
 }
 
-export type Invitation = UserBasic & {
+export type Invitation = {
+	id: number
+	user1Id: number
+	user2Id: number
+	state: 'invited' | 'friend'
 	createdBy: number
 	createdAt: string
-	friendshipId: number
+	user1: UserBasic
+	user2: UserBasic
 }
 
 export type Match = {
@@ -32,4 +37,8 @@ export type Match = {
 	player2: UserBasic
 	player1Score: number
 	player2Score: number
+}
+
+export type SessionEvent = {
+	onNewFriend: { invitation: Invitation }
 }

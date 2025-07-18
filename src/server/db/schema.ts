@@ -44,7 +44,9 @@ export const friendships = sqliteTable(
 		user2Id: int()
 			.notNull()
 			.references(() => users.id),
-		state: text({ enum: ['invited', 'friend'] }).default('invited'),
+		state: text({ enum: ['invited', 'friend'] })
+			.default('invited')
+			.notNull(),
 		createdBy: int()
 			.notNull()
 			.references(() => users.id),

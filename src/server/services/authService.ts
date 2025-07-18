@@ -6,6 +6,7 @@ import {
 	getUser,
 } from '../models/authModels.js'
 import type { LoginSchema, SignupSchema } from '../schemas/authSchema.js'
+
 export async function signupService(data: SignupSchema) {
 	if (await checkUserExists(data.name)) {
 		// TODO: use new Error() instead

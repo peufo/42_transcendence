@@ -76,7 +76,7 @@ customElements.define(
                         <span>${user.name}</span>
                         <div class="flex-grow"></div>
                         <form method="post" action="/invitations/new" class="btn btn-border">
-                            <input type="hidden" name="userId" value="${user.id}" />
+                            <input type="hidden" name="invitedUserId" value="${user.id}" />
                             <input type="submit" value="Invite" />
                         </form>
 
@@ -170,12 +170,14 @@ customElements.define(
 					color: string,
 				) => /*html*/ `
                     <form method="post" action="/invitations/${action}">
-                        <input type="hidden" name="friendshipId" value="${invitation.friendshipId}">
+                        <input type="hidden" name="friendshipId" value="${invitation.id}">
                         <input class="btn ${color}" type="submit" value="${label}">
                     </form>
                 `
 
 				const createdByMe = invitation.createdBy === user.id
+				const otherUser =
+					invitation.user1Id === user.id ? invitation.user2 : invitation.user1
 				const buttons: string[] = []
 				if (createdByMe) {
 					buttons.push(formButton('cancel', 'Cancel', 'btn-red'))
@@ -186,9 +188,9 @@ customElements.define(
 
 				html += /*html*/ `
                     <div class="flex pl-4 p-2 items-center gap-2 border border-gray-200 rounded-xl">
-                    <img src="${getAvatarSrc(invitation)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
+                    <img src="${getAvatarSrc(otherUser)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
                         <div class="flex flex-col">
-                            <span>${invitation.name}</span>
+                            <span>${otherUser.name}</span>
                             <span class="text-xs text-gray-900 leading-3">
                                 ${createdByMe ? 'Sent' : 'Received'} a ${formater.format(new Date(invitation.createdAt))}
                             </span>

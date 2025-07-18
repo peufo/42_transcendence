@@ -22,6 +22,7 @@ export function createSignal<T>(
 }
 
 // TODO: return unsunbscriber ?
+// TODO: const effect is necessarry only func call conditional getters
 export function createEffect(func: () => void | Promise<void>) {
 	const effect = async () => {
 		effectToSubscribe = effect
