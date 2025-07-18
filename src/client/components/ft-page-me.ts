@@ -1,5 +1,5 @@
 import type { UserBasic } from '../../lib/type.js'
-import { createEffect } from '../utils/signal.js'
+import { type CleanEffect, createEffect } from '../utils/signal.js'
 import {
 	getFriends,
 	getInvitations,
@@ -55,12 +55,19 @@ customElements.define(
 customElements.define(
 	'ft-users',
 	class extends HTMLElement {
+		private cleanEffect: CleanEffect
+
 		connectedCallback() {
 			this.classList.add('contents')
-			createEffect(() => {
+			this.cleanEffect = createEffect(() => {
 				this.innerHTML = this.render()
 			})
 		}
+
+		disconnectedCallback() {
+			this.cleanEffect()
+		}
+
 		render() {
 			const users = getUsers()
 
@@ -91,12 +98,17 @@ customElements.define(
 customElements.define(
 	'ft-friends',
 	class extends HTMLElement {
+		private cleanEffect: CleanEffect
+
 		connectedCallback() {
 			this.classList.add('flex', 'flex-col', 'gap-3')
-			// TODO: place it in createEffect() depend of friends[]
-			createEffect(() => {
+			this.cleanEffect = createEffect(() => {
 				this.innerHTML = this.renderContent()
 			})
+		}
+
+		disconnectedCallback() {
+			this.cleanEffect()
 		}
 
 		renderContent(): string {
@@ -143,12 +155,19 @@ customElements.define(
 customElements.define(
 	'ft-invitations',
 	class extends HTMLElement {
+		private cleanEffect: CleanEffect
+
 		connectedCallback() {
 			this.classList.add('flex', 'flex-col', 'gap-3')
-			createEffect(() => {
+			this.cleanEffect = createEffect(() => {
 				this.innerHTML = this.render()
 			})
 		}
+
+		disconnectedCallback() {
+			this.cleanEffect()
+		}
+
 		render(): string {
 			const user = getUser()
 			const invitations = getInvitations()
@@ -208,10 +227,16 @@ customElements.define(
 customElements.define(
 	'ft-welcome',
 	class extends HTMLElement {
+		private cleanEffect: CleanEffect
+
 		connectedCallback() {
-			createEffect(() => {
+			this.cleanEffect = createEffect(() => {
 				this.innerHTML = this.render()
 			})
+		}
+
+		disconnectedCallback() {
+			this.cleanEffect()
 		}
 
 		render(): string {

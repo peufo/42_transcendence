@@ -1,5 +1,9 @@
 import { api } from '../api.js'
-import { createEffect, createSignal } from '../utils/signal.js'
+import {
+	type CleanEffect,
+	createEffect,
+	createSignal,
+} from '../utils/signal.js'
 import { slide, transitionIn, transitionOut } from '../utils/transition.js'
 import './ft-page-404.js'
 import './ft-page-index.js'
@@ -40,11 +44,13 @@ function onPopState() {
 customElements.define(
 	'ft-router',
 	class extends HTMLElement {
+		private cleanEffect: CleanEffect
+
 		connectedCallback() {
 			document.addEventListener('submit', onSubmitForm)
 			document.addEventListener('click', onClickLink)
 			window.addEventListener('popstate', onPopState)
-			createEffect(async () => {
+			this.cleanEffect = createEffect(async () => {
 				const url = getUrl()
 				const page = this.getPage(url.pathname)
 				if (page.layoutData) {
@@ -66,6 +72,10 @@ customElements.define(
 					<${page.component}></${page.component}>
 				`
 			})
+		}
+
+		disconnectedCallback() {
+			this.cleanEffect()
 		}
 
 		getPage(pathname: string): PageOption {

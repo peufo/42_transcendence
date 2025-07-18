@@ -13,7 +13,6 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 		function createEventSender<K extends keyof SessionEvent>(key: K) {
 			return (data: SessionEvent[K]) => {
 				console.log('send', { [key]: data })
-				console.log(socket)
 				socket.send(JSON.stringify({ [key]: data }))
 			}
 		}

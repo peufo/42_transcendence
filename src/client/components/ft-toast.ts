@@ -1,4 +1,8 @@
-import { createEffect, createSignal } from '../utils/signal.js'
+import {
+	type CleanEffect,
+	createEffect,
+	createSignal,
+} from '../utils/signal.js'
 
 type ToastType = 'info' | 'success' | 'error'
 type ToastOption = {
@@ -31,7 +35,7 @@ customElements.define(
 	'ft-toast',
 	class extends HTMLElement {
 		timeoutId: NodeJS.Timeout | null = null
-
+		cleanEffet: CleanEffect
 		constructor() {
 			super()
 			this.classList.add('fixed', 'bottom-2', 'right-2')
@@ -40,7 +44,7 @@ customElements.define(
 			this.classList.add('rounded-lg', 'shadow-sm', 'border')
 			this.classList.add(TOAST_HIDE)
 			setTimeout(() => this.classList.add('transition-transform'), 0)
-			createEffect(() => {
+			this.cleanEffet = createEffect(() => {
 				const toast = getToast()
 				if (!toast) {
 					this.innerHTML = ''
@@ -66,6 +70,7 @@ customElements.define(
 
 		disconnectedCallback() {
 			if (this.timeoutId) clearTimeout(this.timeoutId)
+			this.cleanEffet()
 		}
 	},
 )
