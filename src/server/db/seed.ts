@@ -85,10 +85,20 @@ async function main() {
 					minValue: 2,
 					maxValue: 12,
 				}),
-				ballPositionY: f.int({
-					minValue: 0,
-					maxValue: 99,
-				}),
+				ballPositionY: f.weightedRandom([
+					{
+						weight: 0.2,
+						value: f.int({ minValue: 30, maxValue: 60 }),
+					},
+					{
+						weight: 0.4,
+						value: f.int({ minValue: 61, maxValue: 99 }),
+					},
+					{
+						weight: 0.4,
+						value: f.int({ minValue: 0, maxValue: 29 }),
+					},
+				]),
 				gamestates: f.default({
 					defaultValue: '',
 				}),
@@ -99,7 +109,7 @@ async function main() {
 					values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
 				}),
 			},
-			count: 120000,
+			count: 1000,
 		},
 		count: 10,
 	}))

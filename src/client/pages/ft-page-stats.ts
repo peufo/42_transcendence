@@ -203,7 +203,7 @@ customElements.define(
 			const distributionPercentage = convertToPercentage(goalTakenY)
 			const html = `
 			<h2 class="flex flex-row p-2 items-center justify-center gap-2">Weaknesses</h2>
-			<div class="flex flex-col w-max items-center justify-center ps-1 pb-1 gap-4 border-black border-l-2 border-r-2 border-b-2">
+			<div class="flex flex-col w-max items-center justify-center pl-1 pr-1 pb-1 gap-4 border-black border-l-2 border-r-2 border-b-2">
 				<div class="w-50 h-5 border-2 border-black rounded-4xl shadow-lg"></div>
 				${drawRectangle(distributionPercentage)}
 			</div`
@@ -214,14 +214,24 @@ customElements.define(
 
 function drawRectangle(values: number[]): string {
 	let html = '<div class="flex items-center">'
+	const maxValue = Math.max(...values)
 	for (const value of values) {
-		const color = `rgb(255, ${255 - Math.ceil((value * 255) / 100)}, ${255 - Math.ceil((value * 255) / 100)})`
+		const color = `rgb(255, ${255 - Math.floor((value * 255) / maxValue)}, ${255 - Math.floor((value * 255) / maxValue)})`
 		html += `
 		<div class="w-1 h-1" style="background-color:${color}"></div>
 		`
 	}
 	html += '</div>'
 	return html
+}
+
+function convertToPercentage(goalTakenY: number[]): number[] {
+	const distribution: number[] = []
+	let correctedDistribution: number[] = []
+	for (let i = 0; i < 100; i++) distribution.push(0)
+	for (const value of goalTakenY) distribution[value]++
+	correctedDistribution = distribution.map((e) => (e * 100) / goalTakenY.length)
+	return correctedDistribution
 }
 
 function getGoalTakenY(matches: Match[], user: UserBasic): number[] {
