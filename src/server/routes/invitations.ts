@@ -6,7 +6,7 @@ import '@fastify/cookie'
 import '../types.js'
 import type { UserBasic } from '../../lib/type.js'
 import { notifyUser } from '../events/session.js'
-import type { Friendship, UserColumns } from '../types.js'
+import type { DB } from '../types.js'
 
 export const invitationsRoute: FastifyPluginCallbackZod = (
 	server,
@@ -170,7 +170,7 @@ const userBasicColumns = {
 	createdAt: false,
 	lastLogin: false,
 	isActive: false,
-} satisfies UserColumns
+} satisfies DB.UserColumns
 
 async function getUserBasic(userId: number) {
 	return db.query.users.findFirst({
@@ -179,7 +179,10 @@ async function getUserBasic(userId: number) {
 	})
 }
 
-type FriendshipWithUsers = Friendship & { user1: UserBasic; user2: UserBasic }
+type FriendshipWithUsers = DB.Friendship & {
+	user1: UserBasic
+	user2: UserBasic
+}
 
 async function getInvitations(userId: number): Promise<FriendshipWithUsers[]> {
 	return db.query.friendships.findMany({

@@ -12,7 +12,7 @@ import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod/v4'
 import { db, friendships, users } from '../db/index.js'
 import '@fastify/cookie'
-import type { Friendship } from '../types.js'
+import type { DB } from '../types.js'
 
 export const usersRoute: FastifyPluginCallbackZod = (
 	server,
@@ -72,7 +72,10 @@ export const usersRoute: FastifyPluginCallbackZod = (
 	done()
 }
 
-async function getUserFriendships(userId: number, state?: Friendship['state']) {
+async function getUserFriendships(
+	userId: number,
+	state?: DB.Friendship['state'],
+) {
 	return await db
 		.select()
 		.from(friendships)
@@ -84,7 +87,10 @@ async function getUserFriendships(userId: number, state?: Friendship['state']) {
 		)
 }
 
-async function getUserFriendsId(userId: number, state?: Friendship['state']) {
+async function getUserFriendsId(
+	userId: number,
+	state?: DB.Friendship['state'],
+) {
 	const friendships = await getUserFriendships(userId, state)
 
 	return friendships.map((friendship) =>

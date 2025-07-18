@@ -1,12 +1,12 @@
 import crypto from 'node:crypto'
 import { eq } from 'drizzle-orm'
 import { db, sessions } from '../db/index.js'
-import type { Session } from '../types.js'
+import type { DB } from '../types.js'
 
 const SESSION_INACTIVITY_TIMOUT = 1000 * 60 * 60 * 24 // 1 days
 const SESSION_ACTIVITY_CHECK_INTERVAL = 1000 * 60 * 60 // 1 hour
 
-type SessionWithToken = Session & {
+type SessionWithToken = DB.Session & {
 	token: string
 }
 
@@ -45,7 +45,7 @@ export async function createSession(userId: number): Promise<SessionWithToken> {
 	const secret = generateSecureRandomString()
 	const secretHash = await hashSecret(secret)
 	const token = `${id}.${secret}`
-	const session: Session = {
+	const session: DB.Session = {
 		id,
 		userId,
 		secretHash,
@@ -58,7 +58,7 @@ export async function createSession(userId: number): Promise<SessionWithToken> {
 
 export async function validateSessionToken(
 	token: string,
-): Promise<Session | null> {
+): Promise<DB.Session | null> {
 	const tokenParts = token.split('.')
 	if (tokenParts.length !== 2) {
 		return null
@@ -85,7 +85,7 @@ export async function validateSessionToken(
 	return session
 }
 
-async function getSession(sessionId: string): Promise<Session | null> {
+async function getSession(sessionId: string): Promise<DB.Session | null> {
 	const now = new Date()
 	const [session] = await db
 		.select()

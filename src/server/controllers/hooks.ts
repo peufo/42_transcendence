@@ -2,11 +2,11 @@ import type { FastifyRequest, preHandlerAsyncHookHandler } from 'fastify'
 import { db } from '../db/index.js'
 import { validateSessionToken } from './session.js'
 import '@fastify/cookie'
-import type { Session } from '../types.js'
+import type { DB } from '../types.js'
 
 export async function getSessionFromRequest(
 	req: FastifyRequest,
-): Promise<Session | null> {
+): Promise<DB.Session | null> {
 	const sessionTokenSigned = req.cookies.session
 	if (!sessionTokenSigned) return null
 
