@@ -83,6 +83,7 @@ export class Engine {
 		p2: 0,
 	}
 	#gameOver: boolean
+	#roundOver: boolean
 
 	get paddles() {
 		return this.#paddles
@@ -99,8 +100,10 @@ export class Engine {
 	#timer(seconds: number, timeoutCallback: () => void) {
 		console.log({ seconds }) // event ?
 		setTimeout(() => {
-			if (seconds > 1) this.#timer(seconds - 1, timeoutCallback)
-			else timeoutCallback()
+			if (!this.#gameOver) {
+				if (seconds > 1) this.#timer(seconds - 1, timeoutCallback)
+				else timeoutCallback()
+			}
 		}, 1000)
 	}
 
