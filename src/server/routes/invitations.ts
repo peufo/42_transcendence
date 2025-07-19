@@ -88,9 +88,8 @@ export const invitationsRoute: FastifyPluginCallbackZod = (
 			])
 			if (!user1 || !user2) return res.code(400).send()
 			await notifyUser(invitedUserId, 'onInvitationCreated', {
-				invitation: {
+				friendship: {
 					...invitation,
-					createdAt: invitation.createdAt.toJSON(),
 					user1,
 					user2,
 				},
@@ -106,10 +105,14 @@ export const invitationsRoute: FastifyPluginCallbackZod = (
 			const user = res.locals?.user
 			if (!user) return res.code(401).send()
 			const { friendshipId } = req.body
-			const result = await db
+			const [friendship] = await db
 				.delete(friendships)
 				.where(eq(friendships.id, friendshipId))
-			if (!result.rowsAffected) return res.code(400).send()
+				.returning()
+			if (!friendship) return res.code(400).send()
+			const { user1Id, user2Id } = friendship
+			const concernedUserId = user1Id === user.id ? user2Id : user1Id
+			notifyUser(concernedUserId, 'onInvitationCancel', { friendshipId })
 			return res.send({ success: true })
 		},
 	)
@@ -163,14 +166,10 @@ const friendColumns = {
 } satisfies DB.Columns<Friend> | DB.UserColumns
 
 async function getUserFriend(userId: number) {
-	return db.query.users
-		.findFirst({
-			where: eq(users.id, userId),
-			columns: friendColumns,
-		})
-		.then((user) =>
-			user ? { ...user, lastLogin: user.lastLogin.toJSON() } : undefined,
-		)
+	return db.query.users.findFirst({
+		where: eq(users.id, userId),
+		columns: friendColumns,
+	})
 }
 
 async function getUserBasic(userId: number) {

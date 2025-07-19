@@ -211,7 +211,7 @@ customElements.define(
                         <div class="flex flex-col">
                             <span>${otherUser.name}</span>
                             <span class="text-xs text-gray-900 leading-3">
-                                ${createdByMe ? 'Sent' : 'Received'} a ${formater.format(new Date(invitation.createdAt))}
+                                ${createdByMe ? 'Sent' : 'Received'} a ${formater.format(invitation.createdAt)}
                             </span>
                         </div>
                         <div class="flex-grow"></div>

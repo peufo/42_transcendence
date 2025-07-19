@@ -28,6 +28,7 @@ import {
 	type RoutePage,
 } from '../routes.js'
 import { getUser } from '../utils/store.js'
+import { stringToDate } from '../utils/stringToDate.js'
 import { toast } from './ft-toast.js'
 
 const [getUrl, setUrl] = createSignal<URL>(new URL(document.location.href))
@@ -160,7 +161,7 @@ async function onSubmitForm(event: SubmitEvent) {
 		console.log('TODO: comportement par défaut')
 		return
 	}
-
+	stringToDate(json)
 	options.onSuccess?.(json)
 	if (options.redirectTo) {
 		const pathname = options.redirectTo()

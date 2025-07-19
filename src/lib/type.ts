@@ -7,13 +7,13 @@ export type UserBasic = {
 
 export type User = UserBasic & {
 	isActive: boolean
-	lastLogin: string
-	createdAt: string
+	lastLogin: Date
+	createdAt: Date
 }
 
 export type Friend = UserBasic & {
 	isActive: boolean
-	lastLogin: string
+	lastLogin: Date
 	gameId?: string
 }
 
@@ -23,7 +23,7 @@ export type FriendShip = {
 	user2Id: number
 	state: 'invited' | 'friend'
 	createdBy: number
-	createdAt: string
+	createdAt: Date
 	user1: UserBasic
 	user2: UserBasic
 }
@@ -32,7 +32,7 @@ export type Match = {
 	player1Id: number
 	player2Id: number
 	botDifficulty: string
-	finishedAt: string
+	finishedAt: Date
 	player1: UserBasic
 	player2: UserBasic
 	player1Score: number
@@ -40,6 +40,7 @@ export type Match = {
 }
 
 export type SessionEvent = {
-	onInvitationCreated: { invitation: FriendShip }
+	onInvitationCreated: { friendship: FriendShip }
 	onInvitationAccepted: { newFriend: Friend }
+	onInvitationCancel: { friendshipId: number }
 }

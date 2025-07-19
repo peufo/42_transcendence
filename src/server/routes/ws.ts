@@ -6,6 +6,7 @@ import { createSessionEvent } from '../events/session.js'
 const sessionsEventKeys: (keyof SessionEvent)[] = [
 	'onInvitationCreated',
 	'onInvitationAccepted',
+	'onInvitationCancel',
 ]
 
 export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
