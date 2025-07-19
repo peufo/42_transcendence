@@ -1,6 +1,6 @@
 import type {
 	Friend,
-	Invitation,
+	FriendShip,
 	Match,
 	User,
 	UserBasic,
@@ -9,8 +9,10 @@ import { createSignal } from './signal.js'
 
 export const [getUser, setUser] = createSignal<User | undefined>(undefined)
 export const [getUsers, setUsers] = createSignal<UserBasic[]>([])
-export const [getFriends, setFriends] = createSignal<Friend[]>([])
+export const [getFriends, setFriends, updateFriends] = createSignal<Friend[]>(
+	[],
+)
 export const [getInvitations, setInvitations, updateInvitations] = createSignal<
-	Invitation[]
+	FriendShip[]
 >([])
 export const [getMatches, setMatches] = createSignal<Match[]>([])

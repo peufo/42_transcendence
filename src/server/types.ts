@@ -6,9 +6,8 @@ import type {
 	users,
 } from '../server/db/schema.js'
 
-type Columns<T> = Partial<{ [k in keyof T]: boolean }>
-
 export namespace DB {
+	export type Columns<T> = Partial<{ [k in keyof T]: boolean }>
 	export type User = typeof users.$inferSelect
 	export type UserColumns = Columns<typeof users.$inferSelect>
 	export type UserCreate = typeof users.$inferInsert

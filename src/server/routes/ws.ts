@@ -1,7 +1,12 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import type { SessionEvent } from '../../lib/type.js'
 import { getSessionFromRequest } from '../controllers/hooks.js'
-import { getOrCreateSessionEvent } from '../events/session.js'
+import { createSessionEvent } from '../events/session.js'
+
+const sessionsEventKeys: (keyof SessionEvent)[] = [
+	'onInvitationCreated',
+	'onInvitationAccepted',
+]
 
 export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 	server.get('/session', { websocket: true }, async (socket, req) => {
@@ -10,20 +15,19 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 			socket.close(3000, 'Authentification required')
 			return
 		}
-		function createEventSender<K extends keyof SessionEvent>(key: K) {
-			return (data: SessionEvent[K]) => {
-				console.log('send', { [key]: data })
-				socket.send(JSON.stringify({ [key]: data }))
+		const sessionEvent = createSessionEvent(session.id)
+		function createEventSender<K extends keyof SessionEvent>(eventName: K) {
+			const sender = (data: SessionEvent[K]) => {
+				socket.send(JSON.stringify({ [eventName]: data }))
 			}
+			// @ts-ignore
+			sessionEvent.on(eventName, sender)
+			// @ts-ignore
+			return () => sessionEvent.off(eventName, sender)
 		}
-
-		const sessionEvent = getOrCreateSessionEvent(session.id)
-
-		const sendOnNewFriend = createEventSender('onNewFriend')
-		sessionEvent.on('onNewFriend', sendOnNewFriend)
-
+		const sendersOff = sessionsEventKeys.map(createEventSender)
 		socket.on('close', (_message) => {
-			sessionEvent.off('onNewFriend', sendOnNewFriend)
+			for (const senderOff of sendersOff) senderOff()
 		})
 	})
 

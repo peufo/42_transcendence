@@ -1,12 +1,20 @@
-import { and, eq, or } from 'drizzle-orm'
+import { and, eq, not, or } from 'drizzle-orm'
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod/v4'
 import { db, friendships, users } from '../db/index.js'
 import '@fastify/cookie'
 import '../types.js'
-import type { UserBasic } from '../../lib/type.js'
+import type { Friend, UserBasic } from '../../lib/type.js'
 import { notifyUser } from '../events/session.js'
 import type { DB } from '../types.js'
+
+function schemaBody<Shape extends z.ZodRawShape>(shape: Shape) {
+	return {
+		schema: {
+			body: z.object(shape),
+		},
+	}
+}
 
 export const invitationsRoute: FastifyPluginCallbackZod = (
 	server,
@@ -23,47 +31,38 @@ export const invitationsRoute: FastifyPluginCallbackZod = (
 
 	server.post(
 		'/accept',
-		{
-			schema: {
-				body: z.object({
-					friendshipId: z.coerce.number(),
-				}),
-			},
-		},
+		schemaBody({ friendshipId: z.coerce.number() }),
 		async (req, res) => {
 			const user = res.locals?.user
 			if (!user) return res.code(401).send()
 			const { friendshipId } = req.body
-			console.log({ friendshipId })
-			const result = await db
+			const [friendship] = await db
 				.update(friendships)
 				.set({ state: 'friend' })
 				.where(
 					and(
 						eq(friendships.id, friendshipId),
 						eq(friendships.state, 'invited'),
+						not(eq(friendships.createdBy, user.id)),
 						or(
 							eq(friendships.user1Id, user.id),
 							eq(friendships.user2Id, user.id),
 						),
 					),
 				)
+				.returning()
 
-			console.log({ result })
-			if (!result.rowsAffected) return res.code(400).send()
+			if (!friendship) return res.code(400).send()
+			const newFriend = await getUserFriend(user.id)
+			if (!newFriend) return res.code(400).send()
+			notifyUser(friendship.createdBy, 'onInvitationAccepted', { newFriend })
 			return res.send({ success: true })
 		},
 	)
 
 	server.post(
 		'/new',
-		{
-			schema: {
-				body: z.object({
-					invitedUserId: z.coerce.number(),
-				}),
-			},
-		},
+		schemaBody({ invitedUserId: z.coerce.number() }),
 		async (req, res) => {
 			const user = res.locals?.user
 			if (!user) return res.code(401).send()
@@ -81,7 +80,6 @@ export const invitationsRoute: FastifyPluginCallbackZod = (
 					createdBy: user.id,
 				})
 				.returning()
-			console.log({ invitation })
 			if (!invitation) return res.code(400).send()
 
 			const [user1, user2] = await Promise.all([
@@ -89,7 +87,7 @@ export const invitationsRoute: FastifyPluginCallbackZod = (
 				getUserBasic(invitation.user2Id),
 			])
 			if (!user1 || !user2) return res.code(400).send()
-			await notifyUser(invitedUserId, 'onNewFriend', {
+			await notifyUser(invitedUserId, 'onInvitationCreated', {
 				invitation: {
 					...invitation,
 					createdAt: invitation.createdAt.toJSON(),
@@ -103,13 +101,7 @@ export const invitationsRoute: FastifyPluginCallbackZod = (
 	)
 	server.post(
 		'/cancel',
-		{
-			schema: {
-				body: z.object({
-					friendshipId: z.coerce.number(),
-				}),
-			},
-		},
+		schemaBody({ friendshipId: z.coerce.number() }),
 		async (req, res) => {
 			const user = res.locals?.user
 			if (!user) return res.code(401).send()
@@ -117,20 +109,13 @@ export const invitationsRoute: FastifyPluginCallbackZod = (
 			const result = await db
 				.delete(friendships)
 				.where(eq(friendships.id, friendshipId))
-			console.log({ result })
 			if (!result.rowsAffected) return res.code(400).send()
 			return res.send({ success: true })
 		},
 	)
 	server.post(
 		'/remove',
-		{
-			schema: {
-				body: z.object({
-					friendId: z.coerce.number(),
-				}),
-			},
-		},
+		schemaBody({ friendId: z.coerce.number() }),
 		async (req, res) => {
 			const user = res.locals?.user
 			if (!user) return res.code(401).send()
@@ -144,7 +129,6 @@ export const invitationsRoute: FastifyPluginCallbackZod = (
 							eq(friendships.user2Id, friendId),
 						),
 					)
-				console.log({ result })
 				if (!result.rowsAffected) return res.code(400).send()
 				return res.send({ success: true })
 			}
@@ -156,7 +140,6 @@ export const invitationsRoute: FastifyPluginCallbackZod = (
 						eq(friendships.user2Id, user.id),
 					),
 				)
-			console.log({ result })
 			if (!result.rowsAffected) return res.code(400).send()
 			return res.send({ success: true })
 		},
@@ -166,11 +149,29 @@ export const invitationsRoute: FastifyPluginCallbackZod = (
 }
 
 const userBasicColumns = {
-	passwordHash: false,
-	createdAt: false,
-	lastLogin: false,
-	isActive: false,
-} satisfies DB.UserColumns
+	id: true,
+	name: true,
+	avatar: true,
+	avatarPlaceholder: true,
+} satisfies DB.Columns<UserBasic> | DB.UserColumns
+
+const friendColumns = {
+	...userBasicColumns,
+	isActive: true,
+	lastLogin: true,
+	// TODO: gameId: true
+} satisfies DB.Columns<Friend> | DB.UserColumns
+
+async function getUserFriend(userId: number) {
+	return db.query.users
+		.findFirst({
+			where: eq(users.id, userId),
+			columns: friendColumns,
+		})
+		.then((user) =>
+			user ? { ...user, lastLogin: user.lastLogin.toJSON() } : undefined,
+		)
+}
 
 async function getUserBasic(userId: number) {
 	return db.query.users.findFirst({

@@ -17,7 +17,7 @@ export type Friend = UserBasic & {
 	gameId?: string
 }
 
-export type Invitation = {
+export type FriendShip = {
 	id: number
 	user1Id: number
 	user2Id: number
@@ -40,5 +40,6 @@ export type Match = {
 }
 
 export type SessionEvent = {
-	onNewFriend: { invitation: Invitation }
+	onInvitationCreated: { invitation: FriendShip }
+	onInvitationAccepted: { newFriend: Friend }
 }

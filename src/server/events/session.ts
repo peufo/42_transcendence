@@ -4,13 +4,12 @@ import type { SessionEvent } from '../../lib/type.js'
 import { db, sessions } from '../db/index.js'
 
 type EventMap<T extends Record<string, unknown>> = { [K in keyof T]: [T[K]] }
-type SessionEventEmitter = EventEmitter<EventMap<SessionEvent>>
+export type SessionEventMapped = EventMap<SessionEvent>
+type SessionEventEmitter = EventEmitter<SessionEventMapped>
 
 const sessionsEvent = new Map<string, SessionEventEmitter>()
 
-export function getOrCreateSessionEvent(
-	sessionId: string,
-): SessionEventEmitter {
+export function createSessionEvent(sessionId: string): SessionEventEmitter {
 	const sessionEvent = sessionsEvent.get(sessionId)
 	if (sessionEvent) return sessionEvent
 	const newSessionEvent: SessionEventEmitter = new EventEmitter()
