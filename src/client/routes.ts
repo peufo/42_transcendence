@@ -58,8 +58,8 @@ export const PAGES = {
 	'/account': { component: 'ft-page-account' },
 	'/local/new': { component: 'ft-page-local-new', isPublic: true },
 	'/local/play': { component: 'ft-page-local-play', isPublic: true },
-	'/game/new': { component: 'ft-page-game-new' },
-	'/game/play': { component: 'ft-page-game-play' },
+	'/tournament/new': { component: 'ft-page-tournament-new' },
+	'/tournament/play': { component: 'ft-page-tournament-play' },
 	'/local/play/babylon': { component: 'ft-page-local-play-babylon' },
 } as const satisfies Record<string, PageOption>
 

@@ -1,23 +1,5 @@
 import { api } from '../api.js'
 import {
-	type CleanEffect,
-	createEffect,
-	createSignal,
-} from '../utils/signal.js'
-import { slide, transitionIn, transitionOut } from '../utils/transition.js'
-import './ft-page-404.js'
-import './ft-page-index.js'
-import './ft-page-me.js'
-import './ft-page-login.js'
-import './ft-page-signup.js'
-import './ft-page-stats.js'
-import './ft-page-account.js'
-import './ft-page-local-new.js'
-import './ft-page-local-play.js'
-import './ft-page-game-new.js'
-import './ft-page-game-play.js'
-import './ft-page-local-play-babylon.js'
-import {
 	API_GET,
 	API_POST,
 	type ApiPostOption,
@@ -27,8 +9,14 @@ import {
 	type RouteApiPost,
 	type RoutePage,
 } from '../routes.js'
+import {
+	type CleanEffect,
+	createEffect,
+	createSignal,
+} from '../utils/signal.js'
 import { getUser } from '../utils/store.js'
 import { stringToDate } from '../utils/stringToDate.js'
+import { slide, transitionIn, transitionOut } from '../utils/transition.js'
 import { toast } from './ft-toast.js'
 
 const [getUrl, setUrl] = createSignal<URL>(new URL(document.location.href))

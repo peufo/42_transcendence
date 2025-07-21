@@ -1,5 +1,5 @@
 customElements.define(
-	'ft-page-game-play',
+	'ft-page-tournament-play',
 	class extends HTMLElement {
 		connectedCallback() {
 			this.innerHTML = /*html*/ `

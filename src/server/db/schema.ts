@@ -81,9 +81,6 @@ export const matches = sqliteTable('matches', {
 	player2Id: int().references(() => users.id),
 	player1Score: int().default(0),
 	player2Score: int().default(0),
-	botDifficulty: text({ enum: ['Baby', 'Kevin', 'Terminator'] })
-		.notNull()
-		.default('Kevin'),
 	finishedAt: int({ mode: 'timestamp' }),
 	pointsToWin: int().notNull(),
 })
@@ -98,10 +95,7 @@ export const tournaments = sqliteTable('tournaments', {
 	id: int().primaryKey({ autoIncrement: true }),
 	numberOfPlayers: int().notNull(),
 	pointsToWin: int().notNull(),
-	botDifficulty: text({ enum: ['Baby', 'Kevin', 'Terminator'] })
-		.notNull()
-		.default('Kevin'),
-	lobbyLocked: int({ mode: 'boolean' }).notNull().default(false),
+	state: text({ enum: ['open', 'ongoing', 'finished'] }),
 	createdAt: int({ mode: 'timestamp' }).notNull(),
 	startedAt: int({ mode: 'timestamp' }).notNull(),
 	finished: int({ mode: 'boolean' }).default(false),
