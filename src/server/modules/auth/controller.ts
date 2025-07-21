@@ -10,10 +10,12 @@ export async function signupUser(
 ) {
 	const user = await signupService(req.body)
 	const { token } = await createSession(user.id)
+
 	res.setCookie('session', token, {
 		path: '/',
 		signed: true,
 	})
+
 	res.send({
 		status: 200,
 		message: 'Inscription réussie !',
@@ -27,13 +29,16 @@ export async function loginUser(
 ) {
 	const user = await loginService(req.body)
 	const { token } = await createSession(user.id)
+
 	res.setCookie('session', token, {
 		path: '/',
 		signed: true,
 	})
+
 	res.send({
 		status: 200,
-		message: 'Connection Reussie !',
+		message: 'Connexion réussie !',
 		user,
 	})
 }
+

@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm'
-import { createAvatarPlaceholder } from '../../controllers/avatar.js'
+import { createAvatarPlaceholder } from './avatar.js'
 import { db } from '../../db/index.js'
 import { users } from '../../db/schema.js'
 import type { UserCreate } from '../../types.js'
