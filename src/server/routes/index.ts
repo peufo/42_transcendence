@@ -2,8 +2,8 @@ import fp from 'fastify-plugin'
 import { userSessionHook } from '../modules/auth/hook.js'
 import { authRoute } from '../modules/auth/route.js'
 import { invitationsRoute } from '../modules/invitation/route.js'
-import { statsRoute } from './userStats.js'
 import { usersRoute } from '../modules/users/route.js'
+import { statsRoute } from './userStats.js'
 
 export default fp((server, _options, done) => {
 	server.addHook('preHandler', userSessionHook)

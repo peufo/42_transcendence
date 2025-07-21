@@ -1,8 +1,8 @@
 import { eq } from 'drizzle-orm'
-import { createAvatarPlaceholder } from '../controllers/avatar.js'
-import { db } from '../db/index.js'
-import { users } from '../db/schema.js'
-import type { UserCreate } from '../types.js'
+import { createAvatarPlaceholder } from '../../controllers/avatar.js'
+import { db } from '../../db/index.js'
+import { users } from '../../db/schema.js'
+import type { UserCreate } from '../../types.js'
 
 export async function createUser(data: Omit<UserCreate, 'avatarPlaceholder'>) {
 	const result = await db

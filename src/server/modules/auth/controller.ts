@@ -1,7 +1,7 @@
 import '@fastify/cookie'
 import type { FastifyReply, FastifyRequest } from 'fastify'
-import type { LoginSchema, SignupSchema } from '../schemas/authSchema.js'
-import { loginService, signupService } from '../services/authService.js'
+import type { LoginSchema, SignupSchema } from './authSchema.js'
+import { loginService, signupService } from './service.js'
 import { createSession } from './session.js'
 
 export async function signupUser(

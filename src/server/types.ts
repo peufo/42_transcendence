@@ -19,4 +19,9 @@ declare module 'fastify' {
 			user?: Omit<User, 'passwordHash'>
 		}
 	}
+
+	interface FastifyRequest {
+		cookies: Record<string, string> | undefined
+		unsignCookie: (value: string) => { valid: boolean; value: string }
+	}
 }

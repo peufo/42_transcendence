@@ -41,7 +41,7 @@ server.get('/*', { exposeHeadRoute: false }, (_req, reply) => {
 	reply.sendFile('index.html')
 })
 
-server.setErrorHandler((error, request, reply) => {
+server.setErrorHandler((error, _request, reply) => {
 	const status = error.statusCode || 500
 	reply.status(status).send({
 		error: error.name || 'Internal Server Error',
