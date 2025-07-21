@@ -16,7 +16,6 @@ export async function signupUser(
 			signed: true,
 		})
 		res.send({
-			status: 200,
 			message: 'Inscription réussie !',
 			user,
 		})
@@ -38,7 +37,6 @@ export async function loginUser(
 			signed: true,
 		})
 		res.send({
-			status: 200,
 			message: 'Connection Reussie !',
 			user,
 		})

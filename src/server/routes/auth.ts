@@ -20,9 +20,7 @@ export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 		if (res.locals) {
 			res.locals.user = undefined
 		}
-		res.send({
-			data: null,
-		})
+		res.send({ success: true })
 	})
 
 	server.get('/user', (_req, res) => {

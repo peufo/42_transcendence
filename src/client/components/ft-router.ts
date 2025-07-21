@@ -113,7 +113,7 @@ async function onSubmitForm(event: SubmitEvent) {
 	event.preventDefault()
 	const form = event.target as HTMLFormElement
 	const route = new URL(form.action).pathname
-	const options = API_POST[route as RouteApiPost] as ApiPostOption
+	const options = API_POST[route as RouteApiPost] as ApiPostOption<unknown>
 	if (form.method === 'get') {
 		if (!(route in API_GET)) throw new Error(`route "${route}" not exist`)
 		return api.get(route as RouteApiGet, getFormQuery(new FormData(form)))
@@ -152,7 +152,7 @@ async function onSubmitForm(event: SubmitEvent) {
 	stringToDate(json)
 	options.onSuccess?.(json)
 	if (options.redirectTo) {
-		const pathname = options.redirectTo()
+		const pathname = options.redirectTo(json)
 		return goto(new URL(pathname, document.location.origin))
 	}
 	if (options.invalidate) {

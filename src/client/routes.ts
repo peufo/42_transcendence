@@ -1,3 +1,4 @@
+import type { RoutesGet, RoutesPost } from '../lib/type.js'
 import { setFriendships, setMatches, setUser, setUsers } from './utils/store.js'
 import { validationSignup } from './validation.js'
 
@@ -5,10 +6,14 @@ export type RouteApiGet = keyof typeof API_GET
 export type RouteApiPost = keyof typeof API_POST
 export type RoutePage = keyof typeof PAGES
 
-export type ApiPostOption = {
-	validation?: (form: HTMLFormElement) => null | Record<string, string>
-	onSuccess?<Result>(data: Result): void
-	redirectTo?: () => RoutePage
+export type ApiPostOptionValidation = (
+	form: HTMLFormElement,
+) => null | Record<string, string>
+
+export type ApiPostOption<Result> = {
+	validation?: ApiPostOptionValidation
+	onSuccess?(data: Result): void
+	redirectTo?(data: Result): RoutePage | `${RoutePage}?${string}`
 	invalidate?: RouteApiGet[]
 }
 
@@ -19,12 +24,14 @@ export type PageOption = {
 	isPublic?: boolean | 'only'
 }
 
-export const API_GET = {
+export const API_GET: {
+	[Route in keyof RoutesGet]: (newValue: RoutesGet[Route]) => void
+} = {
 	'/auth/user': setUser,
 	'/users': setUsers,
 	'/friendships': setFriendships,
 	'/userstats': setMatches,
-} as const
+}
 
 export const API_POST = {
 	'/auth/login': {
@@ -37,10 +44,15 @@ export const API_POST = {
 	'/auth/logout': {
 		redirectTo: () => '/',
 	},
+	'/tournament/new': {
+		redirectTo: ({ tournamentId }) => `/tournament/play?id=${tournamentId}`,
+	},
 	'/friendships/new': { invalidate: ['/friendships'] },
 	'/friendships/accept': { invalidate: ['/friendships'] },
 	'/friendships/delete': { invalidate: ['/friendships'] },
-} satisfies Record<string, ApiPostOption>
+} satisfies {
+	[Route in keyof RoutesPost]: ApiPostOption<RoutesPost[Route]>
+}
 
 export const PAGES = {
 	'/': {
