@@ -3,6 +3,7 @@ import type {
 	friendships,
 	matches,
 	sessions,
+	tournaments,
 	users,
 } from '../server/db/schema.js'
 
@@ -15,6 +16,7 @@ export namespace DB {
 	export type Session = typeof sessions.$inferSelect
 	export type SessionCreate = typeof sessions.$inferInsert
 	export type Match = typeof matches.$inferSelect
+	export type Tournament = typeof tournaments.$inferSelect
 }
 
 declare module 'fastify' {

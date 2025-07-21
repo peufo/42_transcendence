@@ -1,7 +1,8 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import '@fastify/cookie'
-import { schemaBody } from '../../utils.js'
-import { createTournament } from './model.js'
+import z from 'zod/v4'
+import { schemaBody, schemaQuery } from '../../utils.js'
+import { createTournament, getTournament } from './model.js'
 import { tournamentSchema } from './schema.js'
 
 export const tournamentsRoute: FastifyPluginCallbackZod = (
@@ -9,17 +10,6 @@ export const tournamentsRoute: FastifyPluginCallbackZod = (
 	_options,
 	done,
 ) => {
-	// 	<RouteGenericInterface, unknown, {
-	//     body: z.ZodObject<{
-	//         numberOfPlayers: z.ZodCoercedNumber<unknown>;
-	//     }, z.core.$strip>;
-	//     response: {
-	//         200: z.ZodObject<ZodShape<{
-	//             success: boolean;
-	//         }>, z.core.$strip>;
-	//     };
-	// }
-
 	server.post('/new', schemaBody(tournamentSchema), async (req, res) => {
 		const user = res.locals?.user
 		if (!user) return res.code(401).send()
@@ -29,6 +19,12 @@ export const tournamentsRoute: FastifyPluginCallbackZod = (
 		})
 
 		return res.send({ success: true, tournamentId: tournament.id })
+	})
+
+	server.get('/', schemaQuery({ id: z.coerce.number() }), async (req, res) => {
+		const { id } = req.query
+		const tournament = await getTournament(id)
+		return res.send({ tournament })
 	})
 
 	done()

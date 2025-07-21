@@ -23,6 +23,13 @@ export function schemaBody<Shape extends z.ZodRawShape>(shape: Shape) {
 		},
 	}
 }
+export function schemaQuery<Shape extends z.ZodRawShape>(shape: Shape) {
+	return {
+		schema: {
+			querystring: z.object(shape),
+		},
+	}
+}
 
 export type ZodShape<T = Record<PropertyKey, unknown>> = {
 	[key in keyof T]: z.ZodType<T[key]>

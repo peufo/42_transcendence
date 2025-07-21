@@ -102,18 +102,31 @@ export const tournaments = sqliteTable('tournaments', {
 })
 
 // TODO: add relation type ? owner, etc..
-export const tournamentsParticipants = sqliteTable('tournaments_participants', {
-	tournamentId: int()
-		.notNull()
-		.references(() => tournaments.id),
-	userId: int()
-		.notNull()
-		.references(() => users.id),
-})
+export const tournamentsParticipants = sqliteTable(
+	'tournaments_participants',
+	{
+		// state: text({ enum: ['waiting', 'inGame'] }),
+		tournamentId: int()
+			.notNull()
+			.references(() => tournaments.id),
+		userId: int()
+			.notNull()
+			.references(() => users.id),
+	},
+	(table) => [unique().on(table.tournamentId, table.userId)],
+)
 
-export const tournamentRelations = relations(tournaments, ({ many }) => ({
-	users: many(tournamentsParticipants),
+export const tournamentRelations = relations(tournaments, ({ many, one }) => ({
+	createdByUser: one(users),
+	participants: many(tournamentsParticipants),
 }))
+
+export const tournamentsParticipantsRelations = relations(
+	tournamentsParticipants,
+	({ one }) => ({
+		user: one(users),
+	}),
+)
 
 export const versus = sqliteTable('versus', {
 	id: int().primaryKey({ autoIncrement: true }),

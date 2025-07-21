@@ -34,6 +34,12 @@ export type FriendshipInvitation = FriendshipBase & {
 
 export type Friendship = FriendshipFriend | FriendshipInvitation
 
+export type SessionEvent = {
+	onFriendshipCreated: { friendship: Friendship }
+	onFriendshipAccepted: { friendship: Friendship }
+	onFriendshipDeleted: { friendshipId: number }
+}
+
 export type Match = {
 	player1Id: number
 	player2Id: number
@@ -45,10 +51,14 @@ export type Match = {
 	player2Score: number
 }
 
-export type SessionEvent = {
-	onFriendshipCreated: { friendship: Friendship }
-	onFriendshipAccepted: { friendship: Friendship }
-	onFriendshipDeleted: { friendshipId: number }
+export type Tournament = {
+	id: number
+	createdAt: Date
+	state: 'open' | 'ongoing' | 'finished'
+	createdBy: number
+	createdByUser: UserBasic
+	participants: { user: UserBasic }[]
+	numberOfPlayers: number
 }
 
 export type RoutesGet = {
