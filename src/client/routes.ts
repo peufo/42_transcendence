@@ -1,10 +1,4 @@
-import {
-	setFriends,
-	setInvitations,
-	setMatches,
-	setUser,
-	setUsers,
-} from './utils/store.js'
+import { setFriendships, setMatches, setUser, setUsers } from './utils/store.js'
 import { validationSignup } from './validation.js'
 
 export type RouteApiGet = keyof typeof API_GET
@@ -28,8 +22,7 @@ export type PageOption = {
 export const API_GET = {
 	'/auth/user': setUser,
 	'/users': setUsers,
-	'/users/friends': setFriends,
-	'/invitations': setInvitations,
+	'/friendships': setFriendships,
 	'/userstats': setMatches,
 } as const
 
@@ -44,11 +37,9 @@ export const API_POST = {
 	'/auth/logout': {
 		redirectTo: () => '/',
 	},
-	'/invitations/new': { invalidate: ['/invitations'] },
-	'/invitations/remove': { invalidate: ['/users/friends'] },
-	'/invitations/accept': { invalidate: ['/invitations', '/users/friends'] },
-	'/invitations/cancel': { invalidate: ['/invitations'] },
-	'/invitations/reject': { invalidate: ['/invitations'] },
+	'/friendships/new': { invalidate: ['/friendships'] },
+	'/friendships/accept': { invalidate: ['/friendships'] },
+	'/friendships/delete': { invalidate: ['/friendships'] },
 } satisfies Record<string, ApiPostOption>
 
 export const PAGES = {
@@ -59,7 +50,7 @@ export const PAGES = {
 	},
 	'/me': {
 		component: 'ft-page-me',
-		pageData: ['/users/friends', '/invitations'],
+		pageData: ['/friendships'],
 	},
 	'/login': { component: 'ft-page-login', isPublic: 'only' },
 	'/signup': { component: 'ft-page-signup', isPublic: 'only' },

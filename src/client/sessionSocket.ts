@@ -1,7 +1,7 @@
 import type { SessionEvent } from '../lib/type.js'
 import { toast } from './components/ft-toast.js'
 import { createEffect } from './utils/signal.js'
-import { getUser, updateFriends, updateInvitations } from './utils/store.js'
+import { getUser, updateFriendships } from './utils/store.js'
 import { stringToDate } from './utils/stringToDate.js'
 
 let sessionSocket: WebSocket | null = null
@@ -19,24 +19,22 @@ const cleanEffect = createEffect(() => {
 	sessionSocket.addEventListener('message', (event) => {
 		const data: Partial<SessionEvent> = JSON.parse(event.data)
 		stringToDate(data)
-		if (data.onInvitationCreated) {
-			const { friendship } = data.onInvitationCreated
-			const fromUser =
-				friendship.user1Id === user.id ? friendship.user2 : friendship.user1
-			toast.info(`New invitation from ${fromUser.name}`)
-			updateInvitations((invitations) => [...invitations, friendship])
+		if (data.onFriendshipCreated) {
+			const { friendship } = data.onFriendshipCreated
+			toast.info(`New invitation from ${friendship.withUser.name}`)
+			updateFriendships((friendships) => [...friendships, friendship])
 		}
 
-		if (data.onInvitationAccepted) {
-			const { newFriend } = data.onInvitationAccepted
-			toast.success(`${newFriend.name} accepted your invitation`)
-			updateFriends((friends) => [...friends, newFriend])
+		if (data.onFriendshipAccepted) {
+			const { friendship } = data.onFriendshipAccepted
+			toast.success(`${friendship.withUser.name} accepted your invitation`)
+			updateFriendships((friendships) => [...friendships, friendship])
 		}
 
-		if (data.onInvitationCancel) {
-			const { friendshipId } = data.onInvitationCancel
-			updateInvitations((invitations) =>
-				invitations.filter(({ id }) => id !== friendshipId),
+		if (data.onFriendshipDeleted) {
+			const { friendshipId } = data.onFriendshipDeleted
+			updateFriendships((friendships) =>
+				friendships.filter(({ id }) => id !== friendshipId),
 			)
 		}
 	})

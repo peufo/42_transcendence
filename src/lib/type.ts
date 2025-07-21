@@ -14,19 +14,25 @@ export type User = UserBasic & {
 export type Friend = UserBasic & {
 	isActive: boolean
 	lastLogin: Date
-	gameId?: string
+	gameId?: string // TODO: add gameId
 }
 
-export type FriendShip = {
+type FriendshipBase = {
 	id: number
-	user1Id: number
-	user2Id: number
-	state: 'invited' | 'friend'
 	createdBy: number
 	createdAt: Date
-	user1: UserBasic
-	user2: UserBasic
 }
+
+export type FriendshipFriend = FriendshipBase & {
+	state: 'friend'
+	withUser: Friend
+}
+export type FriendshipInvitation = FriendshipBase & {
+	state: 'invited'
+	withUser: UserBasic
+}
+
+export type Friendship = FriendshipFriend | FriendshipInvitation
 
 export type Match = {
 	player1Id: number
@@ -40,7 +46,7 @@ export type Match = {
 }
 
 export type SessionEvent = {
-	onInvitationCreated: { friendship: FriendShip }
-	onInvitationAccepted: { newFriend: Friend }
-	onInvitationCancel: { friendshipId: number }
+	onFriendshipCreated: { friendship: Friendship }
+	onFriendshipAccepted: { friendship: Friendship }
+	onFriendshipDeleted: { friendshipId: number }
 }

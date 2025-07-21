@@ -1,18 +1,9 @@
-import {
-	and,
-	eq,
-	getTableColumns,
-	inArray,
-	like,
-	ne,
-	notInArray,
-	or,
-} from 'drizzle-orm'
+import { and, getTableColumns, like, ne, notInArray } from 'drizzle-orm'
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod/v4'
-import { db, friendships, users } from '../db/index.js'
+import { db, users } from '../db/index.js'
 import '@fastify/cookie'
-import type { DB } from '../types.js'
+import { getFriendships } from '../models/friendships.js'
 
 export const usersRoute: FastifyPluginCallbackZod = (
 	server,
@@ -36,7 +27,9 @@ export const usersRoute: FastifyPluginCallbackZod = (
 			const { passwordHash, isActive, lastLogin, createdAt, ...columns } =
 				getTableColumns(users)
 
-			const friendsId = await getUserFriendsId(user.id)
+			const friendsId = await getFriendships(user.id, 'friend').then((values) =>
+				values.map(({ withUser }) => withUser.id),
+			)
 
 			const results = await db
 				.select(columns)
@@ -54,46 +47,5 @@ export const usersRoute: FastifyPluginCallbackZod = (
 		},
 	)
 
-	server.get('/friends', async (_req, res) => {
-		const user = res.locals?.user
-		if (!user) return res.code(401).send()
-
-		const { passwordHash, createdAt, ...columns } = getTableColumns(users)
-
-		const friendsId = await getUserFriendsId(user.id, 'friend')
-		const friends = await db
-			.select(columns)
-			.from(users)
-			.where(inArray(users.id, friendsId))
-		// TODO: add gameId
-		return res.send({ data: friends })
-	})
-
 	done()
-}
-
-async function getUserFriendships(
-	userId: number,
-	state?: DB.Friendship['state'],
-) {
-	return await db
-		.select()
-		.from(friendships)
-		.where(
-			and(
-				or(eq(friendships.user1Id, userId), eq(friendships.user2Id, userId)),
-				state ? eq(friendships.state, state) : undefined,
-			),
-		)
-}
-
-async function getUserFriendsId(
-	userId: number,
-	state?: DB.Friendship['state'],
-) {
-	const friendships = await getUserFriendships(userId, state)
-
-	return friendships.map((friendship) =>
-		friendship.user1Id === userId ? friendship.user2Id : friendship.user1Id,
-	)
 }

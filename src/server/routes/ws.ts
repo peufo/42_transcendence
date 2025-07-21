@@ -4,9 +4,9 @@ import { getSessionFromRequest } from '../controllers/hooks.js'
 import { createSessionEvent } from '../events/session.js'
 
 const sessionsEventKeys: (keyof SessionEvent)[] = [
-	'onInvitationCreated',
-	'onInvitationAccepted',
-	'onInvitationCancel',
+	'onFriendshipCreated',
+	'onFriendshipAccepted',
+	'onFriendshipDeleted',
 ]
 
 export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {

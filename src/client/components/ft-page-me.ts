@@ -1,11 +1,10 @@
-import type { UserBasic } from '../../lib/type.js'
+import type {
+	FriendshipFriend,
+	FriendshipInvitation,
+	UserBasic,
+} from '../../lib/type.js'
 import { type CleanEffect, createEffect } from '../utils/signal.js'
-import {
-	getFriends,
-	getInvitations,
-	getUser,
-	getUsers,
-} from '../utils/store.js'
+import { getFriendships, getUser, getUsers } from '../utils/store.js'
 
 customElements.define(
 	'ft-page-me',
@@ -82,7 +81,7 @@ customElements.define(
                         <img src="${getAvatarSrc(user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
                         <span>${user.name}</span>
                         <div class="flex-grow"></div>
-                        <form method="post" action="/invitations/new" class="btn btn-border">
+                        <form method="post" action="/friendships/new" class="btn btn-border">
                             <input type="hidden" name="invitedUserId" value="${user.id}" />
                             <input type="submit" value="Invite" />
                         </form>
@@ -112,27 +111,33 @@ customElements.define(
 		}
 
 		renderContent(): string {
-			const friends = getFriends()
-			if (!friends) return 'you have no friends :('
+			const friendships = getFriendships().filter(
+				({ state }) => state === 'friend',
+			) as FriendshipFriend[]
+			if (!friendships) return 'you have no friends :('
 
 			let html = /*html*/ `
                 <h3 class="text-sm/6 font-semibold text-gray-900">
                     My friends
                 </h3>
             `
-			for (const friend of friends) {
+			for (const friendship of friendships) {
+				const { withUser: friend } = friendship
 				const badge = friend.isActive
 					? /*html*/ `<span class="badge badge-green">Online</span>`
 					: /*html*/ `<span class="badge badge-dark">Offline</span>`
 
 				let joinBtn = ''
 				const removeBtn = /*html*/ `
-                <form method="post" action="/invitations/remove">
-                        <input type="hidden" name="friendId" value="${friend.id}">
+                <form method="post" action="/friendships/delete">
+                        <input type="hidden" name="friendshipId" value="${friendship.id}">
                         <input class="btn btn-red" type="submit" value="Remove">
                     </form>`
 				if (friend.gameId) {
-					joinBtn = /*html*/ `<a href="/game/play?gameId=${friend.gameId}" class="btn btn-border">Join</a>`
+					joinBtn = /*html*/ `
+						<a href="/game/play?gameId=${friend.gameId}" class="btn btn-border">
+							Join
+						</a>`
 				}
 
 				html += /*html*/ `
@@ -170,7 +175,9 @@ customElements.define(
 
 		render(): string {
 			const user = getUser()
-			const invitations = getInvitations()
+			const invitations = getFriendships().filter(
+				({ state }) => state === 'invited',
+			) as FriendshipInvitation[]
 			if (!user || !invitations.length) return ''
 
 			let html = /*html*/ `
@@ -188,28 +195,26 @@ customElements.define(
 					label: string,
 					color: string,
 				) => /*html*/ `
-                    <form method="post" action="/invitations/${action}">
+                    <form method="post" action="/friendships/${action}">
                         <input type="hidden" name="friendshipId" value="${invitation.id}">
                         <input class="btn ${color}" type="submit" value="${label}">
                     </form>
                 `
-
 				const createdByMe = invitation.createdBy === user.id
-				const otherUser =
-					invitation.user1Id === user.id ? invitation.user2 : invitation.user1
+
 				const buttons: string[] = []
 				if (createdByMe) {
-					buttons.push(formButton('cancel', 'Cancel', 'btn-red'))
+					buttons.push(formButton('delete', 'Cancel', 'btn-red'))
 				} else {
 					buttons.push(formButton('accept', 'Accept', 'btn-green'))
-					buttons.push(formButton('reject', 'Reject', 'btn-red'))
+					buttons.push(formButton('delete', 'Reject', 'btn-red'))
 				}
 
 				html += /*html*/ `
                     <div class="flex pl-4 p-2 items-center gap-2 border border-gray-200 rounded-xl">
-                    <img src="${getAvatarSrc(otherUser)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
+                    <img src="${getAvatarSrc(invitation.withUser)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
                         <div class="flex flex-col">
-                            <span>${otherUser.name}</span>
+                            <span>${invitation.withUser.name}</span>
                             <span class="text-xs text-gray-900 leading-3">
                                 ${createdByMe ? 'Sent' : 'Received'} a ${formater.format(invitation.createdAt)}
                             </span>
