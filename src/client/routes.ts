@@ -44,7 +44,7 @@ export const API_POST = {
 	'/auth/logout': {
 		redirectTo: () => '/',
 	},
-	'/tournament/new': {
+	'/tournaments/new': {
 		redirectTo: ({ tournamentId }) => `/tournament/play?id=${tournamentId}`,
 	},
 	'/friendships/new': { invalidate: ['/friendships'] },

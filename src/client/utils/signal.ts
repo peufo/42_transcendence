@@ -40,8 +40,6 @@ export function createSignal<T>(
 	return [read, write, update]
 }
 
-// TODO: return unsunbscriber ?
-// TODO: const effect is necessarry only func call conditional getters
 export function createEffect(func: () => void | Promise<void>): CleanEffect {
 	cleaners = []
 	createCleaner = (subscribes: SubscribeMap) => {

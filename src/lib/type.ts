@@ -62,7 +62,7 @@ export type RoutesPost = {
 	'/auth/login': { message: string; user: User }
 	'/auth/signup': { message: string; user: User }
 	'/auth/logout': { success: boolean }
-	'/tournament/new': { success: boolean; tournamentId: number }
+	'/tournaments/new': { success: boolean; tournamentId: number }
 	'/friendships/new': { success: boolean }
 	'/friendships/accept': { success: boolean }
 	'/friendships/delete': { success: boolean }
