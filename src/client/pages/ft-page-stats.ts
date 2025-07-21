@@ -59,45 +59,35 @@ customElements.define(
 				for (const match of matchesHead) {
 					if (match.player1Score === null || match.player2Score === null)
 						continue
-
-					if (match.player1.id === user.id) adversary = match.player2
-					else adversary = match.player1
-					if (
-						(match.player1Score > match.player2Score &&
-							match.player1Id === user.id) ||
-						(match.player1Score < match.player2Score &&
-							match.player2Id === user.id)
-					)
-						html += /*html*/ `
-						<div class="flex pl-4 p-2 items-center justify-between gap-2 border border-gray-200 rounded-xl">
-							<div class="flex pl-4 p-2 items-center gap-2">
-								<span> Against </span>
-								<img src="${getAvatarSrc(adversary)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
-								<span>${adversary.name}</span>
-								<div class="flex-grow"></div>
-							</div>
-							<div class="flex pl-4 p-2 justify-around items-center gap-2">
-								<span class="flex items-center gap-2 text-green-400"> ${Math.max(match.player1Score, match.player2Score)}</span>
-								<span class="flex items-center gap-2"> - </span>
-								<span class="flex items-center gap-2"> ${Math.min(match.player1Score, match.player2Score)}</span>
-							</div>
+					html += /*html*/ `
+					<div class="flex pl-4 p-2 items-center justify-around gap-2 border border-gray-200 rounded-xl">
+						<div class="flex p-2 items-center gap-2">
+							<img src="${getAvatarSrc(match.player1)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
+							<span class="flex items-center gap-2"> ${match.player1.name}</span>
+						</div>`
+					if (match.player1Id === user.id) {
+						if (match.player1Score > match.player2Score)
+							html += `<span class="flex items-center gap-2 text-green-400"> ${match.player1Score}</span>`
+						else
+							html += `<span class="flex items-center gap-2 text-red-400"> ${match.player1Score}</span>`
+					} else {
+						html += `<span class="flex items-center gap-2"> ${match.player1Score}</span>`
+					}
+					html += `<span class="flex items-center gap-2"> VS </span>`
+					if (match.player2Id === user.id) {
+						if (match.player2Score > match.player1Score)
+							html += `<span class="flex items-center gap-2 text-red-400"> ${match.player2Score}</span>`
+						else
+							html += `<span class="flex items-center gap-2 text-green-400"> ${match.player2Score}</span>`
+					} else {
+						html += `<span class="flex items-center gap-2"> ${match.player2Score}</span>`
+					}
+					html += `
+						<div class="flex p-2 items-center gap-2">
+							<span class="flex items-center gap-2"> ${match.player2.name}</span>
+							<img src="${getAvatarSrc(match.player2)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
 						</div>
-					`
-					else
-						html += /*html*/ `
-						<div class="flex pl-4 p-2 items-center justify-between gap-2 border border-gray-200 rounded-xl">
-							<div class="flex pl-4 p-2 items-center gap-2">
-								<span> Against </span>
-								<img src="${getAvatarSrc(adversary)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
-								<span>${adversary.name}</span>
-								<div class="flex-grow"></div>
-							</div>
-							<div class="flex justify-around pl-4 p-2 items-center gap-2">
-								<span class="flex items-center gap-2"> ${Math.max(match.player1Score, match.player2Score)}</span>
-								<span class="flex items-center gap-2"> - </span>
-								<span class="flex items-center gap-2 text-red-400"> ${Math.min(match.player1Score, match.player2Score)}</span>
-							</div>
-						</div>
+					</div>
 					`
 				}
 			}
@@ -126,7 +116,9 @@ customElements.define(
 		renderContent(): string {
 			const user = $user.get()
 			if (!user) return ''
-			const html = /*html*/ `<h2 class="flex flex-row p-2 items-center justify-center gap-2">Ranking</h2>`
+			const html = /*html*/ `
+			<h2 class="flex flex-row p-2 items-center justify-center gap-2">Ranking</h2>
+			<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2"></h2>`
 			return html
 		}
 	},

@@ -32,6 +32,7 @@ async function main() {
 		},
 	}))
 
+	const FRIENDSHIP_COUNT = 15
 	await seed(db, { friendships }).refine((f) => ({
 		friendships: {
 			columns: {
@@ -39,7 +40,8 @@ async function main() {
 					defaultValue: 2,
 				}),
 				user2Id: f.valuesFromArray({
-					values: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20],
+					values: new Array(FRIENDSHIP_COUNT).fill(0).map((_, i) => i + 3),
+					isUnique: true,
 				}),
 				state: f.valuesFromArray({
 					values: ['invited', 'friend'],
@@ -48,15 +50,22 @@ async function main() {
 					defaultValue: 2,
 				}),
 			},
-			count: 3,
+			count: FRIENDSHIP_COUNT,
 		},
 	}))
+
+	await db.insert(friendships).values({
+		user1Id: 2,
+		user2Id: 20,
+		createdBy: 20,
+		state: 'invited',
+	})
 
 	await seed(db, { matches, roundsRelations }).refine((f) => ({
 		matches: {
 			columns: {
-				player1Id: f.valuesFromArray({
-					values: [2],
+				player1Id: f.default({
+					defaultValue: 2,
 				}),
 				player2Id: f.valuesFromArray({
 					values: [11, 12, 13, 14, 15, 16, 17, 18, 19],
@@ -113,16 +122,6 @@ async function main() {
 		},
 		count: 10,
 	}))
-
-	const invits = [3, 6, 9, 10, 13, 14]
-	for (const invitId of invits) {
-		await db.insert(friendships).values({
-			user1Id: 2,
-			user2Id: invitId,
-			state: 'invited',
-			createdBy: invitId,
-		})
-	}
 }
 
 main()

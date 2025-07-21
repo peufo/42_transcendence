@@ -17,6 +17,7 @@ export const users = sqliteTable('users', {
 	createdAt: int({ mode: 'timestamp' }).notNull().default(new Date()),
 	lastLogin: int({ mode: 'timestamp' }).notNull().default(new Date()),
 	isActive: int({ mode: 'boolean' }).notNull().default(false),
+	numberOfGoals: int().notNull().default(0),
 })
 
 export const usersRelations = relations(users, ({ many }) => ({
