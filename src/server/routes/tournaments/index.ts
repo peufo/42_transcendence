@@ -24,7 +24,7 @@ export const tournamentsRoute: FastifyPluginCallbackZod = (
 	server.get('/', schemaQuery({ id: z.coerce.number() }), async (req, res) => {
 		const { id } = req.query
 		const tournament = await getTournament(id)
-		return res.send({ tournament })
+		return res.send({ data: tournament })
 	})
 
 	done()

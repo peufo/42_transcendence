@@ -117,14 +117,24 @@ export const tournamentsParticipants = sqliteTable(
 )
 
 export const tournamentRelations = relations(tournaments, ({ many, one }) => ({
-	createdByUser: one(users),
+	createdByUser: one(users, {
+		fields: [tournaments.createdBy],
+		references: [users.id],
+	}),
 	participants: many(tournamentsParticipants),
 }))
 
 export const tournamentsParticipantsRelations = relations(
 	tournamentsParticipants,
 	({ one }) => ({
-		user: one(users),
+		user: one(users, {
+			fields: [tournamentsParticipants.userId],
+			references: [users.id],
+		}),
+		tournament: one(tournaments, {
+			fields: [tournamentsParticipants.tournamentId],
+			references: [tournaments.id],
+		}),
 	}),
 )
 
