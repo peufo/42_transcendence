@@ -11,10 +11,10 @@ type ToastOption = {
 	content?: string
 }
 
-const [getToast, setToast] = createSignal<ToastOption | null>(null)
+const $toast = createSignal<ToastOption | null>(null)
 
 const useToast = (type: ToastType) => (title: string, content?: string) =>
-	setToast({ type, title, content })
+	$toast.set({ type, title, content })
 
 export const toast = {
 	info: useToast('info'),
@@ -45,7 +45,7 @@ customElements.define(
 			this.classList.add(TOAST_HIDE)
 			setTimeout(() => this.classList.add('transition-transform'), 0)
 			this.cleanEffet = createEffect(() => {
-				const toast = getToast()
+				const toast = $toast.get()
 				if (!toast) {
 					this.innerHTML = ''
 					return

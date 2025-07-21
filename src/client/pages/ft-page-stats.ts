@@ -1,6 +1,6 @@
 import type { Match, UserBasic } from '../../lib/type.js'
 import { createEffect } from '../utils/signal.js'
-import { getMatches, getUser } from '../utils/store.js'
+import { $matches, $user } from '../utils/store.js'
 
 customElements.define(
 	'ft-page-stats',
@@ -9,7 +9,7 @@ customElements.define(
 			this.innerHTML = this.render()
 		}
 		render(): string {
-			const user = getUser()
+			const user = $user.get()
 
 			let userContent = ''
 			if (user)
@@ -45,9 +45,9 @@ customElements.define(
 			})
 		}
 		renderContent(): string {
-			const matches = getMatches()
+			const matches = $matches.get()
 			const matchesHead = matches.slice(0, 5)
-			const user = getUser()
+			const user = $user.get()
 			let adversary: UserBasic
 			let html = `
 			<h2 class="flex flex-row p-2 items-center justify-center gap-2">Recent matches</h2>`
@@ -117,9 +117,9 @@ customElements.define(
 			})
 		}
 		renderContent(): string {
-			const user = getUser()
+			const user = $user.get()
 			if (!user) return ''
-			const matches = getMatches()
+			const matches = $matches.get()
 			const winRate = (
 				(getNumberOfWin(matches, user) / matches.length) *
 				100
@@ -154,7 +154,7 @@ customElements.define(
 			})
 		}
 		renderContent(): string {
-			const user = getUser()
+			const user = $user.get()
 			if (!user) return ''
 			const html = `
 			<h2 class="flex flex-row p-2 items-center justify-center gap-2">Goal distribution</h2>`

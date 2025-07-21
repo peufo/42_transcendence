@@ -14,20 +14,20 @@ import {
 	createEffect,
 	createSignal,
 } from '../utils/signal.js'
-import { getUser } from '../utils/store.js'
+import { $user } from '../utils/store.js'
 import { stringToDate } from '../utils/stringToDate.js'
 import { slide, transitionIn, transitionOut } from '../utils/transition.js'
 import { toast } from './ft-toast.js'
 
-const [getUrl, setUrl] = createSignal<URL>(new URL(document.location.href))
+const $url = createSignal<URL>(new URL(document.location.href))
 
 function goto(url: URL) {
 	window.history.pushState({}, '', url)
-	setUrl(url)
+	$url.set(url)
 }
 
 function onPopState() {
-	setUrl(new URL(document.location.href))
+	$url.set(new URL(document.location.href))
 }
 
 customElements.define(
@@ -40,12 +40,15 @@ customElements.define(
 			document.addEventListener('click', onClickLink)
 			window.addEventListener('popstate', onPopState)
 			this.cleanEffect = createEffect(async () => {
-				const url = getUrl()
+				const url = $url.get()
 				const page = this.getPage(url.pathname)
+
 				if (page.layoutData) {
-					await Promise.all(page.layoutData.map((route) => api.get(route)))
+					await Promise.all(
+						page.layoutData.map((route) => api.get(route, url.search.slice(1))),
+					)
 				}
-				const user = getUser()
+				const user = $user.get()
 				if (!page.isPublic && !user) {
 					return goto(
 						new URL(`/login?redirectTo=${url.pathname}`, document.baseURI),
@@ -55,7 +58,9 @@ customElements.define(
 					return goto(new URL(`/me`, document.baseURI))
 				}
 				if (page.pageData) {
-					await Promise.all(page.pageData.map((route) => api.get(route)))
+					await Promise.all(
+						page.pageData.map((route) => api.get(route, url.search.slice(1))),
+					)
 				}
 				this.innerHTML = /*html*/ `
 					<${page.component}></${page.component}>

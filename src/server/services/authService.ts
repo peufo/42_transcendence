@@ -1,9 +1,9 @@
 import argon2 from 'argon2'
 import {
+	$user,
 	checkUserExists,
 	createUser,
 	getPasswordHash,
-	getUser,
 } from '../models/authModels.js'
 import type { LoginSchema, SignupSchema } from '../schemas/authSchema.js'
 
@@ -26,6 +26,6 @@ export async function loginService({ name, password }: LoginSchema) {
 
 	const passwordHash = await getPasswordHash(name)
 	if (!passwordHash) throw { message: 'password hash not found' }
-	if (await argon2.verify(passwordHash, password)) return getUser(name)
+	if (await argon2.verify(passwordHash, password)) return $user(name)
 	else throw { message: `password does not match.` }
 }

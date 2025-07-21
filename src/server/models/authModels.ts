@@ -24,7 +24,7 @@ export async function checkUserExists(username: string): Promise<boolean> {
 	return false
 }
 
-export async function getUser(username: string) {
+export async function $user(username: string) {
 	const result = await db
 		.select({
 			id: users.id,

@@ -66,6 +66,7 @@ export type RoutesGet = {
 	'/users': UserBasic[] // TODO: /users/notMyFriends
 	'/friendships': Friendship[]
 	'/userstats': Match[]
+	'/tournaments': Tournament
 }
 
 export type RoutesPost = {

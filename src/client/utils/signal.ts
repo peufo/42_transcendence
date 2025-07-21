@@ -8,24 +8,25 @@ type Getter<T> = () => T
 type Setter<T> = (newValue: T) => void
 type Updater<T> = (updater: (value: T) => T) => void
 
-export function createSignal<T>(
-	initialValue: T,
-): [Getter<T>, Setter<T>, Updater<T>] {
+export function createSignal<T>(initialValue: T): {
+	get: Getter<T>
+	set: Setter<T>
+	update: Updater<T>
+} {
 	const subscribes: SubscribeMap = new Set()
 	let value = initialValue
 
-	const read: Getter<T> = () => {
+	const get: Getter<T> = () => {
 		if (effectToSubscribe) {
 			if (createCleaner) {
 				cleaners.push(createCleaner(subscribes))
 			}
 			subscribes.add(effectToSubscribe)
 		}
-		console.log('subscribes:', [...subscribes.values()].length)
 		return value
 	}
 
-	const write: Setter<T> = (newValue: T) => {
+	const set: Setter<T> = (newValue: T) => {
 		value = newValue
 		for (const observer of subscribes) {
 			observer()
@@ -34,10 +35,10 @@ export function createSignal<T>(
 
 	const update: Updater<T> = (updater) => {
 		const newValue = updater(value)
-		write(newValue)
+		set(newValue)
 	}
 
-	return [read, write, update]
+	return { get, set, update }
 }
 
 export function createEffect(func: () => void | Promise<void>): CleanEffect {

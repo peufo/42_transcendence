@@ -1,5 +1,5 @@
 import type { RoutesGet, RoutesPost } from '../lib/type.js'
-import { setFriendships, setMatches, setUser, setUsers } from './utils/store.js'
+import * as store from './utils/store.js'
 import { validationSignup } from './validation.js'
 
 export type RouteApiGet = keyof typeof API_GET
@@ -27,10 +27,11 @@ export type PageOption = {
 export const API_GET: {
 	[Route in keyof RoutesGet]: (newValue: RoutesGet[Route]) => void
 } = {
-	'/auth/user': setUser,
-	'/users': setUsers,
-	'/friendships': setFriendships,
-	'/userstats': setMatches,
+	'/auth/user': store.$user.set,
+	'/users': store.$users.set,
+	'/friendships': store.$friendships.set,
+	'/userstats': store.$matches.set,
+	'/tournaments': store.$tournament.set,
 }
 
 export const API_POST = {
@@ -71,7 +72,10 @@ export const PAGES = {
 	'/local/new': { component: 'ft-page-local-new', isPublic: true },
 	'/local/play': { component: 'ft-page-local-play', isPublic: true },
 	'/tournament/new': { component: 'ft-page-tournament-new' },
-	'/tournament/play': { component: 'ft-page-tournament-play' },
+	'/tournament/play': {
+		component: 'ft-page-tournament-play',
+		pageData: ['/tournaments'],
+	},
 	'/local/play/babylon': { component: 'ft-page-local-play-babylon' },
 } as const satisfies Record<string, PageOption>
 

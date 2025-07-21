@@ -7,12 +7,8 @@ import type {
 } from '../../lib/type.js'
 import { createSignal } from './signal.js'
 
-export const [getUser, setUser] = createSignal<User | undefined>(undefined)
-export const [getUsers, setUsers] = createSignal<UserBasic[]>([])
-export const [getFriendships, setFriendships, updateFriendships] = createSignal<
-	Friendship[]
->([])
-export const [getMatches, setMatches] = createSignal<Match[]>([])
-export const [getTournament, setTournament] = createSignal<
-	Tournament | undefined
->(undefined)
+export const $user = createSignal<User | undefined>(undefined)
+export const $users = createSignal<UserBasic[]>([])
+export const $friendships = createSignal<Friendship[]>([])
+export const $matches = createSignal<Match[]>([])
+export const $tournament = createSignal<Tournament | undefined>(undefined)

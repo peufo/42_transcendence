@@ -4,7 +4,7 @@ import type {
 	UserBasic,
 } from '../../lib/type.js'
 import { type CleanEffect, createEffect } from '../utils/signal.js'
-import { getFriendships, getUser, getUsers } from '../utils/store.js'
+import { $friendships, $user, $users } from '../utils/store.js'
 
 customElements.define(
 	'ft-page-me',
@@ -68,9 +68,8 @@ customElements.define(
 		}
 
 		render() {
-			const users = getUsers()
-
-			if (!users)
+			const users = $users.get()
+			if (!users || !users.length)
 				return 'no users can be found that are not already your friends!'
 
 			let html = ''
@@ -111,9 +110,9 @@ customElements.define(
 		}
 
 		renderContent(): string {
-			const friendships = getFriendships().filter(
-				({ state }) => state === 'friend',
-			) as FriendshipFriend[]
+			const friendships = $friendships
+				.get()
+				.filter(({ state }) => state === 'friend') as FriendshipFriend[]
 			if (!friendships) return 'you have no friends :('
 
 			let html = /*html*/ `
@@ -174,10 +173,10 @@ customElements.define(
 		}
 
 		render(): string {
-			const user = getUser()
-			const invitations = getFriendships().filter(
-				({ state }) => state === 'invited',
-			) as FriendshipInvitation[]
+			const user = $user.get()
+			const invitations = $friendships
+				.get()
+				.filter(({ state }) => state === 'invited') as FriendshipInvitation[]
 			if (!user || !invitations.length) return ''
 
 			let html = /*html*/ `
@@ -245,7 +244,7 @@ customElements.define(
 		}
 
 		render(): string {
-			const user = getUser()
+			const user = $user.get()
 			if (!user) {
 				return /*html*/ `<span>401 not authorized </span>`
 			}

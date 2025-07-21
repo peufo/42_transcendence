@@ -1,5 +1,5 @@
 import { type CleanEffect, createEffect } from '../utils/signal.js'
-import { getUser } from '../utils/store.js'
+import { $user } from '../utils/store.js'
 
 customElements.define(
 	'ft-header',
@@ -33,7 +33,7 @@ customElements.define(
 		}
 
 		render(): string {
-			const user = getUser()
+			const user = $user.get()
 
 			if (!user) {
 				return /*html*/ `
