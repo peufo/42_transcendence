@@ -25,12 +25,12 @@ export async function notifyUser<K extends keyof SessionEvent>(
 	eventName: K,
 	data: SessionEvent[K],
 ) {
-	const invitedSessions = await db.query.sessions.findMany({
+	const userSessions = await db.query.sessions.findMany({
 		where: eq(sessions.userId, userId),
 		columns: { id: true },
 	})
-	for (const { id: invitedSessionid } of invitedSessions) {
-		const sessionEvent = sessionsEvent.get(invitedSessionid)
+	for (const { id: sessionId } of userSessions) {
+		const sessionEvent = sessionsEvent.get(sessionId)
 		// @ts-ignore
 		sessionEvent?.emit(eventName, data)
 	}
