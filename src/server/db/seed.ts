@@ -61,9 +61,6 @@ async function main() {
 				player2Score: f.valuesFromArray({
 					values: [0, 1, 2, 3, 4, 5],
 				}),
-				botDifficulty: f.valuesFromArray({
-					values: ['Baby', 'Kevin', 'Terminator'],
-				}),
 				pointsToWin: f.default({
 					defaultValue: 5,
 				}),

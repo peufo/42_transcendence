@@ -170,6 +170,7 @@ function getAverageRally(_matches: Match[]) {
 function getNumberOfWin(matches: Match[], user: UserBasic): number {
 	let win = 0
 	for (const match of matches) {
+		if (match.player1Score === null || match.player2Score === null) continue
 		if (match.player1Id === user.id && match.player1Score > match.player2Score)
 			win++
 		else if (

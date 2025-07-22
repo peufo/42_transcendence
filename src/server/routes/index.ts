@@ -3,7 +3,7 @@ import { authHook } from './auth/hooks.js'
 import { authRoute } from './auth/index.js'
 import { friendshipsRoute } from './friendships/index.js'
 import { tournamentsRoute } from './tournaments/index.js'
-import { statsRoute } from './userStats.js'
+import { statsRoute } from './userStats/index.js'
 import { usersRoute } from './users/index.js'
 import { wsRoute } from './ws.js'
 

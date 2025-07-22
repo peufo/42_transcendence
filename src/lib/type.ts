@@ -43,12 +43,11 @@ export type SessionEvent = {
 export type Match = {
 	player1Id: number
 	player2Id: number
-	botDifficulty: string
-	finishedAt: Date
+	finishedAt: Date | null
 	player1: UserBasic
 	player2: UserBasic
-	player1Score: number
-	player2Score: number
+	player1Score: number | null
+	player2Score: number | null
 }
 
 export type Tournament = {
