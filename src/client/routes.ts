@@ -77,6 +77,7 @@ export const PAGES = {
 		pageData: ['/tournaments'],
 	},
 	'/local/play/babylon': { component: 'ft-page-local-play-babylon' },
+	'/signup': {component: 'ft-page-signup', isPublic: true},
 } as const satisfies Record<string, PageOption>
 
 function redirectAfterLogin() {
