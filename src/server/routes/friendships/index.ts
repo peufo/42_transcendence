@@ -45,8 +45,7 @@ export const friendshipsRoute: FastifyPluginCallbackZod = (
 			await notifyUser(invitedUserId, 'onFriendshipCreated', {
 				friendship: { ...friendship, state: 'invited', withUser },
 			})
-
-			return res.send({ success: true })
+			return res.send({ success: true, invitedUserId })
 		},
 	)
 
@@ -57,15 +56,15 @@ export const friendshipsRoute: FastifyPluginCallbackZod = (
 			const user = permission.user(res)
 			const { friendshipId } = req.body
 			const friendship = await acceptFriendship(friendshipId, user.id)
-			const userId =
+			const acceptedUserId =
 				friendship.createdBy === friendship.user1Id
 					? friendship.user2Id
 					: friendship.user1Id
-			const withUser = await getUserFriend(userId)
+			const withUser = await getUserFriend(acceptedUserId)
 			await notifyUser(friendship.createdBy, 'onFriendshipAccepted', {
 				friendship: { ...friendship, state: 'friend', withUser },
 			})
-			return res.send({ success: true })
+			return res.send({ success: true, acceptedUserId })
 		},
 	)
 

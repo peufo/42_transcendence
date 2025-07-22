@@ -83,7 +83,6 @@ export class Engine {
 		p2: 0,
 	}
 	#gameOver: boolean
-	//#roundOver: boolean
 
 	get paddles() {
 		return this.#paddles

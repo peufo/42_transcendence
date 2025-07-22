@@ -3,7 +3,7 @@ import { db, users } from '../../db/index.js'
 import { getFriendships, userBasicColumns } from '../friendships/model.js'
 
 export async function searchUsersAsNotFriends(userId: number, search: string) {
-	const friendsId = await getFriendships(userId, 'friend').then((values) =>
+	const friendsId = await getFriendships(userId).then((values) =>
 		values.map(({ withUser }) => withUser.id),
 	)
 

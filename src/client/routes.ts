@@ -48,7 +48,14 @@ export const API_POST = {
 	'/tournaments/new': {
 		redirectTo: ({ tournamentId }) => `/tournament/play?id=${tournamentId}`,
 	},
-	'/friendships/new': { invalidate: ['/friendships'] },
+	'/friendships/new': {
+		invalidate: ['/friendships'],
+		onSuccess({ invitedUserId }) {
+			store.$users.update((users) =>
+				users.filter((user) => user.id !== invitedUserId),
+			)
+		},
+	},
 	'/friendships/accept': { invalidate: ['/friendships'] },
 	'/friendships/delete': { invalidate: ['/friendships'] },
 } satisfies {

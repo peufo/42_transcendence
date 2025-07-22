@@ -28,7 +28,9 @@ const cleanEffect = createEffect(() => {
 		if (data.onFriendshipAccepted) {
 			const { friendship } = data.onFriendshipAccepted
 			toast.success(`${friendship.withUser.name} accepted your invitation`)
-			$friendships.update((friendships) => [...friendships, friendship])
+			$friendships.update((friendships) =>
+				friendships.map((f) => (f.id === friendship.id ? friendship : f)),
+			)
 		}
 
 		if (data.onFriendshipDeleted) {
