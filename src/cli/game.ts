@@ -1,4 +1,3 @@
-//import { exit} from 'node:process'
 import { stdin, stdout } from 'node:process'
 import { createInterface, emitKeypressEvents } from 'node:readline'
 import {
@@ -14,9 +13,10 @@ import {
 	type Player,
 	type State,
 } from '../lib/engine/index.js'
+import type { Scope } from './main.js'
 
-export function start() {
-	if (!checkSizeRequirements()) return
+export const start: Scope = () => {
+	if (!checkSizeRequirements()) return null
 	emitKeypressEvents(stdin)
 	const rl = createInterface({ input: stdin, terminal: true })
 	rl.once('SIGINT', terminate)
@@ -65,8 +65,8 @@ export function start() {
 		rl.close()
 		socket.close()
 		stdout.write('Bye\n')
-		// exit(0)
 	}
+	return null
 }
 
 // rendering characters
@@ -106,7 +106,9 @@ function convertState(state: State): State {
 function checkSizeRequirements(): boolean {
 	const windowSize = stdout.getWindowSize() // [0]: width, [1]: height
 	if (windowSize[0] < TTY_WIDTH || windowSize[1] < TTY_HEIGHT) {
-		stdout.write(`Your terminal should be atleast ${TTY_WIDTH}:${TTY_HEIGHT} (current size: ${windowSize[0]}:${windowSize[1]}) for the game to render properly\n`)
+		stdout.write(
+			`Your terminal should be atleast ${TTY_WIDTH}:${TTY_HEIGHT} (current size: ${windowSize[0]}:${windowSize[1]}) for the game to render properly\n`,
+		)
 		return false
 	}
 	return true
@@ -123,7 +125,8 @@ function render(state: State) {
 			if (y === 0 && x === 0) line += CHAR_TOP_LEFT
 			else if (y === 0 && x === TTY_WIDTH - 1) line += CHAR_TOP_RIGHT
 			else if (y === TTY_HEIGHT - 1 && x === 0) line += CHAR_BOTTOM_LEFT
-			else if (y === TTY_HEIGHT - 1 && x === TTY_WIDTH - 1) line += CHAR_BOTTOM_RIGHT
+			else if (y === TTY_HEIGHT - 1 && x === TTY_WIDTH - 1)
+				line += CHAR_BOTTOM_RIGHT
 			else if (y === 0) line += CHAR_TOP
 			else if (y === TTY_HEIGHT - 1) line += CHAR_BOTTOM
 			else if (x === 0) line += CHAR_LEFT
@@ -146,11 +149,11 @@ function render(state: State) {
 		}
 	}
 	lastRender = currentRender
-	stdout.cursorTo(0, TTY_HEIGHT + 1);
+	stdout.cursorTo(0, TTY_HEIGHT + 1)
 }
 
 function renderScores(p1: number, p2: number) {
-	stdout.cursorTo(0, TTY_HEIGHT + 1);
+	stdout.cursorTo(0, TTY_HEIGHT + 1)
 	stdout.write(`Player 1: ${p1} | Player 2: ${p2}`)
 }
 

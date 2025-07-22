@@ -80,7 +80,7 @@ export type RoutesPost = {
 	'/auth/signup': { message: string; user: User }
 	'/auth/logout': { success: boolean }
 	'/tournaments/new': { success: boolean; tournamentId: number }
-	'/friendships/new': { success: boolean }
-	'/friendships/accept': { success: boolean }
+	'/friendships/new': { success: boolean; invitedUserId: number }
+	'/friendships/accept': { success: boolean; acceptedUserId: number }
 	'/friendships/delete': { success: boolean }
 }

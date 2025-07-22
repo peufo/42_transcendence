@@ -1,7 +1,24 @@
 import { exit } from 'node:process'
 import * as p from '@clack/prompts'
+import type { User } from '../lib/type.js'
+import { api, handleApiError } from './api.js'
+import type { Scope } from './main.js'
+import { menuMain } from './menuMain.js'
 
-export async function getHost(): Promise<string> {
+export const login: Scope = async () => {
+	const host = await getHost()
+	const options = await getSessionToken(host).catch((err) => console.log(err))
+	api.setOptions({ host, ...options })
+	return menuMain
+}
+
+export const logout: Scope = () => {
+	api.setOptions({})
+	p.log.success('Disconnected')
+	return menuMain
+}
+
+async function getHost(): Promise<string> {
 	const host = await p.text({
 		message: 'hostname ?',
 		placeholder: 'http://localhost:8000',
@@ -11,11 +28,13 @@ export async function getHost(): Promise<string> {
 	return host
 }
 
-export async function getSessionCookie(host: string): Promise<string> {
+async function getSessionToken(
+	host: string,
+): Promise<Partial<{ sessionToken: string; user: User }>> {
 	const name = await p.text({
 		message: 'username ?',
 		validate(value) {
-			if (value.length < 3) return 'Too short'
+			if (value.length < 2) return 'Too short'
 		},
 	})
 	if (p.isCancel(name)) exit(0)
@@ -39,21 +58,19 @@ export async function getSessionCookie(host: string): Promise<string> {
 			body: JSON.stringify({ name, password }),
 		})
 
-		if (!res.ok) {
-			const json = await res.json()
-			throw new Error(json.message || 'Authentification refused')
-		}
+		if (!res.ok) await handleApiError(res)
 
 		const [cookie] = res.headers.getSetCookie()
 		if (!cookie) throw new Error('Cookie no setted')
-		const [sessionCookie] = cookie.split(' ')
-		if (!sessionCookie || !sessionCookie.startsWith('session='))
+		const [sessionToken] = cookie.split(' ')
+		if (!sessionToken || !sessionToken.startsWith('session='))
 			throw new Error('cookie "session" not found')
-		s.stop('Connected with success')
-		return sessionCookie.slice(0, -1)
+		const { user } = (await res.json()) as { user: User }
+		s.stop(`Hello ${user.name} 👋`)
+		return { sessionToken: sessionToken.slice(0, -1), user }
 	} catch (error: unknown) {
 		if (error instanceof Error) s.stop(error.message, 1)
 		else s.stop('Unkown error', 1)
-		exit()
+		return {}
 	}
 }
