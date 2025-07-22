@@ -1,7 +1,7 @@
-import { and, eq, or } from 'drizzle-orm'
-import type { Friend, Friendship, UserBasic } from '../../lib/type.js'
-import { db, friendships, users } from '../db/index.js'
-import type { DB } from '../types.ts'
+import { and, eq, not, or } from 'drizzle-orm'
+import type { Friend, Friendship, UserBasic } from '../../../lib/type.js'
+import { db, friendships, users } from '../../db/index.js'
+import type { DB } from '../../types.ts'
 
 export const userBasicColumns = {
 	id: true,
@@ -19,7 +19,7 @@ const friendColumns = {
 
 export async function getFriendships(
 	userId: number,
-	state?: DB.Friendship['state'],
+	state?: DB.FriendshipCreate['state'],
 ): Promise<Friendship[]> {
 	return db.query.friendships
 		.findMany({
@@ -57,4 +57,39 @@ export async function getUserBasic(userId: number) {
 		where: eq(users.id, userId),
 		columns: userBasicColumns,
 	})
+}
+
+export async function createFriendship(data: DB.FriendshipCreate) {
+	const [friendship] = await db.insert(friendships).values(data).returning()
+	return friendship
+}
+
+export async function acceptFriendship(
+	friendshipId: number,
+	invitedUserId: number,
+) {
+	const [friendship] = await db
+		.update(friendships)
+		.set({ state: 'friend' })
+		.where(
+			and(
+				eq(friendships.id, friendshipId),
+				eq(friendships.state, 'invited'),
+				not(eq(friendships.createdBy, invitedUserId)),
+				or(
+					eq(friendships.user1Id, invitedUserId),
+					eq(friendships.user2Id, invitedUserId),
+				),
+			),
+		)
+		.returning()
+	return friendship
+}
+
+export async function deleteFriendship(friendshipId: number) {
+	const [friendship] = await db
+		.delete(friendships)
+		.where(eq(friendships.id, friendshipId))
+		.returning()
+	return friendship
 }

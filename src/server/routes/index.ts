@@ -1,7 +1,7 @@
 import fp from 'fastify-plugin'
 import { authHook } from './auth/hooks.js'
 import { authRoute } from './auth/index.js'
-import { friendshipsRoute } from './friendship.js'
+import { friendshipsRoute } from './friendships/index.js'
 import { tournamentsRoute } from './tournaments/index.js'
 import { statsRoute } from './userStats.js'
 import { usersRoute } from './users.js'

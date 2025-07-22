@@ -1,12 +1,16 @@
 import argon2 from 'argon2'
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { removeSessionEvent } from '../../events/session.js'
-import { getSchema, postSchema } from '../../utils/schema.js'
+import { getSchema, permission, postSchema } from '../../utils/index.js'
 import { setSessionCookie } from './controller.js'
 import { createUser, getAuthUser } from './model.js'
 import { authSchema } from './schema.js'
 
 export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
+	server.get('/user', getSchema('/auth/user'), async (_req, res) => {
+		return res.send({ data: res.locals?.user })
+	})
+
 	server.post(
 		'/login',
 		postSchema('/auth/login', authSchema),
@@ -33,16 +37,11 @@ export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 		},
 	)
 	server.post('/logout', postSchema('/auth/logout'), async (_req, res) => {
-		const sessionId = res.locals?.sessionId
-		if (!sessionId) return res.code(401).send()
+		const sessionId = permission.sessionId(res)
 		removeSessionEvent(sessionId)
 		const now = new Date()
 		res.setCookie('session', '', { path: '/', expires: now })
 		res.send({ success: true })
-	})
-
-	server.get('/user', getSchema('/auth/user'), async (_req, res) => {
-		return res.send({ data: res.locals?.user })
 	})
 
 	done()

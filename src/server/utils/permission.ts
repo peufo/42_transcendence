@@ -8,4 +8,9 @@ export const permission = {
 		if (!user) throw server.httpErrors.unauthorized()
 		return user
 	},
+	sessionId(res: FastifyReply): string {
+		const sessionId = res.locals?.sessionId
+		if (!sessionId) throw server.httpErrors.unauthorized()
+		return sessionId
+	},
 }

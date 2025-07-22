@@ -3,7 +3,7 @@ import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod/v4'
 import { db, users } from '../db/index.js'
 import '@fastify/cookie'
-import { getFriendships } from '../models/friendships.js'
+import { getFriendships } from './friendships/model.js'
 
 export const usersRoute: FastifyPluginCallbackZod = (
 	server,

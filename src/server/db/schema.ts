@@ -94,7 +94,9 @@ export const matchesRelations = relations(matches, ({ one }) => ({
 export const tournaments = sqliteTable('tournaments', {
 	id: int().primaryKey({ autoIncrement: true }),
 	numberOfPlayers: int().notNull(),
-	state: text({ enum: ['open', 'ongoing', 'finished'] }).notNull(),
+	state: text({ enum: ['open', 'ongoing', 'finished'] })
+		.notNull()
+		.default('open'),
 	createdAt: int({ mode: 'timestamp' }).notNull().default(new Date()),
 	createdBy: int()
 		.notNull()
