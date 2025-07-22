@@ -1,11 +1,11 @@
 import { eq } from 'drizzle-orm'
-import type z from 'zod/v4'
 import { db, tournaments } from '../../db/index.js'
 import { userBasicColumns } from '../../models/friendships.js'
+import type { ZodData } from '../../utils.js'
 import type { tournamentSchema } from './schema.js'
 
 export async function createTournament(
-	data: { createdBy: number } & z.infer<z.ZodObject<typeof tournamentSchema>>,
+	data: ZodData<typeof tournamentSchema, { createdBy: number }>,
 ) {
 	const [tournament] = await db
 		.insert(tournaments)
