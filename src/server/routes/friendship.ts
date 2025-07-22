@@ -3,7 +3,6 @@ import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod/v4'
 import { db, friendships } from '../db/index.js'
 import '@fastify/cookie'
-import '../types.js'
 import { notifyUser } from '../events/session.js'
 import {
 	getFriendships,

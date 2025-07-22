@@ -62,7 +62,7 @@ export type Tournament = {
 }
 
 export type RoutesGet = {
-	'/auth/user': User
+	'/auth/user': User | undefined
 	'/users': UserBasic[] // TODO: /users/notMyFriends
 	'/friendships': Friendship[]
 	'/userstats': Match[]

@@ -1,6 +1,6 @@
 import fp from 'fastify-plugin'
-import { sessionHook } from '../controllers/hooks.js'
-import { authRoute } from './auth.js'
+import { authHook } from './auth/hooks.js'
+import { authRoute } from './auth/index.js'
 import { friendshipsRoute } from './friendship.js'
 import { tournamentsRoute } from './tournaments/index.js'
 import { statsRoute } from './userStats.js'
@@ -8,7 +8,7 @@ import { usersRoute } from './users.js'
 import { wsRoute } from './ws.js'
 
 export default fp((server, _options, done) => {
-	server.addHook('preHandler', sessionHook)
+	server.addHook('preHandler', authHook)
 	server.register(authRoute, { prefix: '/auth' })
 	server.register(usersRoute, { prefix: '/users' })
 	server.register(friendshipsRoute, { prefix: '/friendships' })

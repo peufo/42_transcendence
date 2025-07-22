@@ -14,7 +14,7 @@ export const tournamentsRoute: FastifyPluginCallbackZod = (
 		'/new',
 		postSchema('/tournaments/new', tournamentSchema),
 		async (req, res) => {
-			const user = permission.authenticated(res)
+			const user = permission.user(res)
 			const tournament = await createTournament({
 				...req.body,
 				createdBy: user.id,
@@ -27,7 +27,7 @@ export const tournamentsRoute: FastifyPluginCallbackZod = (
 		'/',
 		getSchema('/tournaments', { id: z.coerce.number() }),
 		async (req, res) => {
-			permission.authenticated(res)
+			permission.user(res)
 			const { id } = req.query
 			const tournament = await getTournament(id)
 			return res.send({ data: tournament })

@@ -4,7 +4,7 @@ import type { RoutesGet, RoutesPost } from '../../lib/type.js'
 export function postSchema<
 	R extends keyof RoutesPost,
 	BodyShape extends z.ZodRawShape,
->(_url: R, bodyShape: BodyShape) {
+>(_url: R, bodyShape?: BodyShape) {
 	return {
 		schema: {
 			body: z.object(bodyShape),

@@ -1,7 +1,7 @@
 import { and, eq, or } from 'drizzle-orm'
 import type { Friend, Friendship, UserBasic } from '../../lib/type.js'
 import { db, friendships, users } from '../db/index.js'
-import type { DB } from '../types.js'
+import type { DB } from '../types.ts'
 
 export const userBasicColumns = {
 	id: true,

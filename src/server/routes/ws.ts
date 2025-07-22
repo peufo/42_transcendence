@@ -1,7 +1,7 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import type { SessionEvent } from '../../lib/type.js'
-import { getSessionFromRequest } from '../controllers/hooks.js'
 import { createSessionEvent } from '../events/session.js'
+import { getSessionFromRequest } from './auth/hooks.js'
 
 const sessionsEventKeys: (keyof SessionEvent)[] = [
 	'onFriendshipCreated',

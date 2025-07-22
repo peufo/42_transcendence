@@ -1,8 +1,7 @@
 import type { FastifyRequest, preHandlerAsyncHookHandler } from 'fastify'
-import { db } from '../db/index.js'
-import { validateSessionToken } from './session.js'
-import '@fastify/cookie'
-import type { DB } from '../types.js'
+import { db } from '../../db/index.js'
+import type { DB } from '../../types.ts'
+import { validateSessionToken } from './controller.js'
 
 export async function getSessionFromRequest(
 	req: FastifyRequest,
@@ -16,7 +15,7 @@ export async function getSessionFromRequest(
 	return validateSessionToken(sessionToken)
 }
 
-export const sessionHook: preHandlerAsyncHookHandler = async (req, res) => {
+export const authHook: preHandlerAsyncHookHandler = async (req, res) => {
 	try {
 		const session = await getSessionFromRequest(req)
 		if (!session) return

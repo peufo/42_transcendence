@@ -1,4 +1,4 @@
-import type { ApiPostOptionValidation } from './routes.ts'
+import type { ApiPostOptionValidation } from './routes.js'
 
 export const validationSignup: ApiPostOptionValidation = (form) => {
 	const formData = new FormData(form)

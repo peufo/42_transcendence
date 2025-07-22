@@ -1,8 +1,8 @@
 import argon2 from 'argon2'
 import { drizzle } from 'drizzle-orm/libsql'
 import { seed } from 'drizzle-seed'
-import { createAvatarPlaceholder } from '../controllers/avatar.js'
 import { env } from '../env.js'
+import { createAvatarPlaceholder } from '../routes/auth/model.js'
 import { friendships, matches, rounds, users } from './schema.js'
 
 async function main() {
