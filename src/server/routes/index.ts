@@ -4,7 +4,7 @@ import { authRoute } from './auth/index.js'
 import { friendshipsRoute } from './friendships/index.js'
 import { tournamentsRoute } from './tournaments/index.js'
 import { statsRoute } from './userStats.js'
-import { usersRoute } from './users.js'
+import { usersRoute } from './users/index.js'
 import { wsRoute } from './ws.js'
 
 export default fp((server, _options, done) => {
