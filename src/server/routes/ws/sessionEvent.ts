@@ -1,7 +1,7 @@
 import { EventEmitter } from 'node:events'
 import { eq } from 'drizzle-orm'
-import type { SessionEvent } from '../../lib/type.js'
-import { db, sessions } from '../db/index.js'
+import type { SessionEvent } from '../../../lib/type.js'
+import { db, sessions } from '../../db/index.js'
 
 type EventMap<T extends Record<string, unknown>> = { [K in keyof T]: [T[K]] }
 type SessionEventEmitter = EventEmitter<EventMap<SessionEvent>>

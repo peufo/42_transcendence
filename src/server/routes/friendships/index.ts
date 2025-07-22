@@ -1,7 +1,7 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod/v4'
-import { notifyUser } from '../../events/session.js'
 import { getSchema, permission, postSchema } from '../../utils/index.js'
+import { notifyUser } from '../ws/sessionEvent.js'
 import {
 	acceptFriendship,
 	createFriendship,

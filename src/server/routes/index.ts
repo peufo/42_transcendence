@@ -5,7 +5,7 @@ import { friendshipsRoute } from './friendships/index.js'
 import { tournamentsRoute } from './tournaments/index.js'
 import { statsRoute } from './userStats/index.js'
 import { usersRoute } from './users/index.js'
-import { wsRoute } from './ws.js'
+import { wsRoute } from './ws/index.js'
 
 export default fp((server, _options, done) => {
 	server.addHook('preHandler', authHook)

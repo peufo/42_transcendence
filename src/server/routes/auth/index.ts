@@ -1,7 +1,7 @@
 import argon2 from 'argon2'
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
-import { removeSessionEvent } from '../../events/session.js'
 import { getSchema, permission, postSchema } from '../../utils/index.js'
+import { removeSessionEvent } from '../ws/sessionEvent.js'
 import { setSessionCookie } from './controller.js'
 import { createUser, getAuthUser } from './model.js'
 import { authSchema } from './schema.js'
