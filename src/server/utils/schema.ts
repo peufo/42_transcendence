@@ -1,5 +1,5 @@
 import z from 'zod/v4'
-import type { RoutesGet, RoutesPost } from '../lib/type.js'
+import type { RoutesGet, RoutesPost } from '../../lib/type.js'
 
 export function postSchema<
 	R extends keyof RoutesPost,

@@ -2,6 +2,7 @@ import path from 'node:path'
 import fastifyCookie from '@fastify/cookie'
 import fastifyFormbody from '@fastify/formbody'
 import fastifyMultipart from '@fastify/multipart'
+import fastifySensible from '@fastify/sensible'
 import fastifyStatic from '@fastify/static'
 import fastifyWebsocket from '@fastify/websocket'
 import fastify from 'fastify'
@@ -15,12 +16,13 @@ import { env } from './env.js'
 import routes from './routes/index.js'
 import { engineInputSchema } from './schemas/engine.js'
 
-const server = fastify()
+export const server = fastify()
 server.setValidatorCompiler(validatorCompiler)
 server.setSerializerCompiler(serializerCompiler)
 server.register(fastifyWebsocket)
 server.register(fastifyFormbody)
 server.register(fastifyMultipart)
+server.register(fastifySensible)
 server.register(fastifyCookie, {
 	secret: env.COOKIE_SECRET,
 })

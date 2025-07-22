@@ -1,7 +1,8 @@
 import { eq } from 'drizzle-orm'
 import { db, tournaments } from '../../db/index.js'
+import { server } from '../../main.js'
 import { userBasicColumns } from '../../models/friendships.js'
-import type { ZodData } from '../../utils.js'
+import type { ZodData } from '../../utils/index.js'
 import type { tournamentSchema } from './schema.js'
 
 export async function createTournament(
@@ -24,6 +25,6 @@ export async function getTournament(id: number) {
 			},
 		},
 	})
-	if (!tournament) throw Error('Tournament not found') // TODO: HTTP error
+	if (!tournament) throw server.httpErrors.notFound()
 	return tournament
 }
