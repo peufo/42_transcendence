@@ -172,7 +172,7 @@ export const versusRelations = relations(versus, ({ one }) => ({
 
 export const rounds = sqliteTable('rounds', {
 	id: int().primaryKey({ autoIncrement: true }),
-	scorer: text({ enum: ['p1', 'p2'] }),
+	scorer: text({ enum: ['p1', 'p2'] }).notNull(),
 	rallyCount: int().notNull(),
 	ballPositionY: int().notNull(),
 	matchId: int().references(() => matches.id),

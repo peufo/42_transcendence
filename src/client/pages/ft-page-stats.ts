@@ -49,7 +49,7 @@ customElements.define(
 			const matchesHead = matches.slice(0, 5)
 			const user = $user.get()
 			if (!user) return ''
-			let adversary: UserBasic
+
 			let html = /*html*/ `
 				<h2 class="flex flex-row p-2 items-center justify-center gap-2">Recent matches</h2>
 			`
