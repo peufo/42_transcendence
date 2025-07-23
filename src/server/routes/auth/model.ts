@@ -4,10 +4,10 @@ import type { RoutesPost } from '../../../lib/type.js'
 import { db, users } from '../../db/index.js'
 
 export async function getAuthUser(name: string) {
-        const result = await db.query.users.findFirst({
-                where: eq(users.name, name),
-        })
-        return result
+	const result = await db.query.users.findFirst({
+		where: eq(users.name, name),
+	})
+	return result
 }
 
 export async function createUser(data: RoutesPost['/auth/signup']['body']) {

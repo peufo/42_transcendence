@@ -1,8 +1,8 @@
 customElements.define(
-  'ft-page-login',
-  class extends HTMLElement {
-    connectedCallback() {
-      this.innerHTML = /*html*/ `
+	'ft-page-login',
+	class extends HTMLElement {
+		connectedCallback() {
+			this.innerHTML = /*html*/ `
         <div class="flex items-center justify-center min-h-screen bg-gradient-to-r from-cyan-200 via-blue-200 to-blue-900
 ">
           <div class="relative flex flex-col justify-center shadow-lg rounded-2xl bg-blue-900
@@ -67,8 +67,7 @@ customElements.define(
 
           </div>
         </div>
-      `;
-    }
-  }
-);
-
+      `
+		}
+	},
+)
