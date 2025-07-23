@@ -4,10 +4,11 @@ import { db, users } from '../../db/index.js'
 import type { ZodData } from '../../utils/schema.js'
 import type { authSchema } from './schema.js'
 
-export function getAuthUser(name: string) {
-	return db.query.users.findFirst({
-		where: eq(users.name, name),
-	})
+export async function getAuthUser(name: string) {
+        const result = await db.query.users.findFirst({
+                where: eq(users.name, name),
+        })
+        return result
 }
 
 export async function createUser(data: ZodData<typeof authSchema>) {

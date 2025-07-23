@@ -1,4 +1,5 @@
-import { exit, stdin, stdout } from 'node:process'
+//import { exit} from 'node:process'
+import { stdin, stdout } from 'node:process'
 import { createInterface, emitKeypressEvents } from 'node:readline'
 import {
 	ARENA_HEIGHT,
