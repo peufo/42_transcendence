@@ -1,4 +1,4 @@
-import { exit, stdin, stdout } from 'node:process'
+import { stdin, stdout } from 'node:process'
 import { createInterface, emitKeypressEvents } from 'node:readline'
 import {
 	ARENA_HEIGHT,
@@ -13,11 +13,15 @@ import {
 	type Player,
 	type State,
 } from '../lib/engine/index.js'
+import type { Scope } from './main.js'
 
-export function start() {
+export const start: Scope = () => {
+	if (!checkSizeRequirements()) return null
 	emitKeypressEvents(stdin)
 	const rl = createInterface({ input: stdin, terminal: true })
 	rl.once('SIGINT', terminate)
+	stdout.write('\x1bc')
+	renderScores(0, 0)
 	const socket = connectEngine()
 	const setInput = (player: Player, move: Move, value: boolean) => {
 		socket.send(JSON.stringify({ player, move, value }))
@@ -54,70 +58,32 @@ export function start() {
 	})
 
 	stdout.on('resize', () => {
-		if (!checkSizeRequirements()) terminate() // handle
+		if (!checkSizeRequirements()) terminate()
 	})
 
 	function terminate() {
 		rl.close()
 		socket.close()
-		stdout.write('Bye')
-		exit(0)
+		stdout.write('Bye\n')
 	}
+	return null
 }
 
-const horizontal = '─'
-const vertical = '│'
-const topLeft = '┌'
-const topRight = '┐'
-const bottomLeft = '└'
-const bottomRight = '┘'
-const ball = '●'
+// rendering characters
+const CHAR_TOP = '▀'
+const CHAR_BOTTOM = '▄'
+const CHAR_LEFT = '▌'
+const CHAR_RIGHT = '▐'
+const CHAR_TOP_LEFT = '▛'
+const CHAR_TOP_RIGHT = '▜'
+const CHAR_BOTTOM_LEFT = '▙'
+const CHAR_BOTTOM_RIGHT = '▟'
+const CHAR_BALL = '■'
+const CHAR_PADDLE = '█'
 
-function checkSizeRequirements(): boolean {
-	const windowSize = stdout.getWindowSize() // 0: width, 1: height
-	if (windowSize[0] < ARENA_WIDTH / 10 || windowSize[1] < ARENA_HEIGHT / 20)
-		return false
-	return true
-}
-
-// function render(state: State) {
-// 	const width = Math.floor(ARENA_WIDTH / 10)
-// 	const height = Math.floor(ARENA_HEIGHT / 20)
-// 	stdout.write('\x1bc') // clear screen
-// 	let str = ''
-// 	for (let y = 0; y < height; y++) {
-// 		for (let x = 0; x < width; x++) {
-// 			if (y === 0 && x === 0) str += topLeft
-// 			else if (y === 0 && x === width - 1) str += topRight
-// 			else if (y === height - 1 && x === 0) str += bottomLeft
-// 			else if (y === height - 1 && x === width - 1) str += bottomRight
-// 			else if (y === 0 || y === height - 1) str += horizontal
-// 			else if (x === 0 || x === width - 1) str += vertical
-// 			else if (
-// 				(x ===
-// 					Math.floor((PADDLE_BASE_P1_POSITION.x + PADDLE_BASE_WIDTH) / 10) &&
-// 					y >= Math.floor(state.p1 / 20) &&
-// 					y <= Math.floor((state.p1 + PADDLE_BASE_HEIGHT) / 20)) ||
-// 				(x === Math.floor(PADDLE_BASE_P2_POSITION.x / 10) &&
-// 					y >= Math.floor(state.p2 / 20) &&
-// 					y <= Math.floor((state.p2 + PADDLE_BASE_HEIGHT) / 20))
-// 			)
-// 				str += vertical
-// 			else if (
-// 				x === Math.floor(state.b.x / 10) &&
-// 				y === Math.floor(state.b.y / 20)
-// 			)
-// 				str += ball
-// 			else str += ' '
-// 		}
-// 		str += '\n'
-// 	}
-// 	stdout.write(str)
-// }
-
+// conversion to terminal sizes
 const X_DIVIDER = 10
 const Y_DIVIDER = 20
-
 const TTY_WIDTH = Math.floor(ARENA_WIDTH / X_DIVIDER)
 const TTY_HEIGHT = Math.floor(ARENA_HEIGHT / Y_DIVIDER)
 const TTY_PADDLE_HEIGHT = Math.floor(PADDLE_BASE_HEIGHT / Y_DIVIDER)
@@ -137,54 +103,62 @@ function convertState(state: State): State {
 	}
 }
 
-let lastFrame: string[] = []
-let lastState: State | null = null
+function checkSizeRequirements(): boolean {
+	const windowSize = stdout.getWindowSize() // [0]: width, [1]: height
+	if (windowSize[0] < TTY_WIDTH || windowSize[1] < TTY_HEIGHT) {
+		stdout.write(
+			`Your terminal should be atleast ${TTY_WIDTH}:${TTY_HEIGHT} (current size: ${windowSize[0]}:${windowSize[1]}) for the game to render properly\n`,
+		)
+		return false
+	}
+	return true
+}
+
+let lastRender: string[] = []
 
 function render(state: State) {
-	if (state === lastState) {
-		console.log('bite')
-		return
-	}
-	const currentFrame: string[] = []
+	const currentRender: string[] = []
 
-	let frameStr = ''
 	for (let y = 0; y < TTY_HEIGHT; y++) {
 		let line = ''
 		for (let x = 0; x < TTY_WIDTH; x++) {
-			if (y === 0 && x === 0) line += topLeft
-			else if (y === 0 && x === TTY_WIDTH - 1) line += topRight
-			else if (y === TTY_HEIGHT - 1 && x === 0) line += bottomLeft
-			else if (y === TTY_HEIGHT - 1 && x === TTY_WIDTH - 1) line += bottomRight
-			else if (y === 0 || y === TTY_HEIGHT - 1) line += horizontal
-			else if (x === 0 || x === TTY_WIDTH - 1) line += vertical
+			if (y === 0 && x === 0) line += CHAR_TOP_LEFT
+			else if (y === 0 && x === TTY_WIDTH - 1) line += CHAR_TOP_RIGHT
+			else if (y === TTY_HEIGHT - 1 && x === 0) line += CHAR_BOTTOM_LEFT
+			else if (y === TTY_HEIGHT - 1 && x === TTY_WIDTH - 1)
+				line += CHAR_BOTTOM_RIGHT
+			else if (y === 0) line += CHAR_TOP
+			else if (y === TTY_HEIGHT - 1) line += CHAR_BOTTOM
+			else if (x === 0) line += CHAR_LEFT
+			else if (x === TTY_WIDTH - 1) line += CHAR_RIGHT
 			else if (
 				(x === TTY_P1_X &&
 					y >= state.p1 &&
 					y <= state.p1 + TTY_PADDLE_HEIGHT) ||
 				(x === TTY_P2_X && y >= state.p2 && y <= state.p2 + TTY_PADDLE_HEIGHT)
 			)
-				line += vertical
-			else if (x === state.b.x && y === state.b.y) line += ball
+				line += CHAR_PADDLE
+			else if (x === state.b.x && y === state.b.y) line += CHAR_BALL
 			else line += ' '
 		}
-		currentFrame.push(line)
+		currentRender.push(line)
 
-		if (!lastFrame[y] || lastFrame[y] !== line) {
-			frameStr += `\x1b[${y + 1};1H${line}`
+		if (!lastRender[y] || lastRender[y] !== line) {
+			stdout.cursorTo(0, y)
+			stdout.write(line)
 		}
 	}
+	lastRender = currentRender
+	stdout.cursorTo(0, TTY_HEIGHT + 1)
+}
 
-	if (!lastFrame.length) {
-		frameStr = `\x1b[1;1H${frameStr}`
-	}
-
-	stdout.write(frameStr)
-	lastFrame = currentFrame
-	lastState = state
+function renderScores(p1: number, p2: number) {
+	stdout.cursorTo(0, TTY_HEIGHT + 1)
+	stdout.write(`Player 1: ${p1} | Player 2: ${p2}`)
 }
 
 function connectEngine(): WebSocket {
-	const socket = new WebSocket('ws://localhost:8000/ws')
+	const socket = new WebSocket('ws://localhost:8000/ws') // use correct address
 	socket.addEventListener('message', (event) => {
 		const data: EngineEventData = JSON.parse(event.data)
 		const newState = data[EVENT_TYPE.TICK]
@@ -193,7 +167,7 @@ function connectEngine(): WebSocket {
 			render(convertState(newState))
 		}
 		if (newScores) {
-			console.log(newScores)
+			renderScores(newScores.p1, newScores.p2)
 		}
 	})
 	return socket

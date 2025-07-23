@@ -1,18 +1,4 @@
 import { api } from '../api.js'
-import { createEffect, createSignal } from '../utils/signal.js'
-import { slide, transitionIn, transitionOut } from '../utils/transition.js'
-import './ft-page-404.js'
-import './ft-page-index.js'
-import './ft-page-me.js'
-import './ft-page-login.js'
-import './ft-page-signup.js'
-import './ft-page-stats.js'
-import './ft-page-account.js'
-import './ft-page-local-new.js'
-import './ft-page-local-play.js'
-import './ft-page-game-new.js'
-import './ft-page-game-play.js'
-import './ft-page-local-play-babylon.js'
 import {
 	API_GET,
 	API_POST,
@@ -23,34 +9,46 @@ import {
 	type RouteApiPost,
 	type RoutePage,
 } from '../routes.js'
-import { getUser } from '../utils/store.js'
+import {
+	type CleanEffect,
+	createEffect,
+	createSignal,
+} from '../utils/signal.js'
+import { $user } from '../utils/store.js'
+import { stringToDate } from '../utils/stringToDate.js'
+import { slide, transitionIn, transitionOut } from '../utils/transition.js'
 import { toast } from './ft-toast.js'
 
-const [getUrl, setUrl] = createSignal<URL>(new URL(document.location.href))
+const $url = createSignal<URL>(new URL(document.location.href))
 
 function goto(url: URL) {
 	window.history.pushState({}, '', url)
-	setUrl(url)
+	$url.set(url)
 }
 
 function onPopState() {
-	setUrl(new URL(document.location.href))
+	$url.set(new URL(document.location.href))
 }
 
 customElements.define(
 	'ft-router',
 	class extends HTMLElement {
+		private cleanEffect: CleanEffect
+
 		connectedCallback() {
 			document.addEventListener('submit', onSubmitForm)
 			document.addEventListener('click', onClickLink)
 			window.addEventListener('popstate', onPopState)
-			createEffect(async () => {
-				const url = getUrl()
+			this.cleanEffect = createEffect(async () => {
+				const url = $url.get()
 				const page = this.getPage(url.pathname)
+
 				if (page.layoutData) {
-					await Promise.all(page.layoutData.map((route) => api.get(route)))
+					await Promise.all(
+						page.layoutData.map((route) => api.get(route, url.search.slice(1))),
+					)
 				}
-				const user = getUser()
+				const user = $user.get()
 				if (!page.isPublic && !user) {
 					return goto(
 						new URL(`/login?redirectTo=${url.pathname}`, document.baseURI),
@@ -60,12 +58,18 @@ customElements.define(
 					return goto(new URL(`/me`, document.baseURI))
 				}
 				if (page.pageData) {
-					await Promise.all(page.pageData.map((route) => api.get(route)))
+					await Promise.all(
+						page.pageData.map((route) => api.get(route, url.search.slice(1))),
+					)
 				}
 				this.innerHTML = /*html*/ `
 					<${page.component}></${page.component}>
 				`
 			})
+		}
+
+		disconnectedCallback() {
+			this.cleanEffect()
 		}
 
 		getPage(pathname: string): PageOption {
@@ -114,11 +118,12 @@ async function onSubmitForm(event: SubmitEvent) {
 	event.preventDefault()
 	const form = event.target as HTMLFormElement
 	const route = new URL(form.action).pathname
-	const options = API_POST[route as RouteApiPost] as ApiPostOption
 	if (form.method === 'get') {
 		if (!(route in API_GET)) throw new Error(`route "${route}" not exist`)
 		return api.get(route as RouteApiGet, getFormQuery(new FormData(form)))
 	}
+	const options = API_POST[route as RouteApiPost] as ApiPostOption<unknown>
+	if (!options) throw new Error(`route "${route}" not exist`)
 
 	if (options.validation) {
 		const errors = options.validation(form)
@@ -150,10 +155,10 @@ async function onSubmitForm(event: SubmitEvent) {
 		console.log('TODO: comportement par défaut')
 		return
 	}
-
+	stringToDate(json)
 	options.onSuccess?.(json)
 	if (options.redirectTo) {
-		const pathname = options.redirectTo()
+		const pathname = options.redirectTo(json)
 		return goto(new URL(pathname, document.location.origin))
 	}
 	if (options.invalidate) {

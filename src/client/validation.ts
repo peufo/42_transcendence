@@ -1,11 +1,9 @@
-import type { ApiPostOption } from './routes.ts'
+import type { ApiPostOptionValidation } from './routes.js'
 
-type Validation = ApiPostOption['validation']
-
-export const validationSignup: Validation = (form) => {
+export const validationSignup: ApiPostOptionValidation = (form) => {
 	const formData = new FormData(form)
 	const password = formData.get('password')
-	const passwordComfirm = formData.get('confirm')
-	if (password !== passwordComfirm) return { confirm: 'Password is different' }
+	const passwordConfirm = formData.get('confirm')
+	if (password !== passwordConfirm) return { confirm: 'Password is different' }
 	return null
 }

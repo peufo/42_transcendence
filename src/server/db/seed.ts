@@ -1,9 +1,15 @@
 import argon2 from 'argon2'
 import { drizzle } from 'drizzle-orm/libsql'
 import { seed } from 'drizzle-seed'
-import { createAvatarPlaceholder } from '../controllers/avatar.js'
 import { env } from '../env.js'
-import { friendships, matches, rounds, users } from './schema.js'
+import { createAvatarPlaceholder } from '../routes/auth/model.js'
+import {
+	friendships,
+	matches,
+	rounds,
+	roundsRelations,
+	users,
+} from './schema.js'
 
 async function main() {
 	const db = drizzle(env.DB_FILE_NAME)
@@ -26,6 +32,7 @@ async function main() {
 		},
 	}))
 
+	const FRIENDSHIP_COUNT = 15
 	await seed(db, { friendships }).refine((f) => ({
 		friendships: {
 			columns: {
@@ -33,7 +40,8 @@ async function main() {
 					defaultValue: 2,
 				}),
 				user2Id: f.valuesFromArray({
-					values: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20],
+					values: new Array(FRIENDSHIP_COUNT).fill(0).map((_, i) => i + 3),
+					isUnique: true,
 				}),
 				state: f.valuesFromArray({
 					values: ['invited', 'friend'],
@@ -42,15 +50,22 @@ async function main() {
 					defaultValue: 2,
 				}),
 			},
-			count: 3,
+			count: FRIENDSHIP_COUNT,
 		},
 	}))
 
-	await seed(db, { matches }).refine((f) => ({
+	await db.insert(friendships).values({
+		user1Id: 2,
+		user2Id: 20,
+		createdBy: 20,
+		state: 'invited',
+	})
+
+	await seed(db, { matches, roundsRelations }).refine((f) => ({
 		matches: {
 			columns: {
-				player1Id: f.valuesFromArray({
-					values: [2],
+				player1Id: f.default({
+					defaultValue: 2,
 				}),
 				player2Id: f.valuesFromArray({
 					values: [11, 12, 13, 14, 15, 16, 17, 18, 19],
@@ -60,9 +75,6 @@ async function main() {
 				}),
 				player2Score: f.valuesFromArray({
 					values: [0, 1, 2, 3, 4, 5],
-				}),
-				botDifficulty: f.valuesFromArray({
-					values: ['Baby', 'Kevin', 'Terminator'],
 				}),
 				pointsToWin: f.default({
 					defaultValue: 5,
@@ -80,34 +92,36 @@ async function main() {
 				}),
 				rallyCount: f.int({
 					minValue: 2,
-					maxValue: 80,
+					maxValue: 12,
 				}),
-				ballPositionY: f.int({
-					minValue: 0,
-					maxValue: 100,
-				}),
-				matchdId: f.valuesFromArray({
-					values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-				}),
+				ballPositionY: f.weightedRandom([
+					{
+						weight: 0.2,
+						value: f.int({ minValue: 30, maxValue: 60 }),
+					},
+					{
+						weight: 0.4,
+						value: f.int({ minValue: 61, maxValue: 99 }),
+					},
+					{
+						weight: 0.4,
+						value: f.int({ minValue: 0, maxValue: 29 }),
+					},
+				]),
 				gamestates: f.default({
 					defaultValue: '',
 				}),
 				arenaSettings: f.default({
 					defaultValue: '',
 				}),
+				matchId: f.valuesFromArray({
+					values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+				}),
 			},
+			count: 1000,
 		},
+		count: 10,
 	}))
-
-	const invits = [3, 6, 9, 10, 13, 14]
-	for (const invitId of invits) {
-		await db.insert(friendships).values({
-			user1Id: 2,
-			user2Id: invitId,
-			state: 'invited',
-			createdBy: invitId,
-		})
-	}
 }
 
 main()

@@ -1,5 +1,5 @@
-import { createEffect } from '../utils/signal.js'
-import { getUser } from '../utils/store.js'
+import { type CleanEffect, createEffect } from '../utils/signal.js'
+import { $user } from '../utils/store.js'
 
 customElements.define(
 	'ft-header',
@@ -20,14 +20,20 @@ customElements.define(
 customElements.define(
 	'ft-user-menu',
 	class extends HTMLElement {
+		private cleanEffect: CleanEffect
+
 		connectedCallback() {
-			createEffect(() => {
+			this.cleanEffect = createEffect(() => {
 				this.innerHTML = this.render()
 			})
 		}
 
+		disconnectedCallback() {
+			this.cleanEffect()
+		}
+
 		render(): string {
-			const user = getUser()
+			const user = $user.get()
 
 			if (!user) {
 				return /*html*/ `

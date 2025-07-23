@@ -17,6 +17,7 @@ export const users = sqliteTable('users', {
 	createdAt: int({ mode: 'timestamp' }).notNull().default(new Date()),
 	lastLogin: int({ mode: 'timestamp' }).notNull().default(new Date()),
 	isActive: int({ mode: 'boolean' }).notNull().default(false),
+	numberOfGoals: int().notNull().default(0),
 })
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -44,7 +45,9 @@ export const friendships = sqliteTable(
 		user2Id: int()
 			.notNull()
 			.references(() => users.id),
-		state: text({ enum: ['invited', 'friend'] }).default('invited'),
+		state: text({ enum: ['invited', 'friend'] })
+			.default('invited')
+			.notNull(),
 		createdBy: int()
 			.notNull()
 			.references(() => users.id),
@@ -76,48 +79,70 @@ export const matches = sqliteTable('matches', {
 	player1Id: int()
 		.notNull()
 		.references(() => users.id),
-	player2Id: int().references(() => users.id),
+	player2Id: int()
+		.notNull()
+		.references(() => users.id),
 	player1Score: int().default(0),
 	player2Score: int().default(0),
-	botDifficulty: text({ enum: ['Baby', 'Kevin', 'Terminator'] })
-		.notNull()
-		.default('Kevin'),
 	finishedAt: int({ mode: 'timestamp' }),
 	pointsToWin: int().notNull(),
 })
 
-export const matchesRelations = relations(matches, ({ one }) => ({
+export const matchesRelations = relations(matches, ({ one, many }) => ({
 	versus: one(versus),
 	player1: one(users, { fields: [matches.player1Id], references: [users.id] }),
 	player2: one(users, { fields: [matches.player2Id], references: [users.id] }),
+	rounds: many(rounds),
 }))
 
 export const tournaments = sqliteTable('tournaments', {
 	id: int().primaryKey({ autoIncrement: true }),
 	numberOfPlayers: int().notNull(),
-	pointsToWin: int().notNull(),
-	botDifficulty: text({ enum: ['Baby', 'Kevin', 'Terminator'] })
+	state: text({ enum: ['open', 'ongoing', 'finished'] })
 		.notNull()
-		.default('Kevin'),
-	lobbyLocked: int({ mode: 'boolean' }).notNull().default(false),
-	createdAt: int({ mode: 'timestamp' }).notNull(),
-	startedAt: int({ mode: 'timestamp' }).notNull(),
-	finished: int({ mode: 'boolean' }).default(false),
-})
-
-// TODO: add relation type ? owner, etc..
-export const tournamentsParticipants = sqliteTable('tournaments_participants', {
-	tournamentId: int()
-		.notNull()
-		.references(() => tournaments.id),
-	userId: int()
+		.default('open'),
+	createdAt: int({ mode: 'timestamp' }).notNull().default(new Date()),
+	createdBy: int()
 		.notNull()
 		.references(() => users.id),
 })
 
-export const tournamentRelations = relations(tournaments, ({ many }) => ({
-	users: many(tournamentsParticipants),
+// TODO: add relation type ? owner, etc..
+export const tournamentsParticipants = sqliteTable(
+	'tournaments_participants',
+	{
+		// state: text({ enum: ['waiting', 'inGame'] }),
+		tournamentId: int()
+			.notNull()
+			.references(() => tournaments.id),
+		userId: int()
+			.notNull()
+			.references(() => users.id),
+	},
+	(table) => [unique().on(table.tournamentId, table.userId)],
+)
+
+export const tournamentRelations = relations(tournaments, ({ many, one }) => ({
+	createdByUser: one(users, {
+		fields: [tournaments.createdBy],
+		references: [users.id],
+	}),
+	participants: many(tournamentsParticipants),
 }))
+
+export const tournamentsParticipantsRelations = relations(
+	tournamentsParticipants,
+	({ one }) => ({
+		user: one(users, {
+			fields: [tournamentsParticipants.userId],
+			references: [users.id],
+		}),
+		tournament: one(tournaments, {
+			fields: [tournamentsParticipants.tournamentId],
+			references: [tournaments.id],
+		}),
+	}),
+)
 
 export const versus = sqliteTable('versus', {
 	id: int().primaryKey({ autoIncrement: true }),
@@ -146,11 +171,18 @@ export const versusRelations = relations(versus, ({ one }) => ({
 }))
 
 export const rounds = sqliteTable('rounds', {
-	id: int().primaryKey(),
-	scorer: text({ enum: ['p1', 'p2'] }),
+	id: int().primaryKey({ autoIncrement: true }),
+	scorer: text({ enum: ['p1', 'p2'] }).notNull(),
 	rallyCount: int().notNull(),
 	ballPositionY: int().notNull(),
 	matchId: int().references(() => matches.id),
 	gamestates: text('', { mode: 'json' }),
 	arenaSettings: text('', { mode: 'json' }),
 })
+
+export const roundsRelations = relations(rounds, ({ one }) => ({
+	match: one(matches, {
+		fields: [rounds.matchId],
+		references: [matches.id],
+	}),
+}))

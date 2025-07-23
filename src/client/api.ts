@@ -1,5 +1,6 @@
 import { toast } from './components/ft-toast.js'
 import { API_GET, type RouteApiGet } from './routes.js'
+import { stringToDate } from './utils/stringToDate.js'
 
 export const api = {
 	async get(route: RouteApiGet, query?: string) {
@@ -11,6 +12,7 @@ export const api = {
 			return null
 		}
 		const json = await res.json()
+		stringToDate(json.data)
 		// @ts-ignore
 		setter(json.data)
 		return json.data
