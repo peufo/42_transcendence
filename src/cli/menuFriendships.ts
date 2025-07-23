@@ -48,7 +48,7 @@ const menuInvitationsSended: Scope = async () => {
 		({ state, createdBy }) => state === 'invited' && user?.id === createdBy,
 	) as FriendshipInvitation[]
 	if (!invitationsSended.length) {
-		p.log.info("You don't have sended any invitation !")
+		p.log.warn("You don't have sended any invitation !")
 		return menuFriendships
 	}
 
@@ -92,7 +92,7 @@ const menuInvitationsReceived: Scope = async () => {
 		({ state, createdBy }) => state === 'invited' && user?.id !== createdBy,
 	) as FriendshipInvitation[]
 	if (!invitationsReceived.length) {
-		p.log.info("You don't have received any invitation !")
+		p.log.warn("You don't have received any invitation !")
 		return menuFriendships
 	}
 

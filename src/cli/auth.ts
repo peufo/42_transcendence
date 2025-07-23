@@ -7,7 +7,7 @@ import { menuMain } from './menuMain.js'
 
 export const login: Scope = async () => {
 	const host = await getHost()
-	const options = await getSessionToken(host).catch((err) => console.log(err))
+	const options = await getSessionToken(host)
 	api.setOptions({ host, ...options })
 	return menuMain
 }
@@ -31,6 +31,11 @@ async function getHost(): Promise<string> {
 async function getSessionToken(
 	host: string,
 ): Promise<Partial<{ sessionToken: string; user: User }>> {
+	const isSignin = await p.confirm({
+		message: 'You have an account ?',
+	})
+	if (p.isCancel(isSignin)) exit(0)
+
 	const name = await p.text({
 		message: 'username ?',
 		validate(value) {
@@ -47,10 +52,20 @@ async function getSessionToken(
 	})
 	if (p.isCancel(password)) exit(0)
 
+	if (!isSignin) {
+		const confirmation = await p.password({
+			message: 'password confirmation',
+		})
+		if (p.isCancel(confirmation)) exit(0)
+		if (password !== confirmation)
+			throw new Error('Password and confirmation are not identical')
+	}
+
 	const s = p.spinner()
 	s.start('Connection')
 	try {
-		const res = await fetch(`${host}/auth/login`, {
+		const action = isSignin ? 'login' : 'signup'
+		const res = await fetch(`${host}/auth/${action}`, {
 			method: 'post',
 			headers: {
 				'Content-Type': 'application/json',
