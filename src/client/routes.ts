@@ -36,7 +36,9 @@ export const API_GET: {
 	'/tournaments': store.$tournament.set,
 }
 
-export const API_POST = {
+export const API_POST: {
+	[Route in keyof RoutesPost]: ApiPostOption<RoutesPost[Route]['res']>
+} = {
 	'/auth/login': {
 		redirectTo: redirectAfterLogin,
 	},
@@ -60,8 +62,6 @@ export const API_POST = {
 	},
 	'/friendships/accept': { invalidate: ['/friendships'] },
 	'/friendships/delete': { invalidate: ['/friendships'] },
-} satisfies {
-	[Route in keyof RoutesPost]: ApiPostOption<RoutesPost[Route]['res']>
 }
 
 export const PAGES = {
