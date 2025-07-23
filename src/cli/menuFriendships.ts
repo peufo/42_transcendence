@@ -13,6 +13,7 @@ export const menuFriendships: Scope = async () => {
 			{ label: 'Friends', value: menuFriends },
 			{ label: 'Invitations sent', value: menuInvitationsSended },
 			{ label: 'Invitations received', value: menuInvitationsReceived },
+			{ label: 'Send a new invitation', value: menuNewInvitation },
 		],
 	})
 	if (p.isCancel(action)) exit(0)
@@ -53,9 +54,7 @@ const menuInvitationsSended: Scope = async () => {
 
 	const options: ScopeOptions = [
 		{ label: 'Return', value: () => menuFriendships },
-	]
-	for (const { id, withUser } of invitationsSended) {
-		options.push({
+		...invitationsSended.map(({ id, withUser }) => ({
 			label: `Invitation sent to ${withUser.name}`,
 			async value() {
 				const action = await p.select({
@@ -75,8 +74,8 @@ const menuInvitationsSended: Scope = async () => {
 				await action()
 				return menuInvitationsSended
 			},
-		})
-	}
+		})),
+	]
 
 	const action = await p.select({
 		message: `Invitations sent (${invitationsSended.length})`,
@@ -98,10 +97,8 @@ const menuInvitationsReceived: Scope = async () => {
 	}
 
 	const options: ScopeOptions = [
-		{ label: 'Return', value: () => menuFriendships },
-	]
-	for (const { id, withUser } of invitationsReceived) {
-		options.push({
+		{ label: 'Return', value: async () => menuFriendships },
+		...invitationsReceived.map(({ id, withUser }) => ({
 			label: `Invitation from ${withUser.name}`,
 			async value() {
 				const action = await p.select({
@@ -128,8 +125,8 @@ const menuInvitationsReceived: Scope = async () => {
 				await action()
 				return menuInvitationsReceived
 			},
-		})
-	}
+		})),
+	]
 
 	const action = await p.select({
 		message: `My invitations (${invitationsReceived.length})`,
@@ -137,4 +134,28 @@ const menuInvitationsReceived: Scope = async () => {
 	})
 	if (p.isCancel(action)) exit()
 	return action
+}
+
+const menuNewInvitation: Scope = async () => {
+	const search = await p.text({ message: 'Search a user' })
+	if (p.isCancel(search)) exit(0)
+	const users = await api.get('/users', { search })
+
+	const action = await p.select({
+		message: 'Invite a user ?',
+		options: [
+			{ label: 'Return', value: async () => menuFriendships },
+			{ label: 'Search again', value: async () => menuNewInvitation },
+			...users.map((user) => ({
+				label: `Invite ${user.name}`,
+				value: async () => {
+					await api.post('/friendships/new', { invitedUserId: user.id })
+					p.log.success(`${user.name} invited with success !`)
+					return menuFriendships
+				},
+			})),
+		],
+	})
+	if (p.isCancel(action)) exit(0)
+	return action()
 }
