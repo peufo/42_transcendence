@@ -1,7 +1,7 @@
 import { exit } from 'node:process'
 import * as p from '@clack/prompts'
 import type { User } from '../lib/type.js'
-import { api, handleApiError } from './api.js'
+import { api, deleteApiOptions, handleApiError, saveApiOptions } from './api.js'
 import type { Scope } from './main.js'
 import { menuMain } from './menuMain.js'
 
@@ -9,11 +9,13 @@ export const login: Scope = async () => {
 	const host = await getHost()
 	const options = await getSessionToken(host)
 	api.setOptions({ host, ...options })
+	await saveApiOptions({ host, ...options })
 	return menuMain
 }
 
-export const logout: Scope = () => {
+export const logout: Scope = async () => {
 	api.setOptions({})
+	await deleteApiOptions()
 	p.log.success('Disconnected')
 	return menuMain
 }
