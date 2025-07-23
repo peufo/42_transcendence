@@ -4,7 +4,7 @@ import { api } from './api.js'
 import { login, logout } from './auth.js'
 import { start } from './game.js'
 import type { Scope, ScopeOptions } from './main.js'
-import { menuFriends, menuInvitations } from './menuFriendships.js'
+import { menuFriendships } from './menuFriendships.js'
 
 export const menuMain: Scope = async () => {
 	const options: ScopeOptions = []
@@ -12,8 +12,7 @@ export const menuMain: Scope = async () => {
 	if (!api.user()) {
 		options.push({ value: login, label: 'Login' })
 	} else {
-		options.push({ value: menuFriends, label: 'View friends' })
-		options.push({ value: menuInvitations, label: 'View invitations' })
+		options.push({ value: menuFriendships, label: 'Friendships' })
 		options.push({ value: logout, label: 'Logout' })
 	}
 	options.push(
