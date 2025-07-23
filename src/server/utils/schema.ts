@@ -3,13 +3,13 @@ import type { RoutesGet, RoutesPost } from '../../lib/type.js'
 
 export function postSchema<
 	R extends keyof RoutesPost,
-	BodyShape extends z.ZodRawShape,
->(_url: R, bodyShape?: BodyShape) {
+	BodyShape extends ZodShape<RoutesPost[R]['body']>,
+>(_url: R, bodyShape: BodyShape) {
 	return {
 		schema: {
 			body: z.object(bodyShape),
 			response: {
-				200: z.custom<RoutesPost[R]>((data) => data),
+				200: z.custom<RoutesPost[R]['res']>((data) => data),
 			},
 		},
 	}
@@ -17,13 +17,13 @@ export function postSchema<
 
 export function getSchema<
 	R extends keyof RoutesGet,
-	QueryShape extends z.ZodRawShape,
->(_url: R, queryShape?: QueryShape) {
+	QueryShape extends ZodShape<RoutesGet[R]['query']>,
+>(_url: R, queryShape: QueryShape) {
 	return {
 		schema: {
 			querystring: z.object(queryShape),
 			response: {
-				200: z.custom<{ data: RoutesGet[R] }>((data) => data),
+				200: z.custom<RoutesGet[R]['res']>((data) => data),
 			},
 		},
 	}

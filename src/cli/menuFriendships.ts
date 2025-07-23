@@ -6,7 +6,7 @@ import type { Scope, ScopeOptions } from './main.js'
 import { menuMain } from './menuMain.js'
 
 export const menuFriends: Scope = async () => {
-	const friendships = await api.friendships()
+	const friendships = await api.get('/friendships')
 	const friends = friendships.filter(
 		(friendship) => friendship.state === 'friend',
 	) as FriendshipFriend[]
@@ -27,7 +27,7 @@ export const menuFriends: Scope = async () => {
 }
 
 export const menuInvitations: Scope = async () => {
-	const friendships = await api.friendships()
+	const friendships = await api.get('/friendships')
 	const invitations = friendships.filter(
 		(friendship) => friendship.state === 'invited',
 	) as FriendshipInvitation[]
@@ -46,7 +46,7 @@ export const menuInvitations: Scope = async () => {
 					const isConfirmed = await p.confirm({ message })
 					if (p.isCancel(isConfirmed)) exit()
 					if (isConfirmed) {
-						await api.friendshipsDelete({ friendshipId: id })
+						await api.post('/friendships/delete', { friendshipId: id })
 						p.log.success('Invitation canceled !')
 					}
 					return menuInvitations
@@ -64,14 +64,14 @@ export const menuInvitations: Scope = async () => {
 						{
 							label: 'Accept',
 							value: async () => {
-								await api.friendshipsAccept({ friendshipId: id })
+								await api.post('/friendships/accept', { friendshipId: id })
 								p.log.success('Invitation accepted !')
 							},
 						},
 						{
 							label: 'Reject',
 							value: async () => {
-								await api.friendshipsDelete({ friendshipId: id })
+								await api.post('/friendships/delete', { friendshipId: id })
 								p.log.success('Invitation rejected !')
 							},
 						},

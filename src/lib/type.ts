@@ -67,20 +67,46 @@ export type Tournament = {
 	numberOfPlayers: number
 }
 
+type Get<Result, Query = null> = {
+	query: Query
+	res: { data: Result }
+}
+
 export type RoutesGet = {
-	'/auth/user': User | undefined
-	'/users': UserBasic[] // TODO: /users/notMyFriends
-	'/friendships': Friendship[]
-	'/userstats': Match[]
-	'/tournaments': Tournament
+	'/auth/user': Get<User | undefined>
+	'/users': Get<UserBasic[], { search: string }> // TODO: /users/notMyFriends
+	'/friendships': Get<Friendship[]>
+	'/userstats': Get<Match[]>
+	'/tournaments': Get<Tournament, { id: number }>
 }
 
 export type RoutesPost = {
-	'/auth/login': { message: string; user: User }
-	'/auth/signup': { message: string; user: User }
-	'/auth/logout': { success: boolean }
-	'/tournaments/new': { success: boolean; tournamentId: number }
-	'/friendships/new': { success: boolean; invitedUserId: number }
-	'/friendships/accept': { success: boolean; acceptedUserId: number }
-	'/friendships/delete': { success: boolean }
+	'/auth/login': {
+		body: { name: string; password: string }
+		res: { message: string; user: User }
+	}
+	'/auth/signup': {
+		body: { name: string; password: string }
+		res: { message: string; user: User }
+	}
+	'/auth/logout': {
+		body: null
+		res: { success: boolean }
+	}
+	'/tournaments/new': {
+		body: { numberOfPlayers: number }
+		res: { success: boolean; tournamentId: number }
+	}
+	'/friendships/new': {
+		body: { invitedUserId: number }
+		res: { success: boolean; invitedUserId: number }
+	}
+	'/friendships/accept': {
+		body: { friendshipId: number }
+		res: { success: boolean; acceptedUserId: number }
+	}
+	'/friendships/delete': {
+		body: { friendshipId: number }
+		res: { success: boolean }
+	}
 }

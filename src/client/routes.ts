@@ -25,7 +25,9 @@ export type PageOption = {
 }
 
 export const API_GET: {
-	[Route in keyof RoutesGet]: (newValue: RoutesGet[Route]) => void
+	[Route in keyof RoutesGet]: (
+		newValue: RoutesGet[Route]['res']['data'],
+	) => void
 } = {
 	'/auth/user': store.$user.set,
 	'/users': store.$users.set,
@@ -59,7 +61,7 @@ export const API_POST = {
 	'/friendships/accept': { invalidate: ['/friendships'] },
 	'/friendships/delete': { invalidate: ['/friendships'] },
 } satisfies {
-	[Route in keyof RoutesPost]: ApiPostOption<RoutesPost[Route]>
+	[Route in keyof RoutesPost]: ApiPostOption<RoutesPost[Route]['res']>
 }
 
 export const PAGES = {

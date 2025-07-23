@@ -7,7 +7,7 @@ import { createUser, getAuthUser } from './model.js'
 import { authSchema } from './schema.js'
 
 export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
-	server.get('/user', getSchema('/auth/user'), async (_req, res) => {
+	server.get('/user', getSchema('/auth/user', null), async (_req, res) => {
 		return res.send({ data: res.locals?.user })
 	})
 
@@ -38,13 +38,17 @@ export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 			res.send({ message: 'Signup success !', user })
 		},
 	)
-	server.post('/logout', postSchema('/auth/logout'), async (_req, res) => {
-		const sessionId = permission.sessionId(res)
-		removeSessionEvent(sessionId)
-		const now = new Date()
-		res.setCookie('session', '', { path: '/', expires: now })
-		res.send({ success: true })
-	})
+	server.post(
+		'/logout',
+		postSchema('/auth/logout', null),
+		async (_req, res) => {
+			const sessionId = permission.sessionId(res)
+			removeSessionEvent(sessionId)
+			const now = new Date()
+			res.setCookie('session', '', { path: '/', expires: now })
+			res.send({ success: true })
+		},
+	)
 
 	done()
 }

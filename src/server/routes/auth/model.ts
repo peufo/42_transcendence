@@ -1,8 +1,7 @@
 import argon2 from 'argon2'
 import { eq } from 'drizzle-orm'
+import type { RoutesPost } from '../../../lib/type.js'
 import { db, users } from '../../db/index.js'
-import type { ZodData } from '../../utils/schema.js'
-import type { authSchema } from './schema.js'
 
 export async function getAuthUser(name: string) {
         const result = await db.query.users.findFirst({
@@ -11,7 +10,7 @@ export async function getAuthUser(name: string) {
         return result
 }
 
-export async function createUser(data: ZodData<typeof authSchema>) {
+export async function createUser(data: RoutesPost['/auth/signup']['body']) {
 	const { name, password } = data
 	const [createdUser] = await db
 		.insert(users)

@@ -8,7 +8,7 @@ export const statsRoute: FastifyPluginCallbackZod = (
 	_options,
 	done,
 ) => {
-	server.get('/', getSchema('/userstats'), async (_req, res) => {
+	server.get('/', getSchema('/userstats', null), async (_req, res) => {
 		const user = permission.user(res)
 		const matches = await getMatches(user.id)
 		return res.send({ data: matches })
