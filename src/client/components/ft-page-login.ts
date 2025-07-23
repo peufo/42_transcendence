@@ -31,7 +31,7 @@ customElements.define(
             <!-- Titre -->
             <div class="sm:mx-auto sm:w-full sm:max-w-sm z-10">
               <h2 class="mt-10 text-center text-3xl sm:text-4xl font-mono tracking-tight text-white">
-                Welcome to the Pong
+                Welcome to the Pong!
               </h2>
             </div>
 
