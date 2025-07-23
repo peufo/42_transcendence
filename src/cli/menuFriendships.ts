@@ -5,7 +5,21 @@ import { api } from './api.js'
 import type { Scope, ScopeOptions } from './main.js'
 import { menuMain } from './menuMain.js'
 
-export const menuFriends: Scope = async () => {
+export const menuFriendships: Scope = async () => {
+	const action = await p.select({
+		message: 'Friendships',
+		options: [
+			{ label: 'Return', value: menuMain },
+			{ label: 'Friends', value: menuFriends },
+			{ label: 'Invitations sent', value: menuInvitationsSended },
+			{ label: 'Invitations received', value: menuInvitationsReceived },
+		],
+	})
+	if (p.isCancel(action)) exit(0)
+	return action
+}
+
+const menuFriends: Scope = async () => {
 	const friendships = await api.get('/friendships')
 	const friends = friendships.filter(
 		(friendship) => friendship.state === 'friend',
@@ -23,44 +37,77 @@ export const menuFriends: Scope = async () => {
 			`My friends (${friends.length})`,
 		)
 	}
-	return menuMain
+	return menuFriendships
 }
 
-export const menuInvitations: Scope = async () => {
-	const friendships = await api.get('/friendships')
-	const invitations = friendships.filter(
-		(friendship) => friendship.state === 'invited',
-	) as FriendshipInvitation[]
-	if (!invitations.length) {
-		p.log.warn("You don't have invitation !")
-		return menuMain
-	}
+const menuInvitationsSended: Scope = async () => {
 	const user = api.user()
-	const options: ScopeOptions = [{ value: () => menuMain, label: 'Ok' }]
-	for (const { id, withUser, createdBy } of invitations) {
-		if (user?.id === createdBy) {
-			options.push({
-				label: `Invitation sended to ${withUser.name}`,
-				async value() {
-					const message = `Do you want cancel the invitation sended to ${withUser.name} ?`
-					const isConfirmed = await p.confirm({ message })
-					if (p.isCancel(isConfirmed)) exit()
-					if (isConfirmed) {
-						await api.post('/friendships/delete', { friendshipId: id })
-						p.log.success('Invitation canceled !')
-					}
-					return menuInvitations
-				},
-			})
-			continue
-		}
+	const friendships = await api.get('/friendships')
+	const invitationsSended = friendships.filter(
+		({ state, createdBy }) => state === 'invited' && user?.id === createdBy,
+	) as FriendshipInvitation[]
+	if (!invitationsSended.length) {
+		p.log.info("You don't have sended any invitation !")
+		return menuFriendships
+	}
+
+	const options: ScopeOptions = [
+		{ label: 'Return', value: () => menuFriendships },
+	]
+	for (const { id, withUser } of invitationsSended) {
+		options.push({
+			label: `Invitation sent to ${withUser.name}`,
+			async value() {
+				const action = await p.select({
+					message: `${withUser.name} invitation`,
+					options: [
+						{ label: 'Do nothing', value: async () => {} },
+						{
+							label: `Cancel ${withUser.name} invitation`,
+							value: async () => {
+								await api.post('/friendships/delete', { friendshipId: id })
+								p.log.success('Invitation canceled !')
+							},
+						},
+					],
+				})
+				if (p.isCancel(action)) exit(0)
+				await action()
+				return menuInvitationsSended
+			},
+		})
+	}
+
+	const action = await p.select({
+		message: `Invitations sent (${invitationsSended.length})`,
+		options,
+	})
+	if (p.isCancel(action)) exit(0)
+	return action
+}
+
+const menuInvitationsReceived: Scope = async () => {
+	const friendships = await api.get('/friendships')
+	const user = api.user()
+	const invitationsReceived = friendships.filter(
+		({ state, createdBy }) => state === 'invited' && user?.id !== createdBy,
+	) as FriendshipInvitation[]
+	if (!invitationsReceived.length) {
+		p.log.info("You don't have received any invitation !")
+		return menuFriendships
+	}
+
+	const options: ScopeOptions = [
+		{ label: 'Return', value: () => menuFriendships },
+	]
+	for (const { id, withUser } of invitationsReceived) {
 		options.push({
 			label: `Invitation from ${withUser.name}`,
 			async value() {
 				const action = await p.select({
 					message: `What to do with the invitation from ${withUser.name} ?`,
 					options: [
-						{ label: 'Nothing', value: async () => {} },
+						{ label: 'Do nothing', value: async () => {} },
 						{
 							label: 'Accept',
 							value: async () => {
@@ -69,23 +116,23 @@ export const menuInvitations: Scope = async () => {
 							},
 						},
 						{
-							label: 'Reject',
+							label: 'Refuse',
 							value: async () => {
 								await api.post('/friendships/delete', { friendshipId: id })
-								p.log.success('Invitation rejected !')
+								p.log.success('Invitation refused !')
 							},
 						},
 					],
 				})
 				if (p.isCancel(action)) exit(0)
 				await action()
-				return menuInvitations
+				return menuInvitationsReceived
 			},
 		})
 	}
 
 	const action = await p.select({
-		message: `My invitations (${invitations.length})`,
+		message: `My invitations (${invitationsReceived.length})`,
 		options,
 	})
 	if (p.isCancel(action)) exit()
