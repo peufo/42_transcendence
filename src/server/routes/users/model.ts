@@ -17,3 +17,34 @@ export async function searchUsersAsNotFriends(userId: number, search: string) {
 		limit: 5,
 	})
 }
+
+import { eq } from 'drizzle-orm'
+import argon2 from 'argon2'
+
+export async function updateUser(userId: number, data: { name?: string, password?: string }) {
+    const updateData: Partial<typeof users.$inferInsert> = {}
+
+    if (data.name) {
+        updateData.name = data.name
+    }
+
+    if (data.password) {
+        updateData.passwordHash = await argon2.hash(data.password)
+    }
+
+    if (Object.keys(updateData).length === 0) return null
+
+    const [user] = await db
+        .update(users)
+        .set(updateData)
+        .where(eq(users.id, userId))
+        .returning({
+            id: users.id,
+            name: users.name,
+            avatar: users.avatar,
+            avatarPlaceholder: users.avatarPlaceholder,
+        })
+
+    return user
+}
+

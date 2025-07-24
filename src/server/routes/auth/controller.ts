@@ -1,9 +1,5 @@
 import crypto from 'node:crypto'
 import { eq } from 'drizzle-orm'
-<<<<<<<< HEAD:src/server/modules/auth/session.ts
-import { db, sessions } from '../../db/index.js'
-import type { Session } from '../../types.js'
-========
 import type { FastifyReply } from 'fastify'
 import { db, sessions } from '../../db/index.js'
 import type { DB } from '../../types.ts'
@@ -12,7 +8,6 @@ export async function setSessionCookie(userId: number, res: FastifyReply) {
 	const { token } = await createSession(userId)
 	res.setCookie('session', token, { path: '/', signed: true })
 }
->>>>>>>> 24b5e54a2452d9a2731c914374a7d761383801c1:src/server/routes/auth/controller.ts
 
 const SESSION_INACTIVITY_TIMOUT = 1000 * 60 * 60 * 24 // 1 days
 const SESSION_ACTIVITY_CHECK_INTERVAL = 1000 * 60 * 60 // 1 hour

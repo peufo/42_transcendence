@@ -109,4 +109,8 @@ export type RoutesPost = {
 		body: { friendshipId: number }
 		res: { success: boolean }
 	}
+	'/users/update': {
+    	body: { name?: string; password?: string }
+    	res: { success: boolean; user: User }
+  	}
 }
