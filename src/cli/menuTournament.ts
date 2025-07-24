@@ -37,7 +37,7 @@ export async function createMenuTounament(id: number): Promise<Scope> {
 			options: [
 				{
 					label: 'Start tournament',
-					value: () => {
+					value: async () => {
 						if (participants.length < numberOfPlayers) {
 							spinner.stop('Tournament incomplet', 1)
 							return createMenuTounament(id)
@@ -47,8 +47,9 @@ export async function createMenuTounament(id: number): Promise<Scope> {
 				},
 				{
 					label: 'Cancel tournament',
-					value: () => {
-						spinner.stop('Tournament canceled', 1)
+					value: async () => {
+						await api.post('/tournaments/delete', { tournamentId: id })
+						spinner.stop('Tournament canceled')
 						return menuMain
 					},
 				},
