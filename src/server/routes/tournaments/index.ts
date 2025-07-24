@@ -2,8 +2,8 @@ import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import '@fastify/cookie'
 import z from 'zod/v4'
 import { getSchema, permission, postSchema } from '../../utils/index.js'
-import { createTournament, getTournament } from './model.js'
-import { tournamentSchema } from './schema.js'
+import { createTournament, deleteTournament, getTournament } from './model.js'
+import { tournamentSchemaCancel, tournamentSchemaCreate } from './schema.js'
 
 export const tournamentsRoute: FastifyPluginCallbackZod = (
 	server,
@@ -23,14 +23,24 @@ export const tournamentsRoute: FastifyPluginCallbackZod = (
 
 	server.post(
 		'/new',
-		postSchema('/tournaments/new', tournamentSchema),
+		postSchema('/tournaments/new', tournamentSchemaCreate),
 		async (req, res) => {
 			const user = permission.user(res)
-			const tournament = await createTournament({
+			const tournamentId = await createTournament({
 				...req.body,
 				createdBy: user.id,
 			})
-			return res.send({ success: true, tournamentId: tournament.id })
+			return res.send({ success: true, tournamentId })
+		},
+	)
+
+	server.post(
+		'/delete',
+		postSchema('/tournaments/delete', tournamentSchemaCancel),
+		async (req, res) => {
+			const user = permission.user(res)
+			await deleteTournament(req.body.tournamentId, user.id)
+			return res.send({ success: true, message: 'Tournament deleted' })
 		},
 	)
 
