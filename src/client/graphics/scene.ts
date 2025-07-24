@@ -12,8 +12,8 @@ import { toRenderPosition } from './utils.js'
 export function updateGraphics(
 	state: State,
 	ballMesh: BABYLON.Mesh,
-	paddle1: BABYLON.Mesh,
-	paddle2: BABYLON.Mesh,
+	paddle1: BABYLON.AbstractMesh,
+	paddle2: BABYLON.AbstractMesh,
 ): void {
 	ballMesh.position = toRenderPosition(
 		new Vector2(state.b.x, state.b.y),

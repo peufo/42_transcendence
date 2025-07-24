@@ -27,4 +27,9 @@ declare module 'fastify' {
 			session?: DB.Session
 		}
 	}
+
+	interface FastifyRequest {
+		cookies: { [cookieName: string]: string | undefined }
+		unsignCookie: (value: string) => { valid: boolean; value: string }
+	}
 }

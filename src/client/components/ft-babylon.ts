@@ -30,8 +30,8 @@ customElements.define(
 		camera: BABYLON.Camera
 		light: BABYLON.DirectionalLight
 		ballMesh: BABYLON.Mesh
-		paddle1: BABYLON.Mesh
-		paddle2: BABYLON.Mesh
+		paddle1: BABYLON.AbstractMesh
+		paddle2: BABYLON.AbstractMesh
 		gameLogicEngine: GameEngine
 		guiTexture: BABYLON.GUI.AdvancedDynamicTexture
 		scoreText: BABYLON.GUI.TextBlock
@@ -121,14 +121,14 @@ customElements.define(
 				BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
 			this.guiTexture.addControl(this.scoreText)
 		}
-		createGameObjects() {
+		async createGameObjects() {
 			const wallMaterial = createMatwall(this.scene)
 			const paddleMaterial = createPaddleMaterial(this.scene)
 			const ballMaterial = createBallMaterial(this.scene)
 
 			createArena(this.scene, wallMaterial, ARENA_WIDTH, ARENA_HEIGHT)
 
-			const paddles = createPaddles(this.scene, paddleMaterial)
+			const paddles = await createPaddles(this.scene, paddleMaterial)
 			this.paddle1 = paddles.paddle1
 			this.paddle2 = paddles.paddle2
 
