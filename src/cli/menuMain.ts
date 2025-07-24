@@ -21,7 +21,10 @@ export const menuMain: Scope = async () => {
 		{ value: start, label: 'Local game' },
 		{ value: exit, label: 'Exit' },
 	)
-	const action = await p.select({ message: 'What you want to do ?', options })
+	const action = await p.select({
+		message: 'Main menu',
+		options,
+	})
 	if (p.isCancel(action)) exit()
 	return action
 }

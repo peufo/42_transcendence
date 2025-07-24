@@ -137,7 +137,7 @@ const menuInvitationsReceived: Scope = async () => {
 }
 
 const menuNewInvitation: Scope = async () => {
-	const search = await p.text({ message: 'Search a user' })
+	const search = await p.text({ message: 'Search a user', defaultValue: '' })
 	if (p.isCancel(search)) exit(0)
 	const users = await api.get('/users', { search })
 

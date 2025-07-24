@@ -22,19 +22,46 @@ export const menuNewTournament: Scope = async () => {
 }
 
 export async function createMenuTounament(id: number): Promise<Scope> {
-	const tournament = await api.get('/tournaments', { id })
+	const { participants, numberOfPlayers } = await api.get('/tournaments', {
+		id,
+	})
 	return async () => {
 		const spinner = p.spinner()
 		const waitingMessage = () =>
-			`waiting for your friends (${tournament.participants.length} / ${tournament.numberOfPlayers})`
+			`waiting for your friends (${participants.length} / ${numberOfPlayers})`
 		spinner.start(waitingMessage())
 		// TODO: wait on users and start tournament
 
-		await p.select({
-			message: 'Start tournament ?',
-			options: [{ label: "Yes, I'm ready", value: menuMain }],
+		const action = await p.select({
+			message: `${api.host()}/tournament?id=${id}`,
+			options: [
+				{
+					label: 'Start tournament',
+					value: () => {
+						if (participants.length < numberOfPlayers) {
+							spinner.stop('Tournament incomplet', 1)
+							return createMenuTounament(id)
+						}
+						return menuMatch
+					},
+				},
+				{
+					label: 'Cancel tournament',
+					value: () => {
+						spinner.stop('Tournament canceled', 1)
+						return menuMain
+					},
+				},
+			],
 		})
-
-		return menuMain
+		if (p.isCancel(action)) exit(0)
+		return action()
 	}
+}
+
+const menuMatch: Scope = async () => {
+	const isReady = await p.confirm({ message: 'Ready ?' })
+	if (p.isCancel(isReady)) exit(0)
+	p.log.warn('TODO: enter in the game')
+	return menuMain
 }
