@@ -11,13 +11,13 @@ export async function getAuthUser(name: string) {
 }
 
 export async function createUser(data: RoutesPost['/auth/signup']['body']) {
-	const { name, password } = data
+	const { name, password, avatarPlaceholder } = data
 	const [createdUser] = await db
 		.insert(users)
 		.values({
 			name,
 			passwordHash: await argon2.hash(password),
-			avatarPlaceholder: createAvatarPlaceholder(),
+			avatarPlaceholder,
 		})
 		.returning()
 	const { passwordHash, ...user } = createdUser
@@ -26,6 +26,7 @@ export async function createUser(data: RoutesPost['/auth/signup']['body']) {
 
 export function createAvatarPlaceholder() {
 	const avatarUrl = new URL('https://api.dicebear.com/9.x/bottts-neutral/svg')
+	console.log(avatarUrl)
 	avatarUrl.searchParams.append('seed', String(Math.random()))
 	return avatarUrl.toString()
 }

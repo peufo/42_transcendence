@@ -86,7 +86,7 @@ export type RoutesPost = {
 		res: { message: string; user: User }
 	}
 	'/auth/signup': {
-		body: { name: string; password: string }
+		body: { name: string; password: string; avatarPlaceholder: string }
 		res: { message: string; user: User }
 	}
 	'/auth/logout': {

@@ -2,7 +2,6 @@ import argon2 from 'argon2'
 import { drizzle } from 'drizzle-orm/libsql'
 import { seed } from 'drizzle-seed'
 import { env } from '../env.js'
-import { createAvatarPlaceholder } from '../routes/auth/model.js'
 import {
 	friendships,
 	matches,
@@ -10,6 +9,13 @@ import {
 	roundsRelations,
 	users,
 } from './schema.js'
+
+function createAvatarPlaceholder() {
+	const avatarUrl = new URL('https://api.dicebear.com/9.x/bottts-neutral/svg')
+	console.log(avatarUrl)
+	avatarUrl.searchParams.append('seed', String(Math.random()))
+	return avatarUrl.toString()
+}
 
 async function main() {
 	const db = drizzle(env.DB_FILE_NAME)
