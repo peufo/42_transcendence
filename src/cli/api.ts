@@ -8,7 +8,7 @@ import type { RoutesGet, RoutesPost, User } from '../lib/type.js'
 const HOME = process.env.HOME || ''
 const SAVE_FILE = path.resolve(HOME, '.transcendance.json')
 
-type ApiOptions = Partial<{
+export type ApiOptions = Partial<{
 	host: string
 	sessionToken: string
 	user: Pick<User, 'id' | 'name'>
@@ -65,6 +65,7 @@ function useApi() {
 			options = newOptions
 		},
 		user: () => options.user,
+		host: () => options.host || '',
 		get: apiGet,
 		post: apiPost,
 	}
@@ -81,7 +82,7 @@ export async function handleApiError(res: Response) {
 export async function saveApiOptions(options: ApiOptions) {
 	try {
 		await writeFile(SAVE_FILE, JSON.stringify(options), 'utf8')
-		p.log.success(`Session saved in file: ${SAVE_FILE}`)
+		p.log.success(`Session saved in file ${SAVE_FILE}`)
 	} catch (err: unknown) {
 		if (err instanceof Error) p.log.error(`${err.name}: ${err.message}`)
 		return {}
@@ -115,7 +116,7 @@ export async function loadApiOptions() {
 			api.setOptions({})
 			return
 		}
-		p.log.success(`Session loaded from : ${SAVE_FILE}`)
+		p.log.success(`Session loaded from ${SAVE_FILE}`)
 		api.setOptions(res.data)
 	} catch (err: unknown) {
 		if (err instanceof Error) p.log.error(`${err.name}: ${err.message}`)
