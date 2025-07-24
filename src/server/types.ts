@@ -29,7 +29,7 @@ declare module 'fastify' {
 	}
 
 	interface FastifyRequest {
-		cookies: Record<string, string> | undefined
+		cookies: { [cookieName: string]: string | undefined }
 		unsignCookie: (value: string) => { valid: boolean; value: string }
 	}
 }

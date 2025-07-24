@@ -110,7 +110,7 @@ export type RoutesPost = {
 		res: { success: boolean }
 	}
 	'/users/update': {
-    	body: { name?: string; password?: string }
-    	res: { success: boolean; user: User }
-  	}
+		body: { name?: string; password?: string }
+		res: { message: string; success: boolean; user: User }
+	}
 }
