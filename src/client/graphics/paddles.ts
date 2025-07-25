@@ -1,4 +1,3 @@
-/*
 import {
 	PADDLE_BASE_HEIGHT,
 	PADDLE_BASE_P1_POSITION,
@@ -37,7 +36,6 @@ export function createPaddles(
 	return { paddle1, paddle2 }
 }
 
-*/
 /*
 export async function createPaddles(
     scene: BABYLON.Scene,
@@ -115,7 +113,6 @@ export async function createPaddles(
     }
 }
 
-*/
 
 import {
 	PADDLE_BASE_HEIGHT,
@@ -222,3 +219,5 @@ export async function createPaddles(
 		throw error
 	}
 }
+
+*/

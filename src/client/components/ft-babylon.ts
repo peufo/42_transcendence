@@ -107,7 +107,11 @@ customElements.define(
 					this.scene,
 				)
 				this.scene.environmentTexture = envTexture
-				this.scene.createDefaultSkybox(envTexture, true, 5000)
+				const skybox = this.scene.createDefaultSkybox(envTexture, true, 5000);
+    		this.scene.registerBeforeRender(() => {
+        		if (skybox)
+					skybox.rotation.y += 0.0001;
+    		});
 			}
 		}
 
@@ -161,44 +165,22 @@ customElements.define(
 
             const glow = new BABYLON.GlowLayer('glow', this.scene)
             glow.addIncludedOnlyMesh(this.ballMesh)
-            const myParticleSystem = new BABYLON.ParticleSystem(
-                'particles',
-                2000,
-                this.scene,
-            )
-            myParticleSystem.particleTexture = new BABYLON.Texture(
-                'https://assets.babylonjs.com/textures/flare.png',
-            )
-		/*
-			myParticleSystem.emitter = new BABYLON.Vector3(0, 10, 0)
-			myParticleSystem.minSize = 0.5;
-myParticleSystem.maxSize = 5.5;
-myParticleSystem.minLifeTime = 0.3;
-myParticleSystem.maxLifeTime = 1.2;
-myParticleSystem.emitRate = 500;
-myParticleSystem.color1 = new BABYLON.Color4(1, 0.5, 0, 1);
-myParticleSystem.color2 = new BABYLON.Color4(1, 1, 0, 1);
-myParticleSystem.direction1 = new BABYLON.Vector3(-1, 1, 0);
-myParticleSystem.direction2 = new BABYLON.Vector3(1, 1, 0);
-myParticleSystem.minEmitBox = new BABYLON.Vector3(-0.5, 0, -0.5); // position de spawn aléatoire
-myParticleSystem.maxEmitBox = new BABYLON.Vector3(0.5, 0, 0.5);
-
-myParticleSystem.direction1 = new BABYLON.Vector3(0, 1, 0); // monte tout droit
-myParticleSystem.direction2 = new BABYLON.Vector3(0, 1.5, 0); // ou plus vite
-
-myParticleSystem.minEmitPower = 1;
-myParticleSystem.maxEmitPower = 3;
-
-myParticleSystem.updateSpeed = 0.01;
-
-myParticleSystem.gravity = new BABYLON.Vector3(0, -1, 0); // tire vers le bas (effet feu)
-
-
-
-			myParticleSystem.start();
+			const myParticleSystem = new BABYLON.ParticleSystem('particles', 2000, this.scene);
+    		myParticleSystem.particleTexture = new BABYLON.Texture('https://assets.babylonjs.com/textures/flare.png');
+    		myParticleSystem.emitter = this.ballMesh; // Suivre la balle
+    		myParticleSystem.minSize = 0.5;
+    		myParticleSystem.maxSize = 2.0;
+    		myParticleSystem.minLifeTime = 0.3;
+    		myParticleSystem.maxLifeTime = 1.0;
+    		myParticleSystem.emitRate = 300;
+    		myParticleSystem.color1 = new BABYLON.Color4(0, 0.5, 1, 1); // Bleu
+    		myParticleSystem.color2 = new BABYLON.Color4(0, 0, 1, 1);
+    		myParticleSystem.minEmitPower = 2;
+    		myParticleSystem.maxEmitPower = 5;
+    		myParticleSystem.updateSpeed = 0.01;
+    		myParticleSystem.start();
 			console.log("Fire system started:", myParticleSystem);
 
-*/
 		}
 
 		setupShadows() {
