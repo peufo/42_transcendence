@@ -114,7 +114,7 @@ export const tournamentsParticipants = sqliteTable(
 		// state: text({ enum: ['waiting', 'inGame'] }),
 		tournamentId: int()
 			.notNull()
-			.references(() => tournaments.id),
+			.references(() => tournaments.id, { onDelete: 'cascade' }),
 		userId: int()
 			.notNull()
 			.references(() => users.id),
