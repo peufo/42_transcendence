@@ -9,6 +9,9 @@ export type User = UserBasic & {
 	isActive: boolean
 	lastLogin: Date
 	createdAt: Date
+	numberOfMatches: number
+	numberOfWin: number
+	numberOfGoals: number
 }
 
 export type UserStats = UserBasic & {
