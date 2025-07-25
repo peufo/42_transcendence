@@ -1,4 +1,5 @@
 import fp from 'fastify-plugin'
+import { allUserStatsRoute } from './allUsersStats/index.js'
 import { authHook } from './auth/hooks.js'
 import { authRoute } from './auth/index.js'
 import { friendshipsRoute } from './friendships/index.js'
@@ -15,5 +16,6 @@ export default fp((server, _options, done) => {
 	server.register(statsRoute, { prefix: '/userstats' })
 	server.register(tournamentsRoute, { prefix: '/tournaments' })
 	server.register(wsRoute, { prefix: '/ws' })
+	server.register(allUserStatsRoute, { prefix: '/allusersstats' })
 	done()
 })

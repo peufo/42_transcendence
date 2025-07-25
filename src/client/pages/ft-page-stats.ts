@@ -1,6 +1,6 @@
 import type { Match, UserBasic } from '../../lib/type.js'
 import { createEffect } from '../utils/signal.js'
-import { $matches, $user } from '../utils/store.js'
+import { $matches, $rankedUsers, $user } from '../utils/store.js'
 
 customElements.define(
 	'ft-page-stats',
@@ -116,9 +116,22 @@ customElements.define(
 		renderContent(): string {
 			const user = $user.get()
 			if (!user) return ''
-			const html = /*html*/ `
-			<h2 class="flex flex-row p-2 items-center justify-center gap-2">Ranking</h2>
-			<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2"></h2>`
+			let html = `<h2 class="flex flex-row p-2 items-center justify-center gap-2">Ranking</h2>`
+			let rank = 1
+			const usersRanked = $rankedUsers.get()
+			html += `<div class="flex flex-col pl-4 p-2 justify-around gap-2 border border-gray-200 rounded-xl">`
+			for (const user of usersRanked) {
+				console.log('go')
+				html += `
+				<div class="flex items-center p-2 justify-center gap-10 border border-gray-200 rounded-xl">
+					<img src="${getAvatarSrc(user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
+					<span class="flex items-center gap-2">${rank}</span>
+					<span class="flex items-center gap-2"> ${user.name}</span>
+				</div>`
+				rank++
+				if (rank === 11) break
+			}
+			html += `</div`
 			return html
 		}
 	},

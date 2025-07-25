@@ -4,6 +4,7 @@ import type {
 	Tournament,
 	User,
 	UserBasic,
+	UserStats,
 } from '../../lib/type.js'
 import { createSignal } from './signal.js'
 
@@ -12,3 +13,4 @@ export const $users = createSignal<UserBasic[]>([])
 export const $friendships = createSignal<Friendship[]>([])
 export const $matches = createSignal<Match[]>([])
 export const $tournament = createSignal<Tournament | undefined>(undefined)
+export const $rankedUsers = createSignal<UserStats[]>([])

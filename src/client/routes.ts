@@ -34,6 +34,7 @@ export const API_GET: {
 	'/friendships': store.$friendships.set,
 	'/userstats': store.$matches.set,
 	'/tournaments': store.$tournament.set,
+	'/allusersstats': store.$rankedUsers.set,
 }
 
 export const API_POST: {
@@ -76,7 +77,10 @@ export const PAGES = {
 	},
 	'/login': { component: 'ft-page-login', isPublic: 'only' },
 	'/signup': { component: 'ft-page-signup', isPublic: 'only' },
-	'/stats': { component: 'ft-page-stats', pageData: ['/userstats'] },
+	'/stats': {
+		component: 'ft-page-stats',
+		pageData: ['/userstats', '/allusersstats'],
+	},
 	'/account': { component: 'ft-page-account' },
 	'/local/new': { component: 'ft-page-local-new', isPublic: true },
 	'/local/play': { component: 'ft-page-local-play', isPublic: true },

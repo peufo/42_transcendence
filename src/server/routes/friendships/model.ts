@@ -1,5 +1,10 @@
 import { and, eq, not, or } from 'drizzle-orm'
-import type { Friend, Friendship, UserBasic } from '../../../lib/type.js'
+import type {
+	Friend,
+	Friendship,
+	UserBasic,
+	UserStats,
+} from '../../../lib/type.js'
 import { db, friendships, users } from '../../db/index.js'
 import type { DB } from '../../types.ts'
 
@@ -9,6 +14,13 @@ export const userBasicColumns = {
 	avatar: true,
 	avatarPlaceholder: true,
 } satisfies DB.Columns<UserBasic>
+
+export const userStatsColumns = {
+	...userBasicColumns,
+	numberOfMatches: true,
+	numberOfWin: true,
+	numberOfGoals: true,
+} satisfies DB.Columns<UserStats>
 
 const friendColumns = {
 	...userBasicColumns,

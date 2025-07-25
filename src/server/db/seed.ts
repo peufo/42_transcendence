@@ -27,6 +27,18 @@ async function main() {
 				passwordHash: f.default({
 					defaultValue: passwordHash,
 				}),
+				numberOfMatches: f.int({
+					minValue: 2,
+					maxValue: 244,
+				}),
+				numberOfWin: f.int({
+					minValue: 2,
+					maxValue: 244,
+				}),
+				numberOfGoals: f.int({
+					minValue: 2,
+					maxValue: 244,
+				}),
 			},
 			count: 20,
 		},

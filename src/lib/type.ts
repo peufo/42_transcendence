@@ -11,6 +11,12 @@ export type User = UserBasic & {
 	createdAt: Date
 }
 
+export type UserStats = UserBasic & {
+	numberOfMatches: number
+	numberOfWin: number
+	numberOfGoals: number
+}
+
 export type Friend = UserBasic & {
 	isActive: boolean
 	lastLogin: Date
@@ -78,6 +84,7 @@ export type RoutesGet = {
 	'/friendships': Get<Friendship[]>
 	'/userstats': Get<Match[]>
 	'/tournaments': Get<Tournament, { id: number }>
+	'/allusersstats': Get<UserStats[]>
 }
 
 export type RoutesPost = {

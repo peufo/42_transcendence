@@ -17,6 +17,8 @@ export const users = sqliteTable('users', {
 	createdAt: int({ mode: 'timestamp' }).notNull().default(new Date()),
 	lastLogin: int({ mode: 'timestamp' }).notNull().default(new Date()),
 	isActive: int({ mode: 'boolean' }).notNull().default(false),
+	numberOfMatches: int().notNull().default(0),
+	numberOfWin: int().notNull().default(0),
 	numberOfGoals: int().notNull().default(0),
 })
 
