@@ -16,9 +16,9 @@ customElements.define(
 				userContent += /*html*/ `
 					<div class="grid grid-cols-2 gap gap-4 p-10">
 						<div class="flex flex-col"><ft-stats></ft-winrate></div>
-						<div class="flex flex-col"><ft-ranking></ft-ranking></div>
-						<div class="flex flex-col"><ft-match-history></ft-match-history></div>
 						<div class="flex flex-col"><ft-goal-distribution></ft-goal-distribution></div>
+						<div class="flex flex-col"><ft-match-history></ft-match-history></div>
+						<div class="flex flex-col"><ft-ranking></ft-ranking></div>
 					</div>
 				`
 			else userContent += /*html*/ 'No stats can be shown while logged out.'
@@ -114,19 +114,22 @@ customElements.define(
 			})
 		}
 		renderContent(): string {
-			const user = $user.get()
-			if (!user) return ''
+			const current_user = $user.get()
+			if (!current_user) return ''
 			let html = `<h2 class="flex flex-row p-2 items-center justify-center gap-2">Ranking</h2>`
 			let rank = 1
+			let color = ''
 			const usersRanked = $rankedUsers.get()
 			html += `<div class="flex flex-col pl-4 p-2 justify-around gap-2 border border-gray-200 rounded-xl">`
 			for (const user of usersRanked) {
+				if (user.id === current_user.id) color = `text-green-400 font-bold`
+				else color = ''
 				console.log('go')
 				html += `
 				<div class="flex items-center p-2 justify-center gap-10 border border-gray-200 rounded-xl">
 					<img src="${getAvatarSrc(user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
-					<span class="flex items-center gap-2">${rank}</span>
-					<span class="flex items-center gap-2"> ${user.name}</span>
+					<span class="flex items-center gap-2 ${color}">${rank}</span>
+					<span class="flex items-center gap-2 ${color}"> ${user.name}</span>
 				</div>`
 				rank++
 				if (rank === 11) break
