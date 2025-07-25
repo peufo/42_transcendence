@@ -76,11 +76,13 @@ async function main() {
 	await seed(db, { matches, roundsRelations }).refine((f) => ({
 		matches: {
 			columns: {
-				player1Id: f.default({
-					defaultValue: 2,
+				player1Id: f.int({
+					minValue: 1,
+					maxValue: 20,
 				}),
-				player2Id: f.valuesFromArray({
-					values: [11, 12, 13, 14, 15, 16, 17, 18, 19],
+				player2Id: f.int({
+					minValue: 1,
+					maxValue: 20,
 				}),
 				player1Score: f.valuesFromArray({
 					values: [0, 1, 2, 3, 4, 5],
@@ -92,7 +94,7 @@ async function main() {
 					defaultValue: 5,
 				}),
 			},
-			count: 11,
+			count: 3000,
 		},
 	}))
 
