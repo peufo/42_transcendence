@@ -218,7 +218,23 @@ customElements.define(
 				100
 			).toPrecision(3)
 			const averageRally = getAverageRally(userMatches).toPrecision(2)
-			const rankingPercentage = getRankingPercentage(getAllUsersStats, user)
+			const rank = getUserRank(getAllUsersStats, user)
+			const leagueImage = getLeague(getAllUsersStats, rank)
+			let filler = 'th'
+			switch (rank) {
+				case 1:
+					filler = 'st'
+					break
+				case 2:
+					filler = 'nd'
+					break
+				case 3:
+					filler = 'rd'
+					break
+				default:
+					filler = 'th'
+					break
+			}
 			const html = `
 			<div class="grid grid-flow-col grid-rows-2 gap-2">
 				<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold">Total match played</h2>
@@ -229,8 +245,16 @@ customElements.define(
 				<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2">${winRate} %</h2>
 				<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold">Average rally per round</h2>
 				<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2">${averageRally}</h2>
-				<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold">League</h2>
-				${rankingPercentage}
+				<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold">Rank</h2>
+				<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2">${rank}${filler}</h2>
+				<div class="flex flex-row justify-center items-center">
+					<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold">League</h2>
+					<div class="flex flex-row justify-center items-center relative group">
+						<button id="league" class="flex items-center justify-center bg-gray-600 h-5 w-5 text-white rounded-xl">?</button>
+						${getLeagueModal()}
+					</div>
+				</div>
+				${leagueImage}
 			</div>`
 			return html
 		}
@@ -339,16 +363,18 @@ function getAvatarSrc(user: UserBasic): string {
 	return user.avatarPlaceholder
 }
 
-function getRankingPercentage(
-	usersStats: UserStats[],
-	user: UserBasic,
-): string {
+function getUserRank(usersStats: UserStats[], user: UserBasic): number {
 	let rank = 1
-	for (const users of usersStats) {
-		if (users.id === user.id) break
+	for (const userstat of usersStats) {
+		if (userstat.id === user.id) break
 		rank++
 	}
-	const percentage = (rank / usersStats.length) * 100
+	return rank
+}
+
+function getLeague(usersStats: UserStats[], user_rank: number): string {
+	const percentage = (user_rank / usersStats.length) * 100
+	console.log(percentage)
 	let color = '#000000'
 	let league_name = 'Wood'
 	switch (true) {
@@ -389,15 +415,15 @@ function getRankingPercentage(
 			league_name = 'Stone'
 			break
 		default:
-			color = '8B5E3C'
+			color = '#8B5E3C'
 			league_name = 'Wood'
 			break
 	}
-	const leagueSvg = getLeague(color, league_name)
+	const leagueSvg = getLeagueImage(color, league_name)
 	return leagueSvg
 }
 
-function getLeague(color: string, league_name: string): string {
+function getLeagueImage(color: string, league_name: string): string {
 	const leagueSvg = `
 	<div class="flex flex-col p-2 items-center justify-center text-center gap-2">
 		<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold" style="color:${color};">${league_name}</h2>
@@ -426,4 +452,49 @@ function getLeague(color: string, league_name: string): string {
 		</svg>
 	</div>`
 	return leagueSvg
+}
+
+function getLeagueModal(): string {
+	let html = ''
+	const leagues_names = [
+		'Mythical',
+		'Obsidian',
+		'Ruby',
+		'Sapphire',
+		'Emerald',
+		'Crystal',
+		'Steel',
+		'Iron',
+		'Stone',
+		'Wood',
+	]
+	const leagues_colors = [
+		'#FF4500',
+		'#2E2E2E',
+		'#C72C48',
+		'#0F52BA',
+		'#3EB489',
+		'#A0E7E5',
+		'#7A8B8B',
+		'#43464B',
+		'#708090',
+		'#8B5E3C',
+	]
+	html += `
+	<div class="absolute left-1/2 top-full transform -translate-x-1/2 p-4 border border-gray-400 rounded-2xl bg-white shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 z-10 flex justify-center items-center">
+		<div class="flex flex-row justify-center items-center">
+			`
+	for (let i = 0; i < leagues_colors.length; i++) {
+		html += `
+				${getLeagueImage(leagues_colors[i], leagues_names[i])}
+				`
+		if (i < leagues_colors.length - 1)
+			html += `
+		<div class="flex flex-col p-2 items-center justify-center text-center gap-2 font-bold">🡸</div>
+		`
+	}
+	html += `
+		</div>
+	</div>`
+	return html
 }
