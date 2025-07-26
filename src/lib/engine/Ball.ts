@@ -9,14 +9,14 @@ import {
 	BALL_MAX_SPEED,
 	BALL_SUBSTEPS,
 	BALL_TIME_TO_REACH_MAX_SPEED,
+	COLLISION_TYPE,
 	type Engine,
+	EVENT_TYPE,
 	PADDLE_BASE_HEIGHT,
 	PADDLE_BASE_WIDTH,
 	type Player,
 	type Round,
 	TICK_INTERVAL,
-	Collision,
-    COLLISION_TYPE,
 } from './index.js'
 import type { Paddle } from './Paddle.js'
 import { Vector2 } from './Vector2.js'
@@ -30,7 +30,6 @@ export class Ball {
 	)
 	#engine: Engine
 	#rallyCount: number
-	#lastCollision: Collision | null
 	get position() {
 		return this.#position
 	}
@@ -44,52 +43,42 @@ export class Ball {
 		this.#position = new Vector2(position.x, position.y)
 	}
 
-	#handleVerticalWallCollision(): Collision | null {
-		let col: Collision | null
+	#handleVerticalWallCollision(): boolean {
 		if (this.#position.y <= 0) {
 			this.#position.y = 0
 			this.#velocity.y = -this.#velocity.y
-			col = { type: COLLISION_TYPE.WALL_TOP, x: this.#position.x, y: 0 }
-			return col
+			this.#engine.onEvent(EVENT_TYPE.COLLISION, {
+				type: COLLISION_TYPE.WALL_TOP,
+				x: this.#position.x + BALL_BASE_SIZE / 2,
+				y: 0,
+			})
+			return true
 		}
 		if (this.#position.y + BALL_BASE_SIZE >= ARENA_HEIGHT) {
 			this.#position.y = ARENA_HEIGHT - BALL_BASE_SIZE
 			this.#velocity.y = -this.#velocity.y
-			col = { type: COLLISION_TYPE.WALL_BOTTOM, x: this.#position.x, y: ARENA_HEIGHT - BALL_BASE_SIZE }
-			return col
+			this.#engine.onEvent(EVENT_TYPE.COLLISION, {
+				type: COLLISION_TYPE.WALL_BOTTOM,
+				x: this.#position.x + BALL_BASE_SIZE / 2,
+				y: ARENA_HEIGHT,
+			})
+			return true
 		}
-		return null
+		return false
 	}
 
-	#isCollidingWithPaddle(paddle: Paddle, name: string): null | Collision{
+	#isCollidingWithPaddle(paddle: Paddle): boolean {
 		if (
 			this.#position.x + BALL_BASE_SIZE >= paddle.position.x &&
 			this.#position.x <= paddle.position.x + PADDLE_BASE_WIDTH &&
 			this.#position.y + BALL_BASE_SIZE >= paddle.position.y &&
 			this.#position.y <= paddle.position.y + PADDLE_BASE_HEIGHT
-		)
-		{
-			if (name === "p1")
-			{
-				let collision: Collision = {
-					type: COLLISION_TYPE.PADDLE_P1,
-					x: this.#position.x + BALL_BASE_SIZE,
-					y: this.position.y
-				}
-				return collision
-			}
-			else if (name === "p2")
-			{
-				let collision: Collision = {
-					type: COLLISION_TYPE.PADDLE_P2,
-					x: this.#position.x + BALL_BASE_SIZE,
-					y: this.position.y
-				}
-				return collision
-			}
+		) {
+			return true
 		}
-		return null
+		return false
 	}
+
 	#bouncePaddle(paddle: Paddle) {
 		const relativeInsersectY =
 			paddle.position.y +
@@ -113,21 +102,28 @@ export class Ball {
 		}
 	}
 
-	#handlePaddlesCollisions(): Collision | null {
+	#handlePaddlesCollisions(): boolean {
 		const { paddles } = this.#engine
-		let col: Collision 
-		if (this.#isCollidingWithPaddle(paddles.p1, "p1")) {
+		if (this.#isCollidingWithPaddle(paddles.p1)) {
 			this.#position.x = paddles.p1.position.x + PADDLE_BASE_WIDTH
 			this.#bouncePaddle(paddles.p1)
-			return (col = {type: COLLISION_TYPE.PADDLE_P1, x: this.position.x, y: this.position.y})
+			this.#engine.onEvent(EVENT_TYPE.COLLISION, {
+				type: COLLISION_TYPE.PADDLE_P1,
+				x: this.position.x,
+				y: this.position.y + BALL_BASE_SIZE / 2,
+			})
 		}
-		if (this.#isCollidingWithPaddle(paddles.p2, "p2")) {
+		if (this.#isCollidingWithPaddle(paddles.p2)) {
 			this.#position.x = paddles.p2.position.x - BALL_BASE_SIZE
 			this.#bouncePaddle(paddles.p2)
-			return (col = {type: COLLISION_TYPE.PADDLE_P1, x: this.position.x, y: this.position.y})
-		
+			this.#engine.onEvent(EVENT_TYPE.COLLISION, {
+				type: COLLISION_TYPE.PADDLE_P2,
+				x: this.position.x + BALL_BASE_SIZE,
+				y: this.position.y + BALL_BASE_SIZE / 2,
+			})
+			return true
 		}
-		return null
+		return false
 	}
 
 	#checkPlayerScoring(): Round | null {
@@ -159,7 +155,6 @@ export class Ball {
 				this.#rallyCount++
 				return null
 			}
-
 			if (this.#handleVerticalWallCollision()) {
 				return null
 			}

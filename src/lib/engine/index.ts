@@ -22,9 +22,9 @@ export enum COLLISION_TYPE {
 }
 
 export type Collision = {
-	type: COLLISION_TYPE,
-	x: number,
-	y: number,
+	type: COLLISION_TYPE
+	x: number
+	y: number
 }
 export enum EVENT_TYPE {
 	TICK = 0,
@@ -49,7 +49,6 @@ export type State = {
 	b: { x: number; y: number }
 	p1: number
 	p2: number
-	collision?: Collision
 }
 
 // Game properties
@@ -64,7 +63,7 @@ const rules = {
 
 // Ball properties
 export const BALL_MAX_BOUNCE_ANGLE = (4 * Math.PI) / 12 // <- 60 degrees in radians
-export const BALL_BASE_SPEED = 0.2
+export const BALL_BASE_SPEED = 0.3
 export const BALL_MAX_SPEED = 0.7
 export const BALL_TIME_TO_REACH_MAX_SPEED = 50000
 export const BALL_BASE_SIZE = ARENA_WIDTH / 70
@@ -144,8 +143,8 @@ export class Engine {
 			const { scorer } = round
 			this.#endRound()
 			this.#scores[scorer]++
-			this.#onEvent(EVENT_TYPE.SCORE, this.#scores)
-			this.#onEvent(EVENT_TYPE.ROUND, round)
+			this.onEvent(EVENT_TYPE.SCORE, this.#scores)
+			this.onEvent(EVENT_TYPE.ROUND, round)
 			if (this.#scores[scorer] >= rules.scoreToWin)
 				console.log(`${scorer} won the game !`) // event
 			else this.#newRound()
@@ -155,7 +154,7 @@ export class Engine {
 	#tickLoop() {
 		const tickStart = Date.now()
 		this.#updateState()
-		this.#onEvent(EVENT_TYPE.TICK, {
+		this.onEvent(EVENT_TYPE.TICK, {
 			b: { x: this.#ball.position.x, y: this.#ball.position.y },
 			p1: this.paddles.p1.position.y,
 			p2: this.paddles.p2.position.y,
@@ -165,7 +164,7 @@ export class Engine {
 		if (!this.#gameOver) setTimeout(this.#tickLoop.bind(this), delay)
 	}
 
-	#onEvent<T extends EVENT_TYPE>(eventType: T, data: EngineEventData[T]) {
+	onEvent<T extends EVENT_TYPE>(eventType: T, data: EngineEventData[T]) {
 		this.#options.onEvent?.({ [eventType]: data })
 		if (eventType === EVENT_TYPE.TICK) {
 			this.#options.onTick?.(data as State)
@@ -175,6 +174,9 @@ export class Engine {
 		}
 		if (eventType === EVENT_TYPE.ROUND) {
 			this.#options.onRoundEnd?.(data as Round)
+		}
+		if (eventType === EVENT_TYPE.COLLISION) {
+			this.#options.onCollision?.(data as Collision)
 		}
 	}
 
