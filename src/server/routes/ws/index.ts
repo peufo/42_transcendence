@@ -1,35 +1,37 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import z from 'zod/v4'
 import { Engine } from '../../../lib/engine/index.js'
-import type { SessionEvent } from '../../../lib/type.js'
+import type { FriendshipEvents } from '../../../lib/type.js'
 import { getSessionFromRequest } from '../auth/hooks.js'
 import { engineInputSchema } from './schema.js'
-import { createSessionEvent } from './sessionEvent.js'
+import { createUserEmitter } from './userEmitter.js'
 
-const sessionsEventKeys: (keyof SessionEvent)[] = [
-	'onFriendshipCreated',
-	'onFriendshipAccepted',
-	'onFriendshipDeleted',
-]
+const friendshipEvents: Record<keyof FriendshipEvents, true> = {
+	onAccepted: true,
+	onCreated: true,
+	onDeleted: true,
+}
 
 export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
-	server.get('/session', { websocket: true }, async (socket, req) => {
+	server.get('/friendship', { websocket: true }, async (socket, req) => {
 		const session = await getSessionFromRequest(req)
 		if (!session) {
 			socket.close(3000, 'Authentification required')
 			return
 		}
-		const sessionEvent = createSessionEvent(session.id)
-		function createEventSender<K extends keyof SessionEvent>(eventName: K) {
-			const sender = (data: SessionEvent[K]) => {
+		const userEmitter = createUserEmitter(session.userId)
+		function createEventSender<K extends keyof FriendshipEvents>(eventName: K) {
+			const sender = (data: FriendshipEvents[K]) => {
 				socket.send(JSON.stringify({ [eventName]: data }))
 			}
 			// @ts-ignore
-			sessionEvent.on(eventName, sender)
+			userEmitter.on(eventName, sender)
 			// @ts-ignore
-			return () => sessionEvent.off(eventName, sender)
+			return () => userEmitter.off(eventName, sender)
 		}
-		const sendersOff = sessionsEventKeys.map(createEventSender)
+		const sendersOff = Object.keys(friendshipEvents).map((eventName) => {
+			return createEventSender(eventName as keyof FriendshipEvents)
+		})
 		socket.on('close', (_message) => {
 			for (const senderOff of sendersOff) senderOff()
 		})

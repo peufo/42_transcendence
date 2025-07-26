@@ -75,10 +75,11 @@ export type Tournament = {
 // ◦ ────────────────────────────── ◦
 
 // TODO: become FriendshipEvent
-export type SessionEvent = {
-	onFriendshipCreated: { friendship: Friendship }
-	onFriendshipAccepted: { friendship: Friendship }
-	onFriendshipDeleted: { friendshipId: number }
+
+export type FriendshipEvents = {
+	onCreated: { friendship: Friendship }
+	onAccepted: { friendship: Friendship }
+	onDeleted: { friendshipId: number }
 }
 
 export type TournamentEvent = {

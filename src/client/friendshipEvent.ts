@@ -1,40 +1,42 @@
-import type { SessionEvent } from '../lib/type.js'
+import type { FriendshipEvents } from '../lib/type.js'
 import { toast } from './components/ft-toast.js'
 import { createEffect } from './utils/signal.js'
 import { $friendships, $user } from './utils/store.js'
 import { stringToDate } from './utils/stringToDate.js'
 
-let sessionSocket: WebSocket | null = null
+let friendshipSocket: WebSocket | null = null
 
 const cleanEffect = createEffect(() => {
 	const user = $user.get()
 	if (!user) {
-		if (sessionSocket) sessionSocket = null
+		if (friendshipSocket) friendshipSocket = null
 		return
 	}
-	if (sessionSocket) return
+	if (friendshipSocket) return
 	console.log('Open session socket')
-	sessionSocket = new WebSocket(`ws://${document.location.host}/ws/session`)
+	friendshipSocket = new WebSocket(
+		`ws://${document.location.host}/ws/friendship`,
+	)
 
-	sessionSocket.addEventListener('message', (event) => {
-		const data: Partial<SessionEvent> = JSON.parse(event.data)
+	friendshipSocket.addEventListener('message', (event) => {
+		const data: Partial<FriendshipEvents> = JSON.parse(event.data)
 		stringToDate(data)
-		if (data.onFriendshipCreated) {
-			const { friendship } = data.onFriendshipCreated
+		if (data.onCreated) {
+			const { friendship } = data.onCreated
 			toast.info(`New invitation from ${friendship.withUser.name}`)
 			$friendships.update((friendships) => [...friendships, friendship])
 		}
 
-		if (data.onFriendshipAccepted) {
-			const { friendship } = data.onFriendshipAccepted
+		if (data.onAccepted) {
+			const { friendship } = data.onAccepted
 			toast.success(`${friendship.withUser.name} accepted your invitation`)
 			$friendships.update((friendships) =>
 				friendships.map((f) => (f.id === friendship.id ? friendship : f)),
 			)
 		}
 
-		if (data.onFriendshipDeleted) {
-			const { friendshipId } = data.onFriendshipDeleted
+		if (data.onDeleted) {
+			const { friendshipId } = data.onDeleted
 			$friendships.update((friendships) =>
 				friendships.filter(({ id }) => id !== friendshipId),
 			)
