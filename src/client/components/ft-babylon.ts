@@ -39,23 +39,29 @@ customElements.define(
 		constructor() {
 			super()
 			this.classList.add('w-full', 'h-full')
+			this.initAsync() // Appeler la méthode d'initialisation asynchrone
+		}
 
-			this.initCanvasAndEngine()
-			this.setupScene()
-			this.createGameObjects()
-			this.setupVisualEffects()
-			this.setupShadows()
-			this.startEngine()
-			this.setupControls()
-			this.setupScore()
-			this.babylonEngine.runRenderLoop(() => this.scene.render())
-			this.disconnectedCallback
+		async initAsync() {
+			try {
+				this.initCanvasAndEngine()
+				this.setupScene()
+				await this.createGameObjects() // Attendre la fin de createGameObjects
+				console.log('Ball mesh created:', this.ballMesh?.name) // Vérifier que ballMesh est défini
+				this.setupVisualEffects()
+				this.setupShadows()
+				this.startEngine()
+				this.setupControls()
+				this.setupScore()
+				this.babylonEngine.runRenderLoop(() => this.scene.render())
+			} catch (error) {
+				console.error("Erreur lors de l'initialisation:", error)
+			}
 		}
 
 		connectedCallback() {
 			window.addEventListener('resize', () => this.babylonEngine.resize())
 		}
-
 		initCanvasAndEngine() {
 			this.canvas = document.createElement('canvas')
 			this.canvas.style.width = '100%'
@@ -100,7 +106,10 @@ customElements.define(
 					this.scene,
 				)
 				this.scene.environmentTexture = envTexture
-				this.scene.createDefaultSkybox(envTexture, true, 5000)
+				const skybox = this.scene.createDefaultSkybox(envTexture, true, 5000)
+				this.scene.registerBeforeRender(() => {
+					if (skybox) skybox.rotation.y += 0.0001
+				})
 			}
 		}
 
@@ -136,6 +145,10 @@ customElements.define(
 		}
 
 		setupVisualEffects() {
+			if (!this.ballMesh) {
+				throw new Error('ballMesh est undefined dans setupVisualEffects')
+			}
+
 			const trail = new BABYLON.TrailMesh('new', this.ballMesh, this.scene, {
 				diameter: 1,
 				length: 20,
@@ -158,36 +171,19 @@ customElements.define(
 			myParticleSystem.particleTexture = new BABYLON.Texture(
 				'https://assets.babylonjs.com/textures/flare.png',
 			)
-			/*
-			myParticleSystem.emitter = new BABYLON.Vector3(0, 10, 0)
-			myParticleSystem.minSize = 0.5;
-myParticleSystem.maxSize = 5.5;
-myParticleSystem.minLifeTime = 0.3;
-myParticleSystem.maxLifeTime = 1.2;
-myParticleSystem.emitRate = 500;
-myParticleSystem.color1 = new BABYLON.Color4(1, 0.5, 0, 1);
-myParticleSystem.color2 = new BABYLON.Color4(1, 1, 0, 1);
-myParticleSystem.direction1 = new BABYLON.Vector3(-1, 1, 0);
-myParticleSystem.direction2 = new BABYLON.Vector3(1, 1, 0);
-myParticleSystem.minEmitBox = new BABYLON.Vector3(-0.5, 0, -0.5); // position de spawn aléatoire
-myParticleSystem.maxEmitBox = new BABYLON.Vector3(0.5, 0, 0.5);
-
-myParticleSystem.direction1 = new BABYLON.Vector3(0, 1, 0); // monte tout droit
-myParticleSystem.direction2 = new BABYLON.Vector3(0, 1.5, 0); // ou plus vite
-
-myParticleSystem.minEmitPower = 1;
-myParticleSystem.maxEmitPower = 3;
-
-myParticleSystem.updateSpeed = 0.01;
-
-myParticleSystem.gravity = new BABYLON.Vector3(0, -1, 0); // tire vers le bas (effet feu)
-
-
-
-			myParticleSystem.start();
-			console.log("Fire system started:", myParticleSystem);
-
-*/
+			myParticleSystem.emitter = this.ballMesh // Suivre la balle
+			myParticleSystem.minSize = 0.5
+			myParticleSystem.maxSize = 2.0
+			myParticleSystem.minLifeTime = 0.3
+			myParticleSystem.maxLifeTime = 1.0
+			myParticleSystem.emitRate = 300
+			myParticleSystem.color1 = new BABYLON.Color4(0, 0.5, 1, 1) // Bleu
+			myParticleSystem.color2 = new BABYLON.Color4(0, 0, 1, 1)
+			myParticleSystem.minEmitPower = 2
+			myParticleSystem.maxEmitPower = 5
+			myParticleSystem.updateSpeed = 0.01
+			myParticleSystem.start()
+			console.log('Fire system started:', myParticleSystem)
 		}
 
 		setupShadows() {

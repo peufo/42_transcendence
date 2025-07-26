@@ -9,7 +9,9 @@ import {
 	BALL_MAX_SPEED,
 	BALL_SUBSTEPS,
 	BALL_TIME_TO_REACH_MAX_SPEED,
+	COLLISION_TYPE,
 	type Engine,
+	EVENT_TYPE,
 	PADDLE_BASE_HEIGHT,
 	PADDLE_BASE_WIDTH,
 	type Player,
@@ -28,7 +30,6 @@ export class Ball {
 	)
 	#engine: Engine
 	#rallyCount: number
-
 	get position() {
 		return this.#position
 	}
@@ -46,11 +47,21 @@ export class Ball {
 		if (this.#position.y <= 0) {
 			this.#position.y = 0
 			this.#velocity.y = -this.#velocity.y
+			this.#engine.onEvent(EVENT_TYPE.COLLISION, {
+				type: COLLISION_TYPE.WALL_TOP,
+				x: this.#position.x + BALL_BASE_SIZE / 2,
+				y: 0,
+			})
 			return true
 		}
 		if (this.#position.y + BALL_BASE_SIZE >= ARENA_HEIGHT) {
 			this.#position.y = ARENA_HEIGHT - BALL_BASE_SIZE
 			this.#velocity.y = -this.#velocity.y
+			this.#engine.onEvent(EVENT_TYPE.COLLISION, {
+				type: COLLISION_TYPE.WALL_BOTTOM,
+				x: this.#position.x + BALL_BASE_SIZE / 2,
+				y: ARENA_HEIGHT,
+			})
 			return true
 		}
 		return false
@@ -62,8 +73,9 @@ export class Ball {
 			this.#position.x <= paddle.position.x + PADDLE_BASE_WIDTH &&
 			this.#position.y + BALL_BASE_SIZE >= paddle.position.y &&
 			this.#position.y <= paddle.position.y + PADDLE_BASE_HEIGHT
-		)
+		) {
 			return true
+		}
 		return false
 	}
 
@@ -95,11 +107,20 @@ export class Ball {
 		if (this.#isCollidingWithPaddle(paddles.p1)) {
 			this.#position.x = paddles.p1.position.x + PADDLE_BASE_WIDTH
 			this.#bouncePaddle(paddles.p1)
-			return true
+			this.#engine.onEvent(EVENT_TYPE.COLLISION, {
+				type: COLLISION_TYPE.PADDLE_P1,
+				x: this.position.x,
+				y: this.position.y + BALL_BASE_SIZE / 2,
+			})
 		}
 		if (this.#isCollidingWithPaddle(paddles.p2)) {
 			this.#position.x = paddles.p2.position.x - BALL_BASE_SIZE
 			this.#bouncePaddle(paddles.p2)
+			this.#engine.onEvent(EVENT_TYPE.COLLISION, {
+				type: COLLISION_TYPE.PADDLE_P2,
+				x: this.position.x + BALL_BASE_SIZE,
+				y: this.position.y + BALL_BASE_SIZE / 2,
+			})
 			return true
 		}
 		return false

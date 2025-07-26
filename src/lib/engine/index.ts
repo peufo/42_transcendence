@@ -14,16 +14,30 @@ export type Round = {
 	ballPositionY: number
 }
 
+export enum COLLISION_TYPE {
+	WALL_TOP = 'wall_top',
+	WALL_BOTTOM = 'wall_bottom',
+	PADDLE_P1 = 'paddle_p1',
+	PADDLE_P2 = 'paddle_p2',
+}
+
+export type Collision = {
+	type: COLLISION_TYPE
+	x: number
+	y: number
+}
 export enum EVENT_TYPE {
 	TICK = 0,
 	SCORE = 1,
 	ROUND = 2,
+	COLLISION = 3,
 }
 
 export type EngineEventData = {
 	[EVENT_TYPE.TICK]?: State
 	[EVENT_TYPE.SCORE]?: Scores
 	[EVENT_TYPE.ROUND]?: Round
+	[EVENT_TYPE.COLLISION]?: Collision
 }
 
 type EngineOption = {
@@ -31,6 +45,7 @@ type EngineOption = {
 	onTick?: (state: State) => void
 	onScore?: (scores: Scores) => void
 	onRoundEnd?: (round: Round) => void
+	onCollision?: (collision: Collision) => void
 }
 
 export type State = {
@@ -51,7 +66,7 @@ const rules = {
 
 // Ball properties
 export const BALL_MAX_BOUNCE_ANGLE = (4 * Math.PI) / 12 // <- 60 degrees in radians
-export const BALL_BASE_SPEED = 0.2
+export const BALL_BASE_SPEED = 0.3
 export const BALL_MAX_SPEED = 0.7
 export const BALL_TIME_TO_REACH_MAX_SPEED = 50000
 export const BALL_BASE_SIZE = ARENA_WIDTH / 70
@@ -134,7 +149,7 @@ export class Engine {
 	#tickLoop() {
 		const tickStart = Date.now()
 		this.#updateState()
-		this.#onEvent(EVENT_TYPE.TICK, {
+		this.onEvent(EVENT_TYPE.TICK, {
 			b: { x: this.#ball.position.x, y: this.#ball.position.y },
 			p1: this.paddles.p1.position.y,
 			p2: this.paddles.p2.position.y,
@@ -146,7 +161,7 @@ export class Engine {
 		}
 	}
 
-	#onEvent<T extends EVENT_TYPE>(eventType: T, data: EngineEventData[T]) {
+	onEvent<T extends EVENT_TYPE>(eventType: T, data: EngineEventData[T]) {
 		this.#options.onEvent?.({ [eventType]: data })
 		if (eventType === EVENT_TYPE.TICK) {
 			this.#options.onTick?.(data as State)
@@ -157,14 +172,17 @@ export class Engine {
 		if (eventType === EVENT_TYPE.ROUND) {
 			this.#options.onRoundEnd?.(data as Round)
 		}
+		if (eventType === EVENT_TYPE.COLLISION) {
+			this.#options.onCollision?.(data as Collision)
+		}
 	}
 
 	#endRound(roundInfo: Round) {
 		this.#roundOver = true
 		const { scorer } = roundInfo
 		this.#scores[scorer]++
-		this.#onEvent(EVENT_TYPE.SCORE, this.#scores)
-		this.#onEvent(EVENT_TYPE.ROUND, roundInfo)
+		this.onEvent(EVENT_TYPE.SCORE, this.#scores)
+		this.onEvent(EVENT_TYPE.ROUND, roundInfo)
 		if (this.#scores[scorer] >= rules.scoreToWin) {
 			this.#gameOver = true
 			console.log(`${scorer} won the game !`) // event
