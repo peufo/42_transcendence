@@ -41,6 +41,7 @@ export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 		postSchema('/auth/logout', null),
 		async (_req, res) => {
 			const user = permission.user(res)
+			// TODO: remove only if user don't have session
 			removeUserEmitter(user.id)
 			const now = new Date()
 			res.setCookie('session', '', { path: '/', expires: now })
