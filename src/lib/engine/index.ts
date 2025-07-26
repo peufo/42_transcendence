@@ -14,26 +14,42 @@ export type Round = {
 	ballPositionY: number
 }
 
+export enum COLLISION_TYPE {
+	WALL_TOP = 'wall_top',
+	WALL_BOTTOM = 'wall_bottom',
+	PADDLE_P1 = 'paddle_p1',
+	PADDLE_P2 = 'paddle_p2',
+}
+
+export type Collision = {
+	type: COLLISION_TYPE,
+	x: number,
+	y: number,
+}
 export enum EVENT_TYPE {
 	TICK = 0,
 	SCORE = 1,
 	ROUND = 2,
+	COLLISION = 3,
 }
 export type EngineEventData = {
 	[EVENT_TYPE.TICK]?: State
 	[EVENT_TYPE.SCORE]?: Scores
 	[EVENT_TYPE.ROUND]?: Round
+	[EVENT_TYPE.COLLISION]?: Collision
 }
 type EngineOption = {
 	onEvent?: (event: EngineEventData) => void
 	onTick?: (state: State) => void
 	onScore?: (scores: Scores) => void
 	onRoundEnd?: (round: Round) => void
+	onCollision?: (collision: Collision) => void
 }
 export type State = {
 	b: { x: number; y: number }
 	p1: number
 	p2: number
+	collision?: Collision
 }
 
 // Game properties
