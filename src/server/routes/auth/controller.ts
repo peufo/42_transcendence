@@ -107,7 +107,7 @@ async function getSession(sessionId: string): Promise<DB.Session | null> {
 	return session
 }
 
-async function deleteSession(sessionId: string): Promise<null> {
+export async function deleteSession(sessionId: string): Promise<null> {
 	await db.delete(sessions).where(eq(sessions.id, sessionId))
 	return null
 }

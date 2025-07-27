@@ -1,6 +1,7 @@
 import type { FastifyReply } from 'fastify'
 import type { User } from '../../lib/type.js'
 import { server } from '../main.js'
+import type { DB } from '../types.js'
 
 export const permission = {
 	user(res: FastifyReply): User {
@@ -8,9 +9,9 @@ export const permission = {
 		if (!user) throw server.httpErrors.unauthorized()
 		return user
 	},
-	sessionId(res: FastifyReply): string {
-		const sessionId = res.locals?.sessionId
-		if (!sessionId) throw server.httpErrors.unauthorized()
-		return sessionId
+	session(res: FastifyReply): DB.Session {
+		const session = res.locals?.session
+		if (!session) throw server.httpErrors.unauthorized()
+		return session
 	},
 }

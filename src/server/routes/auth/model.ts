@@ -1,7 +1,7 @@
 import argon2 from 'argon2'
 import { eq } from 'drizzle-orm'
 import type { RoutesPost } from '../../../lib/type.js'
-import { db, users } from '../../db/index.js'
+import { db, sessions, users } from '../../db/index.js'
 
 export async function getAuthUser(name: string) {
 	const result = await db.query.users.findFirst({
@@ -28,4 +28,10 @@ export function createAvatarPlaceholder() {
 	const avatarUrl = new URL('https://api.dicebear.com/9.x/bottts-neutral/svg')
 	avatarUrl.searchParams.append('seed', String(Math.random()))
 	return avatarUrl.toString()
+}
+
+export async function getUserSessions(userId: number) {
+	return db.query.sessions.findMany({
+		where: eq(sessions.userId, userId),
+	})
 }

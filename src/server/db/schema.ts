@@ -109,11 +109,9 @@ export const tournaments = sqliteTable('tournaments', {
 		.references(() => users.id),
 })
 
-// TODO: add relation type ? owner, etc..
 export const tournamentsParticipants = sqliteTable(
 	'tournaments_participants',
 	{
-		// state: text({ enum: ['waiting', 'inGame'] }),
 		tournamentId: int()
 			.notNull()
 			.references(() => tournaments.id, { onDelete: 'cascade' }),

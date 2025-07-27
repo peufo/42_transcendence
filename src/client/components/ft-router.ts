@@ -151,10 +151,6 @@ async function onSubmitForm(event: SubmitEvent) {
 
 	if ('message' in json) toast.success(json.message)
 
-	if (!options) {
-		console.log('TODO: comportement par défaut')
-		return
-	}
 	stringToDate(json)
 	options.onSuccess?.(json)
 	if (options.redirectTo) {

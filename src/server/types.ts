@@ -24,7 +24,7 @@ declare module 'fastify' {
 	interface FastifyReply {
 		locals?: {
 			user?: Omit<DB.User, 'passwordHash'>
-			sessionId?: string
+			session?: DB.Session
 		}
 	}
 }

@@ -74,8 +74,6 @@ export type Tournament = {
 // │        Sockets events          │
 // ◦ ────────────────────────────── ◦
 
-// TODO: become FriendshipEvent
-
 export type FriendshipEvents = {
 	onCreated: { friendship: Friendship }
 	onAccepted: { friendship: Friendship }

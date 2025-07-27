@@ -26,7 +26,7 @@ export const authHook: preHandlerAsyncHookHandler = async (req, res) => {
 				passwordHash: false,
 			},
 		})
-		res.locals = { user, sessionId: session.id }
+		res.locals = { user, session }
 	} catch (err) {
 		console.error(err)
 	}
