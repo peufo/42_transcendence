@@ -1,7 +1,7 @@
 import { EventEmitter } from 'node:events'
 import type { FriendshipEvents } from '../../../lib/type.js'
+import type { EventMap } from './controller.js'
 
-type EventMap<T extends Record<string, unknown>> = { [K in keyof T]: [T[K]] }
 type FriendshipEmitter = EventEmitter<EventMap<FriendshipEvents>>
 
 const userEmitterMap = new Map<number, FriendshipEmitter>()

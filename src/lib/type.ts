@@ -80,8 +80,19 @@ export type FriendshipEvents = {
 	onDeleted: { friendshipId: number }
 }
 
-export type TournamentEvent = {
+export type TournamentEvents = {
 	onNewParticipant: { user: UserBasic }
+}
+
+export type RoutesSocket = {
+	'/friendships': {
+		query: null
+		events: FriendshipEvents
+	}
+	'/tournaments': {
+		query: { id: number }
+		events: TournamentEvents
+	}
 }
 
 // ◦ ────────────────────────────── ◦
