@@ -24,7 +24,7 @@ export const users = sqliteTable('users', {
 
 export const usersRelations = relations(users, ({ many }) => ({
 	friends: many(friendships),
-	tournaments: many(tournamentsParticipants),
+	participations: many(tournamentsParticipants),
 }))
 
 export const sessions = sqliteTable('sessions', {

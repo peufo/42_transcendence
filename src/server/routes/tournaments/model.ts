@@ -54,6 +54,7 @@ export async function joinTournament(
 		throw server.httpErrors.forbidden(
 			"Sorry, you can't join this tournament, he's full.",
 		)
-	await db.insert(tournamentsParticipants).values({ tournamentId, userId })
+	if (!tournament.participants.find(({ user }) => user.id === userId))
+		await db.insert(tournamentsParticipants).values({ tournamentId, userId })
 	return getUserBasic(userId)
 }

@@ -126,17 +126,19 @@ customElements.define(
 					? /*html*/ `<span class="badge badge-green">Online</span>`
 					: /*html*/ `<span class="badge badge-dark">Offline</span>`
 
-				let joinBtn = ''
 				const removeBtn = /*html*/ `
-                <form method="post" action="/friendships/delete">
-                        <input type="hidden" name="friendshipId" value="${friendship.id}">
+                	<form method="post" action="/friendships/delete">
+						<input type="hidden" name="friendshipId" value="${friendship.id}">
                         <input class="btn btn-red" type="submit" value="Remove">
                     </form>`
-				if (friend.gameId) {
-					joinBtn = /*html*/ `
-						<a href="/tournament/play?gameId=${friend.gameId}" class="btn btn-border">
-							Join
-						</a>`
+				let joinButtons = ''
+				for (const { tournament } of friend.participations) {
+					if (tournament.state !== 'open') continue
+					joinButtons += /*html*/ `
+					<form method="post" action="/tournaments/join">
+                        <input type="hidden" name="tournamentId" value="${tournament.id}">
+                        <input class="btn btn-border" type="submit" value="Join">
+                    </form>`
 				}
 
 				html += /*html*/ `
@@ -145,7 +147,7 @@ customElements.define(
                         <span>${friend.name}</span>
                         ${badge}
                         <div class="flex-grow"></div>
-                        ${joinBtn}
+                        ${joinButtons}
                         ${removeBtn}
                     </div>
                 `

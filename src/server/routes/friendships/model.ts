@@ -26,7 +26,6 @@ const friendColumns = {
 	...userBasicColumns,
 	isActive: true,
 	lastLogin: true,
-	// TODO: gameId: true
 } satisfies DB.Columns<Friend>
 
 export async function getFriendships(
@@ -40,8 +39,14 @@ export async function getFriendships(
 				state ? eq(friendships.state, state) : undefined,
 			),
 			with: {
-				user1: { columns: friendColumns },
-				user2: { columns: friendColumns },
+				user1: {
+					columns: friendColumns,
+					with: { participations: { with: { tournament: true } } },
+				},
+				user2: {
+					columns: friendColumns,
+					with: { participations: { with: { tournament: true } } },
+				},
 			},
 		})
 		.then(
@@ -59,6 +64,13 @@ export async function getUserFriend(userId: number): Promise<Friend> {
 	const friend = await db.query.users.findFirst({
 		where: eq(users.id, userId),
 		columns: friendColumns,
+		with: {
+			participations: {
+				with: {
+					tournament: true,
+				},
+			},
+		},
 	})
 	if (!friend) throw new Error('Friend not found')
 	return friend

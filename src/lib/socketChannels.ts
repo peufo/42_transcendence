@@ -15,8 +15,9 @@ export const serverEvents: {
 		onDeleted: true,
 	},
 	tournaments: {
-		onCanceled: true,
-		onNewParticipant: true,
+		onDeleted: true,
+		onParticipantJoin: true,
+		onParticipantQuit: true,
 	},
 }
 
@@ -33,6 +34,7 @@ export type ChannelSocket<Channel extends keyof SocketChannels> = ReturnType<
 
 export function openChannel<Channel extends keyof SocketChannels>(
 	channel: Channel,
+	query: SocketChannels[Channel]['query'],
 	handlers: {
 		[EventName in keyof ServerEvents<Channel>]: (
 			data: ServerEvents<Channel>[EventName],
@@ -40,7 +42,10 @@ export function openChannel<Channel extends keyof SocketChannels>(
 	},
 ) {
 	console.log('Open socket in channel', channel)
-	const socket = new WebSocket(`ws://${document.location.host}/ws/${channel}`)
+	const searchParams = new URLSearchParams(Object.entries(query || {}))
+	const socket = new WebSocket(
+		`ws://${document.location.host}/ws/${channel}?${searchParams.toString()}`,
+	)
 	function onMessage(messageEvent: MessageEvent) {
 		const data: ServerEvents<Channel> = JSON.parse(messageEvent.data)
 		stringToDate(data)

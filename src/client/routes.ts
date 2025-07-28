@@ -50,15 +50,6 @@ export const API_POST: {
 	'/auth/logout': {
 		redirectTo: () => '/',
 	},
-	'/tournaments/new': {
-		redirectTo: ({ tournamentId }) => `/tournament/play?id=${tournamentId}`,
-	},
-	'/tournaments/delete': {
-		redirectTo: () => '/',
-	},
-	'/tournaments/join': {
-		redirectTo: ({ tournamentId }) => `/tournament/play?id=${tournamentId}`,
-	},
 	'/friendships/new': {
 		invalidate: ['/friendships'],
 		onSuccess({ invitedUserId }) {
@@ -69,6 +60,18 @@ export const API_POST: {
 	},
 	'/friendships/accept': { invalidate: ['/friendships'] },
 	'/friendships/delete': { invalidate: ['/friendships'] },
+	'/tournaments/new': {
+		redirectTo: ({ tournamentId }) => `/tournament/play?id=${tournamentId}`,
+	},
+	'/tournaments/delete': {
+		redirectTo: () => '/me',
+	},
+	'/tournaments/join': {
+		redirectTo: ({ tournamentId }) => `/tournament/play?id=${tournamentId}`,
+	},
+	'/tournaments/quit': {
+		redirectTo: () => '/me',
+	},
 }
 
 export const PAGES = {

@@ -19,15 +19,19 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 
 	server.get(
 		'/tournaments',
-		{ websocket: true, schema: { body: z.object({ id: z.coerce.number() }) } },
+		{
+			websocket: true,
+			schema: { querystring: z.object({ tournamentId: z.coerce.number() }) },
+		},
 		async (socket, req) => {
 			const session = await getSessionFromRequest(req)
-			// TODO: see how to handle http error here
+			// TODO: What is the behaviour of an http error here
 			if (!session) {
 				socket.close(3000, 'Authentification required')
 				return
 			}
-			const tournament = await getTournament(req.body.id).catch((err) => {
+			const { tournamentId } = req.query
+			const tournament = await getTournament(tournamentId).catch((err) => {
 				socket.close(3000, 'Tournament not exist')
 				throw err
 			})

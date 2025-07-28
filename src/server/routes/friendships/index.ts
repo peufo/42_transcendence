@@ -19,7 +19,6 @@ export const friendshipsRoute: FastifyPluginCallbackZod = (
 	server.get('/', getSchema('/friendships', null), async (_req, res) => {
 		const user = permission.user(res)
 		const friendships = await getFriendships(user.id)
-		// TODO: add gameId
 		return res.send({ data: friendships })
 	})
 

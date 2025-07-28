@@ -15,7 +15,7 @@ createEffect(() => {
 		return
 	}
 	if (friendshipChannel) return
-	friendshipChannel = openChannel('friendships', {
+	friendshipChannel = openChannel('friendships', null, {
 		onCreated({ friendship }) {
 			toast.info(`New invitation from ${friendship.withUser.name}`)
 			$friendships.update((friendships) => [...friendships, friendship])

@@ -23,7 +23,7 @@ export type UserStats = UserBasic & {
 export type Friend = UserBasic & {
 	isActive: boolean
 	lastLogin: Date
-	gameId?: string // TODO: add gameId
+	participations: { tournament: Tournament }[]
 }
 
 type FriendshipBase = {
@@ -65,9 +65,12 @@ export type Tournament = {
 	createdAt: Date
 	state: 'open' | 'ongoing' | 'finished'
 	createdBy: number
+	numberOfPlayers: number
+}
+
+export type TournamentWithLookup = Tournament & {
 	createdByUser: UserBasic
 	participants: { user: UserBasic }[]
-	numberOfPlayers: number
 }
 
 // ◦ ────────────────────────────── ◦
@@ -76,6 +79,7 @@ export type Tournament = {
 
 export type SocketChannels = {
 	friendships: {
+		query: null
 		clientEvents: null
 		serverEvents: {
 			onCreated: { friendship: Friendship }
@@ -84,10 +88,12 @@ export type SocketChannels = {
 		}
 	}
 	tournaments: {
+		query: { tournamentId: string }
 		clientEvents: null
 		serverEvents: {
-			onCanceled: null
-			onNewParticipant: { participant: UserBasic }
+			onDeleted: null
+			onParticipantJoin: { participant: UserBasic }
+			onParticipantQuit: { participant: UserBasic }
 		}
 	}
 }
@@ -106,8 +112,8 @@ export type RoutesGet = {
 	'/users': Get<UserBasic[], { search: string }> // TODO: /users/notMyFriends
 	'/friendships': Get<Friendship[]>
 	'/userstats': Get<Match[]>
-	'/tournaments': Get<Tournament, { id: number }>
 	'/allusersstats': Get<UserStats[]>
+	'/tournaments': Get<TournamentWithLookup, { id: number }>
 }
 
 export type RoutesPost = {
@@ -123,6 +129,18 @@ export type RoutesPost = {
 		body: null
 		res: { success: boolean }
 	}
+	'/friendships/new': {
+		body: { invitedUserId: number }
+		res: { success: boolean; invitedUserId: number }
+	}
+	'/friendships/accept': {
+		body: { friendshipId: number }
+		res: { success: boolean; acceptedUserId: number }
+	}
+	'/friendships/delete': {
+		body: { friendshipId: number }
+		res: { success: boolean }
+	}
 	'/tournaments/new': {
 		body: { numberOfPlayers: number }
 		res: { success: boolean; tournamentId: number }
@@ -135,16 +153,8 @@ export type RoutesPost = {
 		body: { tournamentId: number }
 		res: { success: boolean; tournamentId: number }
 	}
-	'/friendships/new': {
-		body: { invitedUserId: number }
-		res: { success: boolean; invitedUserId: number }
-	}
-	'/friendships/accept': {
-		body: { friendshipId: number }
-		res: { success: boolean; acceptedUserId: number }
-	}
-	'/friendships/delete': {
-		body: { friendshipId: number }
-		res: { success: boolean }
+	'/tournaments/quit': {
+		body: { tournamentId: number }
+		res: { success: boolean; tournamentId: number }
 	}
 }

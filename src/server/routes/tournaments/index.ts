@@ -47,7 +47,7 @@ export const tournamentsRoute: FastifyPluginCallbackZod = (
 			const user = permission.user(res)
 			const { tournamentId } = req.body
 			await deleteTournament(tournamentId, user.id)
-			notify.tournaments(tournamentId, 'onCanceled', null)
+			notify.tournaments(tournamentId, 'onDeleted', null)
 			return res.send({ success: true, message: 'Tournament deleted' })
 		},
 	)
@@ -59,10 +59,12 @@ export const tournamentsRoute: FastifyPluginCallbackZod = (
 			const user = permission.user(res)
 			const { tournamentId } = req.body
 			const participant = await joinTournament(tournamentId, user.id)
-			notify.tournaments(tournamentId, 'onNewParticipant', { participant })
+			notify.tournaments(tournamentId, 'onParticipantJoin', { participant })
 			return res.send({ success: true, tournamentId })
 		},
 	)
+
+	// TODO: /quit
 
 	done()
 }
