@@ -6,7 +6,7 @@ import { bindEmitterWithSocket, getEmitter } from './controller.js'
 import { engineInputSchema } from './schema.js'
 
 export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
-	server.get('/friendship', { websocket: true }, async (socket, req) => {
+	server.get('/friendships', { websocket: true }, async (socket, req) => {
 		const session = await getSessionFromRequest(req)
 		if (!session) {
 			socket.close(3000, 'Authentification required')
