@@ -1,4 +1,4 @@
-import type { FriendshipEvents } from '../lib/type.js'
+import type { FriendshipServerEvents } from '../lib/type.js'
 import { toast } from './components/ft-toast.js'
 import { createEffect } from './utils/signal.js'
 import { $friendships, $user } from './utils/store.js'
@@ -19,7 +19,7 @@ const cleanEffect = createEffect(() => {
 	)
 
 	friendshipSocket.addEventListener('message', (event) => {
-		const data: Partial<FriendshipEvents> = JSON.parse(event.data)
+		const data: Partial<FriendshipServerEvents> = JSON.parse(event.data)
 		stringToDate(data)
 		if (data.onCreated) {
 			const { friendship } = data.onCreated

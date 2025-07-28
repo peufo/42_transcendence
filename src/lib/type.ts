@@ -74,24 +74,22 @@ export type Tournament = {
 // │        Sockets events          │
 // ◦ ────────────────────────────── ◦
 
-export type FriendshipEvents = {
+export type FriendshipServerEvents = {
 	onCreated: { friendship: Friendship }
 	onAccepted: { friendship: Friendship }
 	onDeleted: { friendshipId: number }
 }
 
-export type TournamentEvents = {
+export type TournamentServerEvents = {
 	onNewParticipant: { user: UserBasic }
 }
 
-export type RoutesSocket = {
-	'/friendships': {
-		query: null
-		events: FriendshipEvents
+export type SocketChannels = {
+	friendships: {
+		serverEvents: FriendshipServerEvents
 	}
-	'/tournaments': {
-		query: { id: number }
-		events: TournamentEvents
+	tournaments: {
+		serverEvents: TournamentServerEvents
 	}
 }
 

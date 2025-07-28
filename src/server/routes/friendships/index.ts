@@ -1,7 +1,7 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod/v4'
 import { getSchema, permission, postSchema } from '../../utils/index.js'
-import { notifyUser } from '../ws/userEmitter.js'
+import { notify } from '../ws/controller.js'
 import {
 	acceptFriendship,
 	createFriendship,
@@ -42,7 +42,7 @@ export const friendshipsRoute: FastifyPluginCallbackZod = (
 
 			const withUser = await getUserBasic(user.id)
 			if (!withUser) return res.badRequest()
-			await notifyUser(invitedUserId, 'onCreated', {
+			notify.friendships(invitedUserId, 'onCreated', {
 				friendship: { ...friendship, state: 'invited', withUser },
 			})
 			return res.send({ success: true, invitedUserId })
@@ -61,7 +61,7 @@ export const friendshipsRoute: FastifyPluginCallbackZod = (
 					? friendship.user2Id
 					: friendship.user1Id
 			const withUser = await getUserFriend(acceptedUserId)
-			await notifyUser(friendship.createdBy, 'onAccepted', {
+			notify.friendships(friendship.createdBy, 'onAccepted', {
 				friendship: { ...friendship, state: 'friend', withUser },
 			})
 			return res.send({ success: true, acceptedUserId })
@@ -76,7 +76,7 @@ export const friendshipsRoute: FastifyPluginCallbackZod = (
 			const { friendshipId } = req.body
 			const { user1Id, user2Id } = await deleteFriendship(friendshipId)
 			const concernedUserId = user1Id === user.id ? user2Id : user1Id
-			notifyUser(concernedUserId, 'onDeleted', { friendshipId })
+			notify.friendships(concernedUserId, 'onDeleted', { friendshipId })
 			return res.send({ success: true })
 		},
 	)

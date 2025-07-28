@@ -1,7 +1,7 @@
 import argon2 from 'argon2'
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { getSchema, permission, postSchema } from '../../utils/index.js'
-import { removeUserEmitter } from '../ws/userEmitter.js'
+import { deleteEmitter } from '../ws/controller.js'
 import { deleteSession, setSessionCookie } from './controller.js'
 import { createUser, getAuthUser, getUserSessions } from './model.js'
 import { authSchema } from './schema.js'
@@ -43,7 +43,7 @@ export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 			const session = permission.session(res)
 			await deleteSession(session.id)
 			const sessions = await getUserSessions(session.userId)
-			if (!sessions.length) removeUserEmitter(session.userId)
+			if (!sessions.length) deleteEmitter('friendships', session.userId)
 			const now = new Date()
 			res.setCookie('session', '', { path: '/', expires: now })
 			res.send({ success: true })
