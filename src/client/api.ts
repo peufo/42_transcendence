@@ -1,6 +1,6 @@
+import { stringToDate } from '../lib/utils.js'
 import { toast } from './components/ft-toast.js'
 import { API_GET, type RouteApiGet } from './routes.js'
-import { stringToDate } from './utils/stringToDate.js'
 
 export const api = {
 	async get(route: RouteApiGet, query?: string) {
