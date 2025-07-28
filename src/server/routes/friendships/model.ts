@@ -64,11 +64,13 @@ export async function getUserFriend(userId: number): Promise<Friend> {
 	return friend
 }
 
-export async function getUserBasic(userId: number) {
-	return db.query.users.findFirst({
+export async function getUserBasic(userId: number): Promise<UserBasic> {
+	const user = await db.query.users.findFirst({
 		where: eq(users.id, userId),
 		columns: userBasicColumns,
 	})
+	if (!user) throw new Error('User not found')
+	return user
 }
 
 export async function createFriendship(data: DB.FriendshipCreate) {

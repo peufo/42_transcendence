@@ -159,7 +159,7 @@ async function onSubmitForm(event: SubmitEvent) {
 	}
 	if (options.invalidate) {
 		for (const apiRoute of options.invalidate) {
-			api.get(apiRoute)
+			api.get(apiRoute, document.location.search.slice(1))
 		}
 	}
 

@@ -2,6 +2,7 @@ import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import z from 'zod/v4'
 import { Engine } from '../../../lib/engine/index.js'
 import { getSessionFromRequest } from '../auth/hooks.js'
+import { getTournament } from '../tournaments/model.js'
 import { bindEmitterWithSocket, getEmitter } from './controller.js'
 import { engineInputSchema } from './schema.js'
 
@@ -15,6 +16,25 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 		const emitter = getEmitter('friendships', session.userId)
 		bindEmitterWithSocket('friendships', emitter, socket)
 	})
+
+	server.get(
+		'/tournaments',
+		{ websocket: true, schema: { body: z.object({ id: z.coerce.number() }) } },
+		async (socket, req) => {
+			const session = await getSessionFromRequest(req)
+			// TODO: see how to handle http error here
+			if (!session) {
+				socket.close(3000, 'Authentification required')
+				return
+			}
+			const tournament = await getTournament(req.body.id).catch((err) => {
+				socket.close(3000, 'Tournament not exist')
+				throw err
+			})
+			const emitter = getEmitter('tournaments', tournament.id)
+			bindEmitterWithSocket('tournaments', emitter, socket)
+		},
+	)
 
 	server.get('/', { websocket: true }, (socket, _req) => {
 		const engine = new Engine({

@@ -56,6 +56,9 @@ export const API_POST: {
 	'/tournaments/delete': {
 		redirectTo: () => '/',
 	},
+	'/tournaments/join': {
+		redirectTo: ({ tournamentId }) => `/tournament/play?id=${tournamentId}`,
+	},
 	'/friendships/new': {
 		invalidate: ['/friendships'],
 		onSuccess({ invitedUserId }) {

@@ -15,6 +15,7 @@ export const serverEvents: {
 		onDeleted: true,
 	},
 	tournaments: {
+		onCanceled: true,
 		onNewParticipant: true,
 	},
 }
@@ -25,6 +26,10 @@ export const clientEvents: {
 	friendships: {},
 	tournaments: {},
 }
+
+export type ChannelSocket<Channel extends keyof SocketChannels> = ReturnType<
+	typeof openChannel<Channel>
+>
 
 export function openChannel<Channel extends keyof SocketChannels>(
 	channel: Channel,

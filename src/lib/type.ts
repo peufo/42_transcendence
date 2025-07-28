@@ -86,7 +86,8 @@ export type SocketChannels = {
 	tournaments: {
 		clientEvents: null
 		serverEvents: {
-			onNewParticipant: { user: UserBasic }
+			onCanceled: null
+			onNewParticipant: { participant: UserBasic }
 		}
 	}
 }
@@ -129,6 +130,10 @@ export type RoutesPost = {
 	'/tournaments/delete': {
 		body: { tournamentId: number }
 		res: { success: boolean; message: string }
+	}
+	'/tournaments/join': {
+		body: { tournamentId: number }
+		res: { success: boolean; tournamentId: number }
 	}
 	'/friendships/new': {
 		body: { invitedUserId: number }

@@ -1,12 +1,11 @@
-import { openChannel } from '../lib/socketChannels.js'
+import { type ChannelSocket, openChannel } from '../lib/socketChannels.js'
 import { toast } from './components/ft-toast.js'
 import { createEffect } from './utils/signal.js'
 import { $friendships, $user } from './utils/store.js'
 
-let friendshipChannel: ReturnType<typeof openChannel<'friendships'>> | null =
-	null
+let friendshipChannel: ChannelSocket<'friendships'> | null = null
 
-const cleanEffect = createEffect(() => {
+createEffect(() => {
 	const user = $user.get()
 	if (!user) {
 		if (friendshipChannel) {
@@ -34,5 +33,3 @@ const cleanEffect = createEffect(() => {
 		},
 	})
 })
-
-window.addEventListener('unload', () => cleanEffect())

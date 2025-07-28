@@ -41,7 +41,6 @@ export const friendshipsRoute: FastifyPluginCallbackZod = (
 			})
 
 			const withUser = await getUserBasic(user.id)
-			if (!withUser) return res.badRequest()
 			notify.friendships(invitedUserId, 'onCreated', {
 				friendship: { ...friendship, state: 'invited', withUser },
 			})
