@@ -9,7 +9,7 @@ customElements.define(
 			this.name = this.getAttribute('name') || 'file-x'
 			this.svgClass = this.classList.value
 			this.classList.remove(...this.classList)
-			this.classList.add('content')
+			this.classList.add('contents')
 			this.render()
 		}
 

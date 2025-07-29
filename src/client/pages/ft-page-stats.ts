@@ -14,11 +14,11 @@ customElements.define(
 			let userContent = ''
 			if (user)
 				userContent += /*html*/ `
-					<div class="grid grid-cols-2 grid-flow-row gap gap-4 p-10">
-						<div class="flex flex-col"><ft-stats></ft-winrate></div>
-						<div class="flex flex-col"><ft-goal-distribution></ft-goal-distribution></div>
-						<div class="flex flex-col"><ft-match-history></ft-match-history></div>
-						<div class="flex flex-col"><ft-ranking></ft-ranking></div>
+					<div class="grid grid-cols-1 lg:grid-cols-2 grid-flow-row gap gap-4 p-10">
+						<ft-stats></ft-stats>
+						<ft-goal-distribution></ft-goal-distribution>
+						<ft-match-history></ft-match-history>
+						<ft-ranking></ft-ranking>
 					</div>
 				`
 			else userContent += /*html*/ 'No stats can be shown while logged out.'
@@ -55,44 +55,65 @@ customElements.define(
 			`
 
 			if (!matches || matches.length === 0) {
-				html += `<div class="flex pl-4 p-2 items-center justify-around gap-2">
-				No recent matches can be found.
-				</div>`
+				html += /*html*/ `<div class="flex pl-4 p-2 items-center justify-around gap-2">
+					No recent matches can be found.
+					</div>`
 				return html
 			} else {
 				for (const match of matchesHead) {
 					if (match.player1Score === null || match.player2Score === null)
 						continue
-					html += /*html*/ `
-					<div class="flex pl-4 p-2 items-center justify-around gap-2 border border-gray-200 rounded-xl">
+					const user1 = /*html*/ `
 						<div class="flex p-2 items-center gap-2">
 							<img src="${getAvatarSrc(match.player1)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
-							<span class="flex items-center gap-2">${match.player1.name}</span>
+							<span>${match.player1.name}</span>
 						</div>
-						`
-					if (match.player1Id === user.id) {
-						if (match.player1Score > match.player2Score)
-							html += `<span class="flex items-center gap-2 text-green-400 font-bold">${match.player1Score}</span>`
-						else
-							html += `<span class="flex items-center gap-2 text-red-400 font-bold">${match.player1Score}</span>`
-					} else {
-						html += `<span class="flex items-center gap-2">${match.player1Score}</span>`
-					}
-					html += `<span class="flex items-center gap-2"> VS </span>`
-					if (match.player2Id === user.id) {
-						if (match.player2Score > match.player1Score)
-							html += `<span class="flex items-center gap-2 text-green-400 font-bold">${match.player2Score}</span>`
-						else
-							html += `<span class="flex items-center gap-2 text-red-400 font-bold">${match.player2Score}</span>`
-					} else {
-						html += `<span class="flex items-center gap-2">${match.player2Score}</span>`
-					}
-					html += `
-						<div class="flex p-2 items-center gap-2">
-							<span class="flex items-center gap-2">${match.player2.name}</span>
+					`
+					const user2 = /*html*/ `
+						<div class="flex p-2 items-center justify-end gap-2">
+							<span>${match.player2.name}</span>
 							<img src="${getAvatarSrc(match.player2)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
 						</div>
-					</div>
+					`
+
+					const userIsPlayer1 = user.id === match.player1Id
+					function getScoreClass(playerId: number): string {
+						if (playerId !== user?.id) return ''
+						if (match.player1Score === null) return ''
+						if (match.player2Score === null) return ''
+						if (match.player1Score === match.player2Score) return ''
+						if (match.player1Score > match.player2Score) {
+							if (userIsPlayer1) return 'text-green-400 font-bold'
+							return 'text-red-400 font-bold'
+						}
+						if (userIsPlayer1) return 'text-red-400 font-bold'
+						return 'text-green-400 font-bold'
+					}
+
+					const score1 = /*html*/ `
+						<span class="${getScoreClass(match.player1Id)}">
+							${match.player1Score}
+						</span>
+					`
+					const score2 = /*html*/ `
+						<span class="${getScoreClass(match.player2Id)}">
+							${match.player2Score}
+						</span>
+					`
+
+					html += /*html*/ `
+						<div class="grid grid-cols-3 pl-4 p-2 items-center justify-center gap-2 border border-gray-200 rounded-xl">
+							${user1}
+							<div class="flex items-center justify-center gap-4">
+								${score1}
+								<ft-icon
+									name="zap"
+									class="mr-1 fill-amber-400 stroke-amber-800 scale-x-75 rotate-12">
+								</ft-icon>
+								${score2}
+							</div>
+							${user2}
+						</div>
 					`
 				}
 			}
@@ -145,7 +166,7 @@ customElements.define(
 					}
 				}
 				if (user.id === current_user.id) {
-					name_color = `text-green-400 font-bold`
+					name_color = `font-bold`
 					left_arrow = '🢚'
 					right_arrow = '🢘'
 					user_in_top = true
@@ -161,16 +182,16 @@ customElements.define(
 						`
 				switch (rank) {
 					case 1:
-						html += `<ft-icon name="rank1" class="mr-1"></ft-icon>`
+						html += /*html*/ `<ft-icon name="trophy" class="mr-1 fill-yellow-500 stroke-black-400"></ft-icon>`
 						break
 					case 2:
-						html += `<ft-icon name="rank2" class="mr-1"></ft-icon>`
+						html += /*html*/ `<ft-icon name="trophy" class="mr-1 fill-zinc-500 stroke-black-400"></ft-icon>`
 						break
 					case 3:
-						html += `<ft-icon name="rank3" class="mr-1"></ft-icon>`
+						html += /*html*/ `<ft-icon name="trophy" class="mr-1 fill-amber-800 stroke-black-400"></ft-icon>`
 						break
 					default:
-						html += `<div class="flex flex-row w-5 h-5 items-center justify-center rounded-xl"> ${rank} </div>`
+						html += /*html*/ `<div class="flex flex-row w-5 h-5 items-center justify-center rounded-xl"> ${rank} </div>`
 						break
 				}
 				html += `
@@ -270,11 +291,12 @@ customElements.define(
 					filler = 'th'
 					break
 			}
-			const html = `
+
+			const html = /*html*/ `
 			<div class="grid grid-flow-col grid-rows-2 gap-2">
 				<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold">Total match played</h2>
 				<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2">${user.numberOfMatches}</h2>
-								<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold">Total match won</h2>
+				<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold">Total match won</h2>
 				<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2">${user.numberOfWin}</h2>
 				<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold">Winrate</h2>
 				<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2">${winRate} %</h2>

@@ -47,8 +47,7 @@ customElements.define(
 			return /*html*/ `
 				<ft-dropdown>
 					<button class="btn btn-border flex shrink-0 flex-nowrap">
-						<img src="${getAvatarSrc(user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
-						<ft-icon name="user"></ft-icon>
+						<img src="${getAvatarSrc(user)}" alt="Avatar de l'utilisateur" class="h-6 w-6 -translate-x-1 rounded">
 						<span>${user.name}</span>
 					</button>
 
