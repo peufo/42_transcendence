@@ -14,7 +14,7 @@ customElements.define(
 			let userContent = ''
 			if (user)
 				userContent += /*html*/ `
-					<div class="grid grid-cols-1 lg:grid-cols-2 grid-flow-row gap gap-4 p-10">
+					<div class="grid grid-cols-1 lg:grid-cols-2 grid-flow-row gap gap-4 p-10 max-w-7xl mx-auto">
 						<ft-stats></ft-stats>
 						<ft-goal-distribution></ft-goal-distribution>
 						<ft-match-history></ft-match-history>
@@ -144,9 +144,7 @@ customElements.define(
 			if (!current_user) return ''
 			let html = `<h2 class="flex flex-row p-2 items-center justify-center gap-2 font-bold">Ranking</h2>`
 			let rank = 1
-			let name_color = ''
-			let left_arrow = ''
-			let right_arrow = ''
+			let nameColor = ''
 			let user_in_top = false
 			const usersRanked = $rankedUsers.get()
 			html += `<div class="flex flex-col w-full gap-2">
@@ -165,19 +163,16 @@ customElements.define(
 						continue
 					}
 				}
-				if (user.id === current_user.id) {
-					name_color = `font-bold`
-					left_arrow = '🢚'
-					right_arrow = '🢘'
+				const isCurrentUser = user.id === current_user.id
+				if (isCurrentUser) {
+					nameColor = `font-bold`
 					user_in_top = true
 				} else {
-					name_color = ''
-					left_arrow = ''
-					right_arrow = ''
+					nameColor = ''
 				}
 
 				html += `
-				<div class="flex items-center text-center p-2 border border-gray-200 rounded-xl">
+				<div class="flex items-center text-center p-2 border ${isCurrentUser ? 'border-indigo-500 border-2' : 'border-gray-200'}   rounded-xl">
 					<div class="w-1/6 flex flex-row justify-center items-center">
 						`
 				switch (rank) {
@@ -199,7 +194,7 @@ customElements.define(
 					<div class="w-1/6 flex justify-center items-center">
 						<img src="${getAvatarSrc(user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
 					</div>
-					<div class="w-2/6 flex justify-center items-center ${name_color}">${left_arrow} ${user.name} ${right_arrow}</div>
+					<div class="w-2/6 flex justify-center items-center ${nameColor}">${user.name}</div>
 					<div class="w-2/6 flex justify-center items-center">${user.numberOfGoals}</div>
 				</div>`
 				rank++
@@ -267,43 +262,31 @@ customElements.define(
 			const averageRally = getAverageRally(userMatches).toPrecision(2)
 			const rank = getUserRank(getAllUsersStats, user)
 			const leagueImage = getLeague(getAllUsersStats, rank)
-			let filler = 'th'
-			switch (rank) {
-				case 1:
-					filler = 'st'
-					break
-				case 2:
-					filler = 'nd'
-					break
-				case 3:
-					filler = 'rd'
-					break
-				case 21:
-					filler = 'st'
-					break
-				case 22:
-					filler = 'nd'
-					break
-				case 23:
-					filler = 'st'
-					break
-				default:
-					filler = 'th'
-					break
-			}
 
+			const pr = new Intl.PluralRules('en-US', { type: 'ordinal' })
+			const suffixes = new Map([
+				['one', 'st'],
+				['two', 'nd'],
+				['few', 'rd'],
+				['other', 'th'],
+			])
+			const formatOrdinals = (n: number) => {
+				const rule = pr.select(n)
+				const suffix = suffixes.get(rule)
+				return `${n}${suffix}`
+			}
 			const html = /*html*/ `
-			<div class="grid grid-flow-col grid-rows-2 gap-2">
-				<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold">Total match played</h2>
-				<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2">${user.numberOfMatches}</h2>
-				<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold">Total match won</h2>
-				<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2">${user.numberOfWin}</h2>
-				<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold">Winrate</h2>
-				<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2">${winRate} %</h2>
-				<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold">Average rally per round</h2>
-				<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2">${averageRally}</h2>
-				<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold">Rank</h2>
-				<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2">${rank}${filler}</h2>
+			<div class="grid grid-flow-col grid-rows-2 items-center gap-2">
+				<h2 class="p-2 text-center font-bold">Total match played</h2>
+				<h2 class="p-2 text-center">${user.numberOfMatches}</h2>
+				<h2 class="p-2 text-center font-bold">Total match won</h2>
+				<h2 class="p-2 text-center">${user.numberOfWin}</h2>
+				<h2 class="p-2 text-center font-bold">Winrate</h2>
+				<h2 class="p-2 text-center">${winRate} %</h2>
+				<h2 class="p-2 text-center font-bold">Average rally per round</h2>
+				<h2 class="p-2 text-center">${averageRally}</h2>
+				<h2 class="p-2 text-center font-bold">Rank</h2>
+				<h2 class="p-2 text-center">${formatOrdinals(rank)}</h2>
 				<div class="flex flex-row justify-center items-center">
 					<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold">League</h2>
 					<div class="flex flex-row justify-center items-center relative group">
