@@ -261,7 +261,7 @@ customElements.define(
                     <div class="flex-grow"></div>
                     <a href="/stats" class="btn btn-border">
                         <ft-icon name="ranking" class="mr-1"></ft-icon>
-                        <span>Stats</span>
+                        <span>Statistics</span>
                     </a>
                 </div>
             `

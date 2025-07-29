@@ -1,3 +1,4 @@
+import type { UserBasic } from '../../lib/type.js'
 import { type CleanEffect, createEffect } from '../utils/signal.js'
 import { $user } from '../utils/store.js'
 
@@ -46,10 +47,11 @@ customElements.define(
 			return /*html*/ `
 				<ft-dropdown>
 					<button class="btn btn-border flex shrink-0 flex-nowrap">
+						<img src="${getAvatarSrc(user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
 						<ft-icon name="user"></ft-icon>
 						<span>${user.name}</span>
 					</button>
-					
+
 					<div class="dropdown-box hidden absolute w-36 right-0 rounded-md my-1" role="menu"
 						aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
 						<a href="/" class="menu-item" role="menuitem" tabindex="-1">
@@ -120,3 +122,10 @@ customElements.define(
 		}
 	},
 )
+
+function getAvatarSrc(user: UserBasic): string {
+	if (user.avatar) {
+		return user.avatar
+	}
+	return user.avatarPlaceholder
+}

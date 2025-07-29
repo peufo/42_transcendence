@@ -14,7 +14,7 @@ customElements.define(
 			let userContent = ''
 			if (user)
 				userContent += /*html*/ `
-					<div class="grid grid-cols-2 gap gap-4 p-10">
+					<div class="grid grid-cols-2 grid-flow-row gap gap-4 p-10">
 						<div class="flex flex-col"><ft-stats></ft-winrate></div>
 						<div class="flex flex-col"><ft-goal-distribution></ft-goal-distribution></div>
 						<div class="flex flex-col"><ft-match-history></ft-match-history></div>
@@ -67,28 +67,29 @@ customElements.define(
 					<div class="flex pl-4 p-2 items-center justify-around gap-2 border border-gray-200 rounded-xl">
 						<div class="flex p-2 items-center gap-2">
 							<img src="${getAvatarSrc(match.player1)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
-							<span class="flex items-center gap-2"> ${match.player1.name}</span>
-						</div>`
+							<span class="flex items-center gap-2">${match.player1.name}</span>
+						</div>
+						`
 					if (match.player1Id === user.id) {
 						if (match.player1Score > match.player2Score)
-							html += `<span class="flex items-center gap-2 text-green-400"> ${match.player1Score}</span>`
+							html += `<span class="flex items-center gap-2 text-green-400 font-bold">${match.player1Score}</span>`
 						else
-							html += `<span class="flex items-center gap-2 text-red-400"> ${match.player1Score}</span>`
+							html += `<span class="flex items-center gap-2 text-red-400 font-bold">${match.player1Score}</span>`
 					} else {
-						html += `<span class="flex items-center gap-2"> ${match.player1Score}</span>`
+						html += `<span class="flex items-center gap-2">${match.player1Score}</span>`
 					}
 					html += `<span class="flex items-center gap-2"> VS </span>`
 					if (match.player2Id === user.id) {
 						if (match.player2Score > match.player1Score)
-							html += `<span class="flex items-center gap-2 text-red-400"> ${match.player2Score}</span>`
+							html += `<span class="flex items-center gap-2 text-green-400 font-bold">${match.player2Score}</span>`
 						else
-							html += `<span class="flex items-center gap-2 text-green-400"> ${match.player2Score}</span>`
+							html += `<span class="flex items-center gap-2 text-red-400 font-bold">${match.player2Score}</span>`
 					} else {
-						html += `<span class="flex items-center gap-2"> ${match.player2Score}</span>`
+						html += `<span class="flex items-center gap-2">${match.player2Score}</span>`
 					}
 					html += `
 						<div class="flex p-2 items-center gap-2">
-							<span class="flex items-center gap-2"> ${match.player2.name}</span>
+							<span class="flex items-center gap-2">${match.player2.name}</span>
 							<img src="${getAvatarSrc(match.player2)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
 						</div>
 					</div>
@@ -120,11 +121,12 @@ customElements.define(
 		renderContent(): string {
 			const current_user = $user.get()
 			if (!current_user) return ''
-			let html = `<h2 class="flex flex-row p-2 items-center justify-center gap-2 font-bold">Overall ranking</h2>`
+			let html = `<h2 class="flex flex-row p-2 items-center justify-center gap-2 font-bold">Ranking</h2>`
 			let rank = 1
 			let name_color = ''
 			let left_arrow = ''
 			let right_arrow = ''
+			let user_in_top = false
 			const usersRanked = $rankedUsers.get()
 			html += `<div class="flex flex-col w-full gap-2">
 			 <div class="flex font-semibold text-center">
@@ -135,10 +137,18 @@ customElements.define(
 			</div>
 			`
 			for (const user of usersRanked) {
+				if (rank >= 6) {
+					if (user.id === current_user.id) break
+					else {
+						rank++
+						continue
+					}
+				}
 				if (user.id === current_user.id) {
 					name_color = `text-green-400 font-bold`
 					left_arrow = '🢚'
 					right_arrow = '🢘'
+					user_in_top = true
 				} else {
 					name_color = ''
 					left_arrow = ''
@@ -169,10 +179,25 @@ customElements.define(
 						<img src="${getAvatarSrc(user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
 					</div>
 					<div class="w-2/6 flex justify-center items-center ${name_color}">${left_arrow} ${user.name} ${right_arrow}</div>
-					<div class="w-2/6 flex justify-center items-center"> ${user.numberOfGoals} goals </div>
+					<div class="w-2/6 flex justify-center items-center">${user.numberOfGoals}</div>
 				</div>`
 				rank++
-				if (rank === 6) break
+			}
+			if (!user_in_top) {
+				html += `
+			<div class="flex items-center justify-center p-2 rounded-xl font-bold">...</div>
+			<div class="flex items-center text-center p-2 border border-gray-200 rounded-xl">
+				<div class="w-1/6 flex flex-row justify-center items-center">
+					<div class="flex flex-row w-5 h-5 items-center justify-center rounded-xl"> ${rank} </div>
+				</div>
+				<div class="w-1/6 flex justify-center items-center">
+						<img src="${getAvatarSrc(current_user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
+					</div>
+					<div class="w-2/6 flex justify-center items-center font-bold">${current_user.name}</div>
+					<div class="w-2/6 flex justify-center items-center">${current_user.numberOfGoals}</div>
+				</div>
+			</div>
+			`
 			}
 			html += `</div`
 			return html
@@ -187,6 +212,7 @@ customElements.define(
 			this.classList.add(
 				'flex',
 				'flex-row',
+				'flex-flow',
 				'items-center',
 				'justify-center',
 				'gap-3',
@@ -230,6 +256,15 @@ customElements.define(
 					break
 				case 3:
 					filler = 'rd'
+					break
+				case 21:
+					filler = 'st'
+					break
+				case 22:
+					filler = 'nd'
+					break
+				case 23:
+					filler = 'st'
 					break
 				default:
 					filler = 'th'
@@ -379,44 +414,44 @@ function getLeague(usersStats: UserStats[], user_rank: number): string {
 	let league_name = 'Wood'
 	switch (true) {
 		case percentage < 10:
-			color = '#FF4500'
-			league_name = 'Mythical'
+			color = '#E91E63'
+			league_name = 'Mythic'
 			break
 		case percentage < 20:
-			color = '#2E2E2E'
-			league_name = 'Obsidian'
+			color = '#F4C542'
+			league_name = 'Solaris'
 			break
 		case percentage < 30:
-			color = '#C72C48'
-			league_name = 'Ruby'
+			color = '#00CFFF'
+			league_name = 'Aurora'
 			break
 		case percentage < 40:
-			color = '#0F52BA'
-			league_name = 'Sapphire'
+			color = '#5D6D7E'
+			league_name = 'Storm'
 			break
 		case percentage < 50:
-			color = '#3EB489'
-			league_name = 'Emerald'
+			color = '#353839'
+			league_name = 'Onyx'
 			break
 		case percentage < 60:
-			color = '#A0E7E5'
-			league_name = 'Crystal'
+			color = '#9B59B6'
+			league_name = 'Amethyst'
 			break
 		case percentage < 70:
-			color = '#7A8B8B'
-			league_name = 'Steel'
+			color = '#E25822'
+			league_name = 'Blaze'
 			break
 		case percentage < 80:
-			color = '#43464B'
-			league_name = 'Iron'
+			color = '#2E86AB'
+			league_name = 'Ocean'
 			break
 		case percentage < 90:
-			color = '#708090'
-			league_name = 'Stone'
+			color = '#4A7C59'
+			league_name = 'Moss'
 			break
 		default:
-			color = '#8B5E3C'
-			league_name = 'Wood'
+			color = '#8B2E2E'
+			league_name = 'Ember'
 			break
 	}
 	const leagueSvg = getLeagueImage(color, league_name)
@@ -457,28 +492,40 @@ function getLeagueImage(color: string, league_name: string): string {
 function getLeagueModal(): string {
 	let html = ''
 	const leagues_names = [
-		'Mythical',
-		'Obsidian',
-		'Ruby',
-		'Sapphire',
-		'Emerald',
-		'Crystal',
-		'Steel',
-		'Iron',
-		'Stone',
-		'Wood',
+		'Mythic',
+		'Solaris',
+		'Aurora',
+		'Storm',
+		'Onyx',
+		'Amethyst',
+		'Blaze',
+		'Ocean',
+		'Moss',
+		'Ember',
 	]
 	const leagues_colors = [
-		'#FF4500',
-		'#2E2E2E',
-		'#C72C48',
-		'#0F52BA',
-		'#3EB489',
-		'#A0E7E5',
-		'#7A8B8B',
-		'#43464B',
-		'#708090',
-		'#8B5E3C',
+		'#E91E63',
+		'#F4C542',
+		'#00CFFF',
+		'#5D6D7E',
+		'#353839',
+		'#9B59B6',
+		'#E25822',
+		'#2E86AB',
+		'#4A7C59',
+		'#8B2E2E',
+	]
+	const leagues_percentages = [
+		'< 10%',
+		'< 20%',
+		'< 30%',
+		'< 40%',
+		'< 50%',
+		'< 60%',
+		'< 70%',
+		'< 80%',
+		'< 90%',
+		'< 100%',
 	]
 	html += `
 	<div class="absolute left-1/2 top-full transform -translate-x-1/2 p-4 border border-gray-400 rounded-2xl bg-white shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 z-10 flex justify-center items-center">
@@ -486,7 +533,10 @@ function getLeagueModal(): string {
 			`
 	for (let i = 0; i < leagues_colors.length; i++) {
 		html += `
+				<div class="flex flex-col p-2 items-center justify-center text-center gap-2 font-bold">
 				${getLeagueImage(leagues_colors[i], leagues_names[i])}
+				<div class="font-bold" style="color: ${leagues_colors[i]};">${leagues_percentages[i]}</div>
+				</div>
 				`
 		if (i < leagues_colors.length - 1)
 			html += `
