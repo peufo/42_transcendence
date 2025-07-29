@@ -1,11 +1,11 @@
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import type { UserBasic } from '../../../lib/type.js'
 import { db, tournaments, tournamentsParticipants } from '../../db/index.js'
 import { server } from '../../main.js'
 import type { DB } from '../../types.js'
 import { getUserBasic, userBasicColumns } from '../friendships/model.js'
 
-export async function createTournament(data: DB.TournamentCreate) {
+export async function tournamentCreate(data: DB.TournamentCreate) {
 	const tournamentId = await db.transaction(async (tx) => {
 		const [{ id, createdBy }] = await tx
 			.insert(tournaments)
@@ -19,7 +19,7 @@ export async function createTournament(data: DB.TournamentCreate) {
 	return tournamentId
 }
 
-export async function deleteTournament(tournamentId: number, ownerId: number) {
+export async function tournamentDelete(tournamentId: number, ownerId: number) {
 	const tournament = await db.query.tournaments.findFirst({
 		where: eq(tournaments.id, tournamentId),
 	})
@@ -31,7 +31,7 @@ export async function deleteTournament(tournamentId: number, ownerId: number) {
 	await db.delete(tournaments).where(eq(tournaments.id, tournamentId))
 }
 
-export async function getTournament(tournamentId: number) {
+export async function tournamentGet(tournamentId: number) {
 	const tournament = await db.query.tournaments.findFirst({
 		where: eq(tournaments.id, tournamentId),
 		with: {
@@ -45,16 +45,31 @@ export async function getTournament(tournamentId: number) {
 	return tournament
 }
 
-export async function joinTournament(
+export async function tournamentJoin(
 	tournamentId: number,
 	userId: number,
 ): Promise<UserBasic> {
-	const tournament = await getTournament(tournamentId)
+	const tournament = await tournamentGet(tournamentId)
 	if (tournament.participants.length >= tournament.numberOfPlayers)
 		throw server.httpErrors.forbidden(
 			"Sorry, you can't join this tournament, he's full.",
 		)
 	if (!tournament.participants.find(({ user }) => user.id === userId))
 		await db.insert(tournamentsParticipants).values({ tournamentId, userId })
+	return getUserBasic(userId)
+}
+
+export async function tournamentQuit(
+	tournamentId: number,
+	userId: number,
+): Promise<UserBasic> {
+	await db
+		.delete(tournamentsParticipants)
+		.where(
+			and(
+				eq(tournamentsParticipants.tournamentId, tournamentId),
+				eq(tournamentsParticipants.userId, userId),
+			),
+		)
 	return getUserBasic(userId)
 }

@@ -10,16 +10,10 @@ import {
 	type RouteApiPost,
 	type RoutePage,
 } from '../routes.js'
-import {
-	type CleanEffect,
-	createEffect,
-	createSignal,
-} from '../utils/signal.js'
-import { $user } from '../utils/store.js'
+import { type CleanEffect, createEffect } from '../utils/signal.js'
+import { $url, $user } from '../utils/store.js'
 import { slide, transitionIn, transitionOut } from '../utils/transition.js'
 import { toast } from './ft-toast.js'
-
-const $url = createSignal<URL>(new URL(document.location.href))
 
 function goto(url: URL) {
 	window.history.pushState({}, '', url)

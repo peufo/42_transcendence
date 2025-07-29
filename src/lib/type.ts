@@ -92,8 +92,8 @@ export type SocketChannels = {
 		clientEvents: null
 		serverEvents: {
 			onDeleted: null
-			onParticipantJoin: { participant: UserBasic }
-			onParticipantQuit: { participant: UserBasic }
+			onParticipantJoin: { user: UserBasic }
+			onParticipantQuit: { user: UserBasic }
 		}
 	}
 }

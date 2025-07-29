@@ -2,7 +2,7 @@ import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import z from 'zod/v4'
 import { Engine } from '../../../lib/engine/index.js'
 import { getSessionFromRequest } from '../auth/hooks.js'
-import { getTournament } from '../tournaments/model.js'
+import { tournamentGet } from '../tournaments/model.js'
 import { bindEmitterWithSocket, getEmitter } from './controller.js'
 import { engineInputSchema } from './schema.js'
 
@@ -31,7 +31,7 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 				return
 			}
 			const { tournamentId } = req.query
-			const tournament = await getTournament(tournamentId).catch((err) => {
+			const tournament = await tournamentGet(tournamentId).catch((err) => {
 				socket.close(3000, 'Tournament not exist')
 				throw err
 			})

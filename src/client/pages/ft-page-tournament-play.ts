@@ -1,7 +1,7 @@
 import { type ChannelSocket, openChannel } from '../../lib/socketChannels.js'
 import { toast } from '../components/ft-toast.js'
 import { type CleanEffect, createEffect } from '../utils/signal.js'
-import { $tournament, $user } from '../utils/store.js'
+import { $tournament, $url, $user } from '../utils/store.js'
 
 customElements.define(
 	'ft-page-tournament-play',
@@ -22,31 +22,33 @@ customElements.define(
 				{ tournamentId },
 				{
 					onDeleted() {
-						toast.error('Tournament canceled by owner')
+						toast.error('Tournament deleted by owner')
+						$url.set(new URL('/me', document.baseURI))
 					},
-					onParticipantJoin({ participant }) {
+					onParticipantJoin(newParticipant) {
+						if ($user.get()?.id === newParticipant.user.id) return
 						$tournament.update((tournament) => {
 							if (!tournament) return tournament
 							const isParticipantExist = tournament.participants.find(
-								({ user }) => user.id === participant.id,
+								({ user }) => user.id === newParticipant.user.id,
 							)
 							if (isParticipantExist) return tournament
+							toast.success(`${newParticipant.user.name} join the tournament !`)
 							return {
 								...tournament,
-								participants: [
-									...tournament.participants,
-									{ user: participant },
-								],
+								participants: [...tournament.participants, newParticipant],
 							}
 						})
 					},
-					onParticipantQuit({ participant }) {
+					onParticipantQuit(participant) {
+						if ($user.get()?.id === participant.user.id) return
 						$tournament.update((tournament) => {
 							if (!tournament) return tournament
+							toast.error(`${participant.user.name} quit the tournament !`)
 							return {
 								...tournament,
 								participants: tournament.participants.filter(
-									({ user }) => user.id !== participant.id,
+									({ user }) => user.id !== participant.user.id,
 								),
 							}
 						})

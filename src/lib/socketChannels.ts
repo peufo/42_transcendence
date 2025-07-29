@@ -52,7 +52,7 @@ export function openChannel<Channel extends keyof SocketChannels>(
 		for (const serverEvent of objectKeys(
 			serverEvents[channel],
 		) as (keyof ServerEvents<Channel>)[]) {
-			if (data[serverEvent]) {
+			if (serverEvent in data) {
 				handlers[serverEvent](data[serverEvent])
 			}
 		}
@@ -69,7 +69,7 @@ export function openChannel<Channel extends keyof SocketChannels>(
 			eventName: EventName,
 			data: ClientEvents<Channel>[EventName],
 		) {
-			console.log('TODO: send event', eventName, data)
+			console.log('TODO: send event from client', eventName, data)
 		},
 	}
 }
