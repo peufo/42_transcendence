@@ -113,7 +113,7 @@ export type RoutesGet = {
 	'/friendships': Get<Friendship[]>
 	'/userstats': Get<Match[]>
 	'/allusersstats': Get<UserStats[]>
-	'/tournaments': Get<TournamentWithLookup, { id: number }>
+	'/tournaments': Get<TournamentWithLookup, { tournamentId: number }>
 }
 
 export type RoutesPost = {

@@ -1,6 +1,5 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import '@fastify/cookie'
-import z from 'zod/v4'
 import { getSchema, permission, postSchema } from '../../utils/index.js'
 import { notify } from '../ws/controller.js'
 import {
@@ -18,11 +17,11 @@ export const tournamentsRoute: FastifyPluginCallbackZod = (
 ) => {
 	server.get(
 		'/',
-		getSchema('/tournaments', { id: z.coerce.number() }),
+		getSchema('/tournaments', tournamentIdSchema),
 		async (req, res) => {
 			permission.user(res)
-			const { id } = req.query
-			const tournament = await getTournament(id)
+			const { tournamentId } = req.query
+			const tournament = await getTournament(tournamentId)
 			return res.send({ data: tournament })
 		},
 	)

@@ -21,9 +21,11 @@ export const menuNewTournament: Scope = async () => {
 	return await createMenuTounament(tournamentId)
 }
 
-export async function createMenuTounament(id: number): Promise<Scope> {
+export async function createMenuTounament(
+	tournamentId: number,
+): Promise<Scope> {
 	const { participants, numberOfPlayers } = await api.get('/tournaments', {
-		id,
+		tournamentId,
 	})
 	return async () => {
 		const spinner = p.spinner()
@@ -33,14 +35,14 @@ export async function createMenuTounament(id: number): Promise<Scope> {
 		// TODO: wait on users and start tournament
 
 		const action = await p.select({
-			message: `${api.host()}/tournament?id=${id}`,
+			message: `${api.host()}/tournament?tournamentId=${tournamentId}`,
 			options: [
 				{
 					label: 'Start tournament',
 					value: async () => {
 						if (participants.length < numberOfPlayers) {
 							spinner.stop('Tournament incomplet', 1)
-							return createMenuTounament(id)
+							return createMenuTounament(tournamentId)
 						}
 						return menuMatch
 					},
@@ -48,7 +50,7 @@ export async function createMenuTounament(id: number): Promise<Scope> {
 				{
 					label: 'Cancel tournament',
 					value: async () => {
-						await api.post('/tournaments/delete', { tournamentId: id })
+						await api.post('/tournaments/delete', { tournamentId })
 						spinner.stop('Tournament canceled')
 						return menuMain
 					},

@@ -15,7 +15,7 @@ customElements.define(
 			})
 
 			const tournamentId =
-				new URLSearchParams(document.location.search).get('id') || ''
+				new URLSearchParams(document.location.search).get('tournamentId') || ''
 
 			this.tournamentChanel = openChannel(
 				'tournaments',

@@ -61,13 +61,15 @@ export const API_POST: {
 	'/friendships/accept': { invalidate: ['/friendships'] },
 	'/friendships/delete': { invalidate: ['/friendships'] },
 	'/tournaments/new': {
-		redirectTo: ({ tournamentId }) => `/tournament/play?id=${tournamentId}`,
+		redirectTo: ({ tournamentId }) =>
+			`/tournament/play?tournamentId=${tournamentId}`,
 	},
 	'/tournaments/delete': {
 		redirectTo: () => '/me',
 	},
 	'/tournaments/join': {
-		redirectTo: ({ tournamentId }) => `/tournament/play?id=${tournamentId}`,
+		redirectTo: ({ tournamentId }) =>
+			`/tournament/play?tournamentId=${tournamentId}`,
 	},
 	'/tournaments/quit': {
 		redirectTo: () => '/me',
