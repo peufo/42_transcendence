@@ -123,7 +123,6 @@ customElements.define(
 			let html = `<h2 class="flex flex-row p-2 items-center justify-center gap-2 font-bold">Overall ranking</h2>`
 			let rank = 1
 			let name_color = ''
-			let rank_color = ''
 			let left_arrow = ''
 			let right_arrow = ''
 			const usersRanked = $rankedUsers.get()
@@ -136,20 +135,6 @@ customElements.define(
 			</div>
 			`
 			for (const user of usersRanked) {
-				switch (rank) {
-					case 1:
-						rank_color = 'bg-yellow-500 font-bold'
-						break
-					case 2:
-						rank_color = 'bg-zinc-400 font-bold'
-						break
-					case 3:
-						rank_color = 'bg-orange-700 font-bold'
-						break
-					default:
-						rank_color = ''
-						break
-				}
 				if (user.id === current_user.id) {
 					name_color = `text-green-400 font-bold`
 					left_arrow = '🢚'
@@ -163,8 +148,23 @@ customElements.define(
 				html += `
 				<div class="flex items-center text-center p-2 border border-gray-200 rounded-xl">
 					<div class="w-1/6 flex flex-row justify-center items-center">
-						<div class="flex flex-row w-5 h-5 items-center justify-center ${rank_color} rounded-xl"> ${rank} </div>
-					</div>
+						`
+				switch (rank) {
+					case 1:
+						html += `<ft-icon name="rank1" class="mr-1"></ft-icon>`
+						break
+					case 2:
+						html += `<ft-icon name="rank2" class="mr-1"></ft-icon>`
+						break
+					case 3:
+						html += `<ft-icon name="rank3" class="mr-1"></ft-icon>`
+						break
+					default:
+						html += `<div class="flex flex-row w-5 h-5 items-center justify-center rounded-xl"> ${rank} </div>`
+						break
+				}
+				html += `
+				</div>
 					<div class="w-1/6 flex justify-center items-center">
 						<img src="${getAvatarSrc(user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
 					</div>
@@ -205,7 +205,7 @@ customElements.define(
 			const userMatches = $matches.get()
 			const getAllUsersStats = $rankedUsers.get()
 			if (userMatches.length === 0) {
-				const html = `<div class="grid grid-flow-col grid-rows-2 gap-2">
+				const html = `<div class="grid grid-flow-row grid-rows-2 gap-2">
 					<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold">Total match played</h2>
 					<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold">Winrate</h2>
 					<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold">Average rally per round</h2>
@@ -250,7 +250,7 @@ customElements.define(
 				<div class="flex flex-row justify-center items-center">
 					<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold">League</h2>
 					<div class="flex flex-row justify-center items-center relative group">
-						<button id="league" class="flex items-center justify-center bg-gray-600 h-5 w-5 text-white rounded-xl">?</button>
+						<ft-icon name="message-circle-question" class="mr-1"></ft-icon>
 						${getLeagueModal()}
 					</div>
 				</div>

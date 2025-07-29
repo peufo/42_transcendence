@@ -259,10 +259,9 @@ customElements.define(
                     </h3>
 
                     <div class="flex-grow"></div>
-                    <a href="/stats" class="btn btn-border" title="Ratio">
-                        <ft-icon name="star" class="h-4 w-4 mr-1"></ft-icon>
-                        <span>0.65</span>
-                        <span class="badge badge-dark translate-x-2">6 / 9</span>
+                    <a href="/stats" class="btn btn-border">
+                        <ft-icon name="ranking" class="mr-1"></ft-icon>
+                        <span>Stats</span>
                     </a>
                 </div>
             `
