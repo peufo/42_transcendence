@@ -105,24 +105,17 @@ export class Ball {
 		return false
 	}
 
-	#checkPlayerScoring(): Round | null {
+	#checkPlayerScoring(): Player | null {
 		const outOfBoundsOffset = BALL_BASE_SIZE * 3
 		if (this.#position.x <= -outOfBoundsOffset) {
-			return this.#createRoundEnd('p2')
+			return 'p2'
 		}
 		if (this.#position.x + BALL_BASE_SIZE >= ARENA_WIDTH + outOfBoundsOffset) {
-			return this.#createRoundEnd('p1')
+			return 'p1'
 		}
 		return null
 	}
 
-	#createRoundEnd(scorer: Player): Round {
-		return {
-			scorer,
-			rallyCount: this.#rallyCount,
-			ballPositionY: this.position.y,
-		}
-	}
 	update(): Round | null {
 		for (let i = 0; i < BALL_SUBSTEPS; i++) {
 			this.#velocity.normalize()
@@ -134,12 +127,20 @@ export class Ball {
 				this.#rallyCount++
 				return null
 			}
-
 			if (this.#handleVerticalWallCollision()) {
 				return null
 			}
 		}
-		this.#rallyCount = 0
-		return this.#checkPlayerScoring()
+		const scorer = this.#checkPlayerScoring()
+		if (scorer) {
+			const round: Round = {
+				scorer,
+				rallyCount: this.#rallyCount,
+				ballPositionY: this.#position.y,
+			}
+			this.#rallyCount = 0
+			return round
+		}
+		return null
 	}
 }

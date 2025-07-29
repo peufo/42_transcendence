@@ -19,17 +19,20 @@ export enum EVENT_TYPE {
 	SCORE = 1,
 	ROUND = 2,
 }
+
 export type EngineEventData = {
 	[EVENT_TYPE.TICK]?: State
 	[EVENT_TYPE.SCORE]?: Scores
 	[EVENT_TYPE.ROUND]?: Round
 }
+
 type EngineOption = {
 	onEvent?: (event: EngineEventData) => void
 	onTick?: (state: State) => void
 	onScore?: (scores: Scores) => void
 	onRoundEnd?: (round: Round) => void
 }
+
 export type State = {
 	b: { x: number; y: number }
 	p1: number
@@ -37,7 +40,7 @@ export type State = {
 }
 
 // Game properties
-const TICK_RATE = 20
+const TICK_RATE = 30
 export const BALL_SUBSTEPS = 3
 export const TICK_INTERVAL = 1000 / TICK_RATE
 export const ARENA_WIDTH = 1000
@@ -82,7 +85,8 @@ export class Engine {
 		p1: 0,
 		p2: 0,
 	}
-	#gameOver: boolean
+	#gameOver: boolean = false
+	#roundOver: boolean = false
 
 	get paddles() {
 		return this.#paddles
@@ -123,17 +127,8 @@ export class Engine {
 		if (this.#inputs.p1.down) this.#paddles.p1.move('down')
 		if (this.#inputs.p2.up) this.#paddles.p2.move('up')
 		if (this.#inputs.p2.down) this.#paddles.p2.move('down')
-		const round = this.#ball.update()
-		if (round) {
-			const { scorer } = round
-			this.#endRound()
-			this.#scores[scorer]++
-			this.#onEvent(EVENT_TYPE.SCORE, this.#scores)
-			this.#onEvent(EVENT_TYPE.ROUND, round)
-			if (this.#scores[scorer] >= rules.scoreToWin)
-				console.log(`${scorer} won the game !`) // event
-			else this.#newRound()
-		}
+		const roundInfo = this.#ball.update()
+		if (roundInfo) this.#endRound(roundInfo)
 	}
 
 	#tickLoop() {
@@ -144,9 +139,11 @@ export class Engine {
 			p1: this.paddles.p1.position.y,
 			p2: this.paddles.p2.position.y,
 		})
-		const processTime = Date.now() - tickStart
-		const delay = Math.max(0, TICK_INTERVAL - processTime)
-		if (!this.#gameOver) setTimeout(this.#tickLoop.bind(this), delay)
+		if (!this.#gameOver && !this.#roundOver) {
+			const processTime = Date.now() - tickStart
+			const delay = Math.max(0, TICK_INTERVAL - processTime)
+			setTimeout(this.#tickLoop.bind(this), delay)
+		}
 	}
 
 	#onEvent<T extends EVENT_TYPE>(eventType: T, data: EngineEventData[T]) {
@@ -162,15 +159,23 @@ export class Engine {
 		}
 	}
 
-	#endRound() {
-		this.#gameOver = true
+	#endRound(roundInfo: Round) {
+		this.#roundOver = true
+		const { scorer } = roundInfo
+		this.#scores[scorer]++
+		this.#onEvent(EVENT_TYPE.SCORE, this.#scores)
+		this.#onEvent(EVENT_TYPE.ROUND, roundInfo)
+		if (this.#scores[scorer] >= rules.scoreToWin) {
+			this.#gameOver = true
+			console.log(`${scorer} won the game !`) // event
+		} else this.#newRound()
 	}
 
 	#newRound() {
 		this.#initState()
 		this.#timer(1, () => {
-			this.#gameOver = false
 			this.#roundStartTime = Date.now()
+			this.#roundOver = false
 			this.#tickLoop()
 		})
 	}
