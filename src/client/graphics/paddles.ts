@@ -6,6 +6,122 @@ import {
 } from '../../lib/engine/index.js'
 import { scale, toRenderPosition } from './utils.js'
 
+export function createPaddles(
+	scene: BABYLON.Scene,
+	material: BABYLON.Material,
+) {
+	const paddle1 = BABYLON.MeshBuilder.CreateBox(
+		'p1',
+		{
+			width: scale(PADDLE_BASE_HEIGHT),
+			height: scale(20),
+			depth: scale(PADDLE_BASE_WIDTH),
+		},
+		scene,
+	)
+	paddle1.material = material
+	paddle1.position = toRenderPosition(PADDLE_BASE_P1_POSITION)
+	const paddle2 = BABYLON.MeshBuilder.CreateBox(
+		'p2',
+		{
+			width: scale(PADDLE_BASE_HEIGHT),
+			height: scale(20),
+			depth: scale(PADDLE_BASE_WIDTH),
+		},
+		scene,
+	)
+	paddle2.material = material
+	paddle2.position = toRenderPosition(PADDLE_BASE_P2_POSITION)
+
+	return { paddle1, paddle2 }
+}
+
+/*
+export async function createPaddles(
+    scene: BABYLON.Scene,
+    material: BABYLON.Material
+): Promise<{ paddle1: BABYLON.AbstractMesh; paddle2: BABYLON.AbstractMesh }> {
+    const result = await BABYLON.SceneLoader.AppendAsync(
+        "/public/textures/paddle/",
+        "croissant_4k.gltf",
+        scene
+    );
+	const allMeshes = scene.meshes;
+const model = allMeshes.find(mesh => mesh.name === "croissant" || mesh.name.toLowerCase().includes("croissant"));
+
+if (!model) {
+  throw new Error("Croissant mesh not found in scene.");
+}
+
+const paddle1 = model as BABYLON.Mesh;
+paddle1.name = "paddle1";
+paddle1.position = toRenderPosition(PADDLE_BASE_P1_POSITION);
+paddle1.material = material;
+
+const paddle2 = paddle1.clone("paddle2", null) as BABYLON.Mesh;
+paddle2.position = toRenderPosition(PADDLE_BASE_P2_POSITION);
+paddle2.material = material;
+
+return { paddle1, paddle2 };
+}
+
+export async function createPaddles(
+    scene: BABYLON.Scene,
+    material: BABYLON.Material
+): Promise<{ paddle1: BABYLON.AbstractMesh; paddle2: BABYLON.AbstractMesh }> {
+    try {
+        const result = await BABYLON.SceneLoader.AppendAsync(
+            "/public/textures/paddle/croissant/", // Chemin corrigé
+            "croissant_4k.gltf",
+            scene
+        );
+        console.log("GLTF loaded successfully. Meshes:", scene.meshes.map(mesh => mesh.name));
+
+        const allMeshes = scene.meshes;
+        const model = allMeshes.find(mesh => 
+            mesh.name === "croissant" || 
+            mesh.name === "Croissant_croissant_10M_textured.001" || 
+            mesh.name.toLowerCase().includes("croissant")
+        );
+
+        if (!model) {
+            throw new Error("Croissant mesh not found in scene. Available meshes: " + 
+                scene.meshes.map(mesh => mesh.name).join(", "));
+        }
+
+        if (!(model instanceof BABYLON.Mesh)) {
+            throw new Error("Model is not a BABYLON.Mesh: " + model);
+        }
+
+        const paddle1 = model as BABYLON.Mesh;
+        paddle1.name = "paddle1";
+        paddle1.position = toRenderPosition(PADDLE_BASE_P1_POSITION);
+        paddle1.scaling = new BABYLON.Vector3(50, 50, 50); // Augmente l'échelle
+        console.log("Paddle1 position:", paddle1.position.asArray(), "Scaling:", paddle1.scaling.asArray(), "Visibility:", paddle1.visibility);
+        // paddle1.material = material;
+
+        const paddle2 = paddle1.clone("paddle2", null) as BABYLON.Mesh;
+        paddle2.position = toRenderPosition(PADDLE_BASE_P2_POSITION);
+        paddle2.scaling = new BABYLON.Vector3(50, 50, 50); // Augmente l'échelle
+        console.log("Paddle2 position:", paddle2.position.asArray(), "Scaling:", paddle2.scaling.asArray(), "Visibility:", paddle2.visibility);
+        // paddle2.material = material;
+
+        return { paddle1, paddle2 };
+    } catch (error) {
+        console.error("Failed to create paddles:", error);
+        throw error;
+    }
+}
+
+
+import {
+	PADDLE_BASE_HEIGHT,
+	PADDLE_BASE_P1_POSITION,
+	PADDLE_BASE_P2_POSITION,
+	PADDLE_BASE_WIDTH,
+} from '../../lib/engine/index.js'
+import { scale, toRenderPosition } from './utils.js'
+
 export async function createPaddles(
 	scene: BABYLON.Scene,
 	_material: BABYLON.Material,
@@ -103,3 +219,4 @@ export async function createPaddles(
 		throw error
 	}
 }
+*/

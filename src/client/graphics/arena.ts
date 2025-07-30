@@ -19,28 +19,12 @@ export function createArena(
 	ground.position.y = 3.3
 	ground.material = material
 
-	/*
-const mirrorTexture = new BABYLON.MirrorTexture("mirror", 1024, scene, true)
-mirrorTexture.mirrorPlane = new BABYLON.Plane(0, -1.0, 0, -ground.position.y)
-mirrorTexture.renderList = scene.meshes 
-
-const mirrorMaterial = new BABYLON.StandardMaterial("mirrorMat", scene)
-mirrorMaterial.reflectionTexture = mirrorTexture
-mirrorMaterial.diffuseColor = new BABYLON.Color3(0.2, 0.2, 0.2)
-mirrorMaterial.specularColor = new BABYLON.Color3(1, 1, 1)
-mirrorMaterial.alpha = 1
-
-ground.material = mirrorMaterial
-}
-
-*/
-	//ground.receiveShadows = false
-	//ground.material.disableLighting = true
+	ground.receiveShadows = false
 	const wall = BABYLON.MeshBuilder.CreateBox(
 		'wall',
 		{
 			width: scale(ARENA_HEIGHT),
-			height: 2,
+			height: 5,
 			depth: 2,
 		},
 		scene,
@@ -67,7 +51,7 @@ ground.material = mirrorMaterial
 
 	const wall3 = BABYLON.MeshBuilder.CreateBox('wall3', {
 		width: 2,
-		height: 2,
+		height: 5,
 		depth: scale(ARENA_WIDTH) + 2,
 		//        faceColors: faceColors
 	})

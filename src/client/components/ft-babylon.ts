@@ -2,67 +2,72 @@
 /// <reference path="../../../node_modules/babylonjs-gui/babylon.gui.d.ts" />
 
 import {
-	ARENA_HEIGHT,
-	ARENA_WIDTH,
 	Engine as GameEngine,
 	type Scores,
 	type State,
 } from '../../lib/engine/index.js'
+import * as Graphics from '../graphics/index.js'
 
-import { createArena } from '../graphics/arena.js'
-import { createBall } from '../graphics/ball.js'
-import { createCamera } from '../graphics/camera.js'
-import { createLights } from '../graphics/lights.js'
-import {
-	createBallMaterial,
-	createMatwall,
-	createPaddleMaterial,
-} from '../graphics/materials.js'
-import { createPaddles } from '../graphics/paddles.js'
-import { updateGraphics } from '../graphics/scene.js'
 export const RENDER_SCALE = 0.1
 customElements.define(
 	'ft-babylon',
 	class extends HTMLElement {
-		canvas: HTMLCanvasElement
-		babylonEngine: BABYLON.Engine
-		scene: BABYLON.Scene
-		camera: BABYLON.Camera
-		light: BABYLON.DirectionalLight
-		ballMesh: BABYLON.Mesh
-		paddle1: BABYLON.AbstractMesh
-		paddle2: BABYLON.AbstractMesh
-		gameLogicEngine: GameEngine
-		guiTexture: BABYLON.GUI.AdvancedDynamicTexture
-		scoreText: BABYLON.GUI.TextBlock
+		private canvas: HTMLCanvasElement
+		private babylonEngine: BABYLON.Engine
+		private scene: BABYLON.Scene
+		private camera: BABYLON.ArcRotateCamera
+		private light: BABYLON.DirectionalLight
+		private ballMesh: BABYLON.Mesh
+		private paddle1: BABYLON.AbstractMesh
+		private paddle2: BABYLON.AbstractMesh
+		private gameLogicEngine: GameEngine
+		private guiTexture: BABYLON.GUI.AdvancedDynamicTexture
+		private scoreText: BABYLON.GUI.TextBlock
+		private wallParticleSystem: BABYLON.ParticleSystem
 
 		constructor() {
 			super()
 			this.classList.add('w-full', 'h-full')
-			this.initAsync() // Appeler la méthode d'initialisation asynchrone
+			this.initAsync()
 		}
 
 		async initAsync() {
 			try {
 				this.initCanvasAndEngine()
-				this.setupScene()
-				await this.createGameObjects() // Attendre la fin de createGameObjects
-				console.log('Ball mesh created:', this.ballMesh?.name) // Vérifier que ballMesh est défini
-				this.setupVisualEffects()
-				this.setupShadows()
+				this.camera = Graphics.createCamera(this.scene, this.canvas)
+				this.light = Graphics.createLights(this.scene)
+				Graphics.setupEnvironment(this.scene, this.camera)
+				const { ballMesh, paddle1, paddle2 } = await Graphics.createGameObjects(
+					this.scene,
+				)
+				this.ballMesh = ballMesh
+				this.paddle1 = paddle1
+				this.paddle2 = paddle2
+				Graphics.setupVisualEffects(this.scene, this.ballMesh)
+				Graphics.setupShadows(
+					this.scene,
+					this.light,
+					this.ballMesh,
+					this.paddle1,
+					this.paddle2,
+				)
+				this.wallParticleSystem = Graphics.setupWallCollisionParticles(
+					this.scene,
+				)
+				this.setupScore()
 				this.startEngine()
 				this.setupControls()
-				this.setupScore()
 				this.babylonEngine.runRenderLoop(() => this.scene.render())
 			} catch (error) {
-				console.error("Erreur lors de l'initialisation:", error)
+				console.error('Initialization failed:', error)
 			}
 		}
 
 		connectedCallback() {
 			window.addEventListener('resize', () => this.babylonEngine.resize())
 		}
-		initCanvasAndEngine() {
+
+		private initCanvasAndEngine() {
 			this.canvas = document.createElement('canvas')
 			this.canvas.style.width = '100%'
 			this.canvas.style.height = '100%'
@@ -72,48 +77,10 @@ customElements.define(
 				stencil: true,
 			})
 			this.scene = new BABYLON.Scene(this.babylonEngine)
-			//this.scene.clearColor = new BABYLON.Color4(0.6, 1, 1)
 			this.scene.lightsEnabled = true
-			//this.scene.ambientColor = new BABYLON.Color3(1, 1, 1)
 		}
 
-		setupScene() {
-			this.camera = createCamera(this.scene, this.canvas)
-			this.light = createLights(this.scene)
-			const pipeline = new BABYLON.DefaultRenderingPipeline(
-				'defaultPipeline',
-				true,
-				this.scene,
-				[this.camera],
-			)
-			pipeline.bloomEnabled = true
-			pipeline.imageProcessingEnabled = true
-			pipeline.fxaaEnabled = true
-			//this.scene.fogMode = BABYLON.Scene.FOGMODE_LINEAR;
-			//BABYLON.Scene.FOGMODE_NONE;
-			//BABYLON.Scene.FOGMODE_EXP;
-			//BABYLON.Scene.FOGMODE_EXP2;
-			//BABYLON.Scene.FOGMODE_LINEAR;
-
-			//	this.scene.fogColor = new BABYLON.Color3(0.7, 0.85, 1);
-			//	this.scene.fogDensity = 0.001;
-
-			/*
-			 */
-			if (!this.scene.getMeshByName('BackgroundSkybox')) {
-				const envTexture = BABYLON.CubeTexture.CreateFromPrefilteredData(
-					'/public/textures/polyhaven/cloud8k.env',
-					this.scene,
-				)
-				this.scene.environmentTexture = envTexture
-				const skybox = this.scene.createDefaultSkybox(envTexture, true, 5000)
-				this.scene.registerBeforeRender(() => {
-					if (skybox) skybox.rotation.y += 0.0001
-				})
-			}
-		}
-
-		setupScore() {
+		private setupScore() {
 			this.guiTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI(
 				'UI',
 				true,
@@ -130,90 +97,30 @@ customElements.define(
 				BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
 			this.guiTexture.addControl(this.scoreText)
 		}
-		async createGameObjects() {
-			const wallMaterial = createMatwall(this.scene)
-			const paddleMaterial = createPaddleMaterial(this.scene)
-			const ballMaterial = createBallMaterial(this.scene)
 
-			createArena(this.scene, wallMaterial, ARENA_WIDTH, ARENA_HEIGHT)
-
-			const paddles = await createPaddles(this.scene, paddleMaterial)
-			this.paddle1 = paddles.paddle1
-			this.paddle2 = paddles.paddle2
-
-			this.ballMesh = createBall(this.scene, ballMaterial)
-		}
-
-		setupVisualEffects() {
-			if (!this.ballMesh) {
-				throw new Error('ballMesh est undefined dans setupVisualEffects')
-			}
-
-			const trail = new BABYLON.TrailMesh('new', this.ballMesh, this.scene, {
-				diameter: 1,
-				length: 20,
-				segments: 20,
-				sections: 8,
-				autoStart: true,
-			})
-
-			const trailMat = new BABYLON.StandardMaterial('trailMat', this.scene)
-			trailMat.emissiveColor = new BABYLON.Color3(0, 0, 1)
-			trail.material = trailMat
-
-			const glow = new BABYLON.GlowLayer('glow', this.scene)
-			glow.addIncludedOnlyMesh(this.ballMesh)
-			const myParticleSystem = new BABYLON.ParticleSystem(
-				'particles',
-				2000,
-				this.scene,
-			)
-			myParticleSystem.particleTexture = new BABYLON.Texture(
-				'https://assets.babylonjs.com/textures/flare.png',
-			)
-			myParticleSystem.emitter = this.ballMesh // Suivre la balle
-			myParticleSystem.minSize = 0.5
-			myParticleSystem.maxSize = 2.0
-			myParticleSystem.minLifeTime = 0.3
-			myParticleSystem.maxLifeTime = 1.0
-			myParticleSystem.emitRate = 300
-			myParticleSystem.color1 = new BABYLON.Color4(0, 0.5, 1, 1) // Bleu
-			myParticleSystem.color2 = new BABYLON.Color4(0, 0, 1, 1)
-			myParticleSystem.minEmitPower = 2
-			myParticleSystem.maxEmitPower = 5
-			myParticleSystem.updateSpeed = 0.01
-			myParticleSystem.start()
-			console.log('Fire system started:', myParticleSystem)
-		}
-
-		setupShadows() {
-			const shadowGenerator = new BABYLON.ShadowGenerator(1024, this.light)
-			shadowGenerator.useExponentialShadowMap = true
-			shadowGenerator.useBlurExponentialShadowMap = true
-			shadowGenerator.blurKernel = 32
-			shadowGenerator.darkness = 0.5
-
-			shadowGenerator.addShadowCaster(this.ballMesh)
-			shadowGenerator.addShadowCaster(this.paddle1)
-			shadowGenerator.addShadowCaster(this.paddle2)
-
-			const ground = this.scene.getMeshByName('ground')
-			if (ground) ground.receiveShadows = true
-		}
-
-		startEngine() {
+		private startEngine() {
 			this.gameLogicEngine = new GameEngine({
 				onTick: this.renderGameState.bind(this),
 				onScore: this.handleScoreUpdate.bind(this),
+				onCollision: (c) =>
+					Graphics.handleCollision(
+						c,
+						this.ballMesh,
+						this.paddle1,
+						this.paddle2,
+						this.scene,
+						this.camera,
+						this.wallParticleSystem,
+					),
 			})
 			this.gameLogicEngine.start()
 		}
-		handleScoreUpdate(scores: Scores) {
-			console.log('Score updated:', scores)
+
+		private handleScoreUpdate(scores: Scores) {
 			this.scoreText.text = `${scores.p1} : ${scores.p2}`
 		}
 
-		setupControls() {
+		private setupControls() {
 			const keyHandlers: Record<string, (value: boolean) => void> = {
 				a: (v) => this.gameLogicEngine.setInput('p1', 'up', v),
 				d: (v) => this.gameLogicEngine.setInput('p1', 'down', v),
@@ -225,23 +132,19 @@ customElements.define(
 			document.addEventListener('keyup', (e) => keyHandlers[e.key]?.(false))
 		}
 
-		renderGameState(state: State) {
-			updateGraphics(state, this.ballMesh, this.paddle1, this.paddle2)
+		private renderGameState(state: State) {
+			Graphics.updateGraphics(state, this.ballMesh, this.paddle1, this.paddle2)
 		}
 
 		disconnectedCallback() {
-			console.log('Disposing Babylon properly')
-
 			if (this.scene.environmentTexture) {
 				const envTex = this.scene.environmentTexture
-
 				if (
 					envTex instanceof BABYLON.CubeTexture &&
 					envTex.name.startsWith('blob:')
 				) {
 					URL.revokeObjectURL(envTex.name)
 				}
-
 				envTex.dispose()
 				this.scene.environmentTexture = null
 			}
@@ -249,14 +152,11 @@ customElements.define(
 			const skybox = this.scene.getMeshByName('BackgroundSkybox')
 			skybox?.dispose()
 
-			this.babylonEngine?.stopRenderLoop()
-			this.scene?.dispose()
-			this.babylonEngine?.dispose()
-			this.canvas?.remove()
-
+			this.babylonEngine.stopRenderLoop()
+			this.scene.dispose()
+			this.babylonEngine.dispose()
+			this.canvas.remove()
 			window.removeEventListener('resize', () => this.babylonEngine.resize())
-
-			console.log('Babylon cleaned')
 		}
 	},
 )

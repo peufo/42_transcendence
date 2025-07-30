@@ -14,8 +14,8 @@ import { createCamera } from '../graphics/camera.js'
 import { createLights } from '../graphics/lights.js'
 import {
 	createBallMaterial,
-	createMatwall,
 	createPaddleMaterial,
+	createWallMaterial,
 } from '../graphics/materials.js'
 import { createPaddles } from '../graphics/paddles.js'
 import { updateGraphics } from '../graphics/scene.js'
@@ -189,14 +189,14 @@ customElements.define(
 				BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
 			this.guiTexture.addControl(this.scoreText)
 		}
-		async createGameObjects() {
-			const wallMaterial = createMatwall(this.scene)
+		createGameObjects() {
+			const wallMaterial = createWallMaterial(this.scene)
 			const paddleMaterial = createPaddleMaterial(this.scene)
 			const ballMaterial = createBallMaterial(this.scene)
 
 			createArena(this.scene, wallMaterial, ARENA_WIDTH, ARENA_HEIGHT)
 
-			const paddles = await createPaddles(this.scene, paddleMaterial)
+			const paddles = createPaddles(this.scene, paddleMaterial)
 			this.paddle1 = paddles.paddle1
 			this.paddle2 = paddles.paddle2
 

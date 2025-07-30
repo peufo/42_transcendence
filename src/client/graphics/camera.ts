@@ -1,7 +1,7 @@
 export function createCamera(
 	scene: BABYLON.Scene,
 	canvas: HTMLCanvasElement,
-): BABYLON.Camera {
+): BABYLON.ArcRotateCamera {
 	const camera = new BABYLON.ArcRotateCamera(
 		'camera',
 		-Math.PI / 2,
