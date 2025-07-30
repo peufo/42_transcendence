@@ -3,7 +3,6 @@ import {
 	ARENA_WIDTH,
 	BALL_BASE_SIZE,
 	type EngineEventData,
-	EVENT_TYPE,
 	type Move,
 	PADDLE_BASE_HEIGHT,
 	PADDLE_BASE_P1_POSITION,
@@ -41,13 +40,11 @@ customElements.define(
 			this.socket = new WebSocket(`ws://${document.location.host}/ws`)
 			this.socket.addEventListener('message', (event) => {
 				const data: EngineEventData = JSON.parse(event.data)
-				const newState = data[EVENT_TYPE.TICK]
-				const newScores = data[EVENT_TYPE.SCORE]
-				if (newState) {
-					this.interpolate.updateState(newState)
+				if (data.onTick) {
+					this.interpolate.updateState(data.onTick)
 				}
-				if (newScores) {
-					this.scores = newScores
+				if (data.onScore) {
+					this.scores = data.onScore
 				}
 			})
 			requestAnimationFrame(this.render.bind(this))

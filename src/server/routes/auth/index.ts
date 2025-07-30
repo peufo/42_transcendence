@@ -4,7 +4,7 @@ import { getSchema, permission, postSchema } from '../../utils/index.js'
 import { deleteEmitter } from '../ws/controller.js'
 import { deleteSession, setSessionCookie } from './controller.js'
 import { createUser, getAuthUser, getUserSessions } from './model.js'
-import { authSchema } from './schema.js'
+import { loginSchema, signupSchema } from './schema.js'
 
 export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 	server.get('/user', getSchema('/auth/user', null), async (_req, res) => {
@@ -13,7 +13,7 @@ export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 
 	server.post(
 		'/login',
-		postSchema('/auth/login', authSchema),
+		postSchema('/auth/login', loginSchema),
 		async (req, res) => {
 			const { name, password } = req.body
 			const authUser = await getAuthUser(name)
@@ -27,7 +27,7 @@ export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 	)
 	server.post(
 		'/signup',
-		postSchema('/auth/signup', authSchema),
+		postSchema('/auth/signup', signupSchema),
 		async (req, res) => {
 			const authUser = await getAuthUser(req.body.name)
 			if (authUser) return res.forbidden('User already exists.')

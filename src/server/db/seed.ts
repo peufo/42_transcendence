@@ -12,7 +12,6 @@ import {
 
 function createAvatarPlaceholder() {
 	const avatarUrl = new URL('https://api.dicebear.com/9.x/bottts-neutral/svg')
-	console.log(avatarUrl)
 	avatarUrl.searchParams.append('seed', String(Math.random()))
 	return avatarUrl.toString()
 }
@@ -82,6 +81,9 @@ async function main() {
 	await seed(db, { matches, roundsRelations }).refine((f) => ({
 		matches: {
 			columns: {
+				state: f.valuesFromArray({
+					values: ['ongoing', 'finished'],
+				}),
 				player1Id: f.int({
 					minValue: 1,
 					maxValue: 20,

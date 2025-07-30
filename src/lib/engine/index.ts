@@ -8,10 +8,23 @@ export type Move = 'down' | 'up'
 type Paddles = Record<Player, Paddle>
 type Inputs = Record<Player, Record<Move, boolean>>
 export type Scores = Record<Player, number>
-export type Round = {
+export type RoundData = {
 	scorer: Player
 	rallyCount: number
 	ballPositionY: number
+}
+type GameOverData = {
+	finishedAt: number
+}
+export type State = {
+	b: { x: number; y: number }
+	p1: number
+	p2: number
+}
+export type Collision = {
+	type: COLLISION_TYPE
+	x: number
+	y: number
 }
 
 export enum COLLISION_TYPE {
@@ -21,37 +34,19 @@ export enum COLLISION_TYPE {
 	PADDLE_P2 = 'paddle_p2',
 }
 
-export type Collision = {
-	type: COLLISION_TYPE
-	x: number
-	y: number
-}
-export enum EVENT_TYPE {
-	TICK = 0,
-	SCORE = 1,
-	ROUND = 2,
-	COLLISION = 3,
-}
-
 export type EngineEventData = {
-	[EVENT_TYPE.TICK]?: State
-	[EVENT_TYPE.SCORE]?: Scores
-	[EVENT_TYPE.ROUND]?: Round
-	[EVENT_TYPE.COLLISION]?: Collision
+	onTick?: State
+	onScore?: Scores
+	onRoundEnd?: RoundData
+	onGameEnd?: GameOverData
+	onCollision?: Collision
+	onTimerTick?: number
 }
 
-type EngineOption = {
-	onEvent?: (event: EngineEventData) => void
-	onTick?: (state: State) => void
-	onScore?: (scores: Scores) => void
-	onRoundEnd?: (round: Round) => void
-	onCollision?: (collision: Collision) => void
-}
-
-export type State = {
-	b: { x: number; y: number }
-	p1: number
-	p2: number
+type EngineOption = { onEvent?: (event: EngineEventData) => void } & {
+	[EventName in keyof EngineEventData]: (
+		data: Required<EngineEventData>[EventName],
+	) => void
 }
 
 // Game properties
@@ -102,6 +97,7 @@ export class Engine {
 	}
 	#gameOver: boolean = false
 	#roundOver: boolean = false
+	tickData: EngineEventData = {}
 
 	get paddles() {
 		return this.#paddles
@@ -116,7 +112,7 @@ export class Engine {
 	}
 
 	#timer(seconds: number, timeoutCallback: () => void) {
-		console.log({ seconds }) // event ?
+		this.onEvent({ onTimerTick: seconds })
 		setTimeout(() => {
 			if (!this.#gameOver) {
 				if (seconds > 1) this.#timer(seconds - 1, timeoutCallback)
@@ -148,12 +144,14 @@ export class Engine {
 
 	#tickLoop() {
 		const tickStart = Date.now()
+		this.tickData = {}
 		this.#updateState()
-		this.onEvent(EVENT_TYPE.TICK, {
+		this.tickData.onTick = {
 			b: { x: this.#ball.position.x, y: this.#ball.position.y },
 			p1: this.paddles.p1.position.y,
 			p2: this.paddles.p2.position.y,
-		})
+		}
+		this.onEvent(this.tickData)
 		if (!this.#gameOver && !this.#roundOver) {
 			const processTime = Date.now() - tickStart
 			const delay = Math.max(0, TICK_INTERVAL - processTime)
@@ -161,31 +159,23 @@ export class Engine {
 		}
 	}
 
-	onEvent<T extends EVENT_TYPE>(eventType: T, data: EngineEventData[T]) {
-		this.#options.onEvent?.({ [eventType]: data })
-		if (eventType === EVENT_TYPE.TICK) {
-			this.#options.onTick?.(data as State)
-		}
-		if (eventType === EVENT_TYPE.SCORE) {
-			this.#options.onScore?.(data as Scores)
-		}
-		if (eventType === EVENT_TYPE.ROUND) {
-			this.#options.onRoundEnd?.(data as Round)
-		}
-		if (eventType === EVENT_TYPE.COLLISION) {
-			this.#options.onCollision?.(data as Collision)
+	onEvent(data: EngineEventData) {
+		this.#options.onEvent?.(data)
+		for (const [eventName, eventData] of Object.entries(data)) {
+			// @ts-ignore
+			this.#options[eventName]?.(eventData)
 		}
 	}
 
-	#endRound(roundInfo: Round) {
+	#endRound(roundInfo: RoundData) {
 		this.#roundOver = true
 		const { scorer } = roundInfo
 		this.#scores[scorer]++
-		this.onEvent(EVENT_TYPE.SCORE, this.#scores)
-		this.onEvent(EVENT_TYPE.ROUND, roundInfo)
+		this.tickData.onScore = this.#scores
+		this.tickData.onRoundEnd = roundInfo
 		if (this.#scores[scorer] >= rules.scoreToWin) {
 			this.#gameOver = true
-			console.log(`${scorer} won the game !`) // event
+			this.tickData.onGameEnd = { finishedAt: Date.now() }
 		} else this.#newRound()
 	}
 

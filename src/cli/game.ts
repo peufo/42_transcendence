@@ -4,7 +4,6 @@ import {
 	ARENA_HEIGHT,
 	ARENA_WIDTH,
 	type EngineEventData,
-	EVENT_TYPE,
 	type Move,
 	PADDLE_BASE_HEIGHT,
 	PADDLE_BASE_P1_POSITION,
@@ -161,13 +160,11 @@ function connectEngine(): WebSocket {
 	const socket = new WebSocket('ws://localhost:8000/ws') // use correct address
 	socket.addEventListener('message', (event) => {
 		const data: EngineEventData = JSON.parse(event.data)
-		const newState = data[EVENT_TYPE.TICK]
-		const newScores = data[EVENT_TYPE.SCORE]
-		if (newState) {
-			render(convertState(newState))
+		if (data.onTick) {
+			render(convertState(data.onTick))
 		}
-		if (newScores) {
-			renderScores(newScores.p1, newScores.p2)
+		if (data.onScore) {
+			renderScores(data.onScore.p1, data.onScore.p2)
 		}
 	})
 	return socket

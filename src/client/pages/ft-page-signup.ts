@@ -18,13 +18,16 @@ customElements.define(
                                 <div class ="w-32 h-32">
 									<img id="avatarPlaceholderImage" src="https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}">
 									<input type="hidden" name="avatarPlaceholder" id="avatarPlaceholderInput" value="https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}">
-                                	<div class="badge badge-red w-max my-1" style="">Invalid input: expected string</div> 
-									<!-- TODO: fit error and remove the line above -->
 								</div>
-                                <div class= flex space-x-6>
-                                <button type ="button" id="prev" class="px-4 py-2 btn-primary"> ⬅️ </button>
-                                <button type ="button" id="next" class="px-4 py-2 btn-primary"> ➡️ </button>
+                                <div class="flex gap-2">
+                                    <button type="button" id="prev" class="btn btn-primary">
+                                        <ft-icon name="arrow-left" class="fill-transparent h-5"></ft-icon>  
+                                    </button>
+                                    <button type="button" id="next" class="btn btn-primary">
+                                        <ft-icon name="arrow-right" class="fill-transparent h-5"></ft-icon> 
+                                    </button>
                                 </div>
+                                
 								<!-- TODO: add file upload -->
 							<!-- <div>
                                 <div class="mt-2">

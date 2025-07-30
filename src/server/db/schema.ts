@@ -78,6 +78,7 @@ export const friendshipsRelations = relations(friendships, ({ one }) => ({
 
 export const matches = sqliteTable('matches', {
 	id: int().primaryKey({ autoIncrement: true }),
+	state: text({ enum: ['ongoing', 'finished'] }),
 	player1Id: int()
 		.notNull()
 		.references(() => users.id),
@@ -86,7 +87,7 @@ export const matches = sqliteTable('matches', {
 		.references(() => users.id),
 	player1Score: int().default(0),
 	player2Score: int().default(0),
-	finishedAt: int({ mode: 'timestamp' }),
+	finishedAt: int({ mode: 'timestamp' }).notNull().default(new Date()),
 	pointsToWin: int().notNull(),
 })
 
