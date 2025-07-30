@@ -166,4 +166,8 @@ export type RoutesPost = {
 		body: { name?: string; password?: string }
 		res: { success: boolean; message: string; user: User }
 	}
+	'/users/update/avatar': {
+		body: null
+		res: { message: string; success: boolean }
+	}
 }

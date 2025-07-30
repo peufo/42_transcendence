@@ -130,8 +130,9 @@ async function onSubmitForm(event: SubmitEvent) {
 
 	const res = await fetch(form.action, {
 		method: form.method,
+		// TODO: remove comment ?, breaks form-data
 		headers: {
-			'Content-Type': form.enctype,
+			// 'Content-Type': form.enctype,
 		},
 		body: getFormBody(),
 	})

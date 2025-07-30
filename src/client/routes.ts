@@ -52,6 +52,9 @@ export const API_POST: {
 		redirectTo: () => '/account',
 		validation: validationUpdate,
 	},
+	'/users/update/avatar': {
+		redirectTo: () => '/account',
+	},
 	'/auth/logout': {
 		redirectTo: () => '/',
 	},

@@ -11,7 +11,7 @@ customElements.define(
                     </div>
 
                     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-                        <form method="post"  action="/users/update" class="space-y-6">
+                        <form method="post"  action="/users/update" class="space-y-6" >
 
 						<div class="border-2 border-blue-300 p-4 rounded-md">
                             <div>
@@ -36,22 +36,33 @@ customElements.define(
                                 </div>
                             </div>
 						</div>
-
-                        <div class="border-2 border-blue-300 p-4 rounded-md">
-							<div>
-                                <label class="label" for="file_input">Upload your own avatar</label>
-                                <div class="mt-2">
-                                    <input type="file" accept="image/*" class="btn btn-primary w-full" name="avatarFile" id="file_input">
-                                </div>
-                            </div>
-						</div>
                             <div class="flex flex-col items-center">
                                 <button type="submit" class="btn btn-primary w-full">
                                     Update
                                 </button>
                             </div>
                         </form>
-                    </div>
+					</div>
+						
+                    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+                        <form method="post"  action="/users/update/avatar" c4lass="space-y-6" enctype="multipart/form-data">
+						
+                        <div class="border-2 border-blue-300 p-4 rounded-md">
+							<div class= "">
+                                <label class="label" for="avatarFile">Upload your own avatar</label>
+                                <div class="mt-2">
+                                    <input type="file" accept="image/*" class="btn btn-primary w-full" name="avatarFile" id="avatarFile" required>
+                                </div>
+                            </div>
+						</div>
+                            <div class="flex flex-col items-center py-4">
+                                <button type="submit" class="btn btn-primary w-full">
+                                    Update
+                                </button>
+                            </div>
+                        </form>
+					</div>
+						
                 </div>
             `
 		}
