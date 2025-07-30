@@ -147,7 +147,7 @@ customElements.define(
 			let nameColor = ''
 			let user_in_top = false
 			const usersRanked = $rankedUsers.get()
-			html += `<div class="flex flex-col w-full gap-2">
+			html += /*html*/ `<div class="flex flex-col w-full gap-2">
 			 <div class="flex font-semibold text-center">
 				<div class="w-1/6 p-2">Rank</div>
 				<div class="w-1/6 p-2">Avatar</div>
@@ -171,7 +171,7 @@ customElements.define(
 					nameColor = ''
 				}
 
-				html += `
+				html += /*html*/ `
 				<div class="flex items-center text-center p-2 border ${isCurrentUser ? 'border-indigo-500 border-2' : 'border-gray-200'}   rounded-xl">
 					<div class="w-1/6 flex flex-row justify-center items-center">
 						`
@@ -189,7 +189,7 @@ customElements.define(
 						html += /*html*/ `<div class="flex flex-row w-5 h-5 items-center justify-center rounded-xl"> ${rank} </div>`
 						break
 				}
-				html += `
+				html += /*html*/ `
 				</div>
 					<div class="w-1/6 flex justify-center items-center">
 						<img src="${getAvatarSrc(user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
@@ -200,22 +200,21 @@ customElements.define(
 				rank++
 			}
 			if (!user_in_top) {
-				html += `
-			<div class="flex items-center justify-center p-2 rounded-xl font-bold">...</div>
-			<div class="flex items-center text-center p-2 border border-gray-200 rounded-xl">
-				<div class="w-1/6 flex flex-row justify-center items-center">
-					<div class="flex flex-row w-5 h-5 items-center justify-center rounded-xl"> ${rank} </div>
-				</div>
-				<div class="w-1/6 flex justify-center items-center">
+				html += /*html*/ `
+				<div class="flex items-center justify-center p-2 rounded-xl font-bold">...</div>
+				<div class="flex items-center text-center p-2 border-indigo-500 border-2 rounded-xl">
+					<div class="w-1/6 flex flex-row justify-center items-center">
+						<div class="flex flex-row w-5 h-5 items-center justify-center rounded-xl"> ${rank} </div>
+					</div>
+					<div class="w-1/6 flex justify-center items-center">
 						<img src="${getAvatarSrc(current_user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
 					</div>
 					<div class="w-2/6 flex justify-center items-center font-bold">${current_user.name}</div>
 					<div class="w-2/6 flex justify-center items-center">${current_user.numberOfGoals}</div>
 				</div>
-			</div>
-			`
+				`
 			}
-			html += `</div`
+			html += `</div>`
 			return html
 		}
 	},
@@ -247,7 +246,7 @@ customElements.define(
 			const userMatches = $matches.get()
 			const getAllUsersStats = $rankedUsers.get()
 			if (userMatches.length === 0) {
-				const html = `<div class="grid grid-flow-row grid-rows-2 gap-2">
+				const html = /*html*/ `<div class="grid grid-flow-row grid-rows-2 gap-2">
 					<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold">Total match played</h2>
 					<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold">Winrate</h2>
 					<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold">Average rally per round</h2>
@@ -261,7 +260,7 @@ customElements.define(
 			).toPrecision(3)
 			const averageRally = getAverageRally(userMatches).toPrecision(2)
 			const rank = getUserRank(getAllUsersStats, user)
-			const leagueImage = getLeague(getAllUsersStats, rank)
+			const leagueImage = getLeagueHtml(getAllUsersStats, rank)
 
 			const pr = new Intl.PluralRules('en-US', { type: 'ordinal' })
 			const suffixes = new Map([
@@ -412,144 +411,74 @@ function getUserRank(usersStats: UserStats[], user: UserBasic): number {
 	return rank
 }
 
-function getLeague(usersStats: UserStats[], user_rank: number): string {
-	const percentage = (user_rank / usersStats.length) * 100
-	console.log(percentage)
-	let color = '#000000'
-	let league_name = 'Wood'
-	switch (true) {
-		case percentage < 10:
-			color = '#E91E63'
-			league_name = 'Mythic'
-			break
-		case percentage < 20:
-			color = '#F4C542'
-			league_name = 'Solaris'
-			break
-		case percentage < 30:
-			color = '#00CFFF'
-			league_name = 'Aurora'
-			break
-		case percentage < 40:
-			color = '#5D6D7E'
-			league_name = 'Storm'
-			break
-		case percentage < 50:
-			color = '#353839'
-			league_name = 'Onyx'
-			break
-		case percentage < 60:
-			color = '#9B59B6'
-			league_name = 'Amethyst'
-			break
-		case percentage < 70:
-			color = '#E25822'
-			league_name = 'Blaze'
-			break
-		case percentage < 80:
-			color = '#2E86AB'
-			league_name = 'Ocean'
-			break
-		case percentage < 90:
-			color = '#4A7C59'
-			league_name = 'Moss'
-			break
-		default:
-			color = '#8B2E2E'
-			league_name = 'Ember'
-			break
-	}
-	const leagueSvg = getLeagueImage(color, league_name)
-	return leagueSvg
+type League = { name: string; color: string; icon: string; threshold: number }
+const leagues: League[] = [
+	{ name: 'Summit', color: '#CC04A6', icon: 'mountain', threshold: 2 },
+	{ name: 'Onyx', color: '#6E7575', icon: 'diamond', threshold: 10 },
+	{ name: 'Cyclone', color: '#04B1C9', icon: 'tornado', threshold: 30 },
+	{ name: 'Mist', color: '#C9D6DF', icon: 'cloud', threshold: 60 },
+	{ name: 'Bud', color: '#7AC74F', icon: 'sprout', threshold: 100 },
+] as const
+
+function getLeagueHtml(usersStats: UserStats[], userRank: number): string {
+	const percentage = (userRank / usersStats.length) * 100
+	const league =
+		leagues.find(({ threshold }) => percentage < threshold) ||
+		leagues[leagues.length - 1]
+	const leagueDiv = getLeagueDiv(league)
+	return leagueDiv
 }
 
-function getLeagueImage(color: string, league_name: string): string {
-	const leagueSvg = `
-	<div class="flex flex-col p-2 items-center justify-center text-center gap-2">
-		<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold" style="color:${color};">${league_name}</h2>
-		<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-			width="40px" height="40px" viewBox="0 0 72 72" enable-background="new 0 0 72 72" xml:space="preserve">
-		<g>
-			<path fill="${color}" d="M68.193,19.713L60.171,8.027c-1.539-2.262-4.937-3.967-7.903-3.967H19.721c-2.966,0-6.363,1.708-7.893,3.96L3.784,19.652
-				c-1.711,2.52-1.62,6.4,0.207,8.836l28.002,37.329c1.014,1.352,2.476,2.125,4.01,2.125c1.528,0,2.983-0.771,3.99-2.113l28.004-37.33
-				C69.842,26.035,69.93,22.262,68.193,19.713z M52.268,8.06c0.088,0,0.181,0.014,0.271,0.02l-0.782,0.715
-				c-0.408,0.372-0.436,1.005-0.064,1.412c0.197,0.217,0.469,0.326,0.74,0.326c0.239,0,0.48-0.086,0.674-0.262l1.718-1.569
-				c0.867,0.41,1.633,0.975,2.046,1.583l8.023,11.687c0.212,0.311,0.354,0.688,0.441,1.089h-26.24l8.34-7.612
-				c0.406-0.371,0.436-1.004,0.063-1.412c-0.371-0.407-1.005-0.438-1.413-0.064l-9.826,8.969c-0.038,0.035-0.056,0.081-0.087,0.119h-1
-				c-0.031-0.039-0.049-0.084-0.086-0.118L18.878,8.149c0.289-0.052,0.573-0.089,0.843-0.089H52.268z M15.127,10.282
-				c0.344-0.506,0.939-0.979,1.63-1.362L32.248,23.06H20.23c-0.001,0-0.001,0-0.002,0H6.743c-0.038,0-0.07,0.018-0.107,0.021
-				c0.083-0.435,0.226-0.842,0.447-1.167L15.127,10.282z M7.19,26.088c-0.217-0.289-0.375-0.647-0.481-1.035
-				c0.012,0,0.022,0.007,0.034,0.007h12.781l0.949,2.375c0.155,0.395,0.532,0.635,0.932,0.635c0.121,0,0.244-0.022,0.364-0.069
-				c0.513-0.201,0.767-0.781,0.566-1.295l-0.657-1.646h28.471l-14.16,36.531L25.008,33.534c-0.201-0.513-0.782-0.769-1.296-0.566
-				c-0.514,0.201-0.767,0.781-0.566,1.295l10.712,27.375L7.19,26.088z M38.093,61.697L52.294,25.06h12.988
-				c-0.106,0.386-0.266,0.744-0.485,1.038L38.093,61.697z"/>
-			<path fill="${color}" d="M49.329,13.365c0.241,0,0.483-0.087,0.674-0.262l0.696-0.636c0.406-0.373,0.436-1.005,0.063-1.413
-				c-0.371-0.406-1.004-0.434-1.412-0.063l-0.695,0.636c-0.407,0.372-0.437,1.005-0.063,1.413
-				C48.788,13.256,49.059,13.365,49.329,13.365z"/>
-			<path fill="${color}" d="M23.659,30.087l-0.351-0.895c-0.201-0.511-0.78-0.767-1.296-0.564c-0.513,0.201-0.767,0.781-0.566,1.295l0.351,0.895
-				c0.156,0.395,0.533,0.635,0.932,0.635c0.121,0,0.245-0.022,0.364-0.069C23.607,31.183,23.861,30.603,23.659,30.087z"/>
-		</g>
-		</svg>
-	</div>`
-	return leagueSvg
+function getLeagueDiv(league: League): string {
+	const leagueIconDiv = /*html*/ `
+		<ft-icon
+			name="${league.icon}"
+			class="mr-1" style="fill:${league.color};">
+		</ft-icon>
+	`
+	const leagueNameDiv = /*html*/ `
+		<span class="font-bold" style="color:${league.color}">
+			${league.name}
+		</span>
+	`
+	const leaguediv = /*html*/ `
+		<div class="flex flex-col justify-center items-center gap-4">
+			${leagueNameDiv}
+			${leagueIconDiv}
+		</div>
+	`
+	return leaguediv
 }
 
 function getLeagueModal(): string {
-	let html = ''
-	const leagues_names = [
-		'Mythic',
-		'Solaris',
-		'Aurora',
-		'Storm',
-		'Onyx',
-		'Amethyst',
-		'Blaze',
-		'Ocean',
-		'Moss',
-		'Ember',
-	]
-	const leagues_colors = [
-		'#E91E63',
-		'#F4C542',
-		'#00CFFF',
-		'#5D6D7E',
-		'#353839',
-		'#9B59B6',
-		'#E25822',
-		'#2E86AB',
-		'#4A7C59',
-		'#8B2E2E',
-	]
-	const leagues_percentages = [
-		'< 10%',
-		'< 20%',
-		'< 30%',
-		'< 40%',
-		'< 50%',
-		'< 60%',
-		'< 70%',
-		'< 80%',
-		'< 90%',
-		'< 100%',
-	]
-	html += `
-	<div class="absolute left-1/2 top-full transform -translate-x-1/2 p-4 border border-gray-400 rounded-2xl bg-white shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 z-10 flex justify-center items-center">
-		<div class="flex flex-row justify-center items-center">
-			`
-	for (let i = 0; i < leagues_colors.length; i++) {
-		html += `
+	const leagueListElements = leagues
+		.map((league, index) => {
+			const content = /*html*/ `
 				<div class="flex flex-col p-2 items-center justify-center text-center gap-2 font-bold">
-				${getLeagueImage(leagues_colors[i], leagues_names[i])}
-				<div class="font-bold" style="color: ${leagues_colors[i]};">${leagues_percentages[i]}</div>
+					<span style="color:${league.color}">${league.name}</span>
+					<ft-icon
+						name="${league.icon}"
+						class="mr-1" style="fill:${league.color}; stroke: black;">
+					</ft-icon>
+					<div class="font-bold whitespace-nowrap" style="color: ${league.color};">Top ${league.threshold} %</div>
 				</div>
-				`
-		if (i < leagues_colors.length - 1)
-			html += `
-		<div class="flex flex-col p-2 items-center justify-center text-center gap-2 font-bold">🡸</div>
-		`
-	}
-	html += `
+			`
+			if (index > 0)
+				return `${content}<ft-icon name="arrow-right" class="fill-black-400"></ft-icon>`
+			return content
+		})
+		.reverse()
+		.join('')
+	const leagueList = /*html*/ `
+		<div class="flex flex-row justify-center items-center">
+			${leagueListElements}
 		</div>
-	</div>`
-	return html
+		`
+
+	const modal = /*html*/ `
+		<div class="absolute left-1/2 top-full transform -translate-x-1/2 p-4 border border-gray-400 rounded-2xl bg-white shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 z-10 flex justify-center items-center">
+			${leagueList}
+		</div>
+	`
+	return modal
 }
