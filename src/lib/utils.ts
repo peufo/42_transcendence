@@ -13,15 +13,9 @@ export function deserialize(data: unknown) {
 			const k = key as keyof typeof data
 			if (typeof data[k] === 'string') {
 				if (dateKeys.includes(k)) (data[k] as Date) = new Date(data[k])
-				else (data[k] as string) = sanitize(data[k])
 			} else {
 				deserialize(data[k])
 			}
 		}
 	}
-}
-
-function sanitize(str: string): string {
-	// TODO: Sanitize str
-	return str
 }

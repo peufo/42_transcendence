@@ -1,6 +1,7 @@
 import z from 'zod/v4'
+import { sanitize } from '../../utils/sanitize.js'
 
 export const authSchema = {
-	name: z.string().min(2),
+	name: z.string().min(2).transform(sanitize),
 	password: z.string().min(8),
 }

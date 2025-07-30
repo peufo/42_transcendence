@@ -157,6 +157,22 @@ customElements.define(
 			`
 			for (const user of usersRanked) {
 				if (rank >= 6) {
+					if (user.id === current_user.id && rank === 6) {
+						html += `
+							<div class="flex items-center text-center p-2 border-indigo-500 border-2 rounded-xl">
+								<div class="w-1/6 flex flex-row justify-center items-center">
+									<div class="flex flex-row w-5 h-5 items-center justify-center rounded-xl"> ${rank} </div>
+								</div>
+								<div class="w-1/6 flex justify-center items-center">
+									<img src="${getAvatarSrc(current_user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
+								</div>
+								<div class="w-2/6 flex justify-center items-center font-bold">${current_user.name}</div>
+								<div class="w-2/6 flex justify-center items-center">${current_user.numberOfGoals}</div>
+							</div>
+						</div>
+						`
+						return html
+					}
 					if (user.id === current_user.id) break
 					else {
 						rank++
