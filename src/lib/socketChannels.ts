@@ -1,5 +1,5 @@
 import type { SocketChannels } from './type.js'
-import { objectKeys, stringToDate } from './utils.js'
+import { deserialize, objectKeys } from './utils.js'
 
 export type ServerEvents<Channel extends keyof SocketChannels> =
 	SocketChannels[Channel]['serverEvents']
@@ -48,7 +48,7 @@ export function openChannel<Channel extends keyof SocketChannels>(
 	)
 	function onMessage(messageEvent: MessageEvent) {
 		const data: ServerEvents<Channel> = JSON.parse(messageEvent.data)
-		stringToDate(data)
+		deserialize(data)
 		for (const serverEvent of objectKeys(
 			serverEvents[channel],
 		) as (keyof ServerEvents<Channel>)[]) {

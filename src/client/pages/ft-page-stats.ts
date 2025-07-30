@@ -414,8 +414,8 @@ function getUserRank(usersStats: UserStats[], user: UserBasic): number {
 type League = { name: string; color: string; icon: string; threshold: number }
 const leagues: League[] = [
 	{ name: 'Summit', color: '#CC04A6', icon: 'mountain', threshold: 2 },
-	{ name: 'Onyx', color: '#6E7575', icon: 'diamond', threshold: 10 },
-	{ name: 'Cyclone', color: '#04B1C9', icon: 'tornado', threshold: 30 },
+	{ name: 'Ruby', color: '#E0115F', icon: 'diamond', threshold: 10 },
+	{ name: 'Storm', color: '#04B1C9', icon: 'tornado', threshold: 30 },
 	{ name: 'Mist', color: '#C9D6DF', icon: 'cloud', threshold: 60 },
 	{ name: 'Bud', color: '#7AC74F', icon: 'sprout', threshold: 100 },
 ] as const
@@ -430,10 +430,13 @@ function getLeagueHtml(usersStats: UserStats[], userRank: number): string {
 }
 
 function getLeagueDiv(league: League): string {
+	let styling = ''
+	if (league.name === 'Storm') styling = `style="stroke:${league.color};"`
+	else styling = `style="fill:${league.color}; stroke: black;"`
 	const leagueIconDiv = /*html*/ `
 		<ft-icon
 			name="${league.icon}"
-			class="mr-1" style="fill:${league.color};">
+			class="mr-1" ${styling}>
 		</ft-icon>
 	`
 	const leagueNameDiv = /*html*/ `
@@ -453,12 +456,16 @@ function getLeagueDiv(league: League): string {
 function getLeagueModal(): string {
 	const leagueListElements = leagues
 		.map((league, index) => {
+			let styling = ''
+			if (league.name === 'Storm') styling = `style="stroke:${league.color};"`
+			else styling = `style="fill:${league.color}; stroke: black;"`
+			console.log(styling)
 			const content = /*html*/ `
-				<div class="flex flex-col p-2 items-center justify-center text-center gap-2 font-bold">
-					<span style="color:${league.color}">${league.name}</span>
+				<div class="flex flex-col p-2 items-center justify-center text-center gap-2">
+					<span class="font-bold" style="color:${league.color}">${league.name}</span>
 					<ft-icon
 						name="${league.icon}"
-						class="mr-1" style="fill:${league.color}; stroke: black;">
+						class="mr-1" ${styling}>
 					</ft-icon>
 					<div class="font-bold whitespace-nowrap" style="color: ${league.color};">Top ${league.threshold} %</div>
 				</div>

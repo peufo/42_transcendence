@@ -1,4 +1,4 @@
-import { stringToDate } from '../lib/utils.js'
+import { deserialize } from '../lib/utils.js'
 import { toast } from './components/ft-toast.js'
 import { API_GET, type RouteApiGet } from './routes.js'
 
@@ -12,7 +12,7 @@ export const api = {
 			return null
 		}
 		const json = await res.json()
-		stringToDate(json.data)
+		deserialize(json.data)
 		// @ts-ignore
 		setter(json.data)
 		return json.data

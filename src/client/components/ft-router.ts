@@ -1,4 +1,4 @@
-import { stringToDate } from '../../lib/utils.js'
+import { deserialize } from '../../lib/utils.js'
 import { api } from '../api.js'
 import {
 	API_GET,
@@ -145,7 +145,7 @@ async function onSubmitForm(event: SubmitEvent) {
 
 	if ('message' in json) toast.success(json.message)
 
-	stringToDate(json)
+	deserialize(json)
 	options.onSuccess?.(json)
 	if (options.redirectTo) {
 		const pathname = options.redirectTo(json)
