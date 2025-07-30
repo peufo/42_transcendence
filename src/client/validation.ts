@@ -11,10 +11,9 @@ export const validationSignup: ApiPostOptionValidation = (form) => {
 export const validationUpdate: ApiPostOptionValidation = (form) => {
 	const formData = new FormData(form)
 	const data = Object.fromEntries(formData.entries())
-	const { name, password, confirm, avatar } = data
-	if (name === '' && password === '' && confirm === '' && avatar === '')
-		return { name: 'Fill atleast one information', confirm: '' }
-	if (password !== confirm)
-		return { name: '', confirm: 'Password is different' }
+	const { name, password, confirm } = data
+	if (name === '' && password === '' && confirm === '')
+		return 'Fill atleast one information'
+	if (password !== confirm) return { confirm: 'Password is different' }
 	return null
 }

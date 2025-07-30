@@ -11,7 +11,8 @@ customElements.define(
                     </div>
 
                     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-                        <form class="space-y-6" action="/users/update" method="post">
+                        <form method="post"  action="/users/update" class="space-y-6">
+
 						<div class="border-2 border-blue-300 p-4 rounded-md">
                             <div>
                                 <label for="name" class="label">New username</label>
@@ -36,15 +37,14 @@ customElements.define(
                             </div>
 						</div>
 
-						<div class="border-2 border-blue-300 p-4 rounded-md">
+                        <div class="border-2 border-blue-300 p-4 rounded-md">
 							<div>
-                                <label for="avatar" class="label">Avatar URL</label>
+                                <label class="label" for="file_input">Upload your own avatar</label>
                                 <div class="mt-2">
-                                    <input type="text" name="avatar" id="avatar" autocomplete="off" class="input"/>
+                                    <input type="file" accept="image/*" class="btn btn-primary w-full" name="avatarFile" id="file_input">
                                 </div>
                             </div>
 						</div>
-
                             <div class="flex flex-col items-center">
                                 <button type="submit" class="btn btn-primary w-full">
                                     Update

@@ -122,7 +122,8 @@ async function onSubmitForm(event: SubmitEvent) {
 	if (options.validation) {
 		const errors = options.validation(form)
 		if (errors) {
-			setErrors(errors)
+			if (typeof errors === 'string') setErrorSubmit(errors)
+			else setErrors(errors)
 			return
 		}
 	}
@@ -159,7 +160,7 @@ async function onSubmitForm(event: SubmitEvent) {
 
 	function getFormBody(): string | FormData {
 		const formData = new FormData(form)
-		if (form.enctype === 'multipart/formdata') {
+		if (form.enctype === 'multipart/form-data') {
 			return formData
 		}
 		return getFormQuery(formData)
@@ -169,7 +170,7 @@ async function onSubmitForm(event: SubmitEvent) {
 		const urlEncoded = new URLSearchParams()
 		for (const [key, value] of formData.entries()) {
 			if (typeof value === 'object')
-				throw new Error('Please, set enctype="multipart/formdata"')
+				throw new Error('Please, set enctype="multipart/form-data"')
 			urlEncoded.append(key, value)
 		}
 		return urlEncoded.toString()
