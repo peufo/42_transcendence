@@ -59,6 +59,7 @@ createEffect(() => {
 					f.withUser.tournaments = f.withUser.tournaments.filter(
 						(t) => t.id !== tournament.id,
 					)
+					toast.info(`${f.withUser.name} created a tournament !`)
 					return f
 				}),
 			)

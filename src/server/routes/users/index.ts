@@ -74,12 +74,6 @@ export const usersRoute: FastifyPluginCallbackZod = (
 			})
 			.webp()
 			.toFile(avatarPath)
-		// .extract({
-		// 	left: crop.x,
-		// 	top: crop.y,
-		// 	width: crop.width,
-		// 	height: crop.height,
-		// })
 
 		await db.update(users).set({ hasAvatar: true }).where(eq(users.id, user.id))
 		return res.send({
