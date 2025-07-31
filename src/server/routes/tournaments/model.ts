@@ -27,17 +27,13 @@ async function getUserBusy(userId: number): Promise<boolean> {
 export async function tournamentCreate(data: DB.TournamentCreate) {
 	const userIsBusy = await getUserBusy(data.createdBy)
 	if (userIsBusy) throw server.httpErrors.forbidden('Sorry, your busy')
-	const tournamentId = await db.transaction(async (tx) => {
-		const [{ id, createdBy }] = await tx
-			.insert(tournaments)
-			.values(data)
-			.returning()
+	return db.transaction(async (tx) => {
+		const [tournament] = await tx.insert(tournaments).values(data).returning()
 		await tx
 			.insert(tournamentsParticipants)
-			.values({ tournamentId: id, userId: createdBy })
-		return id
+			.values({ tournamentId: tournament.id, userId: tournament.createdBy })
+		return tournament
 	})
-	return tournamentId
 }
 
 export async function tournamentDelete(tournamentId: number, ownerId: number) {
@@ -49,7 +45,11 @@ export async function tournamentDelete(tournamentId: number, ownerId: number) {
 		throw server.httpErrors.forbidden('You are not the owner of tournament')
 	if (tournament.state !== 'open')
 		throw server.httpErrors.forbidden('Tournament is ongoing or finished')
-	await db.delete(tournaments).where(eq(tournaments.id, tournamentId))
+	const [tournamentDeleted] = await db
+		.delete(tournaments)
+		.where(eq(tournaments.id, tournamentId))
+		.returning()
+	return tournamentDeleted
 }
 
 export async function tournamentGet(tournamentId: number) {

@@ -85,6 +85,8 @@ export type SocketChannels = {
 			onCreated: { friendship: FriendshipInvitation }
 			onAccepted: { friendship: FriendshipFriend }
 			onDeleted: { friendshipId: number }
+			onTournamentCreated: { tournament: Tournament }
+			onTournamentDeleted: { tournament: Tournament }
 		}
 	}
 	tournaments: {
@@ -160,6 +162,6 @@ export type RoutesPost = {
 	}
 	'/users/update': {
 		body: { name?: string; password?: string }
-		res: { message: string; success: boolean; user: User }
+		res: { success: boolean; message: string; user: User }
 	}
 }

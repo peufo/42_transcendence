@@ -1,6 +1,7 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import '@fastify/cookie'
 import { getSchema, permission, postSchema } from '../../utils/index.js'
+import { getFriendshipsId } from '../friendships/model.js'
 import { notify } from '../ws/controller.js'
 import {
 	tournamentCreate,
@@ -32,11 +33,16 @@ export const tournamentsRoute: FastifyPluginCallbackZod = (
 		postSchema('/tournaments/new', tournamentSchemaCreate),
 		async (req, res) => {
 			const { userId } = permission.session(res)
-			const tournamentId = await tournamentCreate({
+			const tournament = await tournamentCreate({
 				...req.body,
 				createdBy: userId,
 			})
-			return res.send({ success: true, tournamentId })
+			//TODO filter by active friends only
+			const friendsId = await getFriendshipsId(userId)
+			for (const userId of friendsId) {
+				notify.friendships(userId, 'onTournamentCreated', { tournament })
+			}
+			return res.send({ success: true, tournamentId: tournament.id })
 		},
 	)
 
@@ -46,8 +52,12 @@ export const tournamentsRoute: FastifyPluginCallbackZod = (
 		async (req, res) => {
 			const { userId } = permission.session(res)
 			const { tournamentId } = req.body
-			await tournamentDelete(tournamentId, userId)
-			notify.tournaments(tournamentId, 'onDeleted', null)
+			const tournament = await tournamentDelete(tournamentId, userId)
+			notify.tournaments(tournament.id, 'onDeleted', null)
+			const friendsId = await getFriendshipsId(userId)
+			for (const userId of friendsId) {
+				notify.friendships(userId, 'onTournamentDeleted', { tournament })
+			}
 			return res.send({ success: true, message: 'Tournament deleted' })
 		},
 	)

@@ -13,6 +13,8 @@ export const serverEvents: {
 		onAccepted: true,
 		onCreated: true,
 		onDeleted: true,
+		onTournamentCreated: true,
+		onTournamentDeleted: true,
 	},
 	tournaments: {
 		onDeleted: true,
