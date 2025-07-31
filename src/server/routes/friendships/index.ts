@@ -6,7 +6,8 @@ import {
 	acceptFriendship,
 	createFriendship,
 	deleteFriendship,
-	getFriendships,
+	getFriendshipsFriend,
+	getFriendshipsInvitation,
 	getUserBasic,
 	getUserFriend,
 } from './model.js'
@@ -16,11 +17,24 @@ export const friendshipsRoute: FastifyPluginCallbackZod = (
 	_options,
 	done,
 ) => {
-	server.get('/', getSchema('/friendships', null), async (_req, res) => {
-		const user = permission.user(res)
-		const friendships = await getFriendships(user.id)
-		return res.send({ data: friendships })
-	})
+	server.get(
+		'/invitation',
+		getSchema('/friendships/invitation', null),
+		async (_req, res) => {
+			const user = permission.user(res)
+			const friendships = await getFriendshipsInvitation(user.id)
+			return res.send({ data: friendships })
+		},
+	)
+	server.get(
+		'/friend',
+		getSchema('/friendships/friend', null),
+		async (_req, res) => {
+			const user = permission.user(res)
+			const friendships = await getFriendshipsFriend(user.id)
+			return res.send({ data: friendships })
+		},
+	)
 
 	server.post(
 		'/new',

@@ -1,6 +1,5 @@
 import { exit } from 'node:process'
 import * as p from '@clack/prompts'
-import type { FriendshipFriend, FriendshipInvitation } from '../lib/type.js'
 import { api } from './api.js'
 import type { Scope, ScopeOptions } from './main.js'
 import { menuMain } from './menuMain.js'
@@ -21,10 +20,7 @@ export const menuFriendships: Scope = async () => {
 }
 
 const menuFriends: Scope = async () => {
-	const friendships = await api.get('/friendships')
-	const friends = friendships.filter(
-		(friendship) => friendship.state === 'friend',
-	) as FriendshipFriend[]
+	const friends = await api.get('/friendships/friend')
 	if (!friends.length) {
 		p.log.warn('Sorry, You have no Friends !')
 	} else {
@@ -43,10 +39,10 @@ const menuFriends: Scope = async () => {
 
 const menuInvitationsSended: Scope = async () => {
 	const user = api.user()
-	const friendships = await api.get('/friendships')
-	const invitationsSended = friendships.filter(
-		({ state, createdBy }) => state === 'invited' && user?.id === createdBy,
-	) as FriendshipInvitation[]
+	const invitations = await api.get('/friendships/invitation')
+	const invitationsSended = invitations.filter(
+		({ createdBy }) => user?.id === createdBy,
+	)
 	if (!invitationsSended.length) {
 		p.log.warn("You don't have sended any invitation !")
 		return menuFriendships
@@ -86,11 +82,11 @@ const menuInvitationsSended: Scope = async () => {
 }
 
 const menuInvitationsReceived: Scope = async () => {
-	const friendships = await api.get('/friendships')
+	const invitations = await api.get('/friendships/invitation')
 	const user = api.user()
-	const invitationsReceived = friendships.filter(
-		({ state, createdBy }) => state === 'invited' && user?.id !== createdBy,
-	) as FriendshipInvitation[]
+	const invitationsReceived = invitations.filter(
+		({ createdBy }) => user?.id !== createdBy,
+	)
 	if (!invitationsReceived.length) {
 		p.log.warn("You don't have received any invitation !")
 		return menuFriendships

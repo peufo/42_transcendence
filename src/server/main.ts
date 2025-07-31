@@ -10,10 +10,22 @@ import {
 	serializerCompiler,
 	validatorCompiler,
 } from 'fastify-type-provider-zod'
+import type { LoggerOptions } from 'pino'
 import { env } from './env.js'
 import routes from './routes/index.js'
 
-export const server = fastify()
+const logger: false | LoggerOptions = env.dev && {
+	level: 'error',
+	transport: {
+		target: 'pino-pretty',
+		options: {
+			translateTime: 'HH:MM:ss Z',
+			ignore: 'pid,hostname',
+		},
+	},
+}
+
+export const server = fastify({ logger })
 server.setValidatorCompiler(validatorCompiler)
 server.setSerializerCompiler(serializerCompiler)
 server.register(fastifyWebsocket)

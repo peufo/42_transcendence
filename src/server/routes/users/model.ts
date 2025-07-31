@@ -3,12 +3,10 @@ import { and, eq, like, ne, notInArray } from 'drizzle-orm'
 import type { User } from '../../../lib/type.js'
 import { db, users } from '../../db/index.js'
 import { server } from '../../main.js'
-import { getFriendships, userBasicColumns } from '../friendships/model.js'
+import { getFriendshipsId, userBasicColumns } from '../friendships/model.js'
 
 export async function searchUsersAsNotFriends(userId: number, search: string) {
-	const friendsId = await getFriendships(userId).then((values) =>
-		values.map(({ withUser }) => withUser.id),
-	)
+	const friendsId = await getFriendshipsId(userId)
 
 	return db.query.users.findMany({
 		where: and(

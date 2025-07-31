@@ -1,7 +1,11 @@
 import { type ChannelSocket, openChannel } from '../lib/socketChannels.js'
 import { toast } from './components/ft-toast.js'
 import { createEffect } from './utils/signal.js'
-import { $friendships, $user } from './utils/store.js'
+import {
+	$friendshipsFriend,
+	$friendshipsInvitation,
+	$user,
+} from './utils/store.js'
 
 let friendshipChannel: ChannelSocket<'friendships'> | null = null
 
@@ -18,16 +22,23 @@ createEffect(() => {
 	friendshipChannel = openChannel('friendships', null, {
 		onCreated({ friendship }) {
 			toast.info(`New invitation from ${friendship.withUser.name}`)
-			$friendships.update((friendships) => [...friendships, friendship])
+			$friendshipsInvitation.update((friendships) => [
+				...friendships,
+				friendship,
+			])
 		},
 		onAccepted({ friendship }) {
 			toast.success(`${friendship.withUser.name} accepted your invitation`)
-			$friendships.update((friendships) =>
-				friendships.map((f) => (f.id === friendship.id ? friendship : f)),
+			$friendshipsInvitation.update((invitations) =>
+				invitations.filter(({ id }) => id !== friendship.id),
 			)
+			$friendshipsFriend.update((friendships) => [...friendships, friendship])
 		},
 		onDeleted({ friendshipId }) {
-			$friendships.update((friendships) =>
+			$friendshipsInvitation.update((invitations) =>
+				invitations.filter(({ id }) => id !== friendshipId),
+			)
+			$friendshipsFriend.update((friendships) =>
 				friendships.filter(({ id }) => id !== friendshipId),
 			)
 		},

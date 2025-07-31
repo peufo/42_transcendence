@@ -1,11 +1,12 @@
 import { and, eq, not, or } from 'drizzle-orm'
 import type {
 	Friend,
-	Friendship,
+	FriendshipFriend,
+	FriendshipInvitation,
 	UserBasic,
 	UserStats,
 } from '../../../lib/type.js'
-import { db, friendships, users } from '../../db/index.js'
+import { db, friendships, tournaments, users } from '../../db/index.js'
 import type { DB } from '../../types.ts'
 
 export const userBasicColumns = {
@@ -28,35 +29,80 @@ const friendColumns = {
 	lastLogin: true,
 } satisfies DB.Columns<Friend>
 
-export async function getFriendships(
+export async function getFriendshipsId(userId: number): Promise<number[]> {
+	return db.query.friendships
+		.findMany({
+			columns: {
+				user1Id: true,
+				user2Id: true,
+			},
+			where: or(
+				eq(friendships.user1Id, userId),
+				eq(friendships.user2Id, userId),
+			),
+		})
+		.then((values) =>
+			values.map(({ user1Id, user2Id }) =>
+				user1Id === userId ? user2Id : user1Id,
+			),
+		)
+}
+
+export async function getFriendshipsInvitation(
 	userId: number,
-	state?: DB.FriendshipCreate['state'],
-): Promise<Friendship[]> {
+): Promise<FriendshipInvitation[]> {
 	return db.query.friendships
 		.findMany({
 			where: and(
 				or(eq(friendships.user1Id, userId), eq(friendships.user2Id, userId)),
-				state ? eq(friendships.state, state) : undefined,
+				eq(friendships.state, 'invited'),
+			),
+			with: {
+				user1: { columns: userBasicColumns },
+				user2: { columns: userBasicColumns },
+			},
+		})
+		.then((values) =>
+			values.map(({ user1, user2, ...friendship }) => {
+				const withUser = user1.id === userId ? user2 : user1
+				return { ...friendship, withUser } as FriendshipInvitation
+			}),
+		)
+}
+
+export async function getFriendshipsFriend(
+	userId: number,
+): Promise<FriendshipFriend[]> {
+	return db.query.friendships
+		.findMany({
+			where: and(
+				or(eq(friendships.user1Id, userId), eq(friendships.user2Id, userId)),
+				eq(friendships.state, 'friend'),
 			),
 			with: {
 				user1: {
 					columns: friendColumns,
-					with: { participations: { with: { tournament: true } } },
+					with: {
+						tournaments: {
+							where: eq(tournaments.state, 'open'),
+						},
+					},
 				},
 				user2: {
 					columns: friendColumns,
-					with: { participations: { with: { tournament: true } } },
+					with: {
+						tournaments: {
+							where: eq(tournaments.state, 'open'),
+						},
+					},
 				},
 			},
 		})
-		.then(
-			(values) =>
-				values.map(({ user1, user2, ...friendship }) => {
-					const withUser = user1.id === userId ? user2 : user1
-					if (friendship.state === 'friend') return { ...friendship, withUser }
-					const { lastLogin, isActive, ...withFriend } = withUser
-					return { ...friendship, withUser: withFriend }
-				}) as Friendship[],
+		.then((values) =>
+			values.map(({ user1, user2, ...friendship }) => {
+				const withUser = user1.id === userId ? user2 : user1
+				return { ...friendship, withUser } as FriendshipFriend
+			}),
 		)
 }
 
@@ -65,13 +111,12 @@ export async function getUserFriend(userId: number): Promise<Friend> {
 		where: eq(users.id, userId),
 		columns: friendColumns,
 		with: {
-			participations: {
-				with: {
-					tournament: true,
-				},
+			tournaments: {
+				where: eq(tournaments.state, 'open'),
 			},
 		},
 	})
+
 	if (!friend) throw new Error('Friend not found')
 	return friend
 }

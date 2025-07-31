@@ -23,7 +23,7 @@ export type UserStats = UserBasic & {
 export type Friend = UserBasic & {
 	isActive: boolean
 	lastLogin: Date
-	participations: { tournament: Tournament }[]
+	tournaments: Tournament[]
 }
 
 type FriendshipBase = {
@@ -82,8 +82,8 @@ export type SocketChannels = {
 		query: null
 		clientEvents: null
 		serverEvents: {
-			onCreated: { friendship: Friendship }
-			onAccepted: { friendship: Friendship }
+			onCreated: { friendship: FriendshipInvitation }
+			onAccepted: { friendship: FriendshipFriend }
 			onDeleted: { friendshipId: number }
 		}
 	}
@@ -110,7 +110,8 @@ type Get<Result, Query = null> = {
 export type RoutesGet = {
 	'/auth/user': Get<User | undefined>
 	'/users': Get<UserBasic[], { search: string }> // TODO: /users/notMyFriends
-	'/friendships': Get<Friendship[]>
+	'/friendships/invitation': Get<FriendshipInvitation[]>
+	'/friendships/friend': Get<FriendshipFriend[]>
 	'/userstats': Get<Match[]>
 	'/allusersstats': Get<UserStats[]>
 	'/tournaments': Get<TournamentWithLookup, { tournamentId: number }>

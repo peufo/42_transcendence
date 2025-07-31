@@ -11,11 +11,17 @@ async function getUserBusy(userId: number): Promise<boolean> {
 		.from(tournamentsParticipants)
 		.where(eq(tournamentsParticipants.userId, userId))
 		.as('participations')
-	const tournamentOpenOrOngoing = await db
+	const activesTournaments = await db
 		.select()
 		.from(tournaments)
-		.innerJoin(participations, ne(tournaments.state, 'finished'))
-	return !!tournamentOpenOrOngoing.length
+		.innerJoin(
+			participations,
+			and(
+				eq(tournaments.id, participations.tournamentId),
+				ne(tournaments.state, 'finished'),
+			),
+		)
+	return !!activesTournaments.length
 }
 
 export async function tournamentCreate(data: DB.TournamentCreate) {

@@ -31,7 +31,8 @@ export const API_GET: {
 } = {
 	'/auth/user': store.$user.set,
 	'/users': store.$users.set,
-	'/friendships': store.$friendships.set,
+	'/friendships/friend': store.$friendshipsFriend.set,
+	'/friendships/invitation': store.$friendshipsInvitation.set,
 	'/userstats': store.$matches.set,
 	'/tournaments': store.$tournament.set,
 	'/allusersstats': store.$rankedUsers.set,
@@ -55,15 +56,19 @@ export const API_POST: {
 		redirectTo: () => '/',
 	},
 	'/friendships/new': {
-		invalidate: ['/friendships'],
+		invalidate: ['/friendships/invitation'],
 		onSuccess({ invitedUserId }) {
 			store.$users.update((users) =>
 				users.filter((user) => user.id !== invitedUserId),
 			)
 		},
 	},
-	'/friendships/accept': { invalidate: ['/friendships'] },
-	'/friendships/delete': { invalidate: ['/friendships'] },
+	'/friendships/accept': {
+		invalidate: ['/friendships/friend', '/friendships/invitation'],
+	},
+	'/friendships/delete': {
+		invalidate: ['/friendships/friend', '/friendships/invitation'],
+	},
 	'/tournaments/new': {
 		redirectTo: ({ tournamentId }) =>
 			`/tournament/play?tournamentId=${tournamentId}`,
@@ -88,7 +93,7 @@ export const PAGES = {
 	},
 	'/me': {
 		component: 'ft-page-me',
-		pageData: ['/friendships'],
+		pageData: ['/friendships/friend', '/friendships/invitation'],
 	},
 	'/login': { component: 'ft-page-login', isPublic: 'only' },
 	'/signup': { component: 'ft-page-signup', isPublic: 'only' },

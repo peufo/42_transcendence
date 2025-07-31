@@ -1,10 +1,11 @@
-import type {
-	FriendshipFriend,
-	FriendshipInvitation,
-	UserBasic,
-} from '../../lib/type.js'
+import type { UserBasic } from '../../lib/type.js'
 import { type CleanEffect, createEffect } from '../utils/signal.js'
-import { $friendships, $user, $users } from '../utils/store.js'
+import {
+	$friendshipsFriend,
+	$friendshipsInvitation,
+	$user,
+	$users,
+} from '../utils/store.js'
 
 customElements.define(
 	'ft-page-me',
@@ -110,9 +111,8 @@ customElements.define(
 		}
 
 		renderContent(): string {
-			const friendships = $friendships
-				.get()
-				.filter(({ state }) => state === 'friend') as FriendshipFriend[]
+			const friendships = $friendshipsFriend.get()
+
 			if (!friendships) return 'you have no friends :('
 
 			let html = /*html*/ `
@@ -132,9 +132,9 @@ customElements.define(
                         <input class="btn btn-red" type="submit" value="Remove">
                     </form>`
 				let joinButtons = ''
-				for (const { tournament } of friend.participations) {
-					if (tournament.state !== 'open') continue
-					joinButtons += /*html*/ `
+				const [tournament] = friend.tournaments
+				if (tournament) {
+					joinButtons = /*html*/ `
 					<form method="post" action="/tournaments/join">
                         <input type="hidden" name="tournamentId" value="${tournament.id}">
                         <input class="btn btn-border" type="submit" value="Join">
@@ -176,9 +176,8 @@ customElements.define(
 
 		render(): string {
 			const user = $user.get()
-			const invitations = $friendships
-				.get()
-				.filter(({ state }) => state === 'invited') as FriendshipInvitation[]
+
+			const invitations = $friendshipsInvitation.get()
 			if (!user || !invitations.length) return ''
 
 			let html = /*html*/ `
