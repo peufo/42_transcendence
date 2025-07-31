@@ -116,9 +116,9 @@ export type RoutesGet = {
 	'/users': Get<UserBasic[], { search: string }> // TODO: /users/notMyFriends
 	'/friendships/invitation': Get<FriendshipInvitation[]>
 	'/friendships/friend': Get<FriendshipFriend[]>
-	'/userstats': Get<Match[]>
-	'/allusersstats': Get<UserStats[]>
 	'/tournaments': Get<TournamentWithLookup, { tournamentId: number }>
+	'/stats/me': Get<Match[]>
+	'/stats/all': Get<UserStats[]>
 }
 
 export type RoutesPost = {

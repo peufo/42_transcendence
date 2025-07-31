@@ -1,6 +1,6 @@
-import { and, eq, isNotNull, or } from 'drizzle-orm'
-import { db, matches } from '../../db/index.js'
-import { userBasicColumns } from '../friendships/model.js'
+import { and, desc, eq, isNotNull, or } from 'drizzle-orm'
+import { db, matches, users } from '../../db/index.js'
+import { userBasicColumns, userStatsColumns } from '../friendships/model.js'
 
 export function getMatches(userId: number) {
 	return db.query.matches.findMany({
@@ -19,5 +19,12 @@ export function getMatches(userId: number) {
 				},
 			},
 		},
+	})
+}
+
+export async function getUsersSortedByGoals() {
+	return db.query.users.findMany({
+		orderBy: [desc(users.numberOfGoals)],
+		columns: userStatsColumns,
 	})
 }
