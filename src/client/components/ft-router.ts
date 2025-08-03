@@ -130,10 +130,7 @@ async function onSubmitForm(event: SubmitEvent) {
 
 	const res = await fetch(form.action, {
 		method: form.method,
-		// TODO: remove comment ?, breaks form-data
-		headers: {
-			// 'Content-Type': form.enctype,
-		},
+		headers: getFormHeaders(),
 		body: getFormBody(),
 	})
 
@@ -157,6 +154,13 @@ async function onSubmitForm(event: SubmitEvent) {
 		for (const apiRoute of options.invalidate) {
 			api.get(apiRoute, document.location.search.slice(1))
 		}
+	}
+
+	function getFormHeaders() {
+		if (form.enctype !== 'multipart/form-data')
+			return {
+				'Content-Type': form.enctype,
+			}
 	}
 
 	function getFormBody(): string | FormData {

@@ -46,14 +46,14 @@ export const usersRoute: FastifyPluginCallbackZod = (
 				sucess: false,
 			})
 		}
-
 		// const user = permission.user(res)
-		// TODO: use user id for filename
+		// TODO: use user id
+		// TODO: make avatars folder env ?
 		await pipeline(
 			data.file,
 			fs.createWriteStream(`./avatars/${data.filename}`),
 		)
-
+		// TODO: set db avatar for user
 		// await db.update(users).set()
 		return res.send({
 			message: 'Updated with success',

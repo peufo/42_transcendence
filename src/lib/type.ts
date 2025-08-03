@@ -163,8 +163,8 @@ export type RoutesPost = {
 		res: { success: boolean; tournamentId: number }
 	}
 	'/users/update': {
-		body: { name?: string; password?: string }
-		res: { success: boolean; message: string; user: User }
+		body: { name: string; password: string }
+		res: { message: string; success: boolean; user: User }
 	}
 	'/users/update/avatar': {
 		body: null
