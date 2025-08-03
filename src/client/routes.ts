@@ -1,6 +1,10 @@
 import type { RoutesGet, RoutesPost } from '../lib/type.js'
 import * as store from './utils/store.js'
-import { validationSignup, validationUpdate } from './validation.js'
+import {
+	avatarUpload,
+	validationSignup,
+	validationUpdate,
+} from './validation.js'
 
 export type RouteApiGet = keyof typeof API_GET
 export type RouteApiPost = keyof typeof API_POST
@@ -54,6 +58,7 @@ export const API_POST: {
 	},
 	'/users/update/avatar': {
 		redirectTo: () => '/account',
+		validation: avatarUpload,
 	},
 	'/auth/logout': {
 		redirectTo: () => '/',

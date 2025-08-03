@@ -38,7 +38,6 @@ export const usersRoute: FastifyPluginCallbackZod = (
 	)
 
 	server.post('/update/avatar', async (req, res) => {
-		// @ts-ignore
 		const data = await req.file()
 		if (!data || data.fieldname !== 'avatarFile') {
 			return res.status(400).send({

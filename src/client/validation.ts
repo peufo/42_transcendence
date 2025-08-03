@@ -17,3 +17,16 @@ export const validationUpdate: ApiPostOptionValidation = (form) => {
 	if (password !== confirm) return { confirm: 'Password is different' }
 	return null
 }
+
+export const avatarUpload: ApiPostOptionValidation = (form) => {
+	const formData = new FormData(form)
+	const files = formData.getAll('avatarFile')
+	if (files.length !== 1) return 'Please select a single file.'
+	if (!(files[0] instanceof File)) {
+		return 'Invalid file upload.'
+	}
+	const maxSize = 5 * 1024 * 1024 // TODO: put in lib ?
+	if (files[0].size > maxSize)
+		return `File too large, max size: ${maxSize / 1024 / 1024}MB`
+	return null
+}

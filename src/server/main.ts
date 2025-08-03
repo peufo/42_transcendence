@@ -25,7 +25,8 @@ const logger: false | LoggerOptions = env.dev && {
 	},
 }
 
-export const server = fastify({ logger })
+export const server = fastify({ logger, bodyLimit: 5 * 1024 * 1024 })
+
 server.setValidatorCompiler(validatorCompiler)
 server.setSerializerCompiler(serializerCompiler)
 server.register(fastifyWebsocket)
