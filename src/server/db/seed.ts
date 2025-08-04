@@ -44,6 +44,7 @@ async function main() {
 					minValue: 2,
 					maxValue: 244,
 				}),
+				isActive: f.default({ defaultValue: false }),
 			},
 			count: 20,
 		},

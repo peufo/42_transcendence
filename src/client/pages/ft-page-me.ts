@@ -1,4 +1,4 @@
-import type { UserBasic } from '../../lib/type.js'
+import type { FriendshipFriend, UserBasic } from '../../lib/type.js'
 import { type CleanEffect, createEffect } from '../utils/signal.js'
 import {
 	$friendshipsFriend,
@@ -120,7 +120,7 @@ customElements.define(
                     My friends
                 </h3>
             `
-			for (const friendship of friendships) {
+			function renderFriendship(friendship: FriendshipFriend): string {
 				const { withUser: friend } = friendship
 				const badge = friend.isActive
 					? /*html*/ `<span class="badge badge-green">Online</span>`
@@ -141,7 +141,7 @@ customElements.define(
                     </form>`
 				}
 
-				html += /*html*/ `
+				return /*html*/ `
                     <div class="flex p-2 items-center gap-2 border border-gray-200 rounded-xl">
                         <img src="${getAvatarSrc(friend)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
                         <span>${friend.name}</span>
@@ -151,6 +151,15 @@ customElements.define(
                         ${removeBtn}
                     </div>
                 `
+			}
+
+			const friendshipsOn = friendships.filter((f) => f.withUser.isActive)
+			const friendshipsOff = friendships.filter((f) => !f.withUser.isActive)
+			for (const friendship of friendshipsOn) {
+				html += renderFriendship(friendship)
+			}
+			for (const friendship of friendshipsOff) {
+				html += renderFriendship(friendship)
 			}
 
 			return html
