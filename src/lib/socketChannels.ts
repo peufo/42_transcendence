@@ -15,6 +15,8 @@ export const serverEvents: {
 		onDeleted: true,
 		onTournamentCreated: true,
 		onTournamentDeleted: true,
+		onFriendOnline: true,
+		onFriendOffline: true,
 	},
 	tournaments: {
 		onDeleted: true,

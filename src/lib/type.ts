@@ -87,6 +87,8 @@ export type SocketChannels = {
 			onDeleted: { friendshipId: number }
 			onTournamentCreated: { tournament: Tournament }
 			onTournamentDeleted: { tournament: Tournament }
+			onFriendOnline: { userId: number }
+			onFriendOffline: { userId: number }
 		}
 	}
 	tournaments: {

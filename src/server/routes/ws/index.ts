@@ -3,7 +3,8 @@ import z from 'zod/v4'
 import { Engine } from '../../../lib/engine/index.js'
 import { getSessionFromRequest } from '../auth/hooks.js'
 import { tournamentGet } from '../tournaments/model.js'
-import { bindEmitterWithSocket, getEmitter } from './controller.js'
+import { bindEmitterWithSocket, notifyFriends } from './controller.js'
+import { setUserIsActive } from './model.js'
 import { engineInputSchema } from './schema.js'
 
 export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
@@ -13,8 +14,17 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 			socket.close(3000, 'Authentification required')
 			return
 		}
-		const emitter = getEmitter('friendships', session.userId)
-		bindEmitterWithSocket('friendships', emitter, socket)
+		const { userId } = session
+		bindEmitterWithSocket('friendships', userId, socket, {
+			onCreate: async () => {
+				await setUserIsActive(userId, true)
+				await notifyFriends(userId, 'onFriendOnline', { userId })
+			},
+			onDestroy: async () => {
+				await setUserIsActive(userId, false)
+				await notifyFriends(userId, 'onFriendOffline', { userId })
+			},
+		})
 	})
 
 	server.get(
@@ -35,8 +45,7 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 				socket.close(3000, 'Tournament not exist')
 				throw err
 			})
-			const emitter = getEmitter('tournaments', tournament.id)
-			bindEmitterWithSocket('tournaments', emitter, socket)
+			bindEmitterWithSocket('tournaments', tournament.id, socket)
 		},
 	)
 

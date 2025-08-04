@@ -26,7 +26,6 @@ export async function createUser(data: RoutesPost['/auth/signup']['body']) {
 
 export function createAvatarPlaceholder() {
 	const avatarUrl = new URL('https://api.dicebear.com/9.x/bottts-neutral/svg')
-	console.log(avatarUrl)
 	avatarUrl.searchParams.append('seed', String(Math.random()))
 	return avatarUrl.toString()
 }

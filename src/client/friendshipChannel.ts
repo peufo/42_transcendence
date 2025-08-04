@@ -59,10 +59,30 @@ createEffect(() => {
 					f.withUser.tournaments = f.withUser.tournaments.filter(
 						(t) => t.id !== tournament.id,
 					)
-					toast.info(`${f.withUser.name} created a tournament !`)
 					return f
 				}),
 			)
+		},
+		onFriendOnline({ userId }) {
+			$friendshipsFriend.update((friendships) => {
+				friendships.map((f) => {
+					if (f.withUser.id !== userId) return f
+					f.withUser.isActive = true
+					toast.info(`${f.withUser.name} is online !`)
+					return f
+				})
+				return friendships
+			})
+		},
+		onFriendOffline({ userId }) {
+			$friendshipsFriend.update((friendships) => {
+				friendships.map((f) => {
+					if (f.withUser.id !== userId) return f
+					f.withUser.isActive = false
+					return f
+				})
+				return friendships
+			})
 		},
 	})
 })
