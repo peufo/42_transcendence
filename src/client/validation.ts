@@ -1,15 +1,14 @@
+import { BODY_SIZE_LIMIT } from '../lib/constants.js'
 import type { ApiPostOptionValidation } from './routes.js'
 
-export const validationSignup: ApiPostOptionValidation = (form) => {
-	const formData = new FormData(form)
+export const validationSignup: ApiPostOptionValidation = (formData) => {
 	const password = formData.get('password')
 	const passwordConfirm = formData.get('confirm')
 	if (password !== passwordConfirm) return { confirm: 'Password is different' }
 	return null
 }
 
-export const validationUpdate: ApiPostOptionValidation = (form) => {
-	const formData = new FormData(form)
+export const validationUpdate: ApiPostOptionValidation = (formData) => {
 	const data = Object.fromEntries(formData.entries())
 	const { name, password, confirm } = data
 	if (name === '' && password === '' && confirm === '')
@@ -18,15 +17,13 @@ export const validationUpdate: ApiPostOptionValidation = (form) => {
 	return null
 }
 
-export const avatarUpload: ApiPostOptionValidation = (form) => {
-	const formData = new FormData(form)
+export const avatarUpload: ApiPostOptionValidation = (formData) => {
 	const files = formData.getAll('avatarFile')
 	if (files.length !== 1) return 'Please select a single file.'
 	if (!(files[0] instanceof File)) {
 		return 'Invalid file upload.'
 	}
-	const maxSize = 5 * 1024 * 1024 // TODO: put in lib ?
-	if (files[0].size > maxSize)
-		return `File too large, max size: ${maxSize / 1024 / 1024}MB`
+	if (files[0].size > BODY_SIZE_LIMIT)
+		return `File too large, max size: ${BODY_SIZE_LIMIT / 1024 / 1024}MB`
 	return null
 }

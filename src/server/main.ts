@@ -11,6 +11,7 @@ import {
 	validatorCompiler,
 } from 'fastify-type-provider-zod'
 import type { LoggerOptions } from 'pino'
+import { BODY_SIZE_LIMIT } from '../lib/constants.js'
 import { env } from './env.js'
 import routes from './routes/index.js'
 
@@ -25,7 +26,7 @@ const logger: false | LoggerOptions = env.dev && {
 	},
 }
 
-export const server = fastify({ logger, bodyLimit: 5 * 1024 * 1024 })
+export const server = fastify({ logger, bodyLimit: BODY_SIZE_LIMIT })
 
 server.setValidatorCompiler(validatorCompiler)
 server.setSerializerCompiler(serializerCompiler)

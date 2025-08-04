@@ -1,7 +1,8 @@
-import fs from 'node:fs'
+import fs from 'node:fs/promises'
 import { pipeline } from 'node:stream/promises'
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod/v4'
+import { env } from '../../env.js'
 import { getSchema, permission, postSchema } from '../../utils/index.js'
 import { searchUsersAsNotFriends, updateUser } from './model.js'
 import { updateUserSchema } from './schema.js'
@@ -45,13 +46,30 @@ export const usersRoute: FastifyPluginCallbackZod = (
 				sucess: false,
 			})
 		}
-		// const user = permission.user(res)
-		// TODO: use user id
+
 		// TODO: make avatars folder env ?
-		await pipeline(
-			data.file,
-			fs.createWriteStream(`./avatars/${data.filename}`),
-		)
+		// await pipeline(
+		// 	data.file,
+		// 	fs.createWriteStream(`./avatars/${data.filename}`),
+		// )
+
+		// const imageBuffer = await data.file.arrayBuffer()
+
+		// const user = permission.user(res)
+		// const avatarPath = path.resolve(env.MEDIA_DIR, 'avatars', `${user.id}.webp`)
+
+		// await fs.mkdir(env.MEDIA_DIR, { recursive: true })
+
+		// await sharp(imageBuffer)
+
+		// 	.extract({
+		// 		left: crop.x,
+		// 		top: crop.y,
+		// 		width: crop.width,
+		// 		height: crop.height,
+		// 	})
+		// 	.toFile(avatarPath)
+
 		// TODO: set db avatar for user
 		// await db.update(users).set()
 		return res.send({

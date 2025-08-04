@@ -11,7 +11,7 @@ export type RouteApiPost = keyof typeof API_POST
 export type RoutePage = keyof typeof PAGES
 
 export type ApiPostOptionValidation = (
-	form: HTMLFormElement,
+	formData: FormData,
 ) => null | Record<string, string> | string
 
 export type ApiPostOption<Result> = {

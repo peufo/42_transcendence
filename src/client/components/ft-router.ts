@@ -116,11 +116,12 @@ async function onSubmitForm(event: SubmitEvent) {
 		if (!(route in API_GET)) throw new Error(`route "${route}" not exist`)
 		return api.get(route as RouteApiGet, getFormQuery(new FormData(form)))
 	}
+	const formData = new FormData(form)
 	const options = API_POST[route as RouteApiPost] as ApiPostOption<unknown>
 	if (!options) throw new Error(`route "${route}" not exist`)
 
 	if (options.validation) {
-		const errors = options.validation(form)
+		const errors = options.validation(formData)
 		if (errors) {
 			if (typeof errors === 'string') setErrorSubmit(errors)
 			else setErrors(errors)
@@ -161,10 +162,10 @@ async function onSubmitForm(event: SubmitEvent) {
 			return {
 				'Content-Type': form.enctype,
 			}
+		return undefined
 	}
 
 	function getFormBody(): string | FormData {
-		const formData = new FormData(form)
 		if (form.enctype === 'multipart/form-data') {
 			return formData
 		}
