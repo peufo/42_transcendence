@@ -8,7 +8,7 @@ if (!process.env.COOKIE_SECRET)
 
 export const env = {
 	PORT: +(process.env.PORT || 8000),
-	MEDIA_DIR: process.env.MEDIA_DIR || './upload',
+	MEDIA_DIR: process.env.MEDIA_DIR || 'upload',
 	APP_HOST: process.env.APP_HOST || '0.0.0.0',
 	DB_FILE_NAME: process.env.DB_FILE_NAME,
 	COOKIE_SECRET: process.env.COOKIE_SECRET,

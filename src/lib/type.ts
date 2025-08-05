@@ -1,7 +1,7 @@
 export type UserBasic = {
 	id: number
 	name: string
-	avatar: string | null
+	hasAvatar: boolean
 	avatarPlaceholder: string
 }
 

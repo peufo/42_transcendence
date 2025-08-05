@@ -43,6 +43,12 @@ server.register(fastifyStatic, {
 	prefix: '/public',
 })
 
+server.register(fastifyStatic, {
+	root: path.resolve('upload'),
+	prefix: `/upload`,
+	decorateReply: false,
+})
+
 if (env.dev) {
 	server.register(fastifyStatic, {
 		root: path.resolve('src'),

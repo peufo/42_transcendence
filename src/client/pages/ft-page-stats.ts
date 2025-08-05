@@ -1,4 +1,5 @@
 import type { Match, UserBasic, UserStats } from '../../lib/type.js'
+import { getAvatarSrc } from '../utils/avatar.js'
 import { createEffect } from '../utils/signal.js'
 import { $matches, $rankedUsers, $user } from '../utils/store.js'
 
@@ -409,13 +410,6 @@ function getAverageRally(matches: Match[]): number {
 		}
 	}
 	return rallyCount / roundCount
-}
-
-function getAvatarSrc(user: UserBasic): string {
-	if (user.avatar) {
-		return user.avatar
-	}
-	return user.avatarPlaceholder
 }
 
 function getUserRank(usersStats: UserStats[], user: UserBasic): number {

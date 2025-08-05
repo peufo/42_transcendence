@@ -23,8 +23,8 @@ async function main() {
 	await seed(db, { users }).refine((f) => ({
 		users: {
 			columns: {
-				avatar: f.default({
-					defaultValue: '',
+				hasAvatar: f.default({
+					defaultValue: false,
 				}),
 				avatarPlaceholder: f.valuesFromArray({
 					values: new Array(10).fill('').map(createAvatarPlaceholder),

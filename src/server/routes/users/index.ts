@@ -1,7 +1,10 @@
 import fs from 'node:fs/promises'
-import { pipeline } from 'node:stream/promises'
+import path from 'node:path'
+import { eq } from 'drizzle-orm'
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
+import sharp from 'sharp'
 import { z } from 'zod/v4'
+import { db, users } from '../../db/index.js'
 import { env } from '../../env.js'
 import { getSchema, permission, postSchema } from '../../utils/index.js'
 import { searchUsersAsNotFriends, updateUser } from './model.js'
@@ -40,38 +43,45 @@ export const usersRoute: FastifyPluginCallbackZod = (
 
 	server.post('/update/avatar', async (req, res) => {
 		const data = await req.file()
-		if (!data || data.fieldname !== 'avatarFile') {
+		if (!data) {
 			return res.status(400).send({
-				message: 'No avatar file provided',
+				message: 'No file uploaded',
+				sucess: false,
+			})
+		}
+		if (!data.mimetype.startsWith('image/')) {
+			return res.status(400).send({
+				message: 'Only image files are allowed',
 				sucess: false,
 			})
 		}
 
-		// TODO: make avatars folder env ?
-		// await pipeline(
-		// 	data.file,
-		// 	fs.createWriteStream(`./avatars/${data.filename}`),
-		// )
+		const user = permission.user(res)
+		const avatarPath = path.resolve(
+			`./${env.MEDIA_DIR}`,
+			'avatars',
+			`${user.id}.webp`,
+		)
+		await fs.mkdir(path.resolve(`./${env.MEDIA_DIR}`, 'avatars'), {
+			recursive: true,
+		})
+		await sharp(await data.toBuffer())
+			.resize({
+				width: 200,
+				height: 200,
+				fit: sharp.fit.cover,
+				position: 'centre',
+			})
+			.webp()
+			.toFile(avatarPath)
+		// .extract({
+		// 	left: crop.x,
+		// 	top: crop.y,
+		// 	width: crop.width,
+		// 	height: crop.height,
+		// })
 
-		// const imageBuffer = await data.file.arrayBuffer()
-
-		// const user = permission.user(res)
-		// const avatarPath = path.resolve(env.MEDIA_DIR, 'avatars', `${user.id}.webp`)
-
-		// await fs.mkdir(env.MEDIA_DIR, { recursive: true })
-
-		// await sharp(imageBuffer)
-
-		// 	.extract({
-		// 		left: crop.x,
-		// 		top: crop.y,
-		// 		width: crop.width,
-		// 		height: crop.height,
-		// 	})
-		// 	.toFile(avatarPath)
-
-		// TODO: set db avatar for user
-		// await db.update(users).set()
+		await db.update(users).set({ hasAvatar: true }).where(eq(users.id, user.id))
 		return res.send({
 			message: 'Updated with success',
 			success: true,

@@ -48,7 +48,7 @@ export async function updateUser(
 		.returning({
 			id: users.id,
 			name: users.name,
-			avatar: users.avatar,
+			hasAvatar: users.hasAvatar,
 			avatarPlaceholder: users.avatarPlaceholder,
 			isActive: users.isActive,
 			lastLogin: users.lastLogin,

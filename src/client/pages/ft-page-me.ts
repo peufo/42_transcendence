@@ -1,4 +1,5 @@
-import type { FriendshipFriend, UserBasic } from '../../lib/type.js'
+import type { FriendshipFriend } from '../../lib/type.js'
+import { getAvatarSrc } from '../utils/avatar.js'
 import { type CleanEffect, createEffect } from '../utils/signal.js'
 import {
 	$friendshipsFriend,
@@ -276,10 +277,3 @@ customElements.define(
 		}
 	},
 )
-
-function getAvatarSrc(user: UserBasic): string {
-	if (user.avatar) {
-		return user.avatar
-	}
-	return user.avatarPlaceholder
-}

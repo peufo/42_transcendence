@@ -1,4 +1,4 @@
-import type { UserBasic } from '../../lib/type.js'
+import { getAvatarSrc } from '../utils/avatar.js'
 import { type CleanEffect, createEffect } from '../utils/signal.js'
 import { $user } from '../utils/store.js'
 
@@ -125,10 +125,3 @@ customElements.define(
 		}
 	},
 )
-
-function getAvatarSrc(user: UserBasic): string {
-	if (user.avatar) {
-		return user.avatar
-	}
-	return user.avatarPlaceholder
-}

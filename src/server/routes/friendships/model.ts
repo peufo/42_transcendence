@@ -12,7 +12,7 @@ import type { DB } from '../../types.ts'
 export const userBasicColumns = {
 	id: true,
 	name: true,
-	avatar: true,
+	hasAvatar: true,
 	avatarPlaceholder: true,
 } satisfies DB.Columns<UserBasic>
 
