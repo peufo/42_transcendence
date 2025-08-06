@@ -44,8 +44,8 @@ server.register(fastifyStatic, {
 })
 
 server.register(fastifyStatic, {
-	root: path.resolve('upload'),
-	prefix: `/upload`,
+	root: path.resolve(env.MEDIA_DIR),
+	prefix: `/${env.MEDIA_DIR}`,
 	decorateReply: false,
 })
 
