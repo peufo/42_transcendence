@@ -133,7 +133,7 @@ customElements.define(
                         <input class="btn btn-red" type="submit" value="Remove">
                     </form>`
 				let joinButtons = ''
-				const [tournament] = friend.tournaments
+				const tournament = friend.tournaments[friend.tournaments.length - 1]
 				if (tournament) {
 					joinButtons = /*html*/ `
 					<form method="post" action="/tournaments/join">

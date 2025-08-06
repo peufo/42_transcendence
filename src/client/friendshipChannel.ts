@@ -52,18 +52,18 @@ createEffect(() => {
 				}),
 			)
 		},
-		onTournamentDeleted({ tournament }) {
-			$friendshipsFriend.update((friendships) =>
-				friendships.map((f) => {
-					if (f.withUser.id !== tournament.createdBy) return f
-					f.withUser.tournaments = f.withUser.tournaments.filter(
-						(t) => t.id !== tournament.id,
-					)
-					toast.info(`${f.withUser.name} created a tournament !`)
-					return f
-				}),
-			)
-		},
+		// onTournamentDeleted({ tournament }) {
+		// 	$friendshipsFriend.update((friendships) =>
+		// 		friendships.map((f) => {
+		// 			if (f.withUser.id !== tournament.createdBy) return f
+		// 			f.withUser.tournaments = f.withUser.tournaments.filter(
+		// 				(t) => t.id !== tournament.id,
+		// 			)
+		// 			toast.info(`${f.withUser.name} created a tournament !`)
+		// 			return f
+		// 		}),
+		// 	)
+		// },
 		onFriendOnline({ userId }) {
 			$friendshipsFriend.update((friendships) => {
 				friendships.map((f) => {

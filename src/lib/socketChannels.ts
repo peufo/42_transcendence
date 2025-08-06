@@ -14,12 +14,11 @@ export const serverEvents: {
 		onCreated: true,
 		onDeleted: true,
 		onTournamentCreated: true,
-		onTournamentDeleted: true,
+		// onTournamentDeleted: true,
 		onFriendOnline: true,
 		onFriendOffline: true,
 	},
 	tournaments: {
-		onDeleted: true,
 		onParticipantJoin: true,
 		onParticipantQuit: true,
 	},

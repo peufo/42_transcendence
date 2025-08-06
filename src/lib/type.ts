@@ -86,7 +86,7 @@ export type SocketChannels = {
 			onAccepted: { friendship: FriendshipFriend }
 			onDeleted: { friendshipId: number }
 			onTournamentCreated: { tournament: Tournament }
-			onTournamentDeleted: { tournament: Tournament }
+			// onTournamentDeleted: { tournament: Tournament }
 			onFriendOnline: { userId: number }
 			onFriendOffline: { userId: number }
 		}
@@ -95,7 +95,6 @@ export type SocketChannels = {
 		query: { tournamentId: string }
 		clientEvents: null
 		serverEvents: {
-			onDeleted: null
 			onParticipantJoin: { user: UserBasic }
 			onParticipantQuit: { user: UserBasic }
 		}
@@ -160,7 +159,7 @@ export type RoutesPost = {
 	}
 	'/tournaments/quit': {
 		body: { tournamentId: number }
-		res: { success: boolean; tournamentId: number }
+		res: { success: boolean }
 	}
 	'/users/update': {
 		body: { name: string; password: string }

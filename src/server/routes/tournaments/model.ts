@@ -36,13 +36,11 @@ export async function tournamentCreate(data: DB.TournamentCreate) {
 	})
 }
 
-export async function tournamentDelete(tournamentId: number, ownerId: number) {
+export async function tournamentDelete(tournamentId: number) {
 	const tournament = await db.query.tournaments.findFirst({
 		where: eq(tournaments.id, tournamentId),
 	})
 	if (!tournament) throw server.httpErrors.notFound()
-	if (tournament.createdBy !== ownerId)
-		throw server.httpErrors.forbidden('You are not the owner of tournament')
 	if (tournament.state !== 'open')
 		throw server.httpErrors.forbidden('Tournament is ongoing or finished')
 	const [tournamentDeleted] = await db
@@ -80,6 +78,16 @@ export async function tournamentJoin(
 	if (!tournament.participants.find(({ user }) => user.id === userId))
 		await db.insert(tournamentsParticipants).values({ tournamentId, userId })
 	return getUserBasic(userId)
+}
+
+export async function isTournamentEmpty(
+	tournamentId: number,
+): Promise<boolean> {
+	const participantList = await db
+		.select()
+		.from(tournamentsParticipants)
+		.where(eq(tournamentsParticipants.tournamentId, tournamentId))
+	return participantList.length === 0
 }
 
 export async function tournamentQuit(
