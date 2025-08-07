@@ -45,6 +45,7 @@ async function main() {
 					maxValue: 244,
 				}),
 				isActive: f.default({ defaultValue: false }),
+				isInTournament: f.default({ defaultValue: 0 }),
 			},
 			count: 20,
 		},

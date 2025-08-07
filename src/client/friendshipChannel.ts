@@ -42,28 +42,25 @@ createEffect(() => {
 				friendships.filter(({ id }) => id !== friendshipId),
 			)
 		},
-		onTournamentCreated({ tournament }) {
+		onTournamentJoin({ tournament, userId }) {
 			$friendshipsFriend.update((friendships) =>
 				friendships.map((f) => {
-					if (f.withUser.id !== tournament.createdBy) return f
-					f.withUser.tournaments.push(tournament)
-					toast.info(`${f.withUser.name} created a tournament !`)
+					if (f.withUser.id !== userId) return f
+					f.withUser.tournament = tournament
+					toast.info(`${f.withUser.name} joined a tournament !`)
 					return f
 				}),
 			)
 		},
-		// onTournamentDeleted({ tournament }) {
-		// 	$friendshipsFriend.update((friendships) =>
-		// 		friendships.map((f) => {
-		// 			if (f.withUser.id !== tournament.createdBy) return f
-		// 			f.withUser.tournaments = f.withUser.tournaments.filter(
-		// 				(t) => t.id !== tournament.id,
-		// 			)
-		// 			toast.info(`${f.withUser.name} created a tournament !`)
-		// 			return f
-		// 		}),
-		// 	)
-		// },
+		onTournamentQuit({ userId }) {
+			$friendshipsFriend.update((friendships) =>
+				friendships.map((f) => {
+					if (f.withUser.id !== userId) return f
+					f.withUser.tournament = null
+					return f
+				}),
+			)
+		},
 		onFriendOnline({ userId }) {
 			$friendshipsFriend.update((friendships) => {
 				friendships.map((f) => {

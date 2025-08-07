@@ -56,7 +56,7 @@ customElements.define(
 
                 <div class="flex flex-col items-center">
                   <button type="submit"
-                    class="btn btn-primary w-full py-2 from-violet-600 to-indigo-600 hover:bg-blue-700 text-white rounded-lg transition-all">
+                    class="btn btn-primary w-full py-2 from-violet-600 to-indigo-600 hover:bg-blue-700 text-white rounded-lg transition-all cursor-pointer">
                     Sign in
                   </button>
                 </div>

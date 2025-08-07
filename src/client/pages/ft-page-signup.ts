@@ -18,7 +18,7 @@ customElements.define(
                         <form class="space-y-6" action="/auth/signup" method="post">
                             <div class="flex flex-col items-center space-y-4">
                                 <ft-avatar-selector></ft-avatar-selector>
-                                
+
                             </div>
                             <div>
                                 <label for="name" class="label">User name</label>
@@ -33,7 +33,7 @@ customElements.define(
                                     <input type="password" name="password" id="password" autocomplete="new-password" class="input" required />
                                 </div>
                             </div>
-                            
+
                             <div>
                                 <label for="confirm" class="label">Confirm password</label>
                                 <div class="mt-2">
@@ -42,7 +42,7 @@ customElements.define(
                             </div>
 
                 <div class="flex flex-col items-center">
-                  <button type="submit" class="btn btn-primary w-full py-2 from-violet-600 to-indigo-600 hover:bg-blue-700 text-white rounded-lg transition-all">
+                  <button type="submit" class="btn btn-primary w-full py-2 from-violet-600 to-indigo-600 hover:bg-blue-700 text-white rounded-lg transition-all cursor-pointer">
                     Sign up
                   </button>
                 </div>

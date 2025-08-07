@@ -133,11 +133,13 @@ customElements.define(
                         <input class="btn btn-red" type="submit" value="Remove">
                     </form>`
 				let joinButtons = ''
-				const tournament = friend.tournaments[friend.tournaments.length - 1]
-				if (tournament) {
+
+				// TODO: handle friend.tournament.state === 'ongoing
+				// TODO : add guillemet
+				if (friend.tournament?.state === 'open') {
 					joinButtons = /*html*/ `
 					<form method="post" action="/tournaments/join">
-                        <input type="hidden" name="tournamentId" value="${tournament.id}">
+                        <input type="hidden" name="tournamentId" value="${friend.tournament.id}">
                         <input class="btn btn-border" type="submit" value="Join">
                     </form>`
 				}

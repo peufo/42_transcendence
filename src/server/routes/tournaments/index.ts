@@ -1,15 +1,7 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import '@fastify/cookie'
 import { getSchema, permission, postSchema } from '../../utils/index.js'
-import { notify, notifyFriends } from '../ws/controller.js'
-import {
-	isTournamentEmpty,
-	tournamentCreate,
-	tournamentDelete,
-	tournamentGet,
-	tournamentJoin,
-	tournamentQuit,
-} from './model.js'
+import { tournamentCreate, tournamentGet } from './model.js'
 import { tournamentIdSchema, tournamentSchemaCreate } from './schema.js'
 
 export const tournamentsRoute: FastifyPluginCallbackZod = (
@@ -37,7 +29,6 @@ export const tournamentsRoute: FastifyPluginCallbackZod = (
 				...req.body,
 				createdBy: userId,
 			})
-			await notifyFriends(userId, 'onTournamentCreated', { tournament })
 			return res.send({ success: true, tournamentId: tournament.id })
 		},
 	)
@@ -54,31 +45,33 @@ export const tournamentsRoute: FastifyPluginCallbackZod = (
 	// 	},
 	// )
 
-	server.post(
-		'/join',
-		postSchema('/tournaments/join', tournamentIdSchema),
-		async (req, res) => {
-			const { userId } = permission.session(res)
-			const { tournamentId } = req.body
-			const user = await tournamentJoin(tournamentId, userId)
-			notify.tournaments(tournamentId, 'onParticipantJoin', { user })
-			return res.send({ success: true, tournamentId })
-		},
-	)
+	// server.post(
+	// 	'/join',
+	// 	postSchema('/tournaments/join', tournamentIdSchema),
+	// 	async (req, res) => {
+	// 		const { userId } = permission.session(res)
+	// 		const { tournamentId } = req.body
+	// 		const tournament = await tournamentJoin(tournamentId, userId)
+	// 		const user = await getUserBasic(userId)
+	// 		await notifyFriends(userId, 'onTournamentJoin', { tournament })
+	// 		notify.tournaments(tournamentId, 'onParticipantJoin', { user })
+	// 		return res.send({ success: true, tournamentId })
+	// 	},
+	// )
 
-	server.post(
-		'/quit',
-		postSchema('/tournaments/quit', tournamentIdSchema),
-		async (req, res) => {
-			const { userId } = permission.session(res)
-			const { tournamentId } = req.body
-			const user = await tournamentQuit(tournamentId, userId)
-			notify.tournaments(tournamentId, 'onParticipantQuit', { user })
-			if (await isTournamentEmpty(tournamentId))
-				await tournamentDelete(tournamentId)
-			return res.send({ success: true })
-		},
-	)
+	// server.post(
+	// 	'/quit',
+	// 	postSchema('/tournaments/quit', tournamentIdSchema),
+	// 	async (req, res) => {
+	// 		const { userId } = permission.session(res)
+	// 		const { tournamentId } = req.body
+	// 		const user = await tournamentQuit(tournamentId, userId)
+	// 		notify.tournaments(tournamentId, 'onParticipantQuit', { user })
+	// 		if (await isTournamentEmpty(tournamentId))
+	// 			await tournamentDelete(tournamentId)
+	// 		return res.send({ success: true })
+	// 	},
+	// )
 
 	done()
 }

@@ -23,7 +23,7 @@ export type UserStats = UserBasic & {
 export type Friend = UserBasic & {
 	isActive: boolean
 	lastLogin: Date
-	tournaments: Tournament[]
+	tournament: Tournament | null
 }
 
 type FriendshipBase = {
@@ -85,8 +85,8 @@ export type SocketChannels = {
 			onCreated: { friendship: FriendshipInvitation }
 			onAccepted: { friendship: FriendshipFriend }
 			onDeleted: { friendshipId: number }
-			onTournamentCreated: { tournament: Tournament }
-			// onTournamentDeleted: { tournament: Tournament }
+			onTournamentJoin: { tournament: Tournament; userId: number }
+			onTournamentQuit: { userId: number }
 			onFriendOnline: { userId: number }
 			onFriendOffline: { userId: number }
 		}

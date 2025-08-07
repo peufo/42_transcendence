@@ -2,10 +2,11 @@ import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import z from 'zod/v4'
 import { Engine } from '../../../lib/engine/index.js'
 import { getSessionFromRequest } from '../auth/hooks.js'
-import { tournamentGet } from '../tournaments/model.js'
+import { tournamentDelete, tournamentGet } from '../tournaments/model.js'
+import { setUserIsActive } from '../users/model.js'
 import { bindEmitterWithSocket, notifyFriends } from './controller.js'
-import { setUserIsActive } from './model.js'
 import { engineInputSchema } from './schema.js'
+import { useUserTournamentSocket } from './tournamentSocket.js'
 
 export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 	server.get('/friendships', { websocket: true }, async (socket, req) => {
@@ -40,12 +41,20 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 				socket.close(3000, 'Authentification required')
 				return
 			}
+			const { userId } = session
 			const { tournamentId } = req.query
 			const tournament = await tournamentGet(tournamentId).catch((err) => {
 				socket.close(3000, 'Tournament not exist')
 				throw err
 			})
-			bindEmitterWithSocket('tournaments', tournament.id, socket)
+
+			useUserTournamentSocket(userId, tournamentId, socket)
+
+			bindEmitterWithSocket('tournaments', tournament.id, socket, {
+				onDestroy: async () => {
+					await tournamentDelete(tournament.id)
+				},
+			})
 		},
 	)
 

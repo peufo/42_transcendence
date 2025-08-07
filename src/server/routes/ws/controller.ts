@@ -50,8 +50,8 @@ export async function notifyFriends<
 	}
 }
 
-export function bindEmitterWithSocket<Chanel extends keyof SocketChannels>(
-	channel: Chanel,
+export function bindEmitterWithSocket<Channel extends keyof SocketChannels>(
+	channel: Channel,
 	emitterKey: number,
 	socket: WebSocket,
 	options: {
@@ -61,8 +61,8 @@ export function bindEmitterWithSocket<Chanel extends keyof SocketChannels>(
 ) {
 	const { emitter, sockets } = getEmitter(channel, emitterKey, options)
 
-	function senderFactory<K extends keyof ServerEvents<Chanel>>(eventName: K) {
-		const sender = (data: ServerEvents<Chanel>[K]) => {
+	function senderFactory<K extends keyof ServerEvents<Channel>>(eventName: K) {
+		const sender = (data: ServerEvents<Channel>[K]) => {
 			socket.send(JSON.stringify({ [eventName]: data }))
 		}
 		// @ts-ignore
@@ -72,7 +72,7 @@ export function bindEmitterWithSocket<Chanel extends keyof SocketChannels>(
 	}
 
 	const sendersOff = Object.keys(serverEvents[channel]).map((eventName) => {
-		return senderFactory(eventName as keyof ServerEvents<Chanel>)
+		return senderFactory(eventName as keyof ServerEvents<Channel>)
 	})
 
 	sockets.add(socket)

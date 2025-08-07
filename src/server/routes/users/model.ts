@@ -5,6 +5,10 @@ import { db, users } from '../../db/index.js'
 import { server } from '../../main.js'
 import { getFriendshipsId, userBasicColumns } from '../friendships/model.js'
 
+export async function setUserIsActive(userId: number, isActive: boolean) {
+	await db.update(users).set({ isActive }).where(eq(users.id, userId))
+}
+
 export async function searchUsersAsNotFriends(userId: number, search: string) {
 	const friendsId = await getFriendshipsId(userId)
 

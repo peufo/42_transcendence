@@ -1,9 +1,9 @@
 import { and, eq, ne } from 'drizzle-orm'
-import type { UserBasic } from '../../../lib/type.js'
+import type { Tournament } from '../../../lib/type.js'
 import { db, tournaments, tournamentsParticipants } from '../../db/index.js'
 import { server } from '../../main.js'
 import type { DB } from '../../types.js'
-import { getUserBasic, userBasicColumns } from '../friendships/model.js'
+import { userBasicColumns } from '../friendships/model.js'
 
 async function getUserBusy(userId: number): Promise<boolean> {
 	const participations = db
@@ -24,9 +24,23 @@ async function getUserBusy(userId: number): Promise<boolean> {
 	return !!activesTournaments.length
 }
 
+export async function tournamentGet(tournamentId: number) {
+	const tournament = await db.query.tournaments.findFirst({
+		where: eq(tournaments.id, tournamentId),
+		with: {
+			createdByUser: { columns: userBasicColumns },
+			participants: {
+				with: { user: { columns: userBasicColumns } },
+			},
+		},
+	})
+	if (!tournament) throw server.httpErrors.notFound()
+	return tournament
+}
+
 export async function tournamentCreate(data: DB.TournamentCreate) {
 	const userIsBusy = await getUserBusy(data.createdBy)
-	if (userIsBusy) throw server.httpErrors.forbidden('Sorry, your busy')
+	if (userIsBusy) throw server.httpErrors.forbidden(`Sorry, you're busy`)
 	return db.transaction(async (tx) => {
 		const [tournament] = await tx.insert(tournaments).values(data).returning()
 		await tx
@@ -50,51 +64,24 @@ export async function tournamentDelete(tournamentId: number) {
 	return tournamentDeleted
 }
 
-export async function tournamentGet(tournamentId: number) {
-	const tournament = await db.query.tournaments.findFirst({
-		where: eq(tournaments.id, tournamentId),
-		with: {
-			createdByUser: { columns: userBasicColumns },
-			participants: {
-				with: { user: { columns: userBasicColumns } },
-			},
-		},
-	})
-	if (!tournament) throw server.httpErrors.notFound()
-	return tournament
-}
-
 export async function tournamentJoin(
 	tournamentId: number,
 	userId: number,
-): Promise<UserBasic> {
+): Promise<Tournament> {
 	const userIsBusy = await getUserBusy(userId)
-	if (userIsBusy) throw server.httpErrors.forbidden('Sorry, your busy')
+	if (userIsBusy) throw server.httpErrors.forbidden(`Sorry, you're busy`)
 	const tournament = await tournamentGet(tournamentId)
 	if (tournament.participants.length >= tournament.numberOfPlayers)
 		throw server.httpErrors.forbidden(
-			"Sorry, you can't join this tournament, he's full.",
+			"Sorry, you can't join this tournament, it is full.",
 		)
 	if (!tournament.participants.find(({ user }) => user.id === userId))
 		await db.insert(tournamentsParticipants).values({ tournamentId, userId })
-	return getUserBasic(userId)
+	return tournament
 }
 
-export async function isTournamentEmpty(
-	tournamentId: number,
-): Promise<boolean> {
-	const participantList = await db
-		.select()
-		.from(tournamentsParticipants)
-		.where(eq(tournamentsParticipants.tournamentId, tournamentId))
-	return participantList.length === 0
-}
-
-export async function tournamentQuit(
-	tournamentId: number,
-	userId: number,
-): Promise<UserBasic> {
-	await db
+export function tournamentQuit(tournamentId: number, userId: number) {
+	return db
 		.delete(tournamentsParticipants)
 		.where(
 			and(
@@ -102,5 +89,4 @@ export async function tournamentQuit(
 				eq(tournamentsParticipants.userId, userId),
 			),
 		)
-	return getUserBasic(userId)
 }

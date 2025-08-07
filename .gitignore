@@ -3,3 +3,4 @@ build
 .env
 local.db
 .pnpm-store
+upload

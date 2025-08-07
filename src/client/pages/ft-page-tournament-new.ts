@@ -27,7 +27,7 @@ customElements.define(
                                 ${nbPlayersOptions}
                             </ul>
                         </fieldset>
-                        <button type="submit" class="btn btn-primary w-full">
+                        <button type="submit" class="btn btn-primary w-full cursor-pointer">
                             Create tournament
                         </button>
                     </form>
