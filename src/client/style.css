@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 .btn {
-	@apply flex items-center bg-white gap-1 justify-center rounded-md px-3 py-1.5 text-sm/6 font-semibold shadow-xs focus-visible:outline-2 focus-visible:outline-offset-2;
+	@apply flex items-center bg-white gap-1 justify-center rounded-md px-3 py-1.5 text-sm/6 font-semibold shadow-xs focus-visible:outline-2 focus-visible:outline-offset-2 cursor-pointer;
 }
 
 .btn-border {
@@ -49,7 +49,7 @@
 }
 
 .menu-item {
-	@apply block flex gap-2 items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50;
+	@apply block flex gap-2 items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer;
 }
 
 @theme {

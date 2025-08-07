@@ -70,3 +70,13 @@ server.listen({ port: env.PORT, host: env.APP_HOST }, (err, address) => {
 	}
 	console.log(`Server listening at ${address}`)
 })
+
+process.on('SIGUSR2', () => {
+	process.kill(process.pid, 'SIGTERM')
+})
+
+process.on('SIGTERM', async () => {
+	// await deleteOpenTournaments()
+	// TODO: change tournament ongoing to finished ?
+	process.exit(0)
+})

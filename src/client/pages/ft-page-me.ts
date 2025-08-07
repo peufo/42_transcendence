@@ -12,13 +12,23 @@ customElements.define(
 	'ft-page-me',
 	class extends HTMLElement {
 		connectedCallback() {
+			const user = $user.get()
+
+			let activeTournamentButton = ''
+			if (user?.tournament)
+				activeTournamentButton = /*html*/ `
+				<a href="/tournament/play?tournamentId=${user.tournament.id}" class="btn btn-primary col-span-2">
+					<ft-icon name="rotate-cw" class="h-5 w-5 mr-1"></ft-icon>
+					Return to tournament
+				</a>`
+
 			this.innerHTML = /*html*/ `
                 <div class="flex min-h-full flex-col justify-center p-6 lg:px-8">
                     <div class="flex flex-col gap-10 mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
                         <div>
                             <ft-welcome></ft-welcome>
 
-                            <div class="grid grid-cols-2 gap-2">
+                            <div class="grid grid-cols-2 gap-3">
                                 <a href="/local/new" class="btn btn-primary">
                                     <ft-icon name="swords" class="h-5 w-5 mr-1"></ft-icon>
                                     Local game
@@ -27,6 +37,7 @@ customElements.define(
                                     <ft-icon name="trophy" class="h-5 w-5 mr-1"></ft-icon>
                                     New tournament
                                 </a>
+								${activeTournamentButton}
                             </div>
                         </div>
                        <ft-friends></ft-friends>

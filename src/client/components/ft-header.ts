@@ -58,11 +58,11 @@ customElements.define(
 							Home
 						</a>
 						<a href="/stats" class="menu-item" role="menuitem" tabindex="-1">
-							<ft-icon name="chart-spline" 	class="h-5"></ft-icon>
+							<ft-icon name="chart-spline" class="h-5"></ft-icon>
 							History
 						</a>
 						<a href="/account" class="menu-item" role="menuitem" tabindex="-1">
-							<ft-icon name="user" 	class="h-5"></ft-icon>
+							<ft-icon name="user" class="h-5"></ft-icon>
 							Account
 						</a>
 						<form method="post" action="/auth/logout">

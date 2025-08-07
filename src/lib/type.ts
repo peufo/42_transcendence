@@ -14,6 +14,10 @@ export type User = UserBasic & {
 	numberOfGoals: number
 }
 
+export type UserWithTournament = User & {
+	tournament: Tournament | null
+}
+
 export type UserStats = UserBasic & {
 	numberOfMatches: number
 	numberOfWin: number
@@ -111,7 +115,7 @@ type Get<Result, Query = null> = {
 }
 
 export type RoutesGet = {
-	'/auth/user': Get<User | undefined>
+	'/auth/user': Get<UserWithTournament | undefined>
 	'/users': Get<UserBasic[], { search: string }> // TODO: /users/notMyFriends
 	'/friendships/invitation': Get<FriendshipInvitation[]>
 	'/friendships/friend': Get<FriendshipFriend[]>

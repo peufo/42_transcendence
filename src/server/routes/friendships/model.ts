@@ -13,7 +13,8 @@ import {
 	tournamentsParticipants,
 	users,
 } from '../../db/index.js'
-import type { DB } from '../../types.ts'
+import type { DB } from '../../types.js'
+import { getActiveTournament } from '../tournaments/model.js'
 
 export const userBasicColumns = {
 	id: true,
@@ -130,18 +131,7 @@ export async function getUserFriend(userId: number): Promise<Friend> {
 		columns: friendColumns,
 	})
 
-	const participations = db
-		.select()
-		.from(tournamentsParticipants)
-		.where(eq(tournamentsParticipants.userId, userId))
-		.as('participations')
-
-	const activeTournaments = await db
-		.select()
-		.from(tournaments)
-		.innerJoin(participations, eq(tournaments.id, participations.tournamentId))
-		.where(ne(tournaments.state, 'finished'))
-	const tournament = activeTournaments.at(0)?.tournaments || null
+	const tournament = await getActiveTournament(userId)
 
 	if (!friend) throw new Error('Friend not found')
 	return { ...friend, tournament }

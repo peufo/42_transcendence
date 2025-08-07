@@ -49,18 +49,7 @@ export async function updateUser(
 		.update(users)
 		.set(updateData)
 		.where(eq(users.id, userId))
-		.returning({
-			id: users.id,
-			name: users.name,
-			hasAvatar: users.hasAvatar,
-			avatarPlaceholder: users.avatarPlaceholder,
-			isActive: users.isActive,
-			lastLogin: users.lastLogin,
-			createdAt: users.createdAt,
-			numberOfMatches: users.numberOfGoals,
-			numberOfWin: users.numberOfWin,
-			numberOfGoals: users.numberOfGoals,
-		})
+		.returning()
 
 	return user
 }

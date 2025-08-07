@@ -17,7 +17,7 @@
 		"build:cli": "tsc -p tsconfig.cli.json",
 		"build:style": "tailwindcss -i ./src/client/style.css -o ./build/public/style.css",
 		"dev": "rm -rf build && run-p -l dev:*",
-		"dev:run": "sleep 2.5 && export NODE_ENV=development && nodemon",
+		"dev:run": "sleep 2.5 && export NODE_ENV=development && nodemon --delay 2000ms",
 		"dev:server": "tsc -p tsconfig.server.json -w --preserveWatchOutput",
 		"dev:client": "tsc -p tsconfig.client.json -w --preserveWatchOutput",
 		"dev:cli": "tsc -p tsconfig.cli.json -w --preserveWatchOutput",
@@ -70,7 +70,6 @@
 		"i": "^0.3.7",
 		"pino": "^9.7.0",
 		"sharp": "^0.34.3",
-		"pino": "^9.7.0",
 		"zod": "^3.25.67"
 	}
 }

@@ -137,6 +137,7 @@ async function onSubmitForm(event: SubmitEvent) {
 
 	const json = await res.json()
 	if (!res.ok) {
+		if ('message' in json) toast.error(json.message)
 		parseErrorMessage(json.message)
 		return
 	}

@@ -43,7 +43,7 @@ customElements.define(
 						if ($user.get()?.id === participant.user.id) return
 						$tournament.update((tournament) => {
 							if (!tournament) return tournament
-							toast.error(`${participant.user.name} quitted the tournament !`)
+							toast.error(`${participant.user.name} left the tournament !`)
 							return {
 								...tournament,
 								participants: tournament.participants.filter(
@@ -59,12 +59,6 @@ customElements.define(
 		async disconnectedCallback() {
 			this.cleanEffect()
 			this.tournamentChannel.close()
-			// const tournamentId = $tournament.get()?.id
-			// await fetch(`/tournaments/quit`, {
-			// 	headers: { 'Content-Type': 'application/json' },
-			// 	body: JSON.stringify({ tournamentId }),
-			// 	method: 'post',
-			// })
 		}
 
 		render() {
@@ -75,23 +69,14 @@ customElements.define(
 			const iParticipate = tournament.participants.find(
 				({ user: { id } }) => id === user.id,
 			)
+			const action = iParticipate ? 'quit' : 'join'
+			const buttonText = action === 'quit' ? 'Quit' : 'Join'
 
-			const leaveButton = /*html*/ `
-				<a class="btn btn-border cursor-pointer" href="/me">Quit</a>
-			`
-			const participantAction = /*html*/ `
-				<div class="flex flex-row gap-2 p-2 justify-center item-center">
-					${leaveButton}
-				${
-					!iParticipate
-						? `
-				<form action="/tournaments/join" method="post" class="contents">
+			const participationForm = /*html*/ `
+				<form action="/tournaments/${action}" method="post" class="contents">
 					<input type="hidden" name="tournamentId" value="${tournament.id}" />
-					<input type="submit" value="Join" class="btn btn-border cursor-pointer">
-				</form>`
-						: ''
-				}
-				</div>
+					<input type="submit" value="${buttonText}" class="btn btn-border cursor-pointer">
+				</form>
 			`
 
 			const title = /*html*/ `
@@ -112,13 +97,13 @@ customElements.define(
 			`
 
 			const participantList = () => {
-				let html = '<div class="flex flex-col item-center justify-center">'
+				let html = /*html*/ `<div class="grid gap-3" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">`
 				let number = 0
 				for (const participant of tournament.participants) {
 					html += /*html*/ `
-					<div class="flex p-2 items-center gap-5 border border-gray-200 rounded-xl">
-						<div class="flex pl-2">${number + 1}</div>
-						<div class="flex flex-row gap-2 items-center">
+					<div class="flex p-2 items-center gap-2 border border-gray-200 rounded-xl">
+						<div class="w-1/10 pl-2 font-bold">${number + 1}</div>
+						<div class="w-9/10 flex flex-row gap-2 items-center">
 							<img src="${getAvatarSrc(participant.user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
 							<div>${participant.user.name}</div>
 						</div>
@@ -129,8 +114,10 @@ customElements.define(
 				while (number < tournament.numberOfPlayers) {
 					html += /*html*/ `
 					<div class="flex p-2 justify-center items-center gap-2 border border-gray-200 rounded-xl">
-						<div class="flex pl-2">${number + 1}</div>
-						<div class="flex items-center justify-center animate-bounce">... waiting for user ...</div>
+						<div class="w-9/10 flex items-center justify-center animate-pulse text-indigo-500"
+							style="animation-delay: ${number * 80}ms;">
+							... Waiting for players ...
+						</div>
 					</div>
 					`
 					number++
@@ -154,11 +141,11 @@ customElements.define(
 			// 	`
 
 			return /*html*/ `
-			<div class="flex flex-col gap-3 mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+			<div class="flex flex-col gap-3 mt-10 sm:mx-auto sm:max-w-lg mx-4">
 				${title}
 				${participantsCount}
 				${participantList()}
-				${participantAction}
+				${participationForm}
 			</div>
 			`
 		}
