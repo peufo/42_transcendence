@@ -84,11 +84,11 @@ customElements.define(
 						if (match.player2Score === null) return ''
 						if (match.player1Score === match.player2Score) return ''
 						if (match.player1Score > match.player2Score) {
-							if (userIsPlayer1) return 'text-green-400 font-bold'
+							if (userIsPlayer1) return 'text-indigo-600 font-bold'
 							return 'text-red-400 font-bold'
 						}
 						if (userIsPlayer1) return 'text-red-400 font-bold'
-						return 'text-green-400 font-bold'
+						return 'text-indigo-600 font-bold'
 					}
 
 					const score1 = /*html*/ `
@@ -109,7 +109,7 @@ customElements.define(
 								${score1}
 								<ft-icon
 									name="zap"
-									class="mr-1 fill-amber-400 stroke-amber-800 scale-x-75 rotate-12">
+									class="mr-1 scale-x-75 rotate-12">
 								</ft-icon>
 								${score2}
 							</div>
