@@ -368,9 +368,9 @@ function drawRectangle(values: number[]): string {
 	let html = '<div class="flex items-center">'
 	const maxValue = Math.max(...values)
 	for (const value of values) {
-		const color = `rgb(255, ${255 - Math.floor((value * 255) / maxValue)}, ${255 - Math.floor((value * 255) / maxValue)})`
+		const color = `rgb(${255 - Math.floor((value * 255) / maxValue)}, ${255 - Math.floor((value * 255) / maxValue)}, 255)`
 		html += `
-		<div class="w-1 h-1" style="background-color:${color}"></div>
+		<div class="w-1 h-4" style="background-color:${color}"></div>
 		`
 	}
 	html += '</div>'
