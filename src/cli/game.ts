@@ -1,26 +1,34 @@
 import { stdin, stdout } from 'node:process'
 import { createInterface, emitKeypressEvents } from 'node:readline'
-import {
-	ARENA_HEIGHT,
-	ARENA_WIDTH,
-	type EngineEventData,
-	type Move,
-	PADDLE_BASE_HEIGHT,
-	PADDLE_BASE_P1_POSITION,
-	PADDLE_BASE_P2_POSITION,
-	PADDLE_BASE_WIDTH,
-	type Player,
-	type State,
+import pc from 'picocolors'
+import type {
+	// ARENA_HEIGHT,
+	// ARENA_WIDTH,
+	EngineEventData,
+	Move,
+	// PADDLE_BASE_HEIGHT,
+	// PADDLE_BASE_P1_POSITION,
+	// PADDLE_BASE_P2_POSITION,
+	// PADDLE_BASE_WIDTH,
+	Player,
+	Scores,
+	State,
 } from '../lib/engine/index.js'
+import { useInterpolate } from '../lib/interpolate.js'
 import type { Scope } from './main.js'
+import { ensureSreenSize } from './screenSize.js'
 
-export const start: Scope = () => {
-	if (!checkSizeRequirements()) return null
+const FRAME_TIMEOUT = 1000 / 60
+const interpolate = useInterpolate()
+let scores: Scores = { p1: 0, p2: 0 }
+let timeout: NodeJS.Timeout
+let isGameRunning = false
+
+export const startGame: Scope = () => {
 	emitKeypressEvents(stdin)
 	const rl = createInterface({ input: stdin, terminal: true })
 	rl.once('SIGINT', terminate)
 	stdout.write('\x1bc')
-	renderScores(0, 0)
 	const socket = connectEngine()
 	const setInput = (player: Player, move: Move, value: boolean) => {
 		socket.send(JSON.stringify({ player, move, value }))
@@ -52,119 +60,65 @@ export const start: Scope = () => {
 		},
 	}
 
-	stdin.on('keypress', (key) => {
+	function onKeyPress(key: string) {
 		keyHandlers[key]?.()
-	})
+	}
 
-	stdout.on('resize', () => {
-		if (!checkSizeRequirements()) terminate()
-	})
+	stdin.on('keypress', onKeyPress)
+	// TODO: escape
+	// stdin.on('keypress', console.log)
 
 	function terminate() {
 		rl.close()
 		socket.close()
+		if (timeout) clearTimeout(timeout)
+		stdin.off('keypress', onKeyPress)
 		stdout.write('Bye\n')
+		isGameRunning = false
 	}
+
+	isGameRunning = true
+	render()
+
 	return null
 }
 
-// rendering characters
-const CHAR_TOP = '▀'
-const CHAR_BOTTOM = '▄'
-const CHAR_LEFT = '▌'
-const CHAR_RIGHT = '▐'
-const CHAR_TOP_LEFT = '▛'
-const CHAR_TOP_RIGHT = '▜'
-const CHAR_BOTTOM_LEFT = '▙'
-const CHAR_BOTTOM_RIGHT = '▟'
-const CHAR_BALL = '■'
-const CHAR_PADDLE = '█'
-
-// conversion to terminal sizes
-const X_DIVIDER = 10
-const Y_DIVIDER = 20
-const TTY_WIDTH = Math.floor(ARENA_WIDTH / X_DIVIDER)
-const TTY_HEIGHT = Math.floor(ARENA_HEIGHT / Y_DIVIDER)
-const TTY_PADDLE_HEIGHT = Math.floor(PADDLE_BASE_HEIGHT / Y_DIVIDER)
-const TTY_P1_X = Math.floor(
-	(PADDLE_BASE_P1_POSITION.x + PADDLE_BASE_WIDTH) / X_DIVIDER,
-)
-const TTY_P2_X = Math.floor(PADDLE_BASE_P2_POSITION.x / X_DIVIDER)
-
-function convertState(state: State): State {
-	return {
-		b: {
-			x: Math.floor(state.b.x / X_DIVIDER),
-			y: Math.floor(state.b.y / Y_DIVIDER),
-		},
-		p1: Math.floor(state.p1 / Y_DIVIDER),
-		p2: Math.floor(state.p2 / Y_DIVIDER),
+async function render() {
+	const start = Date.now()
+	await ensureSreenSize()
+	console.clear()
+	const state = interpolate.getState()
+	renderBall(state)
+	if (isGameRunning) {
+		const renderingTime = Date.now() - start
+		timeout = setTimeout(render, Math.max(0, FRAME_TIMEOUT - renderingTime))
 	}
 }
 
-function checkSizeRequirements(): boolean {
-	const windowSize = stdout.getWindowSize() // [0]: width, [1]: height
-	if (windowSize[0] < TTY_WIDTH || windowSize[1] < TTY_HEIGHT) {
-		stdout.write(
-			`Your terminal should be atleast ${TTY_WIDTH}:${TTY_HEIGHT} (current size: ${windowSize[0]}:${windowSize[1]}) for the game to render properly\n`,
-		)
-		return false
-	}
-	return true
-}
-
-let lastRender: string[] = []
-
-function render(state: State) {
-	const currentRender: string[] = []
-
-	for (let y = 0; y < TTY_HEIGHT; y++) {
-		let line = ''
-		for (let x = 0; x < TTY_WIDTH; x++) {
-			if (y === 0 && x === 0) line += CHAR_TOP_LEFT
-			else if (y === 0 && x === TTY_WIDTH - 1) line += CHAR_TOP_RIGHT
-			else if (y === TTY_HEIGHT - 1 && x === 0) line += CHAR_BOTTOM_LEFT
-			else if (y === TTY_HEIGHT - 1 && x === TTY_WIDTH - 1)
-				line += CHAR_BOTTOM_RIGHT
-			else if (y === 0) line += CHAR_TOP
-			else if (y === TTY_HEIGHT - 1) line += CHAR_BOTTOM
-			else if (x === 0) line += CHAR_LEFT
-			else if (x === TTY_WIDTH - 1) line += CHAR_RIGHT
-			else if (
-				(x === TTY_P1_X &&
-					y >= state.p1 &&
-					y <= state.p1 + TTY_PADDLE_HEIGHT) ||
-				(x === TTY_P2_X && y >= state.p2 && y <= state.p2 + TTY_PADDLE_HEIGHT)
-			)
-				line += CHAR_PADDLE
-			else if (x === state.b.x && y === state.b.y) line += CHAR_BALL
-			else line += ' '
-		}
-		currentRender.push(line)
-
-		if (!lastRender[y] || lastRender[y] !== line) {
-			stdout.cursorTo(0, y)
-			stdout.write(line)
-		}
-	}
-	lastRender = currentRender
-	stdout.cursorTo(0, TTY_HEIGHT + 1)
-}
-
-function renderScores(p1: number, p2: number) {
-	stdout.cursorTo(0, TTY_HEIGHT + 1)
-	stdout.write(`Player 1: ${p1} | Player 2: ${p2}`)
+function renderBall(state: State) {
+	const col = Math.floor(state.b.x / 10)
+	const row = Math.floor(state.b.y / 20)
+	// const char = state.b.y % 2 ? '▄' : '▀'
+	const char = Math.floor(state.b.y / 2) % 2 ? pc.white(pc.bgBlack('▅▅')) : '▅▅'
+	stdout.cursorTo(col, row)
+	stdout.write(char)
+	stdout.cursorTo(0, stdout.rows)
+	stdout.write(Math.floor(state.b.y).toString())
+	stdout.write('  ')
+	stdout.write((Math.floor(state.b.y) % 2).toString())
+	stdout.write('▄▀▄▀▆▅_')
+	stdout.write(`p1: ${scores.p1}, p2: ${scores.p2}`)
 }
 
 function connectEngine(): WebSocket {
 	const socket = new WebSocket('ws://localhost:8000/ws') // use correct address
-	socket.addEventListener('message', (event) => {
+	socket.addEventListener('message', async (event) => {
 		const data: EngineEventData = JSON.parse(event.data)
 		if (data.onTick) {
-			render(convertState(data.onTick))
+			interpolate.updateState(data.onTick)
 		}
 		if (data.onRoundEnd) {
-			renderScores(data.onRoundEnd?.scores.p1, data.onRoundEnd?.scores.p2)
+			scores = data.onRoundEnd.scores
 		}
 	})
 	return socket
