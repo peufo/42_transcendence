@@ -1,6 +1,6 @@
 import type { FastifyReply } from 'fastify'
 import type { User } from '../../lib/type.js'
-import { server } from '../main.js'
+import { server } from '../server.js'
 import type { DB } from '../types.js'
 
 export const permission = {

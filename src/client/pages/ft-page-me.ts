@@ -89,7 +89,7 @@ customElements.define(
 
 			for (const user of users) {
 				html += /*html*/ `
-                    <div class="flex pl-4 p-2 items-center gap-2 border border-gray-200 rounded-xl">
+                    <div class="flex p-2 items-center gap-2 border border-gray-200 rounded-xl">
                         <img src="${getAvatarSrc(user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
                         <span>${user.name}</span>
                         <div class="flex-grow"></div>
@@ -138,7 +138,9 @@ customElements.define(
 				const removeBtn = /*html*/ `
                 	<form method="post" action="/friendships/delete">
 						<input type="hidden" name="friendshipId" value="${friendship.id}" />
-                        <input class="btn btn-red" type="submit" value="Remove" />
+						<button class="btn btn-red w-9 px-2!">
+							<ft-icon name="cancel" class="stroke-red-300"></ft-icon>
+						</button>
                     </form>`
 
 				let joinButtons = ''
@@ -156,7 +158,7 @@ customElements.define(
 
 				return /*html*/ `
                     <div class="flex p-2 items-center gap-2 border border-gray-200 rounded-xl">
-						<div class="relative h-8 w-8">
+						<div class="relative h-8 w-8 shrink-0">
 							<div
 								class="
 									absolute w-2 h-2 rounded-full -bottom-1 -right-1 border
@@ -168,8 +170,8 @@ customElements.define(
 							<img src="${getAvatarSrc(friend)}" alt="Avatar de l'utilisateur" class="rounded">
 						</div>
                         <span>${friend.name}</span>
+						<div class="flex-grow"></div>
 						${joinButtons}
-                        <div class="flex-grow"></div>
                         ${removeBtn}
                     </div>
                 `
@@ -242,7 +244,7 @@ customElements.define(
 				}
 
 				html += /*html*/ `
-                    <div class="flex pl-4 p-2 items-center gap-2 border border-gray-200 rounded-xl">
+                    <div class="flex p-2 items-center gap-2 border border-gray-200 rounded-xl">
                     <img src="${getAvatarSrc(invitation.withUser)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
                         <div class="flex flex-col">
                             <span>${invitation.withUser.name}</span>

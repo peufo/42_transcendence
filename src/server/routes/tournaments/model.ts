@@ -1,9 +1,12 @@
 import { eq } from 'drizzle-orm'
-import type { Tournament } from '../../../lib/type.js'
-import { db, tournaments } from '../../db/index.js'
-import { server } from '../../main.js'
+import type {
+	Tournament,
+	TournamentWithLookup,
+	Versus,
+} from '../../../lib/type.js'
+import { db, tournaments, versus } from '../../db/index.js'
+import { server } from '../../server.js'
 import type { DB } from '../../types.js'
-import { userBasicColumns } from '../friendships/model.js'
 import {
 	createTournament,
 	deleteParticipant,
@@ -20,30 +23,35 @@ async function getUserActiveTournament(
 	return findActiveTournamentByUserId(userId)
 }
 
-export async function tournamentGetWithParticipants(tournamentId: number) {
+export async function tournamentGetWithParticipants(
+	tournamentId: number,
+): Promise<TournamentWithLookup> {
 	const tournament = await findTournamentWithParticipants(tournamentId)
 	if (!tournament) throw server.httpErrors.notFound()
-	return tournament
+	return { ...tournament, stages: await getTournamentStages(tournament.id) }
 }
 
-// export async function tournamentGet(tournamentId: number) {
-// 	const tournament = findTournamentWithParticipants(tournamentId)
-// 	if (!tournament) throw server.httpErrors.notFound()
-// 	return tournament
-// }
-
-export async function tournamentGet(tournamentId: number) {
+export async function tournamentGet(tournamentId: number): Promise<Tournament> {
 	const tournament = await db.query.tournaments.findFirst({
 		where: eq(tournaments.id, tournamentId),
-		with: {
-			createdByUser: { columns: userBasicColumns },
-			participants: {
-				with: { user: { columns: userBasicColumns } },
-			},
-		},
 	})
 	if (!tournament) throw server.httpErrors.notFound()
-	return tournament
+	return { ...tournament, stages: await getTournamentStages(tournament.id) }
+}
+
+async function getTournamentStages(
+	tournamentId: number,
+): Promise<Tournament['stages']> {
+	const results = await db
+		.select()
+		.from(versus)
+		.where(eq(versus.tournamentId, tournamentId))
+	const stages: Versus[][] = []
+	for (const vs of results) {
+		if (!stages[vs.stage]) stages[vs.stage] = [vs]
+		else stages[vs.stage].push(vs)
+	}
+	return stages
 }
 
 export async function tournamentCreate(data: DB.TournamentCreate) {
@@ -98,7 +106,7 @@ export async function tournamentJoin(
 	}
 }
 
-export function tournamentUpdateState(
+function tournamentUpdateState(
 	tournamentId: number,
 	newState: Tournament['state'],
 ) {
@@ -121,4 +129,43 @@ export async function isTournamentEmptyAndOpen(
 	})
 	if (!tournament) return false
 	return tournament.state === 'open' && tournament.participants.length === 0
+}
+
+export async function tournamentStart(tournament: Tournament) {
+	await tournamentUpdateState(tournament.id, 'ongoing')
+
+	const deep = getVersusMaxDepth()
+	const [finalVersus] = await db
+		.insert(versus)
+		.values({
+			tournamentId: tournament.id,
+			stage: 0,
+		})
+		.returning()
+
+	await createVersusChildren(finalVersus)
+
+	function getVersusMaxDepth(): number {
+		let depth_max = 0
+		for (let i = tournament.numberOfPlayers; i > 1; i /= 2) depth_max++
+		return depth_max
+	}
+
+	async function createVersusChildren(parent: DB.Versus) {
+		const data = {
+			tournamentId: tournament.id,
+			parentVersusId: parent.id,
+			stage: parent.stage + 1,
+		}
+		const [newVersusA, newVersusB] = await db
+			.insert(versus)
+			.values([data, data])
+			.returning()
+		if (newVersusA.stage < deep) {
+			await Promise.all([
+				createVersusChildren(newVersusA),
+				createVersusChildren(newVersusB),
+			])
+		}
+	}
 }

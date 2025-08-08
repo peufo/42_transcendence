@@ -10,7 +10,7 @@ import {
 	tournamentGetWithParticipants,
 	tournamentJoin,
 	tournamentQuit,
-	tournamentUpdateState,
+	tournamentStart,
 } from './model.js'
 import { tournamentIdSchema, tournamentSchemaCreate } from './schema.js'
 
@@ -64,7 +64,7 @@ export const tournamentsRoute: FastifyPluginCallbackZod = (
 				notify.tournaments(tournamentId, 'onNewState', {
 					state: 'ongoing',
 				})
-				await tournamentUpdateState(tournamentId, 'ongoing')
+				await tournamentStart(tournament)
 			}
 
 			return res.send({ success: true, tournamentId })

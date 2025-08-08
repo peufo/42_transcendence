@@ -143,7 +143,7 @@ customElements.define(
 		renderContent(): string {
 			const current_user = $user.get()
 			if (!current_user) return ''
-			let html = `<h2 class="flex flex-row p-2 items-center justify-center gap-2 font-bold">Ranking</h2>`
+			let html = /*html*/ `<h2 class="flex flex-row p-2 items-center justify-center gap-2 font-bold">Ranking</h2>`
 			let rank = 1
 			let nameColor = ''
 			let user_in_top = false
@@ -159,7 +159,7 @@ customElements.define(
 			for (const user of usersRanked) {
 				if (rank >= 6) {
 					if (user.id === current_user.id && rank === 6) {
-						html += `
+						html += /*html*/ `
 							<div class="flex items-center text-center p-2 border-indigo-500 border-2 rounded-xl">
 								<div class="w-1/6 flex flex-row justify-center items-center">
 									<div class="flex flex-row w-5 h-5 items-center justify-center rounded-xl"> ${rank} </div>
@@ -343,7 +343,7 @@ customElements.define(
 			if (!user) return ''
 			const matches = $matches.get()
 			if (matches.length === 0) {
-				const html = `
+				const html = /*html*/ `
 					<h2 class="flex flex-row p-2 items-center justify-center gap-2 font-bold">Weaknesses</h2>
 					<div class="flex pl-4 p-2 items-center justify-around gap-2">
 					Not enough matches to calculate statistics.
@@ -353,12 +353,13 @@ customElements.define(
 			}
 			const goalTakenY = getGoalTakenY(matches, user)
 			const distributionPercentage = convertToPercentage(goalTakenY)
-			const html = `
-			<h2 class="flex flex-row p-2 items-center justify-center gap-2 font-bold">Weaknesses</h2>
-			<div class="flex flex-col w-max items-center justify-center pl-1 pr-1 pb-1 gap-4 border-black border-l-2 border-r-2 border-b-2">
-				<div class="w-50 h-5 border-2 border-black rounded-4xl shadow-lg"></div>
-				${drawRectangle(distributionPercentage)}
-			</div`
+			const html = /*html*/ `
+				<h2 class="flex flex-row p-2 items-center justify-center gap-2 font-bold">Weaknesses</h2>
+				<div class="flex flex-col w-max items-center justify-center pl-1 pr-1 pb-1 gap-4 border-black border-l-2 border-r-2 border-b-2">
+					<div class="w-50 h-5 border-2 border-black rounded-4xl shadow-lg"></div>
+					${drawRectangle(distributionPercentage)}
+				</div>
+			`
 			return html
 		}
 	},
@@ -369,7 +370,7 @@ function drawRectangle(values: number[]): string {
 	const maxValue = Math.max(...values)
 	for (const value of values) {
 		const color = `rgb(${255 - Math.floor((value * 255) / maxValue)}, ${255 - Math.floor((value * 255) / maxValue)}, 255)`
-		html += `
+		html += /*html*/ `
 		<div class="w-1 h-4" style="background-color:${color}"></div>
 		`
 	}

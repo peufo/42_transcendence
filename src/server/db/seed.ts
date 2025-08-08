@@ -2,11 +2,13 @@ import argon2 from 'argon2'
 import { drizzle } from 'drizzle-orm/libsql'
 import { seed } from 'drizzle-seed'
 import { env } from '../env.js'
+import { tournamentJoin, tournamentStart } from '../routes/tournaments/model.js'
 import {
 	friendships,
 	matches,
 	rounds,
 	roundsRelations,
+	tournaments,
 	users,
 } from './schema.js'
 
@@ -146,6 +148,20 @@ async function main() {
 		},
 		count: 10,
 	}))
+
+	const [tournament] = await db
+		.insert(tournaments)
+		.values({
+			numberOfPlayers: 8,
+			state: 'open',
+			createdBy: 1,
+		})
+		.returning()
+
+	for (let n = 0; n < 8; n++) {
+		await tournamentJoin(tournament.id, n + 1)
+	}
+	await tournamentStart(tournament)
 }
 
 main()

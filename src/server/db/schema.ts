@@ -2,6 +2,7 @@ import { relations, sql } from 'drizzle-orm'
 import {
 	blob,
 	check,
+	foreignKey,
 	int,
 	sqliteTable,
 	text,
@@ -88,7 +89,7 @@ export const matches = sqliteTable('matches', {
 	player1Score: int().default(0),
 	player2Score: int().default(0),
 	finishedAt: int({ mode: 'timestamp' }).notNull().default(new Date()),
-	pointsToWin: int().notNull(),
+	pointsToWin: int().notNull().default(3),
 })
 
 export const matchesRelations = relations(matches, ({ one, many }) => ({
@@ -101,7 +102,6 @@ export const matchesRelations = relations(matches, ({ one, many }) => ({
 export const tournaments = sqliteTable('tournaments', {
 	id: int().primaryKey({ autoIncrement: true }),
 	numberOfPlayers: int().notNull(),
-	goalsToWin: int().notNull().default(3),
 	state: text({ enum: ['open', 'ongoing', 'finished'] })
 		.notNull()
 		.default('open'),
@@ -146,29 +146,27 @@ export const tournamentsParticipantsRelations = relations(
 	}),
 )
 
-export const versus = sqliteTable('versus', {
-	id: int().primaryKey({ autoIncrement: true }),
-	matchId: int()
-		.unique()
-		.notNull()
-		.references(() => matches.id),
-	tournamentId: int()
-		.unique()
-		.notNull()
-		.references(() => tournaments.id),
-	player1Id: int()
-		.notNull()
-		.unique()
-		.references(() => users.id),
-	player2Id: int()
-		.notNull()
-		.unique()
-		.references(() => users.id),
-	stage: int().notNull(),
-	// parentVersusId: int()
-	// 	.references(() => versus.id)
-	// 	.default(0),
-})
+export const versus = sqliteTable(
+	'versus',
+	{
+		id: int().primaryKey({ autoIncrement: true }),
+		matchId: int()
+			.unique()
+			.references(() => matches.id),
+		tournamentId: int()
+			.notNull()
+			.references(() => tournaments.id),
+		stage: int().notNull(),
+		parentVersusId: int('parentVersusId'),
+	},
+	(self) => [
+		foreignKey({
+			columns: [self.parentVersusId],
+			foreignColumns: [self.id],
+			name: 'parentVersusIdForeignKey',
+		}),
+	],
+)
 
 export const versusRelations = relations(versus, ({ one }) => ({
 	tournament: one(tournaments),

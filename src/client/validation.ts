@@ -14,6 +14,8 @@ export const validationUpdate: ApiPostOptionValidation = (formData) => {
 	if (name === '' && password === '' && confirm === '')
 		return 'Fill atleast one information'
 	if (password !== confirm) return { confirm: 'Password is different' }
+	if (formData.get('name') === '') formData.delete('name')
+	if (formData.get('password') === '') formData.delete('password')
 	return null
 }
 

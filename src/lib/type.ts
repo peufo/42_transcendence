@@ -64,12 +64,20 @@ export type Match = {
 	rounds: Round[]
 }
 
+export type Versus = {
+	id: number
+	tournamentId: number
+	matchId: number | null
+	stage: number
+}
+
 export type Tournament = {
 	id: number
 	createdAt: Date
 	state: 'open' | 'ongoing' | 'finished'
 	createdBy: number
 	numberOfPlayers: number
+	stages?: Versus[][]
 }
 
 export type TournamentWithLookup = Tournament & {
@@ -167,7 +175,7 @@ export type RoutesPost = {
 		res: { success: boolean }
 	}
 	'/users/update': {
-		body: { name: string; password: string }
+		body: { name?: string; password?: string }
 		res: { message: string; success: boolean; user: User }
 	}
 	'/users/update/avatar': {

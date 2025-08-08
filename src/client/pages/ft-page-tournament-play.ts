@@ -1,4 +1,5 @@
 import { type ChannelSocket, openChannel } from '../../lib/socketChannels.js'
+import type { Versus } from '../../lib/type.js'
 import { toast } from '../components/ft-toast.js'
 import { getAvatarSrc } from '../utils/avatar.js'
 import { type CleanEffect, createEffect } from '../utils/signal.js'
@@ -155,28 +156,14 @@ customElements.define(
 				html += '</div>'
 				return html
 			}
-			// /*html*/
-			// ;`
-			// 	<div class="flex flex-col item-center justify-center">
-			// 		${tournament.participants
-			// 			.map((participant) => {
-			// 				return /*html*/ `
-			// 		<div class="flex p-2 items-center gap-2 border border-gray-200 rounded-xl">
-			//             <img src="${getAvatarSrc(participant.user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
-			//             <span>${participant.user.name}</span>
-			//    		</div>`
-			// 			})
-			// 			.join('')}
-			// 	</div>
-			// 	`
 
 			return /*html*/ `
-			<div class="flex flex-col gap-3 mt-10 sm:mx-auto sm:max-w-lg mx-4">
-				${title}
-				${participantsCount}
-				${participantList()}
-				${participationForm}
-			</div>
+				<div class="flex flex-col gap-3 mt-10 sm:mx-auto sm:max-w-lg mx-4">
+					${title}
+					${participantsCount}
+					${participantList()}
+					${participationForm}
+				</div>
 			`
 		}
 	},
@@ -210,40 +197,59 @@ customElements.define(
 			</form>
 			`
 
-			const tournamentBrackets = () => {
-				// for (let i = 0; i < ; i++) {
-				// 	const element = array[i];
+			const roundTitles = ['Final', 'Semi', 'Quarter', 'Eight']
 
-				// }
+			function renderStages(): string {
+				if (!tournament?.stages) return 'No stages'
+				const stages = tournament.stages.map(renderStage)
 				return /*html*/ `
-				<div class="flex">
-					<div class="w-72 m-8 text-center text-xl">Quarterfinals Round</div>
-					<div class="w-72 m-8 text-center text-xl">Semifinals Round</div>
-					<div class="w-72 m-8 text-center text-xl">Final Round</div>
-				</div>
-				<div class="flex items-center">
-					<div class="flex-col m-4">
-						<div class="bg-gray-900 w-72 h-20 m-4"></div>
-						<div class="bg-gray-900 w-72 h-20 m-4"></div>
-						<div class="bg-gray-900 w-72 h-20 m-4"></div>
-						<div class="bg-gray-900 w-72 h-20 m-4"></div>
+					<div class="flex flex-row-reverse justify-end gap-4 p-4">
+						<div class="flex flex-col gap-4 min-w-26"></div>
+						${stages.join('')}
+						<div class="flex flex-col gap-4 min-w-6"></div>
 					</div>
-					<div class="flex-col m-4">
-						<div class="bg-gray-900 w-72 h-20 m-4"></div>
-						<div class="p-10"></div>
-						<div class="bg-gray-900 w-72 h-20 m-4"></div>
+				`
+			}
+
+			function renderStage(stage: Versus[]): string {
+				const vsContainers = stage.map(renderVersus)
+				return /*html*/ `
+					<div class="flex flex-col gap-4 snap-center">
+						<div class="text-center text-md">
+							<h3>${roundTitles[stage[0].stage]}</h3>
+						</div>
+						<div class="flex flex-col gap-2 min-w-32 justify-evenly grow">
+							${vsContainers.join('')}
+						</div>
 					</div>
-					<div class="flex-col m-4">
-						<div class="bg-gray-900 w-72 h-20 m-4"></div>
+				`
+			}
+
+			function renderVersus(vs: Versus): string {
+				return /*html*/ `
+					<div class="border border-gray-200 rounded px-2">
+						${vs.id}
 					</div>
-				</div>
-			`
+				`
 			}
 
 			return /*html*/ `
-			<h1 class="p-2 flex font-bold item-center justify-center">${tournament.createdByUser.name}'s tournament</h1>
-			${tournamentBrackets()}
-			${quitButton}
+				
+				<div class="grid grid-cols-4 gap-4 p-4">
+					<aside class="flex flex-col gap-4">
+						<h2 class="text-lg font-semi px-2">${tournament.createdByUser.name}'s tournament</h2>
+						<div class="overflow-x-scroll rounded-md border border-gray-200 snap-x snap-mandatory">
+							${renderStages()}
+						</div>
+						${quitButton}
+					</aside>
+
+					<div class="col-span-3 rounded-md border">
+						GAME
+					</div>
+				</div>
+
+				
 			`
 		}
 	},

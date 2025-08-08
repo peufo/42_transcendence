@@ -112,17 +112,18 @@ async function onSubmitForm(event: SubmitEvent) {
 	event.preventDefault()
 	const form = event.target as HTMLFormElement
 	const route = new URL(form.action).pathname
+	const formData = new FormData(form)
 	if (form.method === 'get') {
 		if (!(route in API_GET)) throw new Error(`route "${route}" not exist`)
-		return api.get(route as RouteApiGet, getFormQuery(new FormData(form)))
+		return api.get(route as RouteApiGet, getFormQuery())
 	}
-	const formData = new FormData(form)
 	const options = API_POST[route as RouteApiPost] as ApiPostOption<unknown>
 	if (!options) throw new Error(`route "${route}" not exist`)
 
 	if (options.validation) {
 		const errors = options.validation(formData)
 		if (errors) {
+			clearErrors()
 			if (typeof errors === 'string') setErrorSubmit(errors)
 			else setErrors(errors)
 			return
@@ -170,10 +171,10 @@ async function onSubmitForm(event: SubmitEvent) {
 		if (form.enctype === 'multipart/form-data') {
 			return formData
 		}
-		return getFormQuery(formData)
+		return getFormQuery()
 	}
 
-	function getFormQuery(formData: FormData): string {
+	function getFormQuery(): string {
 		const urlEncoded = new URLSearchParams()
 		for (const [key, value] of formData.entries()) {
 			if (typeof value === 'object')

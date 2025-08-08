@@ -5,6 +5,7 @@ import {
 	$friendshipsFriend,
 	$friendshipsInvitation,
 	$user,
+	$users,
 } from './utils/store.js'
 
 let friendshipChannel: ChannelSocket<'friendships'> | null = null
@@ -26,6 +27,9 @@ createEffect(() => {
 				...friendships,
 				friendship,
 			])
+			$users.update((users) =>
+				users.filter((user) => user.id !== friendship.withUser.id),
+			)
 		},
 		onAccepted({ friendship }) {
 			toast.success(`${friendship.withUser.name} accepted your invitation`)

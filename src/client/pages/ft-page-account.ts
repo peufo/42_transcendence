@@ -2,6 +2,10 @@ customElements.define(
 	'ft-page-account',
 	class extends HTMLElement {
 		connectedCallback() {
+			this.render()
+		}
+
+		render() {
 			this.innerHTML = /*html*/ `
                 <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
                     <div class="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -11,7 +15,7 @@ customElements.define(
                     </div>
 
                     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-                        <form method="post"  action="/users/update" class="space-y-6" >
+                        <form method="post" action="/users/update" class="space-y-6" >
 
 						<div class="border-2 border-blue-300 p-4 rounded-md">
                             <div>
