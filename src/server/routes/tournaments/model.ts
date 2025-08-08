@@ -9,7 +9,6 @@ import {
 	deleteParticipant,
 	deleteTournament,
 	findActiveTournamentByUserId,
-	findParticipantsForTournament,
 	findTournament,
 	findTournamentWithParticipants,
 	insertParticipant,
@@ -58,7 +57,6 @@ export async function tournamentDelete(tournamentId: number) {
 	if (!tournament) throw server.httpErrors.notFound()
 	if (tournament.state !== 'open')
 		throw server.httpErrors.forbidden('Tournament is ongoing or finished')
-
 	return deleteTournament(tournamentId)
 }
 
@@ -94,7 +92,6 @@ export async function tournamentJoin(
 		insertParticipant(tournamentId, userId)
 		nbParticipants++
 	}
-	// console.log(`${nbParticipants}/${tournament.numberOfPlayers}`)
 	return {
 		tournament,
 		isTournamentFull: nbParticipants === tournament.numberOfPlayers,
@@ -105,7 +102,8 @@ export function tournamentUpdateState(
 	tournamentId: number,
 	newState: Tournament['state'],
 ) {
-	db.update(tournaments)
+	return db
+		.update(tournaments)
 		.set({ state: newState })
 		.where(eq(tournaments.id, tournamentId))
 }
@@ -114,9 +112,13 @@ export function tournamentQuit(tournamentId: number, userId: number) {
 	return deleteParticipant(tournamentId, userId)
 }
 
-export async function isTournamentEmpty(
+export async function isTournamentEmptyAndOpen(
 	tournamentId: number,
 ): Promise<boolean> {
-	const participantList = await findParticipantsForTournament(tournamentId)
-	return participantList.length === 0
+	const tournament = await db.query.tournaments.findFirst({
+		where: eq(tournaments.id, tournamentId),
+		with: { participants: true },
+	})
+	if (!tournament) return false
+	return tournament.state === 'open' && tournament.participants.length === 0
 }

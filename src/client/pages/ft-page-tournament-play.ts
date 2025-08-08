@@ -50,6 +50,10 @@ customElements.define(
 							}
 						})
 					},
+					onNewState({ state }) {
+						$tournament.update((t) => (!t ? t : { ...t, state }))
+						if (state === 'ongoing') toast.success('Tournament starting')
+					},
 				},
 			)
 		}
@@ -112,7 +116,7 @@ customElements.define(
 
 			const participantsCountColor =
 				tournament.participants.length === tournament.numberOfPlayers
-					? 'text-lime-400 font-bold animate-pulse'
+					? 'text-lime-400 font-bold a'
 					: 'text-gray-400'
 
 			const participantsCount = /*html*/ `
@@ -206,38 +210,39 @@ customElements.define(
 			</form>
 			`
 
-			// const tournamentBrackets: string = () => {
-			// for (let i = 0; i < ; i++) {
-			// 	const element = array[i];
+			const tournamentBrackets = () => {
+				// for (let i = 0; i < ; i++) {
+				// 	const element = array[i];
 
-			// }
-			// }
-
-			// 	`<div class="flex">
-			//       <div class="w-72 m-8 text-center text-xl">Quarterfinals Round</div>
-			//       <div class="w-72 m-8 text-center text-xl">Semifinals Round</div>
-			//       <div class="w-72 m-8 text-center text-xl">Final Round</div>
-			//   </div>
-			//   <div class="flex items-center">
-			//     <div class="flex-col m-4">
-			//       <div class="bg-gray-900 w-72 h-20 m-4"></div>
-			//       <div class="bg-gray-900 w-72 h-20 m-4"></div>
-			//       <div class="bg-gray-900 w-72 h-20 m-4"></div>
-			//       <div class="bg-gray-900 w-72 h-20 m-4"></div>
-			//     </div>
-			//     <div class="flex-col m-4">
-			//       <div class="bg-gray-900 w-72 h-20 m-4"></div>
-			//       <div class="p-10"></div>
-			//       <div class="bg-gray-900 w-72 h-20 m-4"></div>
-			//     </div>
-			//     <div class="flex-col m-4">
-			//       <div class="bg-gray-900 w-72 h-20 m-4"></div>
-			//     </div>
-			//   </div>
-			// `
+				// }
+				return /*html*/ `
+				<div class="flex">
+					<div class="w-72 m-8 text-center text-xl">Quarterfinals Round</div>
+					<div class="w-72 m-8 text-center text-xl">Semifinals Round</div>
+					<div class="w-72 m-8 text-center text-xl">Final Round</div>
+				</div>
+				<div class="flex items-center">
+					<div class="flex-col m-4">
+						<div class="bg-gray-900 w-72 h-20 m-4"></div>
+						<div class="bg-gray-900 w-72 h-20 m-4"></div>
+						<div class="bg-gray-900 w-72 h-20 m-4"></div>
+						<div class="bg-gray-900 w-72 h-20 m-4"></div>
+					</div>
+					<div class="flex-col m-4">
+						<div class="bg-gray-900 w-72 h-20 m-4"></div>
+						<div class="p-10"></div>
+						<div class="bg-gray-900 w-72 h-20 m-4"></div>
+					</div>
+					<div class="flex-col m-4">
+						<div class="bg-gray-900 w-72 h-20 m-4"></div>
+					</div>
+				</div>
+			`
+			}
 
 			return /*html*/ `
 			<h1 class="p-2 flex font-bold item-center justify-center">${tournament.createdByUser.name}'s tournament</h1>
+			${tournamentBrackets()}
 			${quitButton}
 			`
 		}

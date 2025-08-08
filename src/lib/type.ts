@@ -91,7 +91,6 @@ export type SocketChannels = {
 			onDeleted: { friendshipId: number }
 			onTournamentJoin: { tournament: Tournament; userId: number }
 			onTournamentQuit: { userId: number }
-			onTournamentNewState: { state: Tournament['state'] }
 			onFriendOnline: { userId: number }
 			onFriendOffline: { userId: number }
 		}
@@ -102,6 +101,7 @@ export type SocketChannels = {
 		serverEvents: {
 			onParticipantJoin: { user: UserBasic }
 			onParticipantQuit: { user: UserBasic }
+			onNewState: { state: Tournament['state'] }
 		}
 	}
 }

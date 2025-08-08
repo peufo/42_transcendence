@@ -25,6 +25,9 @@
 .badge-dark {
 	@apply bg-gray-100 text-gray-800;
 }
+.badge-indigo {
+	@apply bg-indigo-400 text-stone-50;
+}
 .badge-green {
 	@apply bg-green-100 text-green-800;
 }

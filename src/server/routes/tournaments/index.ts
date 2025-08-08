@@ -4,7 +4,7 @@ import { getSchema, permission, postSchema } from '../../utils/index.js'
 import { getUserBasic } from '../friendships/model.js'
 import { notify, notifyFriends } from '../ws/controller.js'
 import {
-	isTournamentEmpty,
+	isTournamentEmptyAndOpen,
 	tournamentCreate,
 	tournamentDelete,
 	tournamentGetWithParticipants,
@@ -61,10 +61,10 @@ export const tournamentsRoute: FastifyPluginCallbackZod = (
 			notify.tournaments(tournamentId, 'onParticipantJoin', { user })
 
 			if (isTournamentFull) {
-				notify.friendships(tournamentId, 'onTournamentNewState', {
+				notify.tournaments(tournamentId, 'onNewState', {
 					state: 'ongoing',
 				})
-				tournamentUpdateState(tournamentId, 'ongoing')
+				await tournamentUpdateState(tournamentId, 'ongoing')
 			}
 
 			return res.send({ success: true, tournamentId })
@@ -81,7 +81,7 @@ export const tournamentsRoute: FastifyPluginCallbackZod = (
 			const user = await getUserBasic(userId)
 			await notifyFriends(userId, 'onTournamentQuit', { userId: userId })
 			notify.tournaments(tournamentId, 'onParticipantQuit', { user })
-			if (await isTournamentEmpty(tournamentId))
+			if (await isTournamentEmptyAndOpen(tournamentId))
 				await tournamentDelete(tournamentId)
 			return res.send({ success: true })
 		},

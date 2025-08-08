@@ -134,17 +134,14 @@ customElements.define(
             `
 			function renderFriendship(friendship: FriendshipFriend): string {
 				const { withUser: friend } = friendship
-				const badge = friend.isActive
-					? /*html*/ `<span class="badge badge-green">Online</span>`
-					: /*html*/ `<span class="badge badge-dark">Offline</span>`
 
 				const removeBtn = /*html*/ `
                 	<form method="post" action="/friendships/delete">
-						<input type="hidden" name="friendshipId" value="${friendship.id}">
-                        <input class="btn btn-red" type="submit" value="Remove">
+						<input type="hidden" name="friendshipId" value="${friendship.id}" />
+                        <input class="btn btn-red" type="submit" value="Remove" />
                     </form>`
-				let joinButtons = ''
 
+				let joinButtons = ''
 				if (friend.tournament?.state === 'open') {
 					joinButtons = /*html*/ `
 					<form method="post" action="/tournaments/join">
@@ -154,16 +151,25 @@ customElements.define(
 				}
 				if (friend.tournament?.state === 'ongoing') {
 					joinButtons = /*html*/ `
-                    <span>In a tournament</span>`
+                    <div class="badge badge-indigo">In a tournament</div>`
 				}
 
 				return /*html*/ `
                     <div class="flex p-2 items-center gap-2 border border-gray-200 rounded-xl">
-                        <img src="${getAvatarSrc(friend)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
+						<div class="relative h-8 w-8">
+							<div
+								class="
+									absolute w-2 h-2 rounded-full -bottom-1 -right-1 border
+									${friend.isActive ? 'bg-green-500 border-green-700' : 'bg-gray-300 border-gray-400'}
+									
+								"
+								title="${friend.name} is ${friend.isActive ? 'online' : 'offline'}"
+							></div>
+							<img src="${getAvatarSrc(friend)}" alt="Avatar de l'utilisateur" class="rounded">
+						</div>
                         <span>${friend.name}</span>
-                        ${badge}
+						${joinButtons}
                         <div class="flex-grow"></div>
-                        ${joinButtons}
                         ${removeBtn}
                     </div>
                 `
