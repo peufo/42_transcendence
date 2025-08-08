@@ -145,14 +145,16 @@ customElements.define(
                     </form>`
 				let joinButtons = ''
 
-				// TODO: handle friend.tournament.state === 'ongoing
-				// TODO : add guillemet
 				if (friend.tournament?.state === 'open') {
 					joinButtons = /*html*/ `
 					<form method="post" action="/tournaments/join">
                         <input type="hidden" name="tournamentId" value="${friend.tournament.id}">
                         <input class="btn btn-border" type="submit" value="Join">
                     </form>`
+				}
+				if (friend.tournament?.state === 'ongoing') {
+					joinButtons = /*html*/ `
+                    <span>In a tournament</span>`
 				}
 
 				return /*html*/ `

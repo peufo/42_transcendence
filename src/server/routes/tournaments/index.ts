@@ -10,6 +10,7 @@ import {
 	tournamentGetWithParticipants,
 	tournamentJoin,
 	tournamentQuit,
+	tournamentUpdateState,
 } from './model.js'
 import { tournamentIdSchema, tournamentSchemaCreate } from './schema.js'
 
@@ -51,10 +52,21 @@ export const tournamentsRoute: FastifyPluginCallbackZod = (
 		async (req, res) => {
 			const { userId } = permission.session(res)
 			const { tournamentId } = req.body
-			const tournament = await tournamentJoin(tournamentId, userId)
+			const { tournament, isTournamentFull } = await tournamentJoin(
+				tournamentId,
+				userId,
+			)
 			const user = await getUserBasic(userId)
 			await notifyFriends(userId, 'onTournamentJoin', { tournament, userId })
 			notify.tournaments(tournamentId, 'onParticipantJoin', { user })
+
+			if (isTournamentFull) {
+				notify.friendships(tournamentId, 'onTournamentNewState', {
+					state: 'ongoing',
+				})
+				tournamentUpdateState(tournamentId, 'ongoing')
+			}
+
 			return res.send({ success: true, tournamentId })
 		},
 	)

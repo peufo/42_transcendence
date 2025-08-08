@@ -267,7 +267,7 @@ customElements.define(
 					<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold">Total match played</h2>
 					<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold">Winrate</h2>
 					<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold">Average rally per round</h2>
-					<h2 class="flex col-start-1 col-end-4 row-start-2 row-end-3 flex-row p-2 items-center justify-center text-center gap-2">No enough matches to calculate statistics.</h2>
+					<h2 class="flex col-start-1 col-end-4 row-start-2 row-end-3 flex-row p-2 items-center justify-center text-center gap-2">Not enough matches to calculate statistics.</h2>
 				</div>`
 				return html
 			}
@@ -346,7 +346,7 @@ customElements.define(
 				const html = `
 					<h2 class="flex flex-row p-2 items-center justify-center gap-2 font-bold">Weaknesses</h2>
 					<div class="flex pl-4 p-2 items-center justify-around gap-2">
-					No recent matches can be found.
+					Not enough matches to calculate statistics.
 					</div>
 				`
 				return html

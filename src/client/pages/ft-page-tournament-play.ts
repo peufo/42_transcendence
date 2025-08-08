@@ -23,7 +23,6 @@ customElements.define(
 				{ tournamentId },
 				{
 					onParticipantJoin(newParticipant) {
-						if ($user.get()?.id === newParticipant.user.id) return
 						$tournament.update((tournament) => {
 							if (!tournament) return tournament
 							const isParticipantExist = tournament.participants.find(
@@ -40,7 +39,6 @@ customElements.define(
 						})
 					},
 					onParticipantQuit(participant) {
-						if ($user.get()?.id === participant.user.id) return
 						$tournament.update((tournament) => {
 							if (!tournament) return tournament
 							toast.error(`${participant.user.name} left the tournament !`)
@@ -56,7 +54,7 @@ customElements.define(
 			)
 		}
 
-		async disconnectedCallback() {
+		disconnectedCallback() {
 			this.cleanEffect()
 			this.tournamentChannel.close()
 		}
@@ -66,6 +64,35 @@ customElements.define(
 			if (!tournament) return /*html*/ `<span>Tournament not found</span>`
 			const user = $user.get()
 			if (!user) return ''
+
+			if (tournament.state === 'finished')
+				return `<span>${tournament.createdByUser.name}'s tournament is over</span>`
+			return `<ft-tournament-${tournament.state}></ft-tournament-${tournament.state}>`
+		}
+	},
+)
+
+customElements.define(
+	'ft-tournament-open',
+	class extends HTMLElement {
+		private cleanEffect: CleanEffect
+
+		connectedCallback() {
+			this.cleanEffect = createEffect(() => {
+				this.innerHTML = this.render()
+			})
+		}
+
+		disconnectedCallback() {
+			this.cleanEffect()
+		}
+
+		render(): string {
+			const tournament = $tournament.get()
+			if (!tournament) return /*html*/ `<span>Tournament not found</span>`
+			const user = $user.get()
+			if (!user) return ''
+
 			const iParticipate = tournament.participants.find(
 				({ user: { id } }) => id === user.id,
 			)
@@ -82,15 +109,14 @@ customElements.define(
 			const title = /*html*/ `
 			<h1 class="p-2 flex font-bold item-center justify-center">${tournament.createdByUser.name}'s tournament</h1>
 			`
-			const playerColor = () => {
-				let html = ''
-				if (tournament.participants.length === tournament.numberOfPlayers)
-					html = 'text-lime-400 font-bold'
-				else html = 'text-gray-400'
-				return html
-			}
+
+			const participantsCountColor =
+				tournament.participants.length === tournament.numberOfPlayers
+					? 'text-lime-400 font-bold animate-pulse'
+					: 'text-gray-400'
+
 			const participantsCount = /*html*/ `
-			<div class="p-2 flex item-center justify-center ${playerColor()}">
+			<div class="p-2 flex item-center justify-center ${participantsCountColor}">
 				${tournament.participants.length}
 				/ ${tournament.numberOfPlayers} players
 			</div>
@@ -147,6 +173,72 @@ customElements.define(
 				${participantList()}
 				${participationForm}
 			</div>
+			`
+		}
+	},
+)
+
+customElements.define(
+	'ft-tournament-ongoing',
+	class extends HTMLElement {
+		private cleanEffect: CleanEffect
+
+		connectedCallback() {
+			this.cleanEffect = createEffect(() => {
+				this.innerHTML = this.render()
+			})
+		}
+
+		disconnectedCallback() {
+			this.cleanEffect()
+		}
+
+		render(): string {
+			const tournament = $tournament.get()
+			if (!tournament) return /*html*/ `<span>Tournament not found</span>`
+			const user = $user.get()
+			if (!user) return ''
+
+			const quitButton = /*html*/ `
+			<form action="/tournaments/quit" method="post" class="contents">
+				<input type="hidden" name="tournamentId" value="${tournament.id}" />
+				<input type="submit" value="Quit" class="btn btn-border cursor-pointer">
+			</form>
+			`
+
+			// const tournamentBrackets: string = () => {
+			// for (let i = 0; i < ; i++) {
+			// 	const element = array[i];
+
+			// }
+			// }
+
+			// 	`<div class="flex">
+			//       <div class="w-72 m-8 text-center text-xl">Quarterfinals Round</div>
+			//       <div class="w-72 m-8 text-center text-xl">Semifinals Round</div>
+			//       <div class="w-72 m-8 text-center text-xl">Final Round</div>
+			//   </div>
+			//   <div class="flex items-center">
+			//     <div class="flex-col m-4">
+			//       <div class="bg-gray-900 w-72 h-20 m-4"></div>
+			//       <div class="bg-gray-900 w-72 h-20 m-4"></div>
+			//       <div class="bg-gray-900 w-72 h-20 m-4"></div>
+			//       <div class="bg-gray-900 w-72 h-20 m-4"></div>
+			//     </div>
+			//     <div class="flex-col m-4">
+			//       <div class="bg-gray-900 w-72 h-20 m-4"></div>
+			//       <div class="p-10"></div>
+			//       <div class="bg-gray-900 w-72 h-20 m-4"></div>
+			//     </div>
+			//     <div class="flex-col m-4">
+			//       <div class="bg-gray-900 w-72 h-20 m-4"></div>
+			//     </div>
+			//   </div>
+			// `
+
+			return /*html*/ `
+			<h1 class="p-2 flex font-bold item-center justify-center">${tournament.createdByUser.name}'s tournament</h1>
+			${quitButton}
 			`
 		}
 	},

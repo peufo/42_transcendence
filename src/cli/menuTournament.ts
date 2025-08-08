@@ -12,6 +12,7 @@ export const menuNewTournament: Scope = async () => {
 		options: [2, 4, 8, 16].map((nb) => ({ label: nb.toString(), value: nb })),
 	})
 	if (p.isCancel(numberOfPlayers)) exit(0)
+
 	const { tournamentId } = await api.post('/tournaments/new', {
 		numberOfPlayers,
 	})

@@ -6,31 +6,6 @@ export type ServerEvents<Channel extends keyof SocketChannels> =
 export type ClientEvents<Channel extends keyof SocketChannels> =
 	SocketChannels[Channel]['clientEvents']
 
-export const serverEvents: {
-	[Channel in keyof SocketChannels]: Record<keyof ServerEvents<Channel>, true>
-} = {
-	friendships: {
-		onAccepted: true,
-		onCreated: true,
-		onDeleted: true,
-		onTournamentJoin: true,
-		onTournamentQuit: true,
-		onFriendOnline: true,
-		onFriendOffline: true,
-	},
-	tournaments: {
-		onParticipantJoin: true,
-		onParticipantQuit: true,
-	},
-}
-
-export const clientEvents: {
-	[Channel in keyof SocketChannels]: Record<keyof ClientEvents<Channel>, true>
-} = {
-	friendships: {},
-	tournaments: {},
-}
-
 export type ChannelSocket<Channel extends keyof SocketChannels> = ReturnType<
 	typeof openChannel<Channel>
 >
@@ -52,12 +27,8 @@ export function openChannel<Channel extends keyof SocketChannels>(
 	function onMessage(messageEvent: MessageEvent) {
 		const data: ServerEvents<Channel> = JSON.parse(messageEvent.data)
 		deserialize(data)
-		for (const serverEvent of objectKeys(
-			serverEvents[channel],
-		) as (keyof ServerEvents<Channel>)[]) {
-			if (serverEvent in data) {
-				handlers[serverEvent](data[serverEvent])
-			}
+		for (const eventName of objectKeys(handlers)) {
+			if (data[eventName]) handlers[eventName](data[eventName])
 		}
 	}
 

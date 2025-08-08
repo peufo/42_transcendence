@@ -101,6 +101,7 @@ export const matchesRelations = relations(matches, ({ one, many }) => ({
 export const tournaments = sqliteTable('tournaments', {
 	id: int().primaryKey({ autoIncrement: true }),
 	numberOfPlayers: int().notNull(),
+	goalsToWin: int().notNull().default(3),
 	state: text({ enum: ['open', 'ongoing', 'finished'] })
 		.notNull()
 		.default('open'),
@@ -164,6 +165,9 @@ export const versus = sqliteTable('versus', {
 		.unique()
 		.references(() => users.id),
 	stage: int().notNull(),
+	// parentVersusId: int()
+	// 	.references(() => versus.id)
+	// 	.default(0),
 })
 
 export const versusRelations = relations(versus, ({ one }) => ({

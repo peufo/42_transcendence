@@ -1,39 +1,29 @@
 import EventEmitter from 'node:events'
 import type { WebSocket } from 'ws'
-import { type ServerEvents, serverEvents } from '../../../lib/socketChannels.js'
+import type { ServerEvents } from '../../../lib/socketChannels.js'
 import type { SocketChannels } from '../../../lib/type.js'
-import { objectKeys } from '../../../lib/utils.js'
 import { getFriendshipsId } from '../friendships/model.js'
 
-type EventMap<Channel extends keyof SocketChannels> = {
-	[eventName in keyof ServerEvents<Channel>]: [ServerEvents<Channel>[eventName]]
+type EventMessage<Channel extends keyof SocketChannels> = {
+	message: [Partial<SocketChannels[Channel]['serverEvents']>]
 }
 
-const emitterMaps = objectKeys(serverEvents).reduce(
-	(acc, channel) => {
-		acc[channel] = new Map()
-		return acc
-	},
-	{} as {
-		[Channel in keyof SocketChannels]: Map<
-			number,
-			{
-				emitter: EventEmitter<EventMap<Channel>>
-				sockets: Set<WebSocket>
-			}
-		>
-	},
-)
+const emitterMaps: Partial<{
+	[Channel in keyof SocketChannels]: Map<
+		number,
+		{
+			emitter: EventEmitter<EventMessage<Channel>>
+			sockets: Set<WebSocket>
+		}
+	>
+}> = {}
 
-export const notify = objectKeys(serverEvents).reduce(
-	(acc, channel) => {
-		acc[channel] = useNotifier(channel)
-		return acc
-	},
-	{} as {
-		[Channel in keyof SocketChannels]: ReturnType<typeof useNotifier<Channel>>
-	},
-)
+export const notify: {
+	[Channel in keyof SocketChannels]: ReturnType<typeof useNotifier<Channel>>
+} = {
+	friendships: useNotifier('friendships'),
+	tournaments: useNotifier('tournaments'),
+}
 
 type ServerEventsFriendship = SocketChannels['friendships']['serverEvents']
 
@@ -61,29 +51,27 @@ export function bindEmitterWithSocket<Channel extends keyof SocketChannels>(
 ) {
 	const { emitter, sockets } = getEmitter(channel, emitterKey, options)
 
-	function senderFactory<K extends keyof ServerEvents<Channel>>(eventName: K) {
-		const sender = (data: ServerEvents<Channel>[K]) => {
-			socket.send(JSON.stringify({ [eventName]: data }))
-		}
-		// @ts-ignore
-		emitter.on(eventName, sender)
-		// @ts-ignore
-		return () => emitter.off(eventName, sender)
+	const sender = (event: Partial<ServerEvents<Channel>>) => {
+		socket.send(JSON.stringify(event))
 	}
-
-	const sendersOff = Object.keys(serverEvents[channel]).map((eventName) => {
-		return senderFactory(eventName as keyof ServerEvents<Channel>)
-	})
-
+	emitter.on('message', sender)
 	sockets.add(socket)
 	socket.on('close', (_message) => {
-		for (const senderOff of sendersOff) senderOff()
+		emitter.off('message', sender)
 		sockets.delete(socket)
 		if (!sockets.size) {
-			emitterMaps[channel].delete(emitterKey)
+			deleteEmitter(channel, emitterKey)
 			if (options.onDestroy) options.onDestroy()
 		}
 	})
+}
+
+function deleteEmitter<Channel extends keyof SocketChannels>(
+	channel: Channel,
+	emitterKey: number,
+) {
+	if (!emitterMaps[channel]) return
+	emitterMaps[channel].delete(emitterKey)
 }
 
 function getEmitter<Channel extends keyof SocketChannels>(
@@ -91,10 +79,13 @@ function getEmitter<Channel extends keyof SocketChannels>(
 	emitterKey: number,
 	{ onCreate }: { onCreate?: () => void } = {},
 ) {
+	if (!emitterMaps[channel]) {
+		emitterMaps[channel] = new Map()
+	}
 	const emitter = emitterMaps[channel].get(emitterKey)
 	if (emitter) return emitter
 	const newEmitter = {
-		emitter: new EventEmitter<EventMap<Channel>>(),
+		emitter: new EventEmitter<EventMessage<Channel>>(),
 		sockets: new Set<WebSocket>(),
 	}
 	emitterMaps[channel].set(emitterKey, newEmitter)
@@ -102,18 +93,17 @@ function getEmitter<Channel extends keyof SocketChannels>(
 	return newEmitter
 }
 
-function useNotifier<
-	Channel extends keyof SocketChannels,
-	ServerEvents = SocketChannels[Channel]['serverEvents'],
->(channel: Channel) {
-	function notify<EventName extends keyof ServerEvents>(
+function useNotifier<Channel extends keyof SocketChannels>(channel: Channel) {
+	function notify<
+		EventName extends keyof SocketChannels[Channel]['serverEvents'],
+	>(
 		emitterKey: number,
 		eventName: EventName,
-		data: ServerEvents[EventName],
+		data: SocketChannels[Channel]['serverEvents'][EventName],
 	) {
 		const { emitter } = getEmitter(channel, emitterKey)
 		// @ts-ignore
-		emitter.emit(eventName, data)
+		emitter.emit('message', { [eventName]: data })
 	}
 	return notify
 }

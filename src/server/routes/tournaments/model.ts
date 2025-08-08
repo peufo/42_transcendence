@@ -73,7 +73,7 @@ export async function deleteOpenTournaments() {
 export async function tournamentJoin(
 	tournamentId: number,
 	userId: number,
-): Promise<Tournament> {
+): Promise<{ tournament: Tournament; isTournamentFull: boolean }> {
 	const activeTournament = await getUserActiveTournament(userId)
 	if (activeTournament && activeTournament.id !== tournamentId)
 		throw server.httpErrors.forbidden(`Sorry, you're busy`)
@@ -81,15 +81,33 @@ export async function tournamentJoin(
 	const userIsParticipant = tournament.participants.find(
 		({ user }) => user.id === userId,
 	)
+	let nbParticipants = tournament.participants.length
 	if (!userIsParticipant) {
-		if (tournament.participants.length >= tournament.numberOfPlayers) {
+		if (nbParticipants >= tournament.numberOfPlayers) {
 			throw server.httpErrors.forbidden(
 				"Sorry, you can't join this tournament, it is full.",
 			)
 		}
+		if (tournament.state !== 'open') {
+			throw server.httpErrors.forbidden('The tournament is not open anymore.')
+		}
+		insertParticipant(tournamentId, userId)
+		nbParticipants++
 	}
-	insertParticipant(tournamentId, userId)
-	return tournament
+	// console.log(`${nbParticipants}/${tournament.numberOfPlayers}`)
+	return {
+		tournament,
+		isTournamentFull: nbParticipants === tournament.numberOfPlayers,
+	}
+}
+
+export function tournamentUpdateState(
+	tournamentId: number,
+	newState: Tournament['state'],
+) {
+	db.update(tournaments)
+		.set({ state: newState })
+		.where(eq(tournaments.id, tournamentId))
 }
 
 export function tournamentQuit(tournamentId: number, userId: number) {

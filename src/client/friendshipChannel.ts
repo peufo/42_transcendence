@@ -61,6 +61,9 @@ createEffect(() => {
 				}),
 			)
 		},
+		onTournamentNewState({ state }) {
+			toast.success('TODO: handle tournament new state', state)
+		},
 		onFriendOnline({ userId }) {
 			$friendshipsFriend.update((friendships) => {
 				friendships.map((f) => {
