@@ -77,28 +77,6 @@ export const friendshipsRelations = relations(friendships, ({ one }) => ({
 	}),
 }))
 
-export const matches = sqliteTable('matches', {
-	id: int().primaryKey({ autoIncrement: true }),
-	state: text({ enum: ['ongoing', 'finished'] }),
-	player1Id: int()
-		.notNull()
-		.references(() => users.id),
-	player2Id: int()
-		.notNull()
-		.references(() => users.id),
-	player1Score: int().default(0),
-	player2Score: int().default(0),
-	finishedAt: int({ mode: 'timestamp' }).notNull().default(new Date()),
-	pointsToWin: int().notNull().default(3),
-})
-
-export const matchesRelations = relations(matches, ({ one, many }) => ({
-	versus: one(versus),
-	player1: one(users, { fields: [matches.player1Id], references: [users.id] }),
-	player2: one(users, { fields: [matches.player2Id], references: [users.id] }),
-	rounds: many(rounds),
-}))
-
 export const tournaments = sqliteTable('tournaments', {
 	id: int().primaryKey({ autoIncrement: true }),
 	numberOfPlayers: int().notNull(),
@@ -150,9 +128,6 @@ export const versus = sqliteTable(
 	'versus',
 	{
 		id: int().primaryKey({ autoIncrement: true }),
-		matchId: int()
-			.unique()
-			.references(() => matches.id),
 		tournamentId: int()
 			.notNull()
 			.references(() => tournaments.id),
@@ -168,9 +143,34 @@ export const versus = sqliteTable(
 	],
 )
 
+export const matches = sqliteTable('matches', {
+	id: int().primaryKey({ autoIncrement: true }),
+	state: text({ enum: ['ongoing', 'finished'] }),
+	versusId: int()
+		.unique()
+		.references(() => versus.id),
+	player1Id: int()
+		.notNull()
+		.references(() => users.id),
+	player2Id: int()
+		.notNull()
+		.references(() => users.id),
+	player1Score: int().default(0),
+	player2Score: int().default(0),
+	finishedAt: int({ mode: 'timestamp' }),
+	pointsToWin: int().notNull().default(3),
+})
+
+export const matchesRelations = relations(matches, ({ one, many }) => ({
+	versus: one(versus, { fields: [matches.versusId], references: [versus.id] }),
+	player1: one(users, { fields: [matches.player1Id], references: [users.id] }),
+	player2: one(users, { fields: [matches.player2Id], references: [users.id] }),
+	rounds: many(rounds),
+}))
+
 export const versusRelations = relations(versus, ({ one }) => ({
 	tournament: one(tournaments),
-	match: one(matches),
+	match: one(matches, { fields: [versus.id], references: [matches.versusId] }),
 }))
 
 export const rounds = sqliteTable('rounds', {

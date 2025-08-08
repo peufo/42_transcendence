@@ -54,21 +54,26 @@ export type Round = {
 }
 
 export type Match = {
+	id: number
+	state: 'ongoing' | 'finished' | null
+	versusId: number | null
 	player1Id: number
 	player2Id: number
-	finishedAt: Date | null
 	player1: UserBasic
 	player2: UserBasic
 	player1Score: number | null
 	player2Score: number | null
+	finishedAt: Date | null
+	pointsToWin: number
 	rounds: Round[]
 }
 
 export type Versus = {
 	id: number
 	tournamentId: number
-	matchId: number | null
 	stage: number
+	parentVersusId: number | null
+	match: Match | null
 }
 
 export type Tournament = {

@@ -4,7 +4,7 @@ import type {
 	TournamentWithLookup,
 	Versus,
 } from '../../../lib/type.js'
-import { db, tournaments, versus } from '../../db/index.js'
+import { db, matches, tournaments, versus } from '../../db/index.js'
 import { server } from '../../server.js'
 import type { DB } from '../../types.js'
 import {
@@ -42,10 +42,19 @@ export async function tournamentGet(tournamentId: number): Promise<Tournament> {
 async function getTournamentStages(
 	tournamentId: number,
 ): Promise<Tournament['stages']> {
-	const results = await db
-		.select()
-		.from(versus)
-		.where(eq(versus.tournamentId, tournamentId))
+	const results = await db.query.versus.findMany({
+		where: eq(versus.tournamentId, tournamentId),
+		with: {
+			match: {
+				with: {
+					player1: true,
+					player2: true,
+					rounds: true,
+				},
+			},
+		},
+	})
+
 	const stages: Versus[][] = []
 	for (const vs of results) {
 		if (!stages[vs.stage]) stages[vs.stage] = [vs]
@@ -131,23 +140,21 @@ export async function isTournamentEmptyAndOpen(
 	return tournament.state === 'open' && tournament.participants.length === 0
 }
 
-export async function tournamentStart(tournament: Tournament) {
+export async function tournamentStart(tournamentId: number) {
+	const tournament = await tournamentGetWithParticipants(tournamentId)
 	await tournamentUpdateState(tournament.id, 'ongoing')
 
 	const deep = getVersusMaxDepth()
+	const participants = getRandomizedParticipants()
 	const [finalVersus] = await db
 		.insert(versus)
-		.values({
-			tournamentId: tournament.id,
-			stage: 0,
-		})
+		.values({ tournamentId, stage: 0 })
 		.returning()
-
 	await createVersusChildren(finalVersus)
 
 	function getVersusMaxDepth(): number {
 		let depth_max = 0
-		for (let i = tournament.numberOfPlayers; i > 1; i /= 2) depth_max++
+		for (let i = tournament.numberOfPlayers / 2; i > 1; i /= 2) depth_max++
 		return depth_max
 	}
 
@@ -166,6 +173,29 @@ export async function tournamentStart(tournament: Tournament) {
 				createVersusChildren(newVersusA),
 				createVersusChildren(newVersusB),
 			])
+			return
 		}
+		await db.insert(matches).values([
+			{
+				versusId: newVersusA.id,
+				player1Id: participants.pop() || 0,
+				player2Id: participants.pop() || 0,
+			},
+			{
+				versusId: newVersusB.id,
+				player1Id: participants.pop() || 0,
+				player2Id: participants.pop() || 0,
+			},
+		])
+	}
+
+	function getRandomizedParticipants(): number[] {
+		const randomNumbers = new Array(tournament.numberOfPlayers)
+			.fill(1)
+			.map(() => Math.random())
+		const sorted = [...randomNumbers].sort()
+		return randomNumbers
+			.map((n) => sorted.indexOf(n))
+			.map((i) => tournament.participants[i].user.id)
 	}
 }

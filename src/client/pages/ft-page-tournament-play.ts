@@ -225,10 +225,20 @@ customElements.define(
 				`
 			}
 
-			function renderVersus(vs: Versus): string {
+			function renderVersus({ match }: Versus): string {
+				if (!match) {
+					return /*html*/ `
+						<div class="flex items-center justify-between p-1 px-2 gap-1 border border-gray-100 rounded-md bg-gray-100/20 text-gray-400">
+							<span class="text-sm">?</span>
+							<span class="text-sm">?</span>
+						</div>
+					`
+				}
 				return /*html*/ `
-					<div class="border border-gray-200 rounded px-2">
-						${vs.id}
+					<div class="flex items-center justify-between p-1 px-2 gap-1 border border-gray-200 rounded-md">
+						<span class="text-xs">${match.player1.name}</span>
+						<ft-icon name="zap" class="h-3 scale-x-75 rotate-12"></ft-icon>
+						<span class="text-xs">${match.player2.name}</span>
 					</div>
 				`
 			}
@@ -244,7 +254,7 @@ customElements.define(
 						${quitButton}
 					</aside>
 
-					<div class="col-span-3 rounded-md border">
+					<div class="col-span-3 rounded-md border grid place-content-center">
 						GAME
 					</div>
 				</div>

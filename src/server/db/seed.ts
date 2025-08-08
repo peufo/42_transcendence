@@ -161,7 +161,7 @@ async function main() {
 	for (let n = 0; n < 8; n++) {
 		await tournamentJoin(tournament.id, n + 1)
 	}
-	await tournamentStart(tournament)
+	await tournamentStart(tournament.id)
 }
 
 main()

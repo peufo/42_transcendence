@@ -64,7 +64,7 @@ export const tournamentsRoute: FastifyPluginCallbackZod = (
 				notify.tournaments(tournamentId, 'onNewState', {
 					state: 'ongoing',
 				})
-				await tournamentStart(tournament)
+				await tournamentStart(tournament.id)
 			}
 
 			return res.send({ success: true, tournamentId })
