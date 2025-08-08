@@ -1,8 +1,13 @@
 import { type ChannelSocket, openChannel } from '../../lib/socketChannels.js'
+import { getVersusMaxDepth } from '../../lib/tournament.js'
 import type { Versus } from '../../lib/type.js'
 import { toast } from '../components/ft-toast.js'
 import { getAvatarSrc } from '../utils/avatar.js'
-import { type CleanEffect, createEffect } from '../utils/signal.js'
+import {
+	type CleanEffect,
+	createEffect,
+	createSignal,
+} from '../utils/signal.js'
 import { $tournament, $user } from '../utils/store.js'
 
 customElements.define(
@@ -172,16 +177,40 @@ customElements.define(
 customElements.define(
 	'ft-tournament-ongoing',
 	class extends HTMLElement {
-		private cleanEffect: CleanEffect
+		private cleanEffects: CleanEffect[]
+		private stage = createSignal<number>(0)
 
 		connectedCallback() {
-			this.cleanEffect = createEffect(() => {
-				this.innerHTML = this.render()
-			})
+			this.cleanEffects = [
+				createEffect(() => {
+					this.innerHTML = this.render()
+					this.attachEvents()
+				}),
+				createEffect(() => {
+					const stage = this.stage.get()
+					const stageContainer = this.querySelector<HTMLDivElement>(
+						`#stage-${stage}`,
+					)
+					if (!stageContainer) return
+					stageContainer.scrollIntoView({ behavior: 'smooth' })
+				}),
+			]
 		}
 
 		disconnectedCallback() {
-			this.cleanEffect()
+			this.cleanEffects.forEach((clean) => clean())
+		}
+
+		attachEvents() {
+			const stageButtons =
+				this.querySelectorAll<HTMLButtonElement>('button[data-stage]')
+			for (const button of stageButtons) {
+				const stage = button.dataset.stage
+				if (stage === undefined) continue
+				button.addEventListener('click', () => {
+					this.stage.set(+stage)
+				})
+			}
 		}
 
 		render(): string {
@@ -197,9 +226,7 @@ customElements.define(
 			</form>
 			`
 
-			const roundTitles = ['Final', 'Semi', 'Quarter', 'Eight']
-
-			function renderStages(): string {
+			const renderStages = () => {
 				if (!tournament?.stages) return 'No stages'
 				const stages = tournament.stages.map(renderStage)
 				return /*html*/ `
@@ -211,21 +238,16 @@ customElements.define(
 				`
 			}
 
-			function renderStage(stage: Versus[]): string {
+			const renderStage = (stage: Versus[]) => {
 				const vsContainers = stage.map(renderVersus)
 				return /*html*/ `
-					<div class="flex flex-col gap-4 snap-center">
-						<div class="text-center text-md">
-							<h3>${roundTitles[stage[0].stage]}</h3>
-						</div>
-						<div class="flex flex-col gap-2 min-w-32 justify-evenly grow">
-							${vsContainers.join('')}
-						</div>
+					<div id="stage-${stage[0].stage}" class="flex flex-col gap-2 min-w-32 snap-center justify-evenly grow">
+						${vsContainers.join('')}
 					</div>
 				`
 			}
 
-			function renderVersus({ match }: Versus): string {
+			const renderVersus = ({ match }: Versus) => {
 				if (!match) {
 					return /*html*/ `
 						<div class="flex items-center justify-between p-1 px-2 gap-1 border border-gray-100 rounded-md bg-gray-100/20 text-gray-400">
@@ -243,13 +265,33 @@ customElements.define(
 				`
 			}
 
+			const renderStagesButtons = () => {
+				if (!tournament) return ''
+				const stageNames = ['Final', 'Semi', 'Quarter', 'Eight']
+				const maxDeep = getVersusMaxDepth(tournament?.numberOfPlayers)
+				let buttons = ''
+				for (let stage = 0; stage <= maxDeep; stage++) {
+					buttons += /*html*/ `
+						<button
+							class="btn btn-border btn-sm"
+							data-stage="${stage}"
+						>
+							${stageNames[stage]}
+						</button>
+					`
+				}
+				return buttons
+			}
+
 			return /*html*/ `
-				
 				<div class="grid grid-cols-4 gap-4 p-4">
 					<aside class="flex flex-col gap-4">
 						<h2 class="text-lg font-semi px-2">${tournament.createdByUser.name}'s tournament</h2>
 						<div class="overflow-x-scroll rounded-md border border-gray-200 snap-x snap-mandatory">
 							${renderStages()}
+						</div>
+						<div class="flex flex-row-reverse gap-2">
+							${renderStagesButtons()}
 						</div>
 						${quitButton}
 					</aside>
@@ -258,8 +300,6 @@ customElements.define(
 						GAME
 					</div>
 				</div>
-
-				
 			`
 		}
 	},

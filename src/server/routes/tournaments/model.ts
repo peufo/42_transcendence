@@ -1,4 +1,5 @@
 import { eq } from 'drizzle-orm'
+import { getVersusMaxDepth } from '../../../lib/tournament.js'
 import type {
 	Tournament,
 	TournamentWithLookup,
@@ -144,19 +145,13 @@ export async function tournamentStart(tournamentId: number) {
 	const tournament = await tournamentGetWithParticipants(tournamentId)
 	await tournamentUpdateState(tournament.id, 'ongoing')
 
-	const deep = getVersusMaxDepth()
+	const deep = getVersusMaxDepth(tournament.numberOfPlayers)
 	const participants = getRandomizedParticipants()
 	const [finalVersus] = await db
 		.insert(versus)
 		.values({ tournamentId, stage: 0 })
 		.returning()
 	await createVersusChildren(finalVersus)
-
-	function getVersusMaxDepth(): number {
-		let depth_max = 0
-		for (let i = tournament.numberOfPlayers / 2; i > 1; i /= 2) depth_max++
-		return depth_max
-	}
 
 	async function createVersusChildren(parent: DB.Versus) {
 		const data = {
