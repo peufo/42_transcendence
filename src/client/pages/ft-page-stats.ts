@@ -62,7 +62,12 @@ customElements.define(
 				return html
 			} else {
 				for (const match of matchesHead) {
-					if (match.player1Score === null || match.player2Score === null)
+					if (
+						!match.player1 ||
+						!match.player2 ||
+						!match.player1Id ||
+						!match.player2Id
+					)
 						continue
 					const user1 = /*html*/ `
 						<div class="flex p-2 items-center gap-2">
@@ -470,7 +475,6 @@ function getLeagueModal(): string {
 			let styling = ''
 			if (league.name === 'Storm') styling = `style="stroke:${league.color};"`
 			else styling = `style="fill:${league.color}; stroke: black;"`
-			console.log(styling)
 			const content = /*html*/ `
 				<div class="flex flex-col p-2 items-center justify-center text-center gap-2">
 					<span class="font-bold" style="color:${league.color}">${league.name}</span>

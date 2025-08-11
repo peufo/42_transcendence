@@ -2,7 +2,7 @@ import argon2 from 'argon2'
 import { drizzle } from 'drizzle-orm/libsql'
 import { seed } from 'drizzle-seed'
 import { env } from '../env.js'
-import { tournamentJoin, tournamentStart } from '../routes/tournaments/model.js'
+import { tournamentJoin } from '../routes/tournaments/model.js'
 import {
 	friendships,
 	matches,
@@ -86,7 +86,7 @@ async function main() {
 		matches: {
 			columns: {
 				state: f.valuesFromArray({
-					values: ['ongoing', 'finished'],
+					values: ['awaiting', 'ongoing', 'finished'],
 				}),
 				player1Id: f.int({
 					minValue: 1,
@@ -101,9 +101,6 @@ async function main() {
 				}),
 				player2Score: f.valuesFromArray({
 					values: [0, 1, 2, 3, 4, 5],
-				}),
-				pointsToWin: f.default({
-					defaultValue: 5,
 				}),
 			},
 			count: 3000,
@@ -161,7 +158,7 @@ async function main() {
 	for (let n = 0; n < 8; n++) {
 		await tournamentJoin(tournament.id, n + 1)
 	}
-	await tournamentStart(tournament.id)
+	// await tournamentStart(tournament.id)
 }
 
 main()

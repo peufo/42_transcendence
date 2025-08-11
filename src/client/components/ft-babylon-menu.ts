@@ -5,7 +5,7 @@ import {
 	ARENA_HEIGHT,
 	ARENA_WIDTH,
 	Engine as GameEngine,
-	type Scores,
+	type RoundData,
 	type State,
 } from '../../lib/engine/index.js'
 import { createArena } from '../graphics/arena.js'
@@ -274,13 +274,18 @@ myParticleSystem.gravity = new BABYLON.Vector3(0, -1, 0); // tire vers le bas (e
 		}
 
 		startGameEngine() {
-			this.gameLogicEngine = new GameEngine({
-				onTick: this.renderGameState.bind(this),
-				onScore: this.handleScoreUpdate.bind(this),
-			})
+			this.gameLogicEngine = new GameEngine(
+				{
+					onTick: this.renderGameState.bind(this),
+					onRoundEnd: this.handleScoreUpdate.bind(this),
+				},
+				{
+					scoreToWin: 5, // TODO: prout
+				},
+			)
 			this.gameLogicEngine.start()
 		}
-		handleScoreUpdate(scores: Scores) {
+		handleScoreUpdate({ scores }: RoundData) {
 			console.log('Score updated:', scores)
 			this.scoreText.text = `${scores.p1} : ${scores.p2}`
 		}

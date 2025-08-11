@@ -1,3 +1,5 @@
+import type { EngineEventData } from './engine/index.js'
+
 export type UserBasic = {
 	id: number
 	name: string
@@ -55,16 +57,14 @@ export type Round = {
 
 export type Match = {
 	id: number
-	state: 'ongoing' | 'finished' | null
-	versusId: number | null
-	player1Id: number
-	player2Id: number
-	player1: UserBasic
-	player2: UserBasic
-	player1Score: number | null
-	player2Score: number | null
+	state: 'awaiting' | 'ongoing' | 'finished' | null
+	player1Id: number | null
+	player2Id: number | null
+	player1: UserBasic | null
+	player2: UserBasic | null
+	player1Score: number
+	player2Score: number
 	finishedAt: Date | null
-	pointsToWin: number
 	rounds: Round[]
 }
 
@@ -73,7 +73,7 @@ export type Versus = {
 	tournamentId: number
 	stage: number
 	parentVersusId: number | null
-	match: Match | null
+	match: Match
 }
 
 export type Tournament = {
@@ -115,6 +115,7 @@ export type SocketChannels = {
 			onParticipantJoin: { user: UserBasic }
 			onParticipantQuit: { user: UserBasic }
 			onNewState: { state: Tournament['state'] }
+			onEngineEvent: { data: EngineEventData; versusId: number }
 		}
 	}
 }

@@ -28,7 +28,7 @@ export class Ball {
 		getRandomArbitrary(-0.3, 0.3),
 	)
 	#engine: Engine
-	#rallyCount: number
+	#rallyCount: number = 0
 	get position() {
 		return this.#position
 	}
@@ -154,6 +154,7 @@ export class Ball {
 		const scorer = this.#checkPlayerScoring()
 		if (scorer) {
 			const round: RoundData = {
+				scores: { p1: 0, p2: 0 },
 				scorer,
 				rallyCount: this.#rallyCount,
 				ballPositionY: this.#position.y,

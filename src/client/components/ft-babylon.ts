@@ -1,11 +1,7 @@
 /// <reference path="../../../node_modules/babylonjs/babylon.d.ts" />
 /// <reference path="../../../node_modules/babylonjs-gui/babylon.gui.d.ts" />
 
-import {
-	Engine as GameEngine,
-	type Scores,
-	type State,
-} from '../../lib/engine/index.js'
+import type { Engine as GameEngine } from '../../lib/engine/index.js'
 import * as Graphics from '../graphics/index.js'
 
 export const RENDER_SCALE = 0.1
@@ -23,7 +19,7 @@ customElements.define(
 		private gameLogicEngine: GameEngine
 		private guiTexture: BABYLON.GUI.AdvancedDynamicTexture
 		private scoreText: BABYLON.GUI.TextBlock
-		private wallParticleSystem: BABYLON.ParticleSystem
+		// private wallParticleSystem: BABYLON.ParticleSystem
 
 		constructor() {
 			super()
@@ -51,11 +47,11 @@ customElements.define(
 					this.paddle1,
 					this.paddle2,
 				)
-				this.wallParticleSystem = Graphics.setupWallCollisionParticles(
-					this.scene,
-				)
+				// this.wallParticleSystem = Graphics.setupWallCollisionParticles(
+				// 	this.scene,
+				// )
 				this.setupScore()
-				this.startEngine()
+				//this.startEngine()
 				this.setupControls()
 				this.babylonEngine.runRenderLoop(() => this.scene.render())
 			} catch (error) {
@@ -98,27 +94,27 @@ customElements.define(
 			this.guiTexture.addControl(this.scoreText)
 		}
 
-		private startEngine() {
-			this.gameLogicEngine = new GameEngine({
-				onTick: this.renderGameState.bind(this),
-				onScore: this.handleScoreUpdate.bind(this),
-				onCollision: (c) =>
-					Graphics.handleCollision(
-						c,
-						this.ballMesh,
-						this.paddle1,
-						this.paddle2,
-						this.scene,
-						this.camera,
-						this.wallParticleSystem,
-					),
-			})
-			this.gameLogicEngine.start()
-		}
+		// private startEngine() {
+		// 	this.gameLogicEngine = new GameEngine({
+		// 		onTick: this.renderGameState.bind(this),
+		// 		onRoundEnd: this.handleScoreUpdate.bind(this),
+		// 		onCollision: (c) =>
+		// 			Graphics.handleCollision(
+		// 				c,
+		// 				this.ballMesh,
+		// 				this.paddle1,
+		// 				this.paddle2,
+		// 				this.scene,
+		// 				this.camera,
+		// 				this.wallParticleSystem,
+		// 			),
+		// 	})
+		// 	this.gameLogicEngine.start()
+		// }
 
-		private handleScoreUpdate(scores: Scores) {
-			this.scoreText.text = `${scores.p1} : ${scores.p2}`
-		}
+		// private handleScoreUpdate(scores: Scores) {
+		// 	this.scoreText.text = `${scores.p1} : ${scores.p2}`
+		// }
 
 		private setupControls() {
 			const keyHandlers: Record<string, (value: boolean) => void> = {
@@ -132,9 +128,9 @@ customElements.define(
 			document.addEventListener('keyup', (e) => keyHandlers[e.key]?.(false))
 		}
 
-		private renderGameState(state: State) {
-			Graphics.updateGraphics(state, this.ballMesh, this.paddle1, this.paddle2)
-		}
+		// private renderGameState(state: State) {
+		// 	Graphics.updateGraphics(state, this.ballMesh, this.paddle1, this.paddle2)
+		// }
 
 		disconnectedCallback() {
 			if (this.scene.environmentTexture) {

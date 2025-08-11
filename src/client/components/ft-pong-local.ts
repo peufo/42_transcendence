@@ -36,12 +36,17 @@ customElements.define(
 			if (!ctx) throw new Error('Canvas context failed')
 			this.ctx = ctx
 			this.ctx.textAlign = 'center'
-			this.engine = new Engine({
-				onTick: this.interpolate.updateState,
-				onScore: (scores) => {
-					this.scores = scores
+			this.engine = new Engine(
+				{
+					onTick: this.interpolate.updateState,
+					onRoundEnd: (data) => {
+						this.scores = data.scores
+					},
 				},
-			})
+				{
+					scoreToWin: 5, // TODO: select
+				},
+			)
 			this.engine.start()
 			this.frameId = requestAnimationFrame(this.render.bind(this))
 		}
@@ -95,6 +100,7 @@ customElements.define(
 			)
 			this.ctx.fill()
 
+			// scores
 			const fontSize = 40
 			this.ctx.font = `${fontSize}px sans-serif`
 			this.ctx.fillText(
@@ -107,6 +113,7 @@ customElements.define(
 				ARENA_WIDTH / 2 + ARENA_WIDTH / 4,
 				fontSize,
 			)
+
 			this.frameId = requestAnimationFrame(this.render.bind(this))
 		}
 	},

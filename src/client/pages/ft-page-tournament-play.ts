@@ -60,6 +60,45 @@ customElements.define(
 						$tournament.update((t) => (!t ? t : { ...t, state }))
 						if (state === 'ongoing') toast.success('Tournament starting')
 					},
+
+					onEngineEvent({ versusId, data }) {
+						if (!data.onRoundEnd && !data.onGameEnd) return
+						$tournament.update((t) => {
+							if (!t?.stages) return t
+							return {
+								...t,
+								stages: t.stages.map((stage) =>
+									stage.map((vs) => {
+										if (vs.id !== versusId) return vs
+										if (!vs.match) return vs
+										if (data.onRoundEnd) {
+											const { p1, p2 } = data.onRoundEnd.scores
+											return {
+												...vs,
+												match: {
+													...vs.match,
+													state: 'ongoing',
+													player1Score: p1,
+													player2Score: p2,
+												},
+											}
+										}
+										if (data.onGameEnd) {
+											return {
+												...vs,
+												match: {
+													...vs.match,
+													state: 'finished',
+													finishedAt: new Date(data.onGameEnd.finishedAt),
+												},
+											}
+										}
+										return vs
+									}),
+								),
+							}
+						})
+					},
 				},
 			)
 		}
@@ -219,6 +258,9 @@ customElements.define(
 			const user = $user.get()
 			if (!user) return ''
 
+			const iParticipate = tournament.participants.find(
+				({ user: { id } }) => id === user.id,
+			)
 			const quitButton = /*html*/ `
 			<form action="/tournaments/quit" method="post" class="contents">
 				<input type="hidden" name="tournamentId" value="${tournament.id}" />
@@ -248,19 +290,30 @@ customElements.define(
 			}
 
 			const renderVersus = ({ match }: Versus) => {
-				if (!match) {
-					return /*html*/ `
-						<div class="flex items-center justify-between p-1 px-2 gap-1 border border-gray-100 rounded-md bg-gray-100/20 text-gray-400">
-							<span class="text-sm">?</span>
-							<span class="text-sm">?</span>
-						</div>
-					`
+				let colorP1 = ''
+				let colorP2 = ''
+				if (!match.player1 || user.id === match.player1.id)
+					colorP1 = 'text-indigo-600 font-bold'
+				else if (!match.player2 || user.id === match.player2.id)
+					colorP2 = 'text-indigo-600 font-bold'
+				const icon = () => {
+					switch (match.state) {
+						case 'finished':
+							return 'swords'
+						case 'awaiting':
+							return 'bot'
+						case 'ongoing':
+							return 'loader-circle'
+					}
 				}
 				return /*html*/ `
-					<div class="flex items-center justify-between p-1 px-2 gap-1 border border-gray-200 rounded-md">
-						<span class="text-xs">${match.player1.name}</span>
+					<div class="grid grid-cols-3 grid-rows-2 items-center justify-items-center border border-gray-200 rounded-md">
+						<div class="text-xs break-all text-center ${colorP1}">${match.player1 ? match.player1.name : '?'}</div>
 						<ft-icon name="zap" class="h-3 scale-x-75 rotate-12"></ft-icon>
-						<span class="text-xs">${match.player2.name}</span>
+						<div class="text-xs break-all text-center ${colorP2}">${match.player2 ? match.player2.name : '?'}</div>
+						<span class="text-xs">${match.player1Score}</span>
+						<ft-icon name="${icon()}" class="animate-spin w-3 h-3 stroke-indigo-600"></ft-icon>
+						<span class="text-xs">${match.player2Score}</span>
 					</div>
 				`
 			}
@@ -293,10 +346,10 @@ customElements.define(
 						<div class="flex flex-row-reverse gap-2">
 							${renderStagesButtons()}
 						</div>
-						${quitButton}
+						${iParticipate ? quitButton : ''}
 					</aside>
 
-					<div class="col-span-3 rounded-md border grid place-content-center">
+					<div class="col-span-3 grid place-content-center">
 						GAME
 					</div>
 				</div>

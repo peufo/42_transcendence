@@ -163,8 +163,8 @@ function connectEngine(): WebSocket {
 		if (data.onTick) {
 			render(convertState(data.onTick))
 		}
-		if (data.onScore) {
-			renderScores(data.onScore.p1, data.onScore.p2)
+		if (data.onRoundEnd) {
+			renderScores(data.onRoundEnd?.scores.p1, data.onRoundEnd?.scores.p2)
 		}
 	})
 	return socket

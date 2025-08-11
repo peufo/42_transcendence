@@ -10,6 +10,7 @@ type Inputs = Record<Player, Record<Move, boolean>>
 export type Scores = Record<Player, number>
 export type RoundData = {
 	scorer: Player
+	scores: Scores
 	rallyCount: number
 	ballPositionY: number
 }
@@ -36,17 +37,20 @@ export enum COLLISION_TYPE {
 
 export type EngineEventData = {
 	onTick?: State
-	onScore?: Scores
 	onRoundEnd?: RoundData
 	onGameEnd?: GameOverData
 	onCollision?: Collision
 	onTimerTick?: number
 }
 
-type EngineOption = { onEvent?: (event: EngineEventData) => void } & {
+type EngineEventOption = { onEvent?: (event: EngineEventData) => void } & {
 	[EventName in keyof EngineEventData]: (
 		data: Required<EngineEventData>[EventName],
 	) => void
+}
+
+type EngineCustomProperties = {
+	scoreToWin: number
 }
 
 // Game properties
@@ -55,9 +59,6 @@ export const BALL_SUBSTEPS = 3
 export const TICK_INTERVAL = 1000 / TICK_RATE
 export const ARENA_WIDTH = 1000
 export const ARENA_HEIGHT = 700
-const rules = {
-	scoreToWin: 10000,
-}
 
 // Ball properties
 export const BALL_MAX_BOUNCE_ANGLE = (4 * Math.PI) / 12 // <- 60 degrees in radians
@@ -85,7 +86,8 @@ export const PADDLE_BASE_P2_POSITION = new Vector2(
 )
 
 export class Engine {
-	#options: EngineOption
+	#eventOptions: EngineEventOption
+	#customProperties: EngineCustomProperties
 
 	#roundStartTime: number
 	#paddles: Paddles
@@ -107,8 +109,12 @@ export class Engine {
 		return this.#roundStartTime
 	}
 
-	constructor(options: EngineOption = {}) {
-		this.#options = options
+	constructor(
+		eventOptions: EngineEventOption = {},
+		customProperties: EngineCustomProperties,
+	) {
+		this.#eventOptions = eventOptions
+		this.#customProperties = customProperties
 	}
 
 	#timer(seconds: number, timeoutCallback: () => void) {
@@ -160,10 +166,10 @@ export class Engine {
 	}
 
 	onEvent(data: EngineEventData) {
-		this.#options.onEvent?.(data)
+		this.#eventOptions.onEvent?.(data)
 		for (const [eventName, eventData] of Object.entries(data)) {
 			// @ts-ignore
-			this.#options[eventName]?.(eventData)
+			this.#eventOptions[eventName]?.(eventData)
 		}
 	}
 
@@ -171,9 +177,9 @@ export class Engine {
 		this.#roundOver = true
 		const { scorer } = roundInfo
 		this.#scores[scorer]++
-		this.tickData.onScore = this.#scores
+		roundInfo.scores = this.#scores
 		this.tickData.onRoundEnd = roundInfo
-		if (this.#scores[scorer] >= rules.scoreToWin) {
+		if (this.#scores[scorer] >= this.#customProperties.scoreToWin) {
 			this.#gameOver = true
 			this.tickData.onGameEnd = { finishedAt: Date.now() }
 		} else this.#newRound()

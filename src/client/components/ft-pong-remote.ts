@@ -43,8 +43,8 @@ customElements.define(
 				if (data.onTick) {
 					this.interpolate.updateState(data.onTick)
 				}
-				if (data.onScore) {
-					this.scores = data.onScore
+				if (data.onRoundEnd) {
+					this.scores = data.onRoundEnd.scores
 				}
 			})
 			requestAnimationFrame(this.render.bind(this))
@@ -84,7 +84,7 @@ customElements.define(
 			this.ctx.rect(state.b.x, state.b.y, BALL_BASE_SIZE, BALL_BASE_SIZE)
 			this.ctx.fill()
 
-			// // paddle
+			// paddle
 			this.ctx.beginPath()
 			this.ctx.rect(
 				PADDLE_BASE_P1_POSITION.x,
@@ -102,8 +102,20 @@ customElements.define(
 			)
 			this.ctx.fill()
 
-			const str = `Player 1: ${this.scores.p1} | Player 2: ${this.scores.p2}`
-			this.ctx.fillText(str, ARENA_WIDTH / 2, 10)
+			// scores
+			const fontSize = 40
+			this.ctx.font = `${fontSize}px sans-serif`
+			this.ctx.fillText(
+				`${this.scores.p1}`,
+				ARENA_WIDTH / 2 - ARENA_WIDTH / 4,
+				fontSize,
+			)
+			this.ctx.fillText(
+				`${this.scores.p2}`,
+				ARENA_WIDTH / 2 + ARENA_WIDTH / 4,
+				fontSize,
+			)
+
 			requestAnimationFrame(this.render.bind(this))
 		}
 	},
