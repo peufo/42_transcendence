@@ -14,7 +14,7 @@ import {
 	users,
 } from '../../db/index.js'
 import type { DB } from '../../types.js'
-import { getActiveTournament } from '../tournaments/model.js'
+import { getUserActiveTournament } from '../tournaments/tournamentDb.js'
 
 export const userBasicColumns = {
 	id: true,
@@ -131,7 +131,7 @@ export async function getUserFriend(userId: number): Promise<Friend> {
 		columns: friendColumns,
 	})
 
-	const tournament = await getActiveTournament(userId)
+	const tournament = await getUserActiveTournament(userId)
 
 	if (!friend) throw new Error('Friend not found')
 	return { ...friend, tournament }

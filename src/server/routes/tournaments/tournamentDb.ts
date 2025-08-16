@@ -10,13 +10,7 @@ export async function findTournament(tournamentId: number) {
 	})
 }
 
-export async function findTournamentById(tournamentId: number) {
-	return db.query.tournaments.findFirst({
-		where: eq(tournaments.id, tournamentId),
-	})
-}
-
-export async function findActiveTournamentByUserId(
+export async function getUserActiveTournament(
 	userId: number,
 ): Promise<Tournament | null> {
 	const participations = db

@@ -1,54 +1,35 @@
 import { eq } from 'drizzle-orm'
 import { Engine } from '../../../lib/engine/index.js'
-import { getVersusMaxDepth } from '../../../lib/tournament.js'
 import type {
+	Match,
 	Tournament,
 	TournamentWithLookup,
-	Versus,
 } from '../../../lib/type.js'
-import { db, matches, rounds, tournaments, versus } from '../../db/index.js'
+import { db, matches, rounds, tournaments } from '../../db/index.js'
 import { server } from '../../server.js'
 import type { DB } from '../../types.js'
-import { notify } from '../ws/controller.js'
+import { userBasicColumns } from '../friendships/model.js'
+// import { notify } from '../ws/controller.js'
 import {
 	createTournament,
 	deleteParticipant,
 	deleteTournament,
-	findActiveTournamentByUserId,
 	findTournament,
-	findTournamentWithParticipants,
+	getUserActiveTournament,
 	insertParticipant,
 } from './tournamentDb.js'
 
-async function getUserActiveTournament(
-	userId: number,
-): Promise<Tournament | null> {
-	return findActiveTournamentByUserId(userId)
-}
-
-export async function tournamentGetWithParticipants(
+export async function tournamentGet(
 	tournamentId: number,
 ): Promise<TournamentWithLookup> {
-	const tournament = await findTournamentWithParticipants(tournamentId)
-	if (!tournament) throw server.httpErrors.notFound()
-	return { ...tournament, stages: await getTournamentStages(tournament.id) }
-}
-
-export async function tournamentGet(tournamentId: number): Promise<Tournament> {
 	const tournament = await db.query.tournaments.findFirst({
 		where: eq(tournaments.id, tournamentId),
-	})
-	if (!tournament) throw server.httpErrors.notFound()
-	return { ...tournament, stages: await getTournamentStages(tournament.id) }
-}
-
-async function getTournamentStages(
-	tournamentId: number,
-): Promise<Tournament['stages']> {
-	const results = await db.query.versus.findMany({
-		where: eq(versus.tournamentId, tournamentId),
 		with: {
-			match: {
+			createdByUser: { columns: userBasicColumns },
+			participants: {
+				with: { user: { columns: userBasicColumns } },
+			},
+			matches: {
 				with: {
 					player1: true,
 					player2: true,
@@ -57,12 +38,25 @@ async function getTournamentStages(
 			},
 		},
 	})
-	const stages: Versus[][] = []
-	for (const vs of results) {
-		if (!stages[vs.stage]) stages[vs.stage] = [vs]
-		else stages[vs.stage].push(vs)
+	if (!tournament) throw server.httpErrors.notFound()
+	return {
+		...tournament,
+		stages: getMatchesByStages(tournament.numberOfPlayers, tournament.matches),
 	}
-	return stages
+}
+
+function getMatchesByStages<M extends DB.Match>(
+	numberOfPlayers: number,
+	matches: M[],
+): M[][] {
+	matches.sort((a, b) => a.id - b.id)
+	const matchesByStages: M[][] = []
+	let index = 0
+	for (let stageSize = numberOfPlayers / 2; stageSize >= 1; stageSize /= 2) {
+		matchesByStages.push(matches.slice(index, index + stageSize))
+		index += stageSize
+	}
+	return matchesByStages
 }
 
 export async function tournamentCreate(data: DB.TournamentCreate) {
@@ -79,10 +73,6 @@ export async function tournamentDelete(tournamentId: number) {
 	return deleteTournament(tournamentId)
 }
 
-export async function getActiveTournament(userId: number) {
-	return findActiveTournamentByUserId(userId)
-}
-
 export async function deleteOpenTournaments() {
 	await db.delete(tournaments).where(eq(tournaments.state, 'open'))
 }
@@ -94,7 +84,7 @@ export async function tournamentJoin(
 	const activeTournament = await getUserActiveTournament(userId)
 	if (activeTournament && activeTournament.id !== tournamentId)
 		throw server.httpErrors.forbidden(`Sorry, you're busy`)
-	const tournament = await tournamentGetWithParticipants(tournamentId)
+	const tournament = await tournamentGet(tournamentId)
 	const userIsParticipant = tournament.participants.find(
 		({ user }) => user.id === userId,
 	)
@@ -142,142 +132,144 @@ export async function isTournamentEmptyAndOpen(
 	return tournament.state === 'open' && tournament.participants.length === 0
 }
 
-const SCORES_TO_WIN = {
-	0: 2,
-	1: 1,
-	2: 1,
-	3: 1,
+function getScoreToWin(stage: Match[]) {
+	// TODO: update values
+	switch (stage.length) {
+		case 1: // finale
+			return 3
+		case 2: // demi finale
+			return 2
+		default: // le reste
+			return 1
+	}
 }
 
 async function tournamentLoop(tournamentId: number) {
-	const stages = await getTournamentStages(tournamentId)
-	if (!stages) return //TODO what to do ?
-	let currentStageIndex: number = -1
-	let currentVersusIndex: number = 0
-	handleVersus()
+	const tournament = await tournamentGet(tournamentId)
+	let currentStageIndex = 0
+	let currentStage = tournament.stages[currentStageIndex]
 
-	async function handleVersus() {
-		const currentVersus = getCurrentVersus()
-		if (!currentVersus) return
-		const engine = new Engine(
-			{
-				onEvent: async (data) => {
-					if (data.onRoundEnd) {
-						await db.insert(rounds).values({
-							matchId: currentVersus.match.id,
-							scorer: data.onRoundEnd.scorer,
-							rallyCount: data.onRoundEnd.rallyCount,
-							ballPositionY: data.onRoundEnd.ballPositionY,
-						})
-						await db
-							.update(matches)
-							.set({
-								player1Score: data.onRoundEnd.scores.p1,
-								player2Score: data.onRoundEnd.scores.p2,
-							})
-							.where(eq(matches.id, currentVersus.match.id))
-					}
-					if (data.onGameEnd) {
-						await db
-							.update(matches)
-							.set({
-								finishedAt: new Date(data.onGameEnd.finishedAt),
-								state: 'finished',
-							})
-							.where(eq(matches.id, currentVersus.match.id))
-						handleVersus()
-					}
-					notify.tournaments(tournamentId, 'onEngineEvent', {
-						data,
-						versusId: currentVersus.id,
-					})
-				},
-			},
-			{
-				//@ts-ignore
-				scoreToWin: SCORES_TO_WIN[currentVersus.stage],
-				//@ts-ignore
-			},
-		)
-		engine.start()
+	while (currentStageIndex < tournament.stages.length) {
+		await handleStage()
+		incrementStage()
+	}
+	handleEnd()
+
+	async function handleStage() {
+		await Promise.all(currentStage.map(handleMatch))
 	}
 
-	function getCurrentVersus() {
-		// let winnersId[]: number = null
-		const stage = stages?.at(currentStageIndex)
-		if (!stage) return null
-		const versus = stage.at(currentVersusIndex)
-		if (!versus) {
-			// for(const previousVersus of stage)
-			// {
-			// 	if (!previousVersus.match) return
-			// 	const winnerId = previousVersus.match.player1Score > previousVersus.match.player2Score ? previousVersus.match?.player1Id : previousVersus.match?.player2Id
-			// 	winnersId.push(winnerId)
-			// 	previousVersus.parentVersusId
-			// }
-			// generate matches for stage ?
-			currentStageIndex--
-			currentVersusIndex = 0
-			return getCurrentVersus()
+	function incrementStage() {
+		currentStageIndex++
+		if (currentStageIndex === tournament.stages.length) {
+			return
 		}
-		currentVersusIndex++
-		return versus
+		currentStage = tournament.stages[currentStageIndex]
+		//  tournament.notify('onNextStage')
+	}
+
+	function handleEnd() {
+		// tournament.notify('onEnd')
+	}
+
+	function handleMatch(match: Match): Promise<void> {
+		return new Promise((resolve) => {
+			const engine = new Engine({
+				scoreToWin: getScoreToWin(currentStage),
+				async onRoundEnd(round) {
+					await db.insert(rounds).values({
+						matchId: match.id,
+						scorer: round.scorer,
+						rallyCount: round.rallyCount,
+						ballPositionY: round.ballPositionY,
+					})
+					match.player1Score = round.scores.p1
+					match.player2Score = round.scores.p2
+					await db
+						.update(matches)
+						.set({
+							player1Score: round.scores.p1,
+							player2Score: round.scores.p2,
+						})
+						.where(eq(matches.id, match.id))
+				},
+				async onGameEnd(gameEnd) {
+					match.state = 'finished'
+					match.finishedAt = new Date(gameEnd.finishedAt)
+					await db
+						.update(matches)
+						.set({
+							state: match.state,
+							finishedAt: match.finishedAt,
+						})
+						.where(eq(matches.id, match.id))
+					const winnerId =
+						match.player1Score > match.player2Score
+							? match.player1Id
+							: match.player2Id
+					const nextStage = tournament.stages[currentStageIndex + 1]
+					const childMatch =
+						nextStage[Math.floor(currentStage.indexOf(match) / 2)]
+					const player1Id = childMatch.player1Id || winnerId
+					const player2Id = childMatch.player1Id ? winnerId : null
+					childMatch.player1Id = player1Id
+					childMatch.player2Id = player2Id
+					await db
+						.update(matches)
+						.set({ player1Id, player2Id })
+						.where(eq(matches.id, childMatch.id))
+					resolve()
+				},
+				async onEvent() {
+					// notify.tournaments(tournamentId, 'onEngineEvent',
+					// data, versusId
+					// : match.id,
+					// )
+				},
+			})
+
+			startMatch()
+
+			async function startMatch() {
+				engine.start() // TODO: check players are connected
+				match.state = 'ongoing'
+				await db
+					.update(matches)
+					.set({
+						state: match.state,
+					})
+					.where(eq(matches.id, match.id))
+			}
+		})
 	}
 }
 
 export async function tournamentStart(tournamentId: number) {
-	const tournament = await tournamentGetWithParticipants(tournamentId)
+	const tournament = await tournamentGet(tournamentId)
 	await tournamentUpdateState(tournament.id, 'ongoing')
-	const maxDepth = getVersusMaxDepth(tournament.numberOfPlayers)
 	const participants = getRandomizedParticipants()
-	const [match] = await db.insert(matches).values({}).returning()
-	const [finalVersus] = await db
-		.insert(versus)
-		.values({ matchId: match.id, tournamentId, stage: 0 })
+	const newMatches = await db
+		.insert(matches)
+		.values(Array(tournament.numberOfPlayers - 1).fill({ tournamentId }))
 		.returning()
-	await createVersusChildren(finalVersus)
-	await tournamentLoop(tournamentId)
+	const matchesByStage = getMatchesByStages(
+		tournament.numberOfPlayers,
+		newMatches,
+	)
 
-	async function createVersusChildren(parent: DB.Versus) {
-		const data = {
-			tournamentId: tournament.id,
-			parentVersusId: parent.id,
-			stage: parent.stage + 1,
-		}
-		const [matchA] = await db.insert(matches).values({}).returning()
-		const [matchB] = await db.insert(matches).values({}).returning()
-		const [newVersusA, newVersusB] = await db
-			.insert(versus)
-			.values([
-				{ ...data, matchId: matchA.id },
-				{ ...data, matchId: matchB.id },
-			])
-			.returning()
-		if (newVersusA.stage < maxDepth) {
-			await Promise.all([
-				createVersusChildren(newVersusA),
-				createVersusChildren(newVersusB),
-			])
-			return
-		}
-		// TODO: put in separate function
-		console.log(participants)
-		await db
-			.update(matches)
-			.set({
-				player1Id: participants.pop(),
-				player2Id: participants.pop(),
-			})
-			.where(eq(matches.id, newVersusA.matchId))
-		console.log(participants)
-		await db
-			.update(matches)
-			.set({
-				player1Id: participants.pop(),
-				player2Id: participants.pop(),
-			})
-			.where(eq(matches.id, newVersusB.matchId))
-	}
+	await Promise.all(
+		matchesByStage[0].map((match) =>
+			db
+				.update(matches)
+				.set({
+					player1Id: participants.pop(),
+					player2Id: participants.pop(),
+				})
+				.where(eq(matches.id, match.id)),
+		),
+	)
+
+	await tournamentLoop(tournamentId)
 
 	function getRandomizedParticipants(): number[] {
 		const randomNumbers = new Array(tournament.numberOfPlayers)

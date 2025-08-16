@@ -1,6 +1,6 @@
 import { type ChannelSocket, openChannel } from '../../lib/socketChannels.js'
 import { getVersusMaxDepth } from '../../lib/tournament.js'
-import type { Versus } from '../../lib/type.js'
+import type { Match } from '../../lib/type.js'
 import { toast } from '../components/ft-toast.js'
 import { getAvatarSrc } from '../utils/avatar.js'
 import {
@@ -61,44 +61,44 @@ customElements.define(
 						if (state === 'ongoing') toast.success('Tournament starting')
 					},
 
-					onEngineEvent({ versusId, data }) {
-						if (!data.onRoundEnd && !data.onGameEnd) return
-						$tournament.update((t) => {
-							if (!t?.stages) return t
-							return {
-								...t,
-								stages: t.stages.map((stage) =>
-									stage.map((vs) => {
-										if (vs.id !== versusId) return vs
-										if (!vs.match) return vs
-										if (data.onRoundEnd) {
-											const { p1, p2 } = data.onRoundEnd.scores
-											return {
-												...vs,
-												match: {
-													...vs.match,
-													state: 'ongoing',
-													player1Score: p1,
-													player2Score: p2,
-												},
-											}
-										}
-										if (data.onGameEnd) {
-											return {
-												...vs,
-												match: {
-													...vs.match,
-													state: 'finished',
-													finishedAt: new Date(data.onGameEnd.finishedAt),
-												},
-											}
-										}
-										return vs
-									}),
-								),
-							}
-						})
-					},
+					// onEngineEvent({ versusId, data }) {
+					// 	if (!data.onRoundEnd && !data.onGameEnd) return
+					// 	$tournament.update((t) => {
+					// 		if (!t?.stages) return t
+					// 		return {
+					// 			...t,
+					// 			stages: t.stages.map((stage) =>
+					// 				stage.map((vs) => {
+					// 					if (vs.id !== versusId) return vs
+					// 					if (!vs.match) return vs
+					// 					if (data.onRoundEnd) {
+					// 						const { p1, p2 } = data.onRoundEnd.scores
+					// 						return {
+					// 							...vs,
+					// 							match: {
+					// 								...vs.match,
+					// 								state: 'ongoing',
+					// 								player1Score: p1,
+					// 								player2Score: p2,
+					// 							},
+					// 						}
+					// 					}
+					// 					if (data.onGameEnd) {
+					// 						return {
+					// 							...vs,
+					// 							match: {
+					// 								...vs.match,
+					// 								state: 'finished',
+					// 								finishedAt: new Date(data.onGameEnd.finishedAt),
+					// 							},
+					// 						}
+					// 					}
+					// 					return vs
+					// 				}),
+					// 			),
+					// 		}
+					// 	})
+					// },
 				},
 			)
 		}
@@ -225,14 +225,6 @@ customElements.define(
 					this.innerHTML = this.render()
 					this.attachEvents()
 				}),
-				createEffect(() => {
-					const stage = this.stage.get()
-					const stageContainer = this.querySelector<HTMLDivElement>(
-						`#stage-${stage}`,
-					)
-					if (!stageContainer) return
-					stageContainer.scrollIntoView({ behavior: 'smooth' })
-				}),
 			]
 		}
 
@@ -280,16 +272,17 @@ customElements.define(
 				`
 			}
 
-			const renderStage = (stage: Versus[]) => {
-				const vsContainers = stage.map(renderVersus)
+			const renderStage = (stage: Match[]) => {
+				// TODO: highlight background color
+				const vsContainers = stage.map(renderMatch)
 				return /*html*/ `
-					<div id="stage-${stage[0].stage}" class="flex flex-col gap-2 min-w-32 snap-center justify-evenly grow">
+					<div class="flex flex-col gap-2 min-w-32 snap-center justify-evenly grow">
 						${vsContainers.join('')}
 					</div>
 				`
 			}
 
-			const renderVersus = ({ match }: Versus) => {
+			const renderMatch = (match: Match) => {
 				let colorP1 = ''
 				let colorP2 = ''
 				if (!match.player1 || user.id === match.player1.id)

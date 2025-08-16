@@ -1,7 +1,7 @@
 import argon2 from 'argon2'
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { getSchema, permission, postSchema } from '../../utils/index.js'
-import { getActiveTournament } from '../tournaments/model.js'
+import { getUserActiveTournament } from '../tournaments/tournamentDb.js'
 import { deleteSession, setSessionCookie } from './controller.js'
 import { createUser, getAuthUser } from './model.js'
 import { loginSchema, signupSchema } from './schema.js'
@@ -10,7 +10,7 @@ export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 	server.get('/user', getSchema('/auth/user', null), async (_req, res) => {
 		const user = res.locals?.user
 		if (!user) return res.send({ data: undefined })
-		const tournament = await getActiveTournament(user.id)
+		const tournament = await getUserActiveTournament(user.id)
 		return res.send({ data: { ...user, tournament } })
 	})
 

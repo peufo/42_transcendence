@@ -36,17 +36,13 @@ customElements.define(
 			if (!ctx) throw new Error('Canvas context failed')
 			this.ctx = ctx
 			this.ctx.textAlign = 'center'
-			this.engine = new Engine(
-				{
-					onTick: this.interpolate.updateState,
-					onRoundEnd: (data) => {
-						this.scores = data.scores
-					},
+			this.engine = new Engine({
+				scoreToWin: 5, // TODO: select
+				onTick: this.interpolate.updateState,
+				onRoundEnd: (data) => {
+					this.scores = data.scores
 				},
-				{
-					scoreToWin: 5, // TODO: select
-				},
-			)
+			})
 			this.engine.start()
 			this.frameId = requestAnimationFrame(this.render.bind(this))
 		}

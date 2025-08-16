@@ -1,5 +1,3 @@
-import type { EngineEventData } from './engine/index.js'
-
 export type UserBasic = {
 	id: number
 	name: string
@@ -65,15 +63,8 @@ export type Match = {
 	player1Score: number
 	player2Score: number
 	finishedAt: Date | null
+	tournamentId: number | null
 	rounds: Round[]
-}
-
-export type Versus = {
-	id: number
-	tournamentId: number
-	stage: number
-	parentVersusId: number | null
-	match: Match
 }
 
 export type Tournament = {
@@ -82,10 +73,10 @@ export type Tournament = {
 	state: 'open' | 'ongoing' | 'finished'
 	createdBy: number
 	numberOfPlayers: number
-	stages?: Versus[][]
 }
 
 export type TournamentWithLookup = Tournament & {
+	stages: Match[][]
 	createdByUser: UserBasic
 	participants: { user: UserBasic }[]
 }
@@ -115,7 +106,10 @@ export type SocketChannels = {
 			onParticipantJoin: { user: UserBasic }
 			onParticipantQuit: { user: UserBasic }
 			onNewState: { state: Tournament['state'] }
-			onEngineEvent: { data: EngineEventData; versusId: number }
+			// onEngineEvent: { data: EngineEventData; versusId: number }
+			// onMatchesReady: { matches: Match[] }
+			// onMatchEnd: { tournament: Tournament }
+			// onRoundEnd: { matchId: number, scores: Scores }
 		}
 	}
 }

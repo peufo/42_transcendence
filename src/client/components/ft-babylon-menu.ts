@@ -274,15 +274,11 @@ myParticleSystem.gravity = new BABYLON.Vector3(0, -1, 0); // tire vers le bas (e
 		}
 
 		startGameEngine() {
-			this.gameLogicEngine = new GameEngine(
-				{
-					onTick: this.renderGameState.bind(this),
-					onRoundEnd: this.handleScoreUpdate.bind(this),
-				},
-				{
-					scoreToWin: 5, // TODO: prout
-				},
-			)
+			this.gameLogicEngine = new GameEngine({
+				scoreToWin: 5,
+				onTick: this.renderGameState.bind(this),
+				onRoundEnd: this.handleScoreUpdate.bind(this),
+			})
 			this.gameLogicEngine.start()
 		}
 		handleScoreUpdate({ scores }: RoundData) {

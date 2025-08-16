@@ -7,7 +7,7 @@ import {
 	isTournamentEmptyAndOpen,
 	tournamentCreate,
 	tournamentDelete,
-	tournamentGetWithParticipants,
+	tournamentGet,
 	tournamentJoin,
 	tournamentQuit,
 	tournamentStart,
@@ -25,7 +25,7 @@ export const tournamentsRoute: FastifyPluginCallbackZod = (
 		async (req, res) => {
 			permission.user(res)
 			const { tournamentId } = req.query
-			const tournament = await tournamentGetWithParticipants(tournamentId)
+			const tournament = await tournamentGet(tournamentId)
 			return res.send({ data: tournament })
 		},
 	)
