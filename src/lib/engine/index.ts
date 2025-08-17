@@ -15,6 +15,7 @@ export type RoundData = {
 	ballPositionY: number
 }
 type GameOverData = {
+	finalRound: RoundData
 	finishedAt: number
 }
 export type State = {
@@ -171,11 +172,16 @@ export class Engine {
 		const { scorer } = roundInfo
 		this.#scores[scorer]++
 		roundInfo.scores = this.#scores
-		this.tickData.onRoundEnd = roundInfo
 		if (this.#scores[scorer] >= this.#options.scoreToWin) {
-			this.#gameOver = true
-			this.tickData.onGameEnd = { finishedAt: Date.now() }
-		} else this.#newRound()
+			this.tickData.onGameEnd = {
+				finalRound: roundInfo,
+				finishedAt: Date.now(),
+			}
+			this.stop()
+		} else {
+			this.tickData.onRoundEnd = roundInfo
+			this.#newRound()
+		}
 	}
 
 	#newRound() {

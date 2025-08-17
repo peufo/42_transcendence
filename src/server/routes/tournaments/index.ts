@@ -61,9 +61,6 @@ export const tournamentsRoute: FastifyPluginCallbackZod = (
 			notify.tournaments(tournamentId, 'onParticipantJoin', { user })
 
 			if (isTournamentFull) {
-				notify.tournaments(tournamentId, 'onNewState', {
-					state: 'ongoing',
-				})
 				await tournamentStart(tournament.id)
 			}
 

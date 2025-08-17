@@ -8,14 +8,19 @@ type EventMessage<Channel extends keyof SocketChannels> = {
 	message: [Partial<SocketChannels[Channel]['serverEvents']>]
 }
 
+type ServerPayload<Channel extends keyof SocketChannels> =
+	'serverPayload' extends keyof SocketChannels[Channel]
+		? SocketChannels[Channel]['serverPayload'] | undefined
+		: undefined
+
+type EmitterObject<Channel extends keyof SocketChannels> = {
+	events: EventEmitter<EventMessage<Channel>>
+	sockets: Set<WebSocket>
+	payload?: ServerPayload<Channel>
+}
+
 const emitterMaps: Partial<{
-	[Channel in keyof SocketChannels]: Map<
-		number,
-		{
-			emitter: EventEmitter<EventMessage<Channel>>
-			sockets: Set<WebSocket>
-		}
-	>
+	[Channel in keyof SocketChannels]: Map<number, EmitterObject<Channel>>
 }> = {}
 
 export const notify: {
@@ -23,6 +28,7 @@ export const notify: {
 } = {
 	friendships: useNotifier('friendships'),
 	tournaments: useNotifier('tournaments'),
+	matches: useNotifier('matches'),
 }
 
 type ServerEventsFriendship = SocketChannels['friendships']['serverEvents']
@@ -45,51 +51,58 @@ export function bindEmitterWithSocket<Channel extends keyof SocketChannels>(
 	emitterKey: number,
 	socket: WebSocket,
 	options: {
-		onDestroy?: () => void
 		onCreate?: () => void
+		onOpen?: (payload: ServerPayload<Channel>) => ServerPayload<Channel>
+		onClose?: (payload: ServerPayload<Channel>) => ServerPayload<Channel>
+		onDestroy?: (payload: ServerPayload<Channel>) => void
 	} = {},
 ) {
-	const { emitter, sockets } = getEmitter(channel, emitterKey, options)
-
+	const emitter = getEmitter(channel, emitterKey, options)
+	if (options.onOpen) emitter.payload = options.onOpen(emitter.payload)
 	const sender = (event: Partial<ServerEvents<Channel>>) => {
 		socket.send(JSON.stringify(event))
 	}
-	emitter.on('message', sender)
-	sockets.add(socket)
+	emitter.events.on('message', sender)
+	emitter.sockets.add(socket)
 	socket.on('close', (_message) => {
-		emitter.off('message', sender)
-		sockets.delete(socket)
-		if (!sockets.size) {
+		if (options.onClose) emitter.payload = options.onClose(emitter.payload)
+		emitter.events.off('message', sender)
+		emitter.sockets.delete(socket)
+		if (!emitter.sockets.size) {
 			deleteEmitter(channel, emitterKey)
-			if (options.onDestroy) options.onDestroy()
+			if (options.onDestroy) options.onDestroy(emitter.payload)
 		}
 	})
 }
 
-function deleteEmitter<Channel extends keyof SocketChannels>(
+export function deleteEmitter<Channel extends keyof SocketChannels>(
 	channel: Channel,
 	emitterKey: number,
 ) {
-	if (!emitterMaps[channel]) return
-	emitterMaps[channel].delete(emitterKey)
+	const emitter = emitterMaps[channel]?.get(emitterKey)
+	if (!emitter) return
+	for (const socket of emitter.sockets) {
+		socket.close()
+	}
+	emitterMaps[channel]?.delete(emitterKey)
 }
 
 function getEmitter<Channel extends keyof SocketChannels>(
 	channel: Channel,
 	emitterKey: number,
 	{ onCreate }: { onCreate?: () => void } = {},
-) {
+): EmitterObject<Channel> {
 	if (!emitterMaps[channel]) {
 		emitterMaps[channel] = new Map()
 	}
 	const emitter = emitterMaps[channel].get(emitterKey)
 	if (emitter) return emitter
 	const newEmitter = {
-		emitter: new EventEmitter<EventMessage<Channel>>(),
+		events: new EventEmitter<EventMessage<Channel>>(),
 		sockets: new Set<WebSocket>(),
 	}
+	onCreate?.()
 	emitterMaps[channel].set(emitterKey, newEmitter)
-	if (onCreate) onCreate()
 	return newEmitter
 }
 
@@ -99,9 +112,9 @@ function useNotifier<Channel extends keyof SocketChannels>(channel: Channel) {
 	>(
 		emitterKey: number,
 		eventName: EventName,
-		data: SocketChannels[Channel]['serverEvents'][EventName],
+		data: Required<SocketChannels[Channel]['serverEvents']>[EventName],
 	) {
-		const { emitter } = getEmitter(channel, emitterKey)
+		const { events: emitter } = getEmitter(channel, emitterKey)
 		// @ts-ignore
 		emitter.emit('message', { [eventName]: data })
 	}

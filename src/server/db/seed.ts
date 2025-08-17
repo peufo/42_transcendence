@@ -102,6 +102,9 @@ async function main() {
 				player2Score: f.valuesFromArray({
 					values: [0, 1, 2, 3, 4, 5],
 				}),
+				tournamentId: f.default({
+					defaultValue: null,
+				}),
 			},
 			count: 3000,
 		},
@@ -149,16 +152,15 @@ async function main() {
 	const [tournament] = await db
 		.insert(tournaments)
 		.values({
-			numberOfPlayers: 8,
+			numberOfPlayers: 16,
 			state: 'open',
 			createdBy: 1,
 		})
 		.returning()
 
-	for (let n = 0; n < 8; n++) {
+	for (let n = 0; n < 14; n++) {
 		await tournamentJoin(tournament.id, n + 1)
 	}
-	// await tournamentStart(tournament.id)
 }
 
 main()

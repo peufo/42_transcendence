@@ -1,3 +1,5 @@
+import type { Engine, EngineEventData } from './engine/index.js'
+
 export type UserBasic = {
 	id: number
 	name: string
@@ -53,17 +55,20 @@ export type Round = {
 	ballPositionY: number
 }
 
-export type Match = {
+export type MatchBasic = {
 	id: number
-	state: 'awaiting' | 'ongoing' | 'finished' | null
+	state: 'awaiting' | 'ongoing' | 'finished'
 	player1Id: number | null
 	player2Id: number | null
-	player1: UserBasic | null
-	player2: UserBasic | null
 	player1Score: number
 	player2Score: number
 	finishedAt: Date | null
 	tournamentId: number | null
+}
+
+export type Match = MatchBasic & {
+	player1: UserBasic | null
+	player2: UserBasic | null
 	rounds: Round[]
 }
 
@@ -105,11 +110,22 @@ export type SocketChannels = {
 		serverEvents: {
 			onParticipantJoin: { user: UserBasic }
 			onParticipantQuit: { user: UserBasic }
-			onNewState: { state: Tournament['state'] }
-			// onEngineEvent: { data: EngineEventData; versusId: number }
-			// onMatchesReady: { matches: Match[] }
-			// onMatchEnd: { tournament: Tournament }
-			// onRoundEnd: { matchId: number, scores: Scores }
+			onStart: { stages: Match[][] }
+			onMatchChange: { match: MatchBasic }
+			onEnd: null
+		}
+	}
+	matches: {
+		query: { matchId: string }
+		clientEvents: null //TODO: Input Engine
+		serverEvents: {
+			onEngineEvent: EngineEventData
+			onSurrender: MatchBasic
+		}
+		serverPayload: {
+			engine: Engine
+			player1Ready: boolean
+			player2Ready: boolean
 		}
 	}
 }

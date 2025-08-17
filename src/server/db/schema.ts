@@ -133,6 +133,7 @@ export const matches = sqliteTable('matches', {
 	player2Id: int().references(() => users.id),
 	player1Score: int().default(0).notNull(),
 	player2Score: int().default(0).notNull(),
+	scoreToWin: int().default(3).notNull(),
 	tournamentId: int().references(() => tournaments.id),
 	finishedAt: int({ mode: 'timestamp' }),
 })
@@ -140,37 +141,12 @@ export const matches = sqliteTable('matches', {
 export const matchesRelations = relations(matches, ({ one, many }) => ({
 	player1: one(users, { fields: [matches.player1Id], references: [users.id] }),
 	player2: one(users, { fields: [matches.player2Id], references: [users.id] }),
-	tournament: one(tournaments),
+	tournament: one(tournaments, {
+		fields: [matches.tournamentId],
+		references: [tournaments.id],
+	}),
 	rounds: many(rounds),
 }))
-
-// export const versus = sqliteTable(
-// 	'versus',
-// 	{
-// 		id: int().primaryKey({ autoIncrement: true }),
-// 		tournamentId: int()
-// 			.notNull()
-// 			.references(() => tournaments.id),
-// 		stage: int().notNull(),
-// 		parentVersusId: int('parentVersusId'),
-// 		matchId: int()
-// 			.references(() => matches.id)
-// 			.notNull()
-// 			.unique(),
-// 	},
-// 	(self) => [
-// 		foreignKey({
-// 			columns: [self.parentVersusId],
-// 			foreignColumns: [self.id],
-// 			name: 'parentVersusIdForeignKey',
-// 		}),
-// 	],
-// )
-
-// export const versusRelations = relations(versus, ({ one }) => ({
-// 	tournament: one(tournaments),
-// 	match: one(matches, { fields: [versus.matchId], references: [matches.id] }),
-// }))
 
 export const rounds = sqliteTable('rounds', {
 	id: int().primaryKey({ autoIncrement: true }),

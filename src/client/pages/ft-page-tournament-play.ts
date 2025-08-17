@@ -1,13 +1,9 @@
 import { type ChannelSocket, openChannel } from '../../lib/socketChannels.js'
-import { getVersusMaxDepth } from '../../lib/tournament.js'
+import { getCurrentStage } from '../../lib/tournament.js'
 import type { Match } from '../../lib/type.js'
 import { toast } from '../components/ft-toast.js'
 import { getAvatarSrc } from '../utils/avatar.js'
-import {
-	type CleanEffect,
-	createEffect,
-	createSignal,
-} from '../utils/signal.js'
+import { type CleanEffect, createEffect } from '../utils/signal.js'
 import { $tournament, $user } from '../utils/store.js'
 
 customElements.define(
@@ -56,49 +52,54 @@ customElements.define(
 							}
 						})
 					},
-					onNewState({ state }) {
-						$tournament.update((t) => (!t ? t : { ...t, state }))
-						if (state === 'ongoing') toast.success('Tournament starting')
+					onStart({ stages }) {
+						$tournament.update((t) => {
+							if (!t) return undefined
+							return { ...t, state: 'ongoing', stages }
+						})
+						toast.success('Tournament starting')
+						// TODO: $url.set(matchId=${match.id})
 					},
+					onMatchChange({ match }) {
+						$tournament.update((t) => {
+							const user = $user.get()
+							// for (const stage of t.stages) {
+							// 	for (const m of stage) {
+							// 		if (m.id !== match.id) continue
+							// 		Object.assign(m, match)
+							// 	}
+							// }
+							const m = t?.stages.flat().find((m) => m.id === match.id)
+							if (!t || !m) return t
+							Object.assign(m, match)
 
-					// onEngineEvent({ versusId, data }) {
-					// 	if (!data.onRoundEnd && !data.onGameEnd) return
-					// 	$tournament.update((t) => {
-					// 		if (!t?.stages) return t
-					// 		return {
-					// 			...t,
-					// 			stages: t.stages.map((stage) =>
-					// 				stage.map((vs) => {
-					// 					if (vs.id !== versusId) return vs
-					// 					if (!vs.match) return vs
-					// 					if (data.onRoundEnd) {
-					// 						const { p1, p2 } = data.onRoundEnd.scores
-					// 						return {
-					// 							...vs,
-					// 							match: {
-					// 								...vs.match,
-					// 								state: 'ongoing',
-					// 								player1Score: p1,
-					// 								player2Score: p2,
-					// 							},
-					// 						}
-					// 					}
-					// 					if (data.onGameEnd) {
-					// 						return {
-					// 							...vs,
-					// 							match: {
-					// 								...vs.match,
-					// 								state: 'finished',
-					// 								finishedAt: new Date(data.onGameEnd.finishedAt),
-					// 							},
-					// 						}
-					// 					}
-					// 					return vs
-					// 				}),
-					// 			),
-					// 		}
-					// 	})
-					// },
+							if (
+								match.player1Id === user?.id ||
+								match.player2Id === user?.id
+							) {
+								// TODO: $url.set(matchId=${match.id})
+								// TODO: ensure close current channel before ?
+								// openChannel(
+								// 	'matches',
+								// 	{ matchId: match.id.toString() },
+								// 	{
+								// 		onEngineEvent(data) {},
+								// 		onSurrender(data) {},
+								// 	},
+								// )
+							}
+
+							return { ...t, state: 'ongoing' }
+						})
+
+						// update the good match
+
+						// if i'm a player, openChannel('matches)
+					},
+					onEnd() {
+						$tournament.update((t) => (!t ? t : { ...t, state: 'finished' }))
+						toast.success('Tournament terminated')
+					},
 				},
 			)
 		}
@@ -216,32 +217,16 @@ customElements.define(
 customElements.define(
 	'ft-tournament-ongoing',
 	class extends HTMLElement {
-		private cleanEffects: CleanEffect[]
-		private stage = createSignal<number>(0)
+		private cleanEffect: CleanEffect
 
 		connectedCallback() {
-			this.cleanEffects = [
-				createEffect(() => {
-					this.innerHTML = this.render()
-					this.attachEvents()
-				}),
-			]
+			this.cleanEffect = createEffect(() => {
+				this.innerHTML = this.render()
+			})
 		}
 
 		disconnectedCallback() {
-			this.cleanEffects.forEach((clean) => clean())
-		}
-
-		attachEvents() {
-			const stageButtons =
-				this.querySelectorAll<HTMLButtonElement>('button[data-stage]')
-			for (const button of stageButtons) {
-				const stage = button.dataset.stage
-				if (stage === undefined) continue
-				button.addEventListener('click', () => {
-					this.stage.set(+stage)
-				})
-			}
+			this.cleanEffect()
 		}
 
 		render(): string {
@@ -260,73 +245,71 @@ customElements.define(
 			</form>
 			`
 
+			const currentStage = getCurrentStage(tournament.stages)
+
 			const renderStages = () => {
-				if (!tournament?.stages) return 'No stages'
+				if (!tournament.stages) return 'No stages'
 				const stages = tournament.stages.map(renderStage)
 				return /*html*/ `
-					<div class="flex flex-row-reverse justify-end gap-4 p-4">
+					<div class="flex gap-4 p-4">
 						<div class="flex flex-col gap-4 min-w-26"></div>
 						${stages.join('')}
-						<div class="flex flex-col gap-4 min-w-6"></div>
+						<div class="flex flex-col gap-4 min-w-26"></div>
 					</div>
 				`
 			}
 
 			const renderStage = (stage: Match[]) => {
-				// TODO: highlight background color
 				const vsContainers = stage.map(renderMatch)
+				let currentStageClasses = ''
+				if (stage === currentStage) {
+					currentStageClasses = 'ring-1 ring-indigo-500 rounded-lg bg-indigo-50'
+				}
+				const stageNames = ['Final', 'Semi', 'Quarter', 'Eight']
 				return /*html*/ `
-					<div class="flex flex-col gap-2 min-w-32 snap-center justify-evenly grow">
-						${vsContainers.join('')}
+					<div class="flex flex-col gap-4">
+						<h3 class="text-center">
+							${stageNames.at(tournament.stages.length - tournament.stages.indexOf(stage) - 1)}
+						</h3>
+						<div class="flex flex-col gap-1 p-1 min-w-56 snap-center justify-evenly grow  ${currentStageClasses}">
+							${vsContainers.join('')}
+						</div>
 					</div>
+					
 				`
+			}
+
+			const matchIcons: Record<Match['state'], string> = {
+				awaiting: /*html*/ `<ft-icon name="clock" class="w-3 h-3 stroke-amber-500"></ft-icon>`,
+				ongoing: /*html*/ `<ft-icon name="loader-circle" class="w-3 h-3 stroke-indigo-500"></ft-icon>`,
+				finished: '',
 			}
 
 			const renderMatch = (match: Match) => {
 				let colorP1 = ''
 				let colorP2 = ''
-				if (!match.player1 || user.id === match.player1.id)
+				if (match.player1 && user.id === match.player1.id)
 					colorP1 = 'text-indigo-600 font-bold'
-				else if (!match.player2 || user.id === match.player2.id)
+				else if (match.player2 && user.id === match.player2.id)
 					colorP2 = 'text-indigo-600 font-bold'
-				const icon = () => {
-					switch (match.state) {
-						case 'finished':
-							return 'swords'
-						case 'awaiting':
-							return 'bot'
-						case 'ongoing':
-							return 'loader-circle'
-					}
-				}
 				return /*html*/ `
-					<div class="grid grid-cols-3 grid-rows-2 items-center justify-items-center border border-gray-200 rounded-md">
-						<div class="text-xs break-all text-center ${colorP1}">${match.player1 ? match.player1.name : '?'}</div>
-						<ft-icon name="zap" class="h-3 scale-x-75 rotate-12"></ft-icon>
-						<div class="text-xs break-all text-center ${colorP2}">${match.player2 ? match.player2.name : '?'}</div>
-						<span class="text-xs">${match.player1Score}</span>
-						<ft-icon name="${icon()}" class="animate-spin w-3 h-3 stroke-indigo-600"></ft-icon>
-						<span class="text-xs">${match.player2Score}</span>
+					<div class="bg-white border border-gray-200 rounded-md">
+						<div class="grid grid-cols-7 p-1 items-center justify-items-center">
+							<div class="text-xs break-all text-center col-span-3 ${colorP1}">
+								${match.player1 ? match.player1.name : '?'}
+							</div>
+							<ft-icon name="zap" class="h-3 scale-x-75 rotate-12"></ft-icon>
+							<div class="text-xs break-all text-center col-span-3 ${colorP2}">
+								${match.player2 ? match.player2.name : '?'}
+							</div>
+						</div>
+						<div class="grid grid-cols-7 p-1 items-center justify-items-center">
+							<span class="text-xs col-span-3">${match.player1Score}</span>
+							${matchIcons[match.state]}
+							<span class="text-xs col-span-3">${match.player2Score}</span>
+						</div>
 					</div>
 				`
-			}
-
-			const renderStagesButtons = () => {
-				if (!tournament) return ''
-				const stageNames = ['Final', 'Semi', 'Quarter', 'Eight']
-				const maxDeep = getVersusMaxDepth(tournament?.numberOfPlayers)
-				let buttons = ''
-				for (let stage = 0; stage <= maxDeep; stage++) {
-					buttons += /*html*/ `
-						<button
-							class="btn btn-border btn-sm"
-							data-stage="${stage}"
-						>
-							${stageNames[stage]}
-						</button>
-					`
-				}
-				return buttons
 			}
 
 			return /*html*/ `
@@ -336,14 +319,11 @@ customElements.define(
 						<div class="overflow-x-scroll rounded-md border border-gray-200 snap-x snap-mandatory">
 							${renderStages()}
 						</div>
-						<div class="flex flex-row-reverse gap-2">
-							${renderStagesButtons()}
-						</div>
 						${iParticipate ? quitButton : ''}
 					</aside>
 
 					<div class="col-span-3 grid place-content-center">
-						GAME
+						<ft-pong-remote></ft-pong-remote>
 					</div>
 				</div>
 			`
