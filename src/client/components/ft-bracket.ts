@@ -1,27 +1,8 @@
 import { getCurrentStage } from '../../lib/tournament.js'
 import type { Match } from '../../lib/type.js'
+import { getMyMatch, setMatchId } from '../utils/match.js'
 import { type CleanEffect, createEffect } from '../utils/signal.js'
-import {
-	$matchId,
-	$participants,
-	$stages,
-	$tournament,
-	$user,
-} from '../utils/store.js'
-
-function getMyMatch(userId: number, stages: Match[][]) {
-	return stages.flat().find((m) => {
-		return (
-			(m.player1Id === userId || m.player2Id === userId) &&
-			m.state === 'awaiting'
-		)
-	})
-}
-
-function setMatchId(matchId: number) {
-	const currentMatchId = $matchId.get()
-	if (currentMatchId !== matchId) $matchId.set(matchId)
-}
+import { $participants, $stages, $tournament, $user } from '../utils/store.js'
 
 customElements.define(
 	'ft-bracket',
@@ -45,7 +26,7 @@ customElements.define(
 			const user = $user.get()
 			if (!user) return ''
 
-			const myMatch = getMyMatch(user.id, stages)
+			const myMatch = getMyMatch(stages)
 			if (myMatch) {
 				setMatchId(myMatch.id)
 			}

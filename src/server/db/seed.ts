@@ -149,16 +149,18 @@ async function main() {
 		count: 10,
 	}))
 
+	const nbPlayers = 8
+
 	const [tournament] = await db
 		.insert(tournaments)
 		.values({
-			numberOfPlayers: 16,
+			numberOfPlayers: nbPlayers,
 			state: 'open',
 			createdBy: 1,
 		})
 		.returning()
 
-	for (let n = 0; n < 14; n++) {
+	for (let n = 0; n < nbPlayers - 2; n++) {
 		await tournamentJoin(tournament.id, n + 1)
 	}
 }

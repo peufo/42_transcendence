@@ -1,6 +1,7 @@
 import { type ChannelSocket, openChannel } from '../../lib/socketChannels.js'
 import { toast } from '../components/ft-toast.js'
 import { getAvatarSrc } from '../utils/avatar.js'
+import { getMyMatch, setMatchId } from '../utils/match.js'
 import { type CleanEffect, createEffect } from '../utils/signal.js'
 import { $participants, $stages, $tournament, $user } from '../utils/store.js'
 
@@ -42,17 +43,15 @@ customElements.define(
 					},
 					onStart({ stages }) {
 						toast.success('Tournament starting')
+						$stages.set(stages)
 						$tournament.update((t) => {
 							if (!t) return undefined
 							return { ...t, state: 'ongoing' }
 						})
-						$stages.set(stages)
 
-						// const user = $user.get()
-						// if (!user) return
-						// const myMatch = getMyMatch(user.id, stages)
-						// if (!myMatch) return
-						// setMatchId(myMatch.id)
+						const myMatch = getMyMatch(stages)
+						if (!myMatch) return
+						setMatchId(myMatch.id)
 					},
 					onMatchChange({ match }) {
 						$stages.update((stages) => {

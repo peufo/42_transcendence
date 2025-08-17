@@ -177,6 +177,15 @@ customElements.define(
                 `
 			}
 
+			if (!friendships.length) {
+				html += /*html*/ `
+					<div class="text-gray-600 grid place-content-center bg-gray-50 rounded-md p-4">
+						You have no friends :(
+					</div>
+				`
+				return html
+			}
+
 			const friendshipsOn = friendships.filter((f) => f.withUser.isActive)
 			const friendshipsOff = friendships.filter((f) => !f.withUser.isActive)
 			for (const friendship of friendshipsOn) {
