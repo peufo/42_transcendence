@@ -1,10 +1,8 @@
 import { type ChannelSocket, openChannel } from '../../lib/socketChannels.js'
-import { getCurrentStage } from '../../lib/tournament.js'
-import type { Match } from '../../lib/type.js'
 import { toast } from '../components/ft-toast.js'
 import { getAvatarSrc } from '../utils/avatar.js'
 import { type CleanEffect, createEffect } from '../utils/signal.js'
-import { $tournament, $user } from '../utils/store.js'
+import { $participants, $stages, $tournament, $user } from '../utils/store.js'
 
 customElements.define(
 	'ft-page-tournament-play',
@@ -25,80 +23,56 @@ customElements.define(
 				{ tournamentId },
 				{
 					onParticipantJoin(newParticipant) {
-						$tournament.update((tournament) => {
-							if (!tournament) return tournament
-							const isParticipantExist = tournament.participants.find(
+						toast.success(`${newParticipant.user.name} joined the tournament !`)
+						$participants.update((participants) => {
+							const isParticipantExist = participants.find(
 								({ user }) => user.id === newParticipant.user.id,
 							)
-							if (isParticipantExist) return tournament
-							toast.success(
-								`${newParticipant.user.name} joined the tournament !`,
-							)
-							return {
-								...tournament,
-								participants: [...tournament.participants, newParticipant],
-							}
+							if (isParticipantExist) return participants
+							return [...participants, newParticipant]
 						})
 					},
 					onParticipantQuit(participant) {
-						$tournament.update((tournament) => {
-							if (!tournament) return tournament
-							toast.error(`${participant.user.name} left the tournament !`)
-							return {
-								...tournament,
-								participants: tournament.participants.filter(
-									({ user }) => user.id !== participant.user.id,
-								),
-							}
+						toast.error(`${participant.user.name} left the tournament !`)
+						$participants.update((participants) => {
+							return participants.filter(
+								({ user }) => user.id !== participant.user.id,
+							)
 						})
 					},
 					onStart({ stages }) {
+						toast.success('Tournament starting')
 						$tournament.update((t) => {
 							if (!t) return undefined
-							return { ...t, state: 'ongoing', stages }
+							return { ...t, state: 'ongoing' }
 						})
-						toast.success('Tournament starting')
-						// TODO: $url.set(matchId=${match.id})
+						$stages.set(stages)
+
+						// const user = $user.get()
+						// if (!user) return
+						// const myMatch = getMyMatch(user.id, stages)
+						// if (!myMatch) return
+						// setMatchId(myMatch.id)
 					},
 					onMatchChange({ match }) {
-						$tournament.update((t) => {
+						$stages.update((stages) => {
 							const user = $user.get()
-							// for (const stage of t.stages) {
-							// 	for (const m of stage) {
-							// 		if (m.id !== match.id) continue
-							// 		Object.assign(m, match)
-							// 	}
-							// }
-							const m = t?.stages.flat().find((m) => m.id === match.id)
-							if (!t || !m) return t
+							const m = stages.flat().find((m) => m.id === match.id)
+							if (!m) return stages
 							Object.assign(m, match)
-
 							if (
 								match.player1Id === user?.id ||
 								match.player2Id === user?.id
 							) {
-								// TODO: $url.set(matchId=${match.id})
 								// TODO: ensure close current channel before ?
-								// openChannel(
-								// 	'matches',
-								// 	{ matchId: match.id.toString() },
-								// 	{
-								// 		onEngineEvent(data) {},
-								// 		onSurrender(data) {},
-								// 	},
-								// )
+								// setMatchId(m.id)
 							}
-
-							return { ...t, state: 'ongoing' }
+							return stages
 						})
-
-						// update the good match
-
-						// if i'm a player, openChannel('matches)
 					},
 					onEnd() {
-						$tournament.update((t) => (!t ? t : { ...t, state: 'finished' }))
 						toast.success('Tournament terminated')
+						$tournament.update((t) => (!t ? t : { ...t, state: 'finished' }))
 					},
 				},
 			)
@@ -112,8 +86,6 @@ customElements.define(
 		render() {
 			const tournament = $tournament.get()
 			if (!tournament) return /*html*/ `<span>Tournament not found</span>`
-			const user = $user.get()
-			if (!user) return ''
 
 			if (tournament.state === 'finished')
 				return `<span>${tournament.createdByUser.name}'s tournament is over</span>`
@@ -139,11 +111,12 @@ customElements.define(
 
 		render(): string {
 			const tournament = $tournament.get()
+			const participants = $participants.get()
 			if (!tournament) return /*html*/ `<span>Tournament not found</span>`
 			const user = $user.get()
 			if (!user) return ''
 
-			const iParticipate = tournament.participants.find(
+			const iParticipate = participants.find(
 				({ user: { id } }) => id === user.id,
 			)
 			const action = iParticipate ? 'quit' : 'join'
@@ -161,13 +134,13 @@ customElements.define(
 			`
 
 			const participantsCountColor =
-				tournament.participants.length === tournament.numberOfPlayers
+				participants.length === tournament.numberOfPlayers
 					? 'text-lime-400 font-bold a'
 					: 'text-gray-400'
 
 			const participantsCount = /*html*/ `
 			<div class="p-2 flex item-center justify-center ${participantsCountColor}">
-				${tournament.participants.length}
+				${participants.length}
 				/ ${tournament.numberOfPlayers} players
 			</div>
 			`
@@ -175,7 +148,7 @@ customElements.define(
 			const participantList = () => {
 				let html = /*html*/ `<div class="grid gap-3" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">`
 				let number = 0
-				for (const participant of tournament.participants) {
+				for (const participant of participants) {
 					html += /*html*/ `
 					<div class="flex p-2 items-center gap-2 border border-gray-200 rounded-xl">
 						<div class="w-1/10 pl-2 font-bold">${number + 1}</div>
@@ -233,96 +206,12 @@ customElements.define(
 			const tournament = $tournament.get()
 			if (!tournament) return /*html*/ `<span>Tournament not found</span>`
 			const user = $user.get()
-			if (!user) return ''
-
-			const iParticipate = tournament.participants.find(
-				({ user: { id } }) => id === user.id,
-			)
-			const quitButton = /*html*/ `
-			<form action="/tournaments/quit" method="post" class="contents">
-				<input type="hidden" name="tournamentId" value="${tournament.id}" />
-				<input type="submit" value="Quit" class="btn btn-border cursor-pointer">
-			</form>
-			`
-
-			const currentStage = getCurrentStage(tournament.stages)
-
-			const renderStages = () => {
-				if (!tournament.stages) return 'No stages'
-				const stages = tournament.stages.map(renderStage)
-				return /*html*/ `
-					<div class="flex gap-4 p-4">
-						<div class="flex flex-col gap-4 min-w-26"></div>
-						${stages.join('')}
-						<div class="flex flex-col gap-4 min-w-26"></div>
-					</div>
-				`
-			}
-
-			const renderStage = (stage: Match[]) => {
-				const vsContainers = stage.map(renderMatch)
-				let currentStageClasses = ''
-				if (stage === currentStage) {
-					currentStageClasses = 'ring-1 ring-indigo-500 rounded-lg bg-indigo-50'
-				}
-				const stageNames = ['Final', 'Semi', 'Quarter', 'Eight']
-				return /*html*/ `
-					<div class="flex flex-col gap-4">
-						<h3 class="text-center">
-							${stageNames.at(tournament.stages.length - tournament.stages.indexOf(stage) - 1)}
-						</h3>
-						<div class="flex flex-col gap-1 p-1 min-w-56 snap-center justify-evenly grow  ${currentStageClasses}">
-							${vsContainers.join('')}
-						</div>
-					</div>
-					
-				`
-			}
-
-			const matchIcons: Record<Match['state'], string> = {
-				awaiting: /*html*/ `<ft-icon name="clock" class="w-3 h-3 stroke-amber-500"></ft-icon>`,
-				ongoing: /*html*/ `<ft-icon name="loader-circle" class="w-3 h-3 stroke-indigo-500"></ft-icon>`,
-				finished: '',
-			}
-
-			const renderMatch = (match: Match) => {
-				let colorP1 = ''
-				let colorP2 = ''
-				if (match.player1 && user.id === match.player1.id)
-					colorP1 = 'text-indigo-600 font-bold'
-				else if (match.player2 && user.id === match.player2.id)
-					colorP2 = 'text-indigo-600 font-bold'
-				return /*html*/ `
-					<div class="bg-white border border-gray-200 rounded-md">
-						<div class="grid grid-cols-7 p-1 items-center justify-items-center">
-							<div class="text-xs break-all text-center col-span-3 ${colorP1}">
-								${match.player1 ? match.player1.name : '?'}
-							</div>
-							<ft-icon name="zap" class="h-3 scale-x-75 rotate-12"></ft-icon>
-							<div class="text-xs break-all text-center col-span-3 ${colorP2}">
-								${match.player2 ? match.player2.name : '?'}
-							</div>
-						</div>
-						<div class="grid grid-cols-7 p-1 items-center justify-items-center">
-							<span class="text-xs col-span-3">${match.player1Score}</span>
-							${matchIcons[match.state]}
-							<span class="text-xs col-span-3">${match.player2Score}</span>
-						</div>
-					</div>
-				`
-			}
+			if (!user) return 'User not authentified'
 
 			return /*html*/ `
-				<div class="grid grid-cols-4 gap-4 p-4">
-					<aside class="flex flex-col gap-4">
-						<h2 class="text-lg font-semi px-2">${tournament.createdByUser.name}'s tournament</h2>
-						<div class="overflow-x-scroll rounded-md border border-gray-200 snap-x snap-mandatory">
-							${renderStages()}
-						</div>
-						${iParticipate ? quitButton : ''}
-					</aside>
-
-					<div class="col-span-3 grid place-content-center">
+				<div class="grid grid-cols-4 gap-4 p-4 min-w-[1360px]">
+					<ft-bracket></ft-bracket>
+					<div class="col-span-3">
 						<ft-pong-remote></ft-pong-remote>
 					</div>
 				</div>

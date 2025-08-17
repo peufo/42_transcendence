@@ -53,6 +53,10 @@ export function bindEmitterWithSocket<Channel extends keyof SocketChannels>(
 	options: {
 		onCreate?: () => void
 		onOpen?: (payload: ServerPayload<Channel>) => ServerPayload<Channel>
+		onClientEvent?: (
+			payload: ServerPayload<Channel>,
+			data: SocketChannels[Channel]['clientEvents'],
+		) => void
 		onClose?: (payload: ServerPayload<Channel>) => ServerPayload<Channel>
 		onDestroy?: (payload: ServerPayload<Channel>) => void
 	} = {},
@@ -64,6 +68,14 @@ export function bindEmitterWithSocket<Channel extends keyof SocketChannels>(
 	}
 	emitter.events.on('message', sender)
 	emitter.sockets.add(socket)
+	if (options.onClientEvent) {
+		socket.on('message', (rawData) => {
+			const data = JSON.parse(
+				rawData.toString('utf-8'),
+			) as SocketChannels[Channel]['clientEvents']
+			options.onClientEvent?.(emitter.payload, data)
+		})
+	}
 	socket.on('close', (_message) => {
 		if (options.onClose) emitter.payload = options.onClose(emitter.payload)
 		emitter.events.off('message', sender)

@@ -27,8 +27,12 @@ export function createMatchEngine(match: DB.Match): Engine {
 				new Date(finishedAt),
 			)
 			const tournamentId = match.tournamentId
-			if (tournamentId)
+			if (tournamentId) {
+				notify.tournaments(tournamentId, 'onMatchChange', {
+					match: updatedMatch,
+				})
 				await handleTournamentGameEnd({ ...updatedMatch, tournamentId })
+			}
 		},
 		async onEvent(data) {
 			notify.matches(match.id, 'onEngineEvent', data)
@@ -60,7 +64,11 @@ async function handleTournamentGameEnd(
 	}
 	const matchStage = stages[matchStageIndex]
 	const nextStage = stages[matchStageIndex + 1]
-	const nextMatch = nextStage[Math.floor(matchStage.indexOf(match) / 2)]
+	const nextMatch = nextStage.at(Math.floor(matchStage.indexOf(match) / 2))
+	if (!nextMatch) {
+		console.log('WTF')
+		return
+	}
 	await db
 		.update(matches)
 		.set({

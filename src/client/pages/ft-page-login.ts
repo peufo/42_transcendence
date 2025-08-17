@@ -41,7 +41,7 @@ customElements.define(
                 <div>
                   <label for="name" class="block text-white font-medium">User name</label>
                   <div class="mt-2">
-                    <input type="text" name="name" id="name" autocomplete="off"
+                    <input autofocus type="text" name="name" id="name" autocomplete="off"
                       class="input w-full rounded-lg px-4 py-2 text-white bg-white/10 backdrop-blur-md placeholder-white/60 focus:outline-offset-2 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-blue-900 transition duration-300 " />
                   </div>
                 </div>

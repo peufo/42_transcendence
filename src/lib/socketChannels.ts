@@ -10,6 +10,10 @@ export type ChannelSocket<Channel extends keyof SocketChannels> = ReturnType<
 	typeof openChannel<Channel>
 >
 
+export type OpenedChannel<Channel extends keyof SocketChannels> = ReturnType<
+	typeof openChannel<Channel>
+>
+
 export function openChannel<Channel extends keyof SocketChannels>(
 	channel: Channel,
 	query: SocketChannels[Channel]['query'],
@@ -43,7 +47,9 @@ export function openChannel<Channel extends keyof SocketChannels>(
 			eventName: EventName,
 			data: ClientEvents<Channel>[EventName],
 		) {
-			console.log('TODO: send event from client', eventName, data)
+			if (socket.readyState === socket.OPEN) {
+				socket.send(JSON.stringify({ [eventName]: data }))
+			}
 		},
 	}
 }

@@ -2,6 +2,7 @@ import type {
 	FriendshipFriend,
 	FriendshipInvitation,
 	Match,
+	Tournament,
 	TournamentWithLookup,
 	UserBasic,
 	UserStats,
@@ -16,6 +17,11 @@ export const $friendshipsFriend = createSignal<FriendshipFriend[]>([])
 export const $friendshipsInvitation = createSignal<FriendshipInvitation[]>([])
 export const $matches = createSignal<Match[]>([])
 export const $rankedUsers = createSignal<UserStats[]>([])
-export const $tournament = createSignal<TournamentWithLookup | undefined>(
-	undefined,
+export const $tournament = createSignal<
+	(Tournament & { createdByUser: UserBasic }) | undefined
+>(undefined)
+export const $participants = createSignal<TournamentWithLookup['participants']>(
+	[],
 )
+export const $stages = createSignal<TournamentWithLookup['stages']>([])
+export const $matchId = createSignal<number>(-1)

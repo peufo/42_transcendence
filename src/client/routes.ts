@@ -39,7 +39,11 @@ export const API_GET: {
 	'/friendships/invitation': store.$friendshipsInvitation.set,
 	'/stats/me': store.$matches.set,
 	'/stats/all': store.$rankedUsers.set,
-	'/tournaments': store.$tournament.set,
+	'/tournaments': (t) => {
+		store.$tournament.set(t)
+		store.$participants.set(t.participants)
+		store.$stages.set(t.stages)
+	},
 }
 
 export const API_POST: {

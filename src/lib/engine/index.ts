@@ -6,7 +6,7 @@ import { Vector2 } from './Vector2.js'
 export type Player = 'p1' | 'p2'
 export type Move = 'down' | 'up'
 type Paddles = Record<Player, Paddle>
-type Inputs = Record<Player, Record<Move, boolean>>
+export type EngineInputs = Record<Player, Partial<Record<Move, boolean>>>
 export type Scores = Record<Player, number>
 export type RoundData = {
 	scorer: Player
@@ -62,8 +62,8 @@ export const ARENA_HEIGHT = 700
 
 // Ball properties
 export const BALL_MAX_BOUNCE_ANGLE = (4 * Math.PI) / 12 // <- 60 degrees in radians
-export const BALL_BASE_SPEED = 0.3
-export const BALL_MAX_SPEED = 0.7
+export const BALL_BASE_SPEED = 0.35
+export const BALL_MAX_SPEED = 1.2
 export const BALL_TIME_TO_REACH_MAX_SPEED = 50000
 export const BALL_BASE_SIZE = ARENA_WIDTH / 70
 export const BALL_BASE_POSITION = new Vector2(
@@ -90,7 +90,7 @@ export class Engine {
 	#roundStartTime: number
 	#paddles: Paddles
 	#ball: Ball
-	#inputs: Inputs
+	#inputs: EngineInputs
 	#scores: Scores = {
 		p1: 0,
 		p2: 0,
@@ -113,12 +113,15 @@ export class Engine {
 
 	#timer(seconds: number, timeoutCallback: () => void) {
 		this.onEvent({ onTimerTick: seconds })
+		if (seconds === 0) {
+			timeoutCallback()
+			return
+		}
 		setTimeout(() => {
 			if (!this.#gameOver) {
-				if (seconds > 1) this.#timer(seconds - 1, timeoutCallback)
-				else timeoutCallback()
+				this.#timer(seconds - 1, timeoutCallback)
 			}
-		}, 1000)
+		}, 500)
 	}
 
 	#initState() {
@@ -186,7 +189,7 @@ export class Engine {
 
 	#newRound() {
 		this.#initState()
-		this.#timer(1, () => {
+		this.#timer(3, () => {
 			this.#roundStartTime = Date.now()
 			this.#roundOver = false
 			this.#tickLoop()
@@ -194,7 +197,7 @@ export class Engine {
 	}
 
 	setInput(player: Player, move: Move, value: boolean) {
-		this.#inputs[player][move] = value
+		if (this.#inputs) this.#inputs[player][move] = value
 	}
 
 	start() {

@@ -1,4 +1,4 @@
-import type { Engine, EngineEventData } from './engine/index.js'
+import type { Engine, EngineEventData, Move, Player } from './engine/index.js'
 
 export type UserBasic = {
 	id: number
@@ -117,7 +117,13 @@ export type SocketChannels = {
 	}
 	matches: {
 		query: { matchId: string }
-		clientEvents: null //TODO: Input Engine
+		clientEvents: {
+			onPlayerInput: {
+				player: Player
+				move: Move
+				value: boolean
+			}
+		}
 		serverEvents: {
 			onEngineEvent: EngineEventData
 			onSurrender: MatchBasic

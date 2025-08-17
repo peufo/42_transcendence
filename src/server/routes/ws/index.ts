@@ -2,9 +2,7 @@ import { eq } from 'drizzle-orm'
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import z from 'zod/v4'
 import type { Player } from '../../../lib/engine/index.js'
-
 import { db, matches } from '../../db/index.js'
-
 import { getSessionFromRequest } from '../auth/hooks.js'
 import { findTournament } from '../tournaments/tournamentDb.js'
 import { setUserIsActive } from '../users/model.js'
@@ -93,9 +91,9 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 				onOpen(payload) {
 					if (!payload) {
 						return {
+							engine: createMatchEngine(match),
 							player1Ready: player === 'p1',
 							player2Ready: player === 'p2',
-							engine: createMatchEngine(match),
 						}
 					}
 					if (payload.player1Ready && payload.player2Ready) {
@@ -108,6 +106,12 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 						payload.engine.start()
 					}
 					return payload
+				},
+				onClientEvent(payload, event) {
+					if (event.onPlayerInput) {
+						const { player, move, value } = event.onPlayerInput
+						payload?.engine.setInput(player, move, value)
+					}
 				},
 				onClose(payload) {
 					if (!payload) return undefined
@@ -128,26 +132,5 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 			})
 		},
 	)
-
-	// server.get('/', { websocket: true }, (socket, _req) => {
-	// 	const engine = new Engine({
-	// 		onEvent: (event) => socket.send(JSON.stringify(event)),
-	// 	})
-	// 	engine.start() // event ?
-	// 	socket.on('message', (message) => {
-	// 		const json = JSON.parse(message.toString('utf-8'))
-	// 		const input = z.safeParse(engineInputSchema, json)
-	// 		if (input.error) {
-	// 			console.error(input.error)
-	// 			return
-	// 		}
-	// 		const { player, move, value } = input.data
-	// 		engine.setInput(player, move, value)
-	// 	})
-	// 	socket.on('close', (_message) => {
-	// 		engine.stop()
-	// 	})
-	// })
-
 	done()
 }
