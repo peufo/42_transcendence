@@ -36,13 +36,13 @@ customElements.define(
 			this.cleanEffect = createEffect(async () => {
 				const url = $url.get()
 				const page = this.getPage(url.pathname)
-
 				if (page.layoutData) {
 					await Promise.all(
 						page.layoutData.map((route) => api.get(route, url.search.slice(1))),
 					)
 				}
 				const user = $user.get()
+
 				if (!page.isPublic && !user) {
 					return goto(
 						new URL(`/login?redirectTo=${url.pathname}`, document.baseURI),

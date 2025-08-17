@@ -98,6 +98,9 @@ export const API_POST: {
 }
 
 export const PAGES = {
+	'/lab': {
+		component: 'ft-page-lab',
+	},
 	'/': {
 		component: 'ft-page-index',
 		layoutData: ['/auth/user'],

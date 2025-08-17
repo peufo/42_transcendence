@@ -14,5 +14,9 @@ export function getMyMatch(stages: Match[][]) {
 
 export function setMatchId(matchId: number) {
 	const currentMatchId = $matchId.get()
-	if (currentMatchId !== matchId) $matchId.set(matchId)
+	if (currentMatchId !== matchId) {
+		$matchId.set(matchId)
+		return true
+	}
+	return false
 }

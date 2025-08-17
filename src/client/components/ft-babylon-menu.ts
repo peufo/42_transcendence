@@ -37,8 +37,7 @@ customElements.define(
 		gameLogicEngine: GameEngine
 		guiTexture: BABYLON.GUI.AdvancedDynamicTexture
 
-		constructor() {
-			super()
+		connectedCallback() {
 			this.classList.add('grid', 'place-items-center')
 
 			this.initCanvasAndEngine()
@@ -54,9 +53,6 @@ customElements.define(
 			this.ballMesh.position.y += 5
 			this.babylonEngine.runRenderLoop(() => this.scene.render())
 			this.handleSceneChange()
-		}
-
-		connectedCallback() {
 			window.addEventListener('resize', () => this.babylonEngine.resize())
 		}
 

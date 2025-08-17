@@ -1,6 +1,6 @@
-let effectToSubscribe: (() => unknown) | null = null
-let createCleaner: ((subscribes: SubscribeMap) => CleanEffect) | null = null
-let cleaners: CleanEffect[] = []
+const effectsToSubscribe: (() => unknown)[] = []
+const cleanerFactories: ((subscribes: SubscribeMap) => CleanEffect)[] = []
+const cleanersStack: CleanEffect[][] = []
 
 export type CleanEffect = () => void
 type SubscribeMap = Set<() => void>
@@ -17,10 +17,13 @@ export function createSignal<T>(initialValue: T): {
 	let value = initialValue
 
 	const get: Getter<T> = () => {
+		const effectToSubscribe = effectsToSubscribe.at(-1)
+		const cleanerFactory = cleanerFactories.at(-1)
+		const cleaners = cleanersStack.at(-1)
+		if (cleanerFactory && cleaners) {
+			cleaners.push(cleanerFactory(subscribes))
+		}
 		if (effectToSubscribe) {
-			if (createCleaner) {
-				cleaners.push(createCleaner(subscribes))
-			}
 			subscribes.add(effectToSubscribe)
 		}
 		return value
@@ -42,23 +45,24 @@ export function createSignal<T>(initialValue: T): {
 }
 
 export function createEffect(func: () => void | Promise<void>): CleanEffect {
-	cleaners = []
-	createCleaner = (subscribes: SubscribeMap) => {
+	cleanersStack.push([])
+	cleanerFactories.push((subscribes: SubscribeMap) => {
 		return () => subscribes.delete(func)
-	}
-	effectToSubscribe = func
+	})
+	effectsToSubscribe.push(func)
 	const promise = func()
-	if (!promise) effectToSubscribe = null
+	if (!promise) effectsToSubscribe.pop()
 	else
 		promise.then(() => {
-			effectToSubscribe = null
+			effectsToSubscribe.pop()
 		})
-	effectToSubscribe = null
-	createCleaner = null
-	const _unsubscribes = [...cleaners]
+	effectsToSubscribe.pop()
+	cleanerFactories.pop()
+	const cleaners = cleanersStack.pop() || []
 	return () => {
-		for (const _unsubscribe of _unsubscribes) {
-			_unsubscribe()
+		for (const cleaner of cleaners) {
+			console.log('cleaning')
+			cleaner()
 		}
 	}
 }

@@ -4,8 +4,7 @@ customElements.define(
 		name: string
 		svgClass: string
 
-		constructor() {
-			super()
+		connectedCallback() {
 			this.name = this.getAttribute('name') || 'file-x'
 			this.svgClass = this.classList.value
 			this.classList.remove(...this.classList)

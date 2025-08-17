@@ -31,6 +31,8 @@ customElements.define(
 customElements.define(
 	'ft-match-history',
 	class extends HTMLElement {
+		private user = $user.get()
+
 		connectedCallback() {
 			this.classList.add(
 				'flex',
@@ -48,8 +50,7 @@ customElements.define(
 		renderContent(): string {
 			const matches = $matches.get()
 			const matchesHead = matches.slice(0, 5)
-			const user = $user.get()
-			if (!user) return ''
+			if (!this.user) return ''
 
 			let html = /*html*/ `
 				<h2 class="flex flex-row p-2 items-center justify-center gap-2 font-bold">Recent matches</h2>
@@ -82,9 +83,9 @@ customElements.define(
 						</div>
 					`
 
-					const userIsPlayer1 = user.id === match.player1Id
-					function getScoreClass(playerId: number): string {
-						if (playerId !== user?.id) return ''
+					const userIsPlayer1 = this.user.id === match.player1Id
+					const getScoreClass = (playerId: number): string => {
+						if (playerId !== this.user?.id) return ''
 						if (match.player1Score === null) return ''
 						if (match.player2Score === null) return ''
 						if (match.player1Score === match.player2Score) return ''
@@ -131,6 +132,8 @@ customElements.define(
 customElements.define(
 	'ft-ranking',
 	class extends HTMLElement {
+		private user = $user.get()
+
 		connectedCallback() {
 			this.classList.add(
 				'flex',
@@ -146,8 +149,7 @@ customElements.define(
 			})
 		}
 		renderContent(): string {
-			const current_user = $user.get()
-			if (!current_user) return ''
+			if (!this.user) return ''
 			let html = /*html*/ `<h2 class="flex flex-row p-2 items-center justify-center gap-2 font-bold">Ranking</h2>`
 			let rank = 1
 			let nameColor = ''
@@ -161,31 +163,31 @@ customElements.define(
 				<div class="w-2/6 p-2"># Goals</div>
 			</div>
 			`
-			for (const user of usersRanked) {
+			for (const userRanked of usersRanked) {
 				if (rank >= 6) {
-					if (user.id === current_user.id && rank === 6) {
+					if (userRanked.id === this.user.id && rank === 6) {
 						html += /*html*/ `
 							<div class="flex items-center text-center p-2 border-indigo-500 border-2 rounded-xl">
 								<div class="w-1/6 flex flex-row justify-center items-center">
 									<div class="flex flex-row w-5 h-5 items-center justify-center rounded-xl"> ${rank} </div>
 								</div>
 								<div class="w-1/6 flex justify-center items-center">
-									<img src="${getAvatarSrc(current_user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
+									<img src="${getAvatarSrc(this.user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
 								</div>
-								<div class="w-2/6 flex justify-center items-center font-bold">${current_user.name}</div>
-								<div class="w-2/6 flex justify-center items-center">${current_user.numberOfGoals}</div>
+								<div class="w-2/6 flex justify-center items-center font-bold">${this.user.name}</div>
+								<div class="w-2/6 flex justify-center items-center">${this.user.numberOfGoals}</div>
 							</div>
 						</div>
 						`
 						return html
 					}
-					if (user.id === current_user.id) break
+					if (userRanked.id === this.user.id) break
 					else {
 						rank++
 						continue
 					}
 				}
-				const isCurrentUser = user.id === current_user.id
+				const isCurrentUser = userRanked.id === this.user.id
 				if (isCurrentUser) {
 					nameColor = `font-bold`
 					user_in_top = true
@@ -214,10 +216,10 @@ customElements.define(
 				html += /*html*/ `
 				</div>
 					<div class="w-1/6 flex justify-center items-center">
-						<img src="${getAvatarSrc(user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
+						<img src="${getAvatarSrc(userRanked)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
 					</div>
-					<div class="w-2/6 flex justify-center items-center ${nameColor}">${user.name}</div>
-					<div class="w-2/6 flex justify-center items-center">${user.numberOfGoals}</div>
+					<div class="w-2/6 flex justify-center items-center ${nameColor}">${userRanked.name}</div>
+					<div class="w-2/6 flex justify-center items-center">${userRanked.numberOfGoals}</div>
 				</div>`
 				rank++
 			}
@@ -229,10 +231,10 @@ customElements.define(
 						<div class="flex flex-row w-5 h-5 items-center justify-center rounded-xl"> ${rank} </div>
 					</div>
 					<div class="w-1/6 flex justify-center items-center">
-						<img src="${getAvatarSrc(current_user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
+						<img src="${getAvatarSrc(this.user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
 					</div>
-					<div class="w-2/6 flex justify-center items-center font-bold">${current_user.name}</div>
-					<div class="w-2/6 flex justify-center items-center">${current_user.numberOfGoals}</div>
+					<div class="w-2/6 flex justify-center items-center font-bold">${this.user.name}</div>
+					<div class="w-2/6 flex justify-center items-center">${this.user.numberOfGoals}</div>
 				</div>
 				`
 			}
@@ -245,6 +247,8 @@ customElements.define(
 customElements.define(
 	'ft-stats',
 	class extends HTMLElement {
+		private user = $user.get()
+
 		connectedCallback() {
 			this.classList.add(
 				'flex',
@@ -263,8 +267,7 @@ customElements.define(
 			})
 		}
 		renderContent(): string {
-			const user = $user.get()
-			if (!user) return ''
+			if (!this.user) return ''
 			const userMatches = $matches.get()
 			const getAllUsersStats = $rankedUsers.get()
 			if (userMatches.length === 0) {
@@ -277,11 +280,11 @@ customElements.define(
 				return html
 			}
 			const winRate = (
-				(user.numberOfWin / user.numberOfMatches) *
+				(this.user.numberOfWin / this.user.numberOfMatches) *
 				100
 			).toPrecision(3)
 			const averageRally = getAverageRally(userMatches).toPrecision(2)
-			const rank = getUserRank(getAllUsersStats, user)
+			const rank = getUserRank(getAllUsersStats, this.user)
 			const leagueImage = getLeagueHtml(getAllUsersStats, rank)
 
 			const pr = new Intl.PluralRules('en-US', { type: 'ordinal' })
@@ -299,9 +302,9 @@ customElements.define(
 			const html = /*html*/ `
 			<div class="grid grid-flow-col grid-rows-2 items-center gap-2">
 				<h2 class="p-2 text-center font-bold">Total match played</h2>
-				<h2 class="p-2 text-center">${user.numberOfMatches}</h2>
+				<h2 class="p-2 text-center">${this.user.numberOfMatches}</h2>
 				<h2 class="p-2 text-center font-bold">Total match won</h2>
-				<h2 class="p-2 text-center">${user.numberOfWin}</h2>
+				<h2 class="p-2 text-center">${this.user.numberOfWin}</h2>
 				<h2 class="p-2 text-center font-bold">Winrate</h2>
 				<h2 class="p-2 text-center">${winRate} %</h2>
 				<h2 class="p-2 text-center font-bold">Average rally per round</h2>
@@ -325,6 +328,8 @@ customElements.define(
 customElements.define(
 	'ft-goal-distribution',
 	class extends HTMLElement {
+		private user = $user.get()
+
 		connectedCallback() {
 			this.classList.add(
 				'flex',
@@ -344,8 +349,7 @@ customElements.define(
 			})
 		}
 		renderContent(): string {
-			const user = $user.get()
-			if (!user) return ''
+			if (!this.user) return ''
 			const matches = $matches.get()
 			if (matches.length === 0) {
 				const html = /*html*/ `
@@ -356,7 +360,7 @@ customElements.define(
 				`
 				return html
 			}
-			const goalTakenY = getGoalTakenY(matches, user)
+			const goalTakenY = getGoalTakenY(matches, this.user)
 			const distributionPercentage = convertToPercentage(goalTakenY)
 			const html = /*html*/ `
 				<h2 class="flex flex-row p-2 items-center justify-center gap-2 font-bold">Weaknesses</h2>

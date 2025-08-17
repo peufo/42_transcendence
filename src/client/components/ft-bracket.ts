@@ -7,6 +7,9 @@ import { $participants, $stages, $tournament, $user } from '../utils/store.js'
 customElements.define(
 	'ft-bracket',
 	class extends HTMLElement {
+		private user = $user.get()
+		private tournament = $tournament.get()
+		private participants = $participants.get()
 		private cleanEffect: CleanEffect
 
 		connectedCallback() {
@@ -20,24 +23,21 @@ customElements.define(
 		}
 
 		render(): string {
-			const tournament = $tournament.get()
-			const participants = $participants.get()
 			const stages = $stages.get()
-			const user = $user.get()
-			if (!user) return ''
+			if (!this.user || !this.tournament) return ''
 
 			const myMatch = getMyMatch(stages)
-			if (myMatch) {
-				setMatchId(myMatch.id)
+			if (myMatch && setMatchId(myMatch.id)) {
+				return ''
 			}
 
-			const iParticipate = participants.find(
-				({ user: { id } }) => id === user.id,
+			const iParticipate = this.participants.find(
+				({ user: { id } }) => id === this.user?.id,
 			)
 
 			const quitButton = /*html*/ `
 				<form action="/tournaments/quit" method="post" class="contents">
-					<input type="hidden" name="tournamentId" value="${tournament?.id}" />
+					<input type="hidden" name="tournamentId" value="${this.tournament.id}" />
 					<input type="submit" value="Quit" class="btn btn-border cursor-pointer">
 				</form>
 			`
@@ -56,7 +56,7 @@ customElements.define(
 			}
 
 			const renderStage = (stage: Match[]) => {
-				const vsContainers = stage.map(renderMatch)
+				const matchElements = stage.map(renderMatch)
 				let currentStageClasses = ''
 				if (stage === currentStage) {
 					currentStageClasses = 'ring-1 ring-indigo-500 rounded-lg bg-indigo-50'
@@ -68,7 +68,7 @@ customElements.define(
                             ${stageNames.at(stages.length - stages.indexOf(stage) - 1)}
                         </h3>
                         <div class="flex flex-col gap-1 p-1 min-w-56 snap-center justify-evenly grow  ${currentStageClasses}">
-                            ${vsContainers.join('')}
+                            ${matchElements.join('')}
                         </div>
                     </div>
                     
@@ -84,9 +84,9 @@ customElements.define(
 			const renderMatch = (match: Match) => {
 				let colorP1 = ''
 				let colorP2 = ''
-				if (match.player1 && user.id === match.player1.id)
+				if (match.player1 && this.user?.id === match.player1.id)
 					colorP1 = 'text-indigo-600 font-bold'
-				else if (match.player2 && user.id === match.player2.id)
+				else if (match.player2 && this.user?.id === match.player2.id)
 					colorP2 = 'text-indigo-600 font-bold'
 				return /*html*/ `
                     <div class="bg-white border border-gray-200 rounded-md">
@@ -110,7 +110,7 @@ customElements.define(
 
 			return /*html*/ `
 				<aside class="flex flex-col gap-4">
-					<h2 class="text-lg font-semi px-2">${tournament?.createdByUser.name}'s tournament</h2>
+					<h2 class="text-lg font-semi px-2">${this.tournament?.createdByUser.name}'s tournament</h2>
 					<div class="overflow-x-scroll rounded-md border border-gray-200 snap-x snap-mandatory">
 						${renderStages()}
 					</div>

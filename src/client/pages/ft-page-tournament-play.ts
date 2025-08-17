@@ -8,6 +8,7 @@ import { $participants, $stages, $tournament, $user } from '../utils/store.js'
 customElements.define(
 	'ft-page-tournament-play',
 	class extends HTMLElement {
+		private user = $user.get()
 		private cleanEffect: CleanEffect
 		private tournamentChannel: ChannelSocket<'tournaments'>
 
@@ -23,7 +24,7 @@ customElements.define(
 				'tournaments',
 				{ tournamentId },
 				{
-					onParticipantJoin(newParticipant) {
+					onParticipantJoin: (newParticipant) => {
 						toast.success(`${newParticipant.user.name} joined the tournament !`)
 						$participants.update((participants) => {
 							const isParticipantExist = participants.find(
@@ -33,7 +34,7 @@ customElements.define(
 							return [...participants, newParticipant]
 						})
 					},
-					onParticipantQuit(participant) {
+					onParticipantQuit: (participant) => {
 						toast.error(`${participant.user.name} left the tournament !`)
 						$participants.update((participants) => {
 							return participants.filter(
@@ -41,35 +42,33 @@ customElements.define(
 							)
 						})
 					},
-					onStart({ stages }) {
+					onStart: ({ stages }) => {
 						toast.success('Tournament starting')
-						$stages.set(stages)
 						$tournament.update((t) => {
 							if (!t) return undefined
 							return { ...t, state: 'ongoing' }
 						})
+						$stages.set(stages)
 
 						const myMatch = getMyMatch(stages)
 						if (!myMatch) return
 						setMatchId(myMatch.id)
 					},
-					onMatchChange({ match }) {
+					onMatchChange: ({ match }) => {
 						$stages.update((stages) => {
-							const user = $user.get()
 							const m = stages.flat().find((m) => m.id === match.id)
 							if (!m) return stages
 							Object.assign(m, match)
 							if (
-								match.player1Id === user?.id ||
-								match.player2Id === user?.id
+								match.player1Id === this.user?.id ||
+								match.player2Id === this.user?.id
 							) {
-								// TODO: ensure close current channel before ?
-								// setMatchId(m.id)
+								setMatchId(m.id)
 							}
 							return stages
 						})
 					},
-					onEnd() {
+					onEnd: () => {
 						toast.success('Tournament terminated')
 						$tournament.update((t) => (!t ? t : { ...t, state: 'finished' }))
 					},
@@ -83,6 +82,7 @@ customElements.define(
 		}
 
 		render() {
+			console.log('RENDER TOURNAMENT PAGE')
 			const tournament = $tournament.get()
 			if (!tournament) return /*html*/ `<span>Tournament not found</span>`
 
@@ -96,10 +96,13 @@ customElements.define(
 customElements.define(
 	'ft-tournament-open',
 	class extends HTMLElement {
+		private user = $user.get()
+		private tournament = $tournament.get()
 		private cleanEffect: CleanEffect
 
 		connectedCallback() {
 			this.cleanEffect = createEffect(() => {
+				console.log('RENDER TOURNAMENT OPEN')
 				this.innerHTML = this.render()
 			})
 		}
@@ -109,38 +112,36 @@ customElements.define(
 		}
 
 		render(): string {
-			const tournament = $tournament.get()
+			if (!this.tournament) return /*html*/ `<span>Tournament not found</span>`
+			if (!this.user) return ''
 			const participants = $participants.get()
-			if (!tournament) return /*html*/ `<span>Tournament not found</span>`
-			const user = $user.get()
-			if (!user) return ''
 
 			const iParticipate = participants.find(
-				({ user: { id } }) => id === user.id,
+				({ user: { id } }) => id === this.user?.id,
 			)
 			const action = iParticipate ? 'quit' : 'join'
 			const buttonText = action === 'quit' ? 'Quit' : 'Join'
 
 			const participationForm = /*html*/ `
 				<form action="/tournaments/${action}" method="post" class="contents">
-					<input type="hidden" name="tournamentId" value="${tournament.id}" />
+					<input type="hidden" name="tournamentId" value="${this.tournament.id}" />
 					<input type="submit" value="${buttonText}" class="btn btn-border cursor-pointer">
 				</form>
 			`
 
 			const title = /*html*/ `
-			<h1 class="p-2 flex font-bold item-center justify-center">${tournament.createdByUser.name}'s tournament</h1>
+			<h1 class="p-2 flex font-bold item-center justify-center">${this.tournament.createdByUser.name}'s tournament</h1>
 			`
 
 			const participantsCountColor =
-				participants.length === tournament.numberOfPlayers
+				participants.length === this.tournament.numberOfPlayers
 					? 'text-lime-400 font-bold a'
 					: 'text-gray-400'
 
 			const participantsCount = /*html*/ `
 			<div class="p-2 flex item-center justify-center ${participantsCountColor}">
 				${participants.length}
-				/ ${tournament.numberOfPlayers} players
+				/ ${this.tournament.numberOfPlayers} players
 			</div>
 			`
 
@@ -149,24 +150,25 @@ customElements.define(
 				let number = 0
 				for (const participant of participants) {
 					html += /*html*/ `
-					<div class="flex p-2 items-center gap-2 border border-gray-200 rounded-xl">
-						<div class="w-1/10 pl-2 font-bold">${number + 1}</div>
-						<div class="w-9/10 flex flex-row gap-2 items-center">
-							<img src="${getAvatarSrc(participant.user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
-							<div>${participant.user.name}</div>
+						<div class="flex p-2 items-center gap-2 border border-gray-200 rounded-xl">
+							<div class="w-1/10 pl-2 font-bold">${number + 1}</div>
+							<div class="w-9/10 flex flex-row gap-2 items-center">
+								<img src="${getAvatarSrc(participant.user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
+								<div>${participant.user.name}</div>
+							</div>
 						</div>
-					</div>
 					`
 					number++
 				}
-				while (number < tournament.numberOfPlayers) {
+				const numberOfPlayers = this.tournament?.numberOfPlayers || 0
+				while (number < numberOfPlayers) {
 					html += /*html*/ `
-					<div class="flex p-2 justify-center items-center gap-2 border border-gray-200 rounded-xl">
-						<div class="w-9/10 flex items-center justify-center animate-pulse text-indigo-500"
-							style="animation-delay: ${number * 80}ms;">
-							... Waiting for players ...
+						<div class="flex p-2 justify-center items-center gap-2 border border-gray-200 rounded-xl">
+							<div class="w-9/10 flex items-center justify-center animate-pulse text-indigo-500"
+								style="animation-delay: ${number * 80}ms;">
+								... Waiting for players ...
+							</div>
 						</div>
-					</div>
 					`
 					number++
 				}
@@ -189,24 +191,12 @@ customElements.define(
 customElements.define(
 	'ft-tournament-ongoing',
 	class extends HTMLElement {
-		private cleanEffect: CleanEffect
-
 		connectedCallback() {
-			this.cleanEffect = createEffect(() => {
-				this.innerHTML = this.render()
-			})
-		}
-
-		disconnectedCallback() {
-			this.cleanEffect()
+			console.log('RENDER TOURNAMENT ONGOING')
+			this.innerHTML = this.render()
 		}
 
 		render(): string {
-			const tournament = $tournament.get()
-			if (!tournament) return /*html*/ `<span>Tournament not found</span>`
-			const user = $user.get()
-			if (!user) return 'User not authentified'
-
 			return /*html*/ `
 				<div class="grid grid-cols-4 gap-4 p-4 min-w-[1360px]">
 					<ft-bracket></ft-bracket>

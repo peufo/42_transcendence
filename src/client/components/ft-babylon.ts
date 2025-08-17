@@ -21,10 +21,10 @@ customElements.define(
 		private scoreText: BABYLON.GUI.TextBlock
 		// private wallParticleSystem: BABYLON.ParticleSystem
 
-		constructor() {
-			super()
+		connectedCallback() {
 			this.classList.add('w-full', 'h-full')
 			this.initAsync()
+			window.addEventListener('resize', () => this.babylonEngine.resize())
 		}
 
 		async initAsync() {
@@ -57,10 +57,6 @@ customElements.define(
 			} catch (error) {
 				console.error('Initialization failed:', error)
 			}
-		}
-
-		connectedCallback() {
-			window.addEventListener('resize', () => this.babylonEngine.resize())
 		}
 
 		private initCanvasAndEngine() {

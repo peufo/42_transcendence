@@ -5,8 +5,7 @@ import { $user } from '../utils/store.js'
 customElements.define(
 	'ft-header',
 	class extends HTMLElement {
-		constructor() {
-			super()
+		connectedCallback() {
 			this.innerHTML = /*html*/ `
 				<header class="flex items-center p-2 pl-4 gap-2 border-b border-indigo-100">
 					<a href="/" class="text-2xl text-blue-600">Transcendance</a>
@@ -44,6 +43,7 @@ customElements.define(
 					</a>`
 			}
 
+			// TODO: history === statistics ?
 			return /*html*/ `
 				<ft-dropdown>
 					<button class="btn btn-border flex shrink-0 flex-nowrap">
@@ -84,8 +84,7 @@ customElements.define(
 		timeoutId: NodeJS.Timeout | null = null
 		box: HTMLDivElement
 
-		constructor() {
-			super()
+		connectedCallback() {
 			this.classList.add('relative')
 			const button = this.querySelector<HTMLButtonElement>('button')
 			const box = this.querySelector<HTMLDivElement>('.dropdown-box')

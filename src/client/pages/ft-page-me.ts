@@ -204,6 +204,7 @@ customElements.define(
 	'ft-invitations',
 	class extends HTMLElement {
 		private cleanEffect: CleanEffect
+		private user = $user.get()
 
 		connectedCallback() {
 			this.classList.add('flex', 'flex-col', 'gap-3')
@@ -217,10 +218,8 @@ customElements.define(
 		}
 
 		render(): string {
-			const user = $user.get()
-
 			const invitations = $friendshipsInvitation.get()
-			if (!user || !invitations.length) return ''
+			if (!this.user || !invitations.length) return ''
 
 			let html = /*html*/ `
                 <h3 class="text-sm/6 font-semibold text-gray-900">
@@ -242,7 +241,7 @@ customElements.define(
                         <input class="btn ${color}" type="submit" value="${label}">
                     </form>
                 `
-				const createdByMe = invitation.createdBy === user.id
+				const createdByMe = invitation.createdBy === this.user.id
 
 				const buttons: string[] = []
 				if (createdByMe) {
@@ -274,16 +273,8 @@ customElements.define(
 customElements.define(
 	'ft-welcome',
 	class extends HTMLElement {
-		private cleanEffect: CleanEffect
-
 		connectedCallback() {
-			this.cleanEffect = createEffect(() => {
-				this.innerHTML = this.render()
-			})
-		}
-
-		disconnectedCallback() {
-			this.cleanEffect()
+			this.innerHTML = this.render()
 		}
 
 		render(): string {

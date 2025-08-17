@@ -48,6 +48,8 @@ customElements.define(
 		}
 
 		connectedCallback() {
+			console.log('RENDER PONG REMOTE', $matchId.get())
+
 			this.classList.add('flex', 'justify-center')
 			const stages = $stages.get()
 			const user = $user.get()

@@ -24,8 +24,7 @@ customElements.define(
 			p2: 0,
 		}
 
-		constructor() {
-			super()
+		connectedCallback() {
 			this.classList.add('grid', 'place-items-center')
 			this.canvas = document.createElement('canvas')
 			this.canvas.setAttribute('width', ARENA_WIDTH.toString())
@@ -44,15 +43,8 @@ customElements.define(
 				},
 			})
 			this.engine.start()
+
 			this.frameId = requestAnimationFrame(this.render.bind(this))
-		}
-
-		disconnectedCallback() {
-			cancelAnimationFrame(this.frameId)
-			this.engine.stop()
-		}
-
-		connectedCallback() {
 			const keyHandlers: Record<string, (value: boolean) => void> = {
 				w: (value) => this.engine.setInput('p1', 'up', value),
 				s: (value) => this.engine.setInput('p1', 'down', value),
@@ -67,6 +59,11 @@ customElements.define(
 			document.addEventListener('keyup', (event) => {
 				keyHandlers[event.key]?.(false)
 			})
+		}
+
+		disconnectedCallback() {
+			cancelAnimationFrame(this.frameId)
+			this.engine.stop()
 		}
 
 		render() {

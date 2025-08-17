@@ -10,18 +10,18 @@ import type {
 } from '../../lib/type.js'
 import { createSignal } from './signal.js'
 
-export const $url = createSignal<URL>(new URL(document.location.href))
-export const $user = createSignal<UserWithTournament | undefined>(undefined)
-export const $users = createSignal<UserBasic[]>([])
-export const $friendshipsFriend = createSignal<FriendshipFriend[]>([])
-export const $friendshipsInvitation = createSignal<FriendshipInvitation[]>([])
-export const $matches = createSignal<Match[]>([])
-export const $rankedUsers = createSignal<UserStats[]>([])
+export const $url = createSignal<URL>(new URL(document.location.href)) // ft-router
+export const $user = createSignal<UserWithTournament | undefined>(undefined) // ft-router
+export const $users = createSignal<UserBasic[]>([]) // ft-users
+export const $friendshipsFriend = createSignal<FriendshipFriend[]>([]) // ft-friends
+export const $friendshipsInvitation = createSignal<FriendshipInvitation[]>([]) // ft-invitations
+export const $matches = createSignal<Match[]>([]) // ft-stats, ft-goal-distribution, ft-match-history
+export const $rankedUsers = createSignal<UserStats[]>([]) // ft-stats, ft-ranking
 export const $tournament = createSignal<
 	(Tournament & { createdByUser: UserBasic }) | undefined
->(undefined)
+>(undefined) // ft-page-tournament-play
 export const $participants = createSignal<TournamentWithLookup['participants']>(
 	[],
-)
-export const $stages = createSignal<TournamentWithLookup['stages']>([])
+) // ft-page-tournament-open
+export const $stages = createSignal<TournamentWithLookup['stages']>([]) // ft-bracket
 export const $matchId = createSignal<number>(-1)

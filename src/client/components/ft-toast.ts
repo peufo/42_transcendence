@@ -36,8 +36,7 @@ customElements.define(
 	class extends HTMLElement {
 		timeoutId: NodeJS.Timeout | null = null
 		cleanEffet: CleanEffect
-		constructor() {
-			super()
+		connectedCallback() {
 			this.classList.add('fixed', 'bottom-2', 'right-2')
 			this.classList.add('flex', 'items-center', 'w-full', 'max-w-xs', 'p-4')
 			this.classList.add('text-sm', 'text-gray-700')

@@ -3,7 +3,7 @@ customElements.define(
 	class extends HTMLElement {
 		connectedCallback() {
 			this.innerHTML = `
-        	<ft-babylon> </ft-babylon>
+        		<ft-babylon> </ft-babylon>
         	`
 		}
 	},
