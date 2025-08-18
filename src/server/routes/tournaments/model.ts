@@ -151,7 +151,6 @@ function getScoreToWin(stageIndex: number) {
 export async function tournamentStart(tournamentId: number) {
 	await tournamentUpdateState(tournamentId, 'ongoing')
 	const tournament = await tournamentGet(tournamentId)
-	const participants = getRandomizedParticipants()
 	const newMatches = await db
 		.insert(matches)
 		.values(
@@ -173,6 +172,7 @@ export async function tournamentStart(tournamentId: number) {
 		tournament.numberOfPlayers,
 		newMatches,
 	)
+	const participants = getRandomizedParticipants()
 	await Promise.all(
 		matchesByStage[0].map((match) =>
 			db

@@ -66,7 +66,7 @@ async function handleTournamentGameEnd(
 	const nextStage = stages[matchStageIndex + 1]
 	const nextMatch = nextStage.at(Math.floor(matchStage.indexOf(match) / 2))
 	if (!nextMatch) {
-		console.log('WTF')
+		console.log('Should not happen')
 		return
 	}
 	await db
@@ -76,6 +76,21 @@ async function handleTournamentGameEnd(
 			player2Id: nextMatch.player1Id ? winnerId : null,
 		})
 		.where(eq(matches.id, nextMatch.id))
+
+	const updatedNextMatch = await db.query.matches.findFirst({
+		where: eq(matches.id, nextMatch.id),
+		with: {
+			player1: true,
+			player2: true,
+		},
+	})
+	if (!updatedNextMatch) {
+		console.log('Should not happen')
+		return
+	}
+	notify.tournaments(match.tournamentId, 'onMatchChange', {
+		match: updatedNextMatch,
+	})
 }
 
 async function updateMatchRound(matchId: number, round: RoundData) {

@@ -1,6 +1,5 @@
 import { getCurrentStage } from '../../lib/tournament.js'
 import type { Match } from '../../lib/type.js'
-import { getMyMatch, setMatchId } from '../utils/match.js'
 import { type CleanEffect, createEffect } from '../utils/signal.js'
 import { $participants, $stages, $tournament, $user } from '../utils/store.js'
 
@@ -24,12 +23,7 @@ customElements.define(
 
 		render(): string {
 			const stages = $stages.get()
-			if (!this.user || !this.tournament) return ''
-
-			const myMatch = getMyMatch(stages)
-			if (myMatch && setMatchId(myMatch.id)) {
-				return ''
-			}
+			if (!this.user || !this.tournament) return 'user or tournament not found'
 
 			const iParticipate = this.participants.find(
 				({ user: { id } }) => id === this.user?.id,
@@ -71,7 +65,7 @@ customElements.define(
                             ${matchElements.join('')}
                         </div>
                     </div>
-                    
+
                 `
 			}
 

@@ -44,24 +44,26 @@ customElements.define(
 					},
 					onStart: ({ stages }) => {
 						toast.success('Tournament starting')
+						const myMatch = getMyMatch(stages)
+						if (!myMatch) return
+						setMatchId(myMatch.id)
+						$stages.set(stages)
 						$tournament.update((t) => {
 							if (!t) return undefined
 							return { ...t, state: 'ongoing' }
 						})
-						$stages.set(stages)
-
-						const myMatch = getMyMatch(stages)
-						if (!myMatch) return
-						setMatchId(myMatch.id)
 					},
 					onMatchChange: ({ match }) => {
 						$stages.update((stages) => {
 							const m = stages.flat().find((m) => m.id === match.id)
 							if (!m) return stages
+							console.log('match: ', match)
+							console.log('before: ', m)
 							Object.assign(m, match)
+							console.log('after:', m)
 							if (
-								match.player1Id === this.user?.id ||
-								match.player2Id === this.user?.id
+								m.player1Id === this.user?.id ||
+								m.player2Id === this.user?.id
 							) {
 								setMatchId(m.id)
 							}

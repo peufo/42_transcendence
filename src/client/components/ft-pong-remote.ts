@@ -12,6 +12,7 @@ import {
 } from '../../lib/engine/index.js'
 import { useInterpolate } from '../../lib/interpolate.js'
 import { type OpenedChannel, openChannel } from '../../lib/socketChannels.js'
+import { getMyMatch, setMatchId } from '../utils/match.js'
 import { $matchId, $stages, $tournament, $user } from '../utils/store.js'
 import { toast } from './ft-toast.js'
 
@@ -48,10 +49,17 @@ customElements.define(
 		}
 
 		connectedCallback() {
-			console.log('RENDER PONG REMOTE', $matchId.get())
+			// TODO : put in effect ?
 
 			this.classList.add('flex', 'justify-center')
 			const stages = $stages.get()
+
+			const myMatch = getMyMatch(stages)
+			if (myMatch && !setMatchId(myMatch.id)) {
+				throw new Error('match already set')
+			}
+
+			console.log('RENDER PONG REMOTE', $matchId.get())
 			const user = $user.get()
 			const tournament = $tournament.get()
 			if (!user || !tournament) return // TODO: handle

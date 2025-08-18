@@ -103,6 +103,7 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 					if (player === 'p1') payload.player1Ready = true
 					if (player === 'p2') payload.player2Ready = true
 					if (payload.player1Ready && payload.player2Ready) {
+						// TODO : wait 1 sec ?
 						payload.engine.start()
 					}
 					return payload
