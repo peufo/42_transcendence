@@ -61,7 +61,7 @@ customElements.define(
                   </button>
                 </div>
               </form>
-
+              <a href="/login/waiting/google" class="btn btn-primary w-full py-2 from-violet-600 to-indigo-600 hover:bg-blue-700 text-white rounded-lg transition-all cursor-pointer">Login with Google</a>
               <a href="/signup" class="text-blue-400 text-sm hover:underline mt-4 block text-center">Create an account</a>
             </div>
 

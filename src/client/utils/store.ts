@@ -25,3 +25,4 @@ export const $participants = createSignal<TournamentWithLookup['participants']>(
 ) // ft-page-tournament-open
 export const $stages = createSignal<TournamentWithLookup['stages']>([]) // ft-bracket
 export const $matchId = createSignal<number>(-1)
+export const $oauth2 = createSignal<Response | undefined>(undefined)

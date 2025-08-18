@@ -5,6 +5,10 @@ if (!process.env.DB_FILE_NAME)
 	throw new Error('DB_FILE_NAME environment value is required')
 if (!process.env.COOKIE_SECRET)
 	throw new Error('COOKIE_SECRET environment value is required')
+if (!process.env.GOOGLE_CLIENT_ID)
+	throw new Error('GOOGLE_CLIENT_ID environment value is required')
+if (!process.env.GOOGLE_SECRET)
+	throw new Error('GOOGLE_SECRET environment value is required')
 
 export const env = {
 	PORT: +(process.env.PORT || 8000),
@@ -13,4 +17,6 @@ export const env = {
 	DB_FILE_NAME: process.env.DB_FILE_NAME,
 	COOKIE_SECRET: process.env.COOKIE_SECRET,
 	dev: process.env.NODE_ENV === 'development',
+	GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+	GOOGLE_SECRET: process.env.GOOGLE_SECRET,
 } as const

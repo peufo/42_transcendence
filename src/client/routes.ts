@@ -44,6 +44,7 @@ export const API_GET: {
 		store.$participants.set(t.participants)
 		store.$stages.set(t.stages)
 	},
+	'/auth/oauth/google': store.$oauth2.set,
 }
 
 export const API_POST: {
@@ -127,6 +128,10 @@ export const PAGES = {
 	'/local/play/babylon': {
 		component: 'ft-page-local-play-babylon',
 		isPublic: true,
+	},
+	'/login/waiting/google': {
+		component: 'ft-page-redirect-google',
+		isPublic: 'only',
 	},
 } as const satisfies Record<string, PageOption>
 

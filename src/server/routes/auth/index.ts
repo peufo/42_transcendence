@@ -51,5 +51,11 @@ export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 		},
 	)
 
+	server.get(
+		'/auth/oauth/google/callback',
+		getSchema('/auth/oauth/google', null),
+		async (_req, _res) => {},
+	)
+
 	done()
 }

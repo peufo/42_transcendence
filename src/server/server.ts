@@ -2,6 +2,7 @@ import path from 'node:path'
 import fastifyCookie from '@fastify/cookie'
 import fastifyFormbody from '@fastify/formbody'
 import fastifyMultipart from '@fastify/multipart'
+// import fastifyOauth2 from '@fastify/oauth2'
 import fastifySensible from '@fastify/sensible'
 import fastifyStatic from '@fastify/static'
 import fastifyWebsocket from '@fastify/websocket'
@@ -38,6 +39,19 @@ export function startServer() {
 	server.register(fastifyCookie, {
 		secret: env.COOKIE_SECRET,
 	})
+	// server.register(fastifyOauth2, {
+	// 	name: 'googleOAuth2',
+	// 	credentials: {
+	// 		client: {
+	// 			id: env.GOOGLE_CLIENT_ID as string,
+	// 			secret: env.GOOGLE_SECRET as string,
+	// 		},
+	// 		auth: fastifyOauth2.GOOGLE_CONFIGURATION,
+	// 	},
+	// 	// register a fastify url to start the redirect flow to the service provider's OAuth2 login
+	// 	startRedirectPath: '/auth/oauth/google',
+	// 	callbackUri: 'http://localhost:8000/auth/oauth/google/callback',
+	// })
 
 	server.register(fastifyStatic, {
 		root: [path.resolve('public'), path.resolve('build/public')],

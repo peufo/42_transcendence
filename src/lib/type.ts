@@ -153,6 +153,7 @@ export type RoutesGet = {
 	'/tournaments': Get<TournamentWithLookup, { tournamentId: number }>
 	'/stats/me': Get<Match[]>
 	'/stats/all': Get<UserStats[]>
+	'/auth/oauth/google': Get<Response>
 }
 
 export type RoutesPost = {
