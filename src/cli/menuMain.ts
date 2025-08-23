@@ -2,7 +2,7 @@ import { exit } from 'node:process'
 import * as p from '@clack/prompts'
 import { api } from './api.js'
 import { login, logout } from './auth.js'
-import { startGame } from './game.js'
+import { startGameLocal } from './game.js'
 import type { Scope, ScopeOptions } from './main.js'
 import { menuFriendships } from './menuFriendships.js'
 import { menuNewTournament } from './menuTournament.js'
@@ -18,7 +18,7 @@ export const menuMain: Scope = async () => {
 		options.push({ label: 'New tournament', value: menuNewTournament })
 	}
 	options.push(
-		{ value: startGame, label: 'Local game' },
+		{ value: startGameLocal, label: 'Local game' },
 		{ value: exit, label: 'Exit' },
 	)
 	const action = await p.select({
