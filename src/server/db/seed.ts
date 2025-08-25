@@ -48,6 +48,7 @@ async function main() {
 				}),
 				isActive: f.default({ defaultValue: false }),
 				isInTournament: f.default({ defaultValue: 0 }),
+				isOAuth2: f.default({ defaultValue: false }),
 			},
 			count: 20,
 		},

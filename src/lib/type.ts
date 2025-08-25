@@ -14,6 +14,7 @@ export type User = UserBasic & {
 	numberOfMatches: number
 	numberOfWin: number
 	numberOfGoals: number
+	isOAuth2: boolean
 }
 
 export type UserWithTournament = User & {

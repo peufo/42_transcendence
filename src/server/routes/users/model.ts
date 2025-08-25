@@ -23,6 +23,7 @@ export async function searchUsersAsNotFriends(userId: number, search: string) {
 	})
 }
 
+// TODO: check oauth2
 export async function updateUser(
 	userId: number,
 	data: { name?: string; password?: string },
@@ -38,7 +39,7 @@ export async function updateUser(
 			throw server.httpErrors.badRequest('Please choose a different username')
 	}
 
-	if (data.password) {
+	if (data.password && existingUser.passwordHash && !existingUser.isOAuth2) {
 		const isSame = await argon2.verify(existingUser.passwordHash, data.password)
 		if (!isSame) updateData.passwordHash = await argon2.hash(data.password)
 		else

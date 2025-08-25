@@ -3,7 +3,7 @@ import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { getSchema, permission, postSchema } from '../../utils/index.js'
 import { getUserActiveTournament } from '../tournaments/tournamentDb.js'
 import { deleteSession, setSessionCookie } from './controller.js'
-import { createUser, getAuthUser } from './model.js'
+import { createUser, createUserOAuth2, getAuthUser } from './model.js'
 import { loginSchema, signupSchema } from './schema.js'
 
 export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
@@ -20,6 +20,8 @@ export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 		async (req, res) => {
 			const { name, password } = req.body
 			const authUser = await getAuthUser(name)
+			if (authUser?.isOAuth2 === true || !authUser?.passwordHash)
+				return res.forbidden('This user uses a google account to authenticate')
 			if (!authUser) return res.forbidden('Wrong username or password')
 			const passwordOk = await argon2.verify(authUser.passwordHash, password)
 			if (!passwordOk) return res.forbidden('Wrong username or password')
@@ -61,9 +63,26 @@ export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 				headers: { Authorization: `Bearer ${token.access_token}` },
 			},
 		)
-		const user = await userRes.json()
-		console.log(user)
-		res.send({ message: 'Connection success !' })
+		const googleUser = await userRes.json()
+		const name = googleUser.name.substring(
+			0,
+			Math.min(googleUser.name.length, 24),
+		)
+		let authUser = await getAuthUser(name)
+		if (authUser) {
+			if (!authUser.isOAuth2)
+				return res.forbidden(
+					`This user doesn't use a google account to authenticate`,
+				)
+		} else {
+			authUser = await createUserOAuth2({
+				name: googleUser.name,
+				avatarUrl: googleUser.picture,
+			})
+		}
+		await setSessionCookie(authUser.id, res)
+		const { passwordHash, ...user } = authUser
+		res.redirect('/me').send({ message: 'Connection success !', user })
 	})
 
 	done()

@@ -56,12 +56,22 @@ customElements.define(
 
                 <div class="flex flex-col items-center">
                   <button type="submit"
-                    class="btn btn-primary w-full py-2 from-violet-600 to-indigo-600 hover:bg-blue-700 text-white rounded-lg transition-all cursor-pointer">
+                    class="btn btn-primary w-full py-2 mb-3 from-violet-600 to-indigo-600 hover:bg-blue-700 text-white rounded-lg transition-all cursor-pointer">
                     Sign in
                   </button>
                 </div>
               </form>
-              <a href="/login/waiting/google" class="btn btn-primary w-full py-2 from-violet-600 to-indigo-600 hover:bg-blue-700 text-white rounded-lg transition-all cursor-pointer">Login with Google</a>
+              <a href="/login/waiting/google" class="btn w-full py-2 text-red-400 from-violet-600 to-indigo-600 hover:bg-blue-700 rounded-lg transition-all cursor-pointer">
+				<div class="text-black">Login with</div>
+					<div class="flex flex-row justify-around">
+					<div class="text-blue-500">G</div>
+					<div class="text-red-500">o</div>
+					<div class="text-yellow-500">o</div>
+					<div class="text-blue-500">g</div>
+					<div class="text-green-500">l</div>
+					<div class="text-red-500">e</div>
+				</div>
+			  </a>
               <a href="/signup" class="text-blue-400 text-sm hover:underline mt-4 block text-center">Create an account</a>
             </div>
 

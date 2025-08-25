@@ -1,3 +1,5 @@
+import { $user } from '../utils/store.js'
+
 customElements.define(
 	'ft-page-account',
 	class extends HTMLElement {
@@ -6,6 +8,25 @@ customElements.define(
 		}
 
 		render() {
+			const user = $user.get()
+			if (!user) return
+
+			const modifyPassword = /*html*/ `
+                <div class="border-2 border-blue-300 p-4 rounded-md">
+                    <div>
+                        <label for="password" class="label">New password</label>
+                        <div class="mt-2">
+                            <input type="password" name="password" id="password" autocomplete="new-password" class="input"  />
+                        </div>
+                    </div>
+                    <div>
+                        <label for="confirm" class="label">Confirm new password</label>
+                        <div class="mt-2">
+                            <input type="password" name="confirm" id="confirm" autocomplete="new-password" class="input" />
+                        </div>
+                    </div>
+                </div>`
+
 			this.innerHTML = /*html*/ `
                 <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
                     <div class="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -26,20 +47,7 @@ customElements.define(
                             </div>
 						</div>
 
-						<div class="border-2 border-blue-300 p-4 rounded-md">
-                            <div>
-                                <label for="password" class="label">New password</label>
-                                <div class="mt-2">
-                                    <input type="password" name="password" id="password" autocomplete="new-password" class="input"  />
-                                </div>
-                            </div>
-                            <div>
-                                <label for="confirm" class="label">Confirm new password</label>
-                                <div class="mt-2">
-                                    <input type="password" name="confirm" id="confirm" autocomplete="new-password" class="input" />
-                                </div>
-                            </div>
-						</div>
+                        ${user.isOAuth2 ? '' : modifyPassword}
                             <div class="flex flex-col items-center">
                                 <button type="submit" class="btn btn-primary w-full">
                                     Update
@@ -47,10 +55,10 @@ customElements.define(
                             </div>
                         </form>
 					</div>
-						
+
                     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
                         <form method="post"  action="/users/update/avatar" c4lass="space-y-6" enctype="multipart/form-data">
-						
+
                         <div class="border-2 border-blue-300 p-4 rounded-md">
 							<div class= "">
                                 <label class="label" for="avatarFile">Upload your own avatar</label>
@@ -66,7 +74,7 @@ customElements.define(
                             </div>
                         </form>
 					</div>
-						
+
                 </div>
             `
 		}

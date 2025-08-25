@@ -11,7 +11,7 @@ import {
 export const users = sqliteTable('users', {
 	id: int().primaryKey({ autoIncrement: true }),
 	name: text().notNull().unique(),
-	passwordHash: text().notNull(),
+	passwordHash: text(),
 	hasAvatar: int({ mode: 'boolean' }).notNull().default(false),
 	avatarPlaceholder: text().notNull(),
 	createdAt: int({ mode: 'timestamp' }).notNull().default(new Date()),
@@ -20,6 +20,7 @@ export const users = sqliteTable('users', {
 	numberOfMatches: int().notNull().default(0),
 	numberOfWin: int().notNull().default(0),
 	numberOfGoals: int().notNull().default(0),
+	isOAuth2: int({ mode: 'boolean' }).notNull(),
 })
 
 export const usersRelations = relations(users, ({ many }) => ({

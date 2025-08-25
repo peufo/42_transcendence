@@ -18,10 +18,28 @@ export async function createUser(data: RoutesPost['/auth/signup']['body']) {
 			name,
 			passwordHash: await argon2.hash(password),
 			avatarPlaceholder,
+			isOAuth2: false,
 		})
 		.returning()
 	const { passwordHash, ...user } = createdUser
 	return user
+}
+
+export async function createUserOAuth2(data: {
+	name: string
+	avatarUrl: string
+}) {
+	const { name, avatarUrl } = data
+	const [createdUser] = await db
+		.insert(users)
+		.values({
+			name,
+			passwordHash: null,
+			avatarPlaceholder: avatarUrl,
+			isOAuth2: true,
+		})
+		.returning()
+	return createdUser
 }
 
 export function createAvatarPlaceholder() {
