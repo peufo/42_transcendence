@@ -51,11 +51,20 @@ export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 		},
 	)
 
-	server.get(
-		'/auth/oauth/google/callback',
-		getSchema('/auth/oauth/google', null),
-		async (_req, _res) => {},
-	)
+	server.get('/login/google/callback', async (req, res) => {
+		const { token } =
+			//@ts-ignore
+			await server.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(req)
+		const userRes = await fetch(
+			'https://www.googleapis.com/oauth2/v2/userinfo',
+			{
+				headers: { Authorization: `Bearer ${token.access_token}` },
+			},
+		)
+		const user = await userRes.json()
+		console.log(user)
+		res.send({ message: 'Connection success !' })
+	})
 
 	done()
 }

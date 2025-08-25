@@ -2,11 +2,12 @@ import path from 'node:path'
 import fastifyCookie from '@fastify/cookie'
 import fastifyFormbody from '@fastify/formbody'
 import fastifyMultipart from '@fastify/multipart'
-// import fastifyOauth2 from '@fastify/oauth2'
+import fastifyOauth2 from '@fastify/oauth2'
 import fastifySensible from '@fastify/sensible'
 import fastifyStatic from '@fastify/static'
 import fastifyWebsocket from '@fastify/websocket'
-import fastify from 'fastify'
+import fastify, { type FastifyRequest } from 'fastify'
+
 import {
 	serializerCompiler,
 	validatorCompiler,
@@ -27,6 +28,42 @@ const logger: false | LoggerOptions = env.dev && {
 	},
 }
 
+const googleAuthConfig = {
+	authorizeHost: 'https://accounts.google.com',
+	authorizePath: '/o/oauth2/v2/auth',
+	tokenHost: 'https://oauth2.googleapis.com',
+	tokenPath: '/token',
+}
+
+const oauth2Options = {
+	name: 'googleOAuth2',
+	scope: ['profile', 'email'],
+	credentials: {
+		client: {
+			id: env.GOOGLE_CLIENT_ID,
+			secret: env.GOOGLE_SECRET,
+		},
+		auth: googleAuthConfig,
+	},
+	startRedirectPath: '/auth/oauth/google',
+	callbackUri: 'http://localhost:8000/auth/login/google/callback',
+	generateStateFunction: (request: FastifyRequest) => {
+		//@ts-ignore
+		return request.query.state
+	},
+	checkStateFunction: (
+		request: FastifyRequest,
+		callback: (err?: Error | null) => void,
+	) => {
+		//@ts-ignore
+		if (request.query.state) {
+			callback()
+			return
+		}
+		callback(new Error('Invalid state'))
+	},
+}
+
 export const server = fastify({ logger, bodyLimit: BODY_SIZE_LIMIT })
 
 export function startServer() {
@@ -39,20 +76,8 @@ export function startServer() {
 	server.register(fastifyCookie, {
 		secret: env.COOKIE_SECRET,
 	})
-	// server.register(fastifyOauth2, {
-	// 	name: 'googleOAuth2',
-	// 	credentials: {
-	// 		client: {
-	// 			id: env.GOOGLE_CLIENT_ID as string,
-	// 			secret: env.GOOGLE_SECRET as string,
-	// 		},
-	// 		auth: fastifyOauth2.GOOGLE_CONFIGURATION,
-	// 	},
-	// 	// register a fastify url to start the redirect flow to the service provider's OAuth2 login
-	// 	startRedirectPath: '/auth/oauth/google',
-	// 	callbackUri: 'http://localhost:8000/auth/oauth/google/callback',
-	// })
-
+	// @ts-ignore
+	server.register(fastifyOauth2, oauth2Options)
 	server.register(fastifyStatic, {
 		root: [path.resolve('public'), path.resolve('build/public')],
 		prefix: '/public',
