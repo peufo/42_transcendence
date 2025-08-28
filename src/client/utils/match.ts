@@ -1,7 +1,7 @@
-import type { Match } from '../../lib/type.js'
-import { $matchId, $user } from './store.js'
+import type { Match, MatchBasic } from '../../lib/type.js'
+import { $match, $user } from './store.js'
 
-export function getMyMatch(stages: Match[][]) {
+export function getMyAwaitingMatchFromStages(stages: Match[][]) {
 	const user = $user.get()
 	if (!user) return undefined
 	return stages.flat().find((m) => {
@@ -12,11 +12,9 @@ export function getMyMatch(stages: Match[][]) {
 	})
 }
 
-export function setMatchId(matchId: number) {
-	const currentMatchId = $matchId.get()
-	if (currentMatchId !== matchId) {
-		$matchId.set(matchId)
-		return true
+export function setMatch(match: MatchBasic | undefined) {
+	const currentMatch = $match.get()
+	if (currentMatch !== match) {
+		$match.set(match)
 	}
-	return false
 }

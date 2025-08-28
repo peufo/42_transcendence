@@ -25,25 +25,21 @@ export async function createUser(data: RoutesPost['/auth/signup']['body']) {
 	return user
 }
 
-export async function createUserOAuth2(data: {
-	name: string
-	avatarUrl: string
-}) {
-	const { name, avatarUrl } = data
+export async function createUserOAuth2(name: string) {
 	const [createdUser] = await db
 		.insert(users)
 		.values({
 			name,
 			passwordHash: null,
-			avatarPlaceholder: avatarUrl,
+			avatarPlaceholder: getRandomAvatarPlaceholder(),
 			isOAuth2: true,
 		})
 		.returning()
 	return createdUser
 }
 
-export function createAvatarPlaceholder() {
-	const avatarUrl = new URL('https://api.dicebear.com/9.x/bottts-neutral/svg')
+export function getRandomAvatarPlaceholder() {
+	const avatarUrl = new URL('https://api.dicebear.com/9.x/avataaars/svg')
 	avatarUrl.searchParams.append('seed', String(Math.random()))
 	return avatarUrl.toString()
 }

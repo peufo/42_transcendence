@@ -61,7 +61,6 @@ export function createEffect(func: () => void | Promise<void>): CleanEffect {
 	const cleaners = cleanersStack.pop() || []
 	return () => {
 		for (const cleaner of cleaners) {
-			console.log('cleaning')
 			cleaner()
 		}
 	}

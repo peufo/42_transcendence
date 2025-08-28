@@ -77,10 +77,7 @@ export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 					`A user with this name already exist and doesn't use a google account to authenticate`,
 				)
 		} else {
-			authUser = await createUserOAuth2({
-				name,
-				avatarUrl: googleUser.picture,
-			})
+			authUser = await createUserOAuth2(name)
 		}
 		await setSessionCookie(authUser.id, res)
 		const { passwordHash, ...user } = authUser

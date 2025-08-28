@@ -85,11 +85,11 @@ customElements.define(
 				return /*html*/ `
                     <div class="bg-white border border-gray-200 rounded-md">
                         <div class="grid grid-cols-7 p-1 items-center justify-items-center">
-                            <div class="text-xs break-all text-center col-span-3 ${colorP1}">
+                            <div class="text-xs break-word text-center col-span-3 ${colorP1}">
                                 ${match.player1 ? match.player1.name : '?'}
                             </div>
                             <ft-icon name="zap" class="h-3 scale-x-75 rotate-12"></ft-icon>
-                            <div class="text-xs break-all text-center col-span-3 ${colorP2}">
+                            <div class="text-xs break-word text-center col-span-3 ${colorP2}">
                                 ${match.player2 ? match.player2.name : '?'}
                             </div>
                         </div>

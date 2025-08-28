@@ -61,10 +61,10 @@ export const tournamentsRoute: FastifyPluginCallbackZod = (
 			notify.tournaments(tournamentId, 'onParticipantJoin', { user })
 
 			if (isTournamentFull) {
-				await tournamentStart(tournament.id)
+				setTimeout(() => tournamentStart(tournament.id), 1000) // TODO: is this the best way ? Probably not
 			}
 
-			return res.send({ success: true, tournamentId })
+			res.send({ success: true, tournamentId })
 		},
 	)
 

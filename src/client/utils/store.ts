@@ -2,6 +2,7 @@ import type {
 	FriendshipFriend,
 	FriendshipInvitation,
 	Match,
+	MatchBasic,
 	Tournament,
 	TournamentWithLookup,
 	UserBasic,
@@ -24,5 +25,5 @@ export const $participants = createSignal<TournamentWithLookup['participants']>(
 	[],
 ) // ft-page-tournament-open
 export const $stages = createSignal<TournamentWithLookup['stages']>([]) // ft-bracket
-export const $matchId = createSignal<number>(-1)
+export const $match = createSignal<MatchBasic | undefined>(undefined)
 export const $oauth2 = createSignal<Response | undefined>(undefined)

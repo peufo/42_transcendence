@@ -62,9 +62,13 @@ async function handleTournamentGameEnd(
 		notify.tournaments(match.tournamentId, 'onEnd', null)
 		return
 	}
+
 	const matchStage = stages[matchStageIndex]
 	const nextStage = stages[matchStageIndex + 1]
-	const nextMatch = nextStage.at(Math.floor(matchStage.indexOf(match) / 2))
+	const nextMatchIndex = Math.floor(
+		matchStage.findIndex((m) => m.id === match.id) / 2,
+	)
+	const nextMatch = nextStage.at(nextMatchIndex)
 	if (!nextMatch) {
 		console.log('Should not happen')
 		return

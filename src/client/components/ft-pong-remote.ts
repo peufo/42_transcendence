@@ -12,8 +12,8 @@ import {
 } from '../../lib/engine/index.js'
 import { useInterpolate } from '../../lib/interpolate.js'
 import { type OpenedChannel, openChannel } from '../../lib/socketChannels.js'
-import { getMyMatch, setMatchId } from '../utils/match.js'
-import { $matchId, $stages, $tournament, $user } from '../utils/store.js'
+import { type CleanEffect, createEffect } from '../utils/signal.js'
+import { $match, $user } from '../utils/store.js'
 import { toast } from './ft-toast.js'
 
 customElements.define(
@@ -28,6 +28,8 @@ customElements.define(
 			p1: 0,
 			p2: 0,
 		}
+		private user = $user.get()
+		private cleanEffect: CleanEffect
 
 		initCanvas() {
 			if (!this.canvas) {
@@ -46,32 +48,40 @@ customElements.define(
 
 		disconnectedCallback() {
 			this.channel?.close()
+			this.cleanEffect()
 		}
 
 		connectedCallback() {
-			// TODO : put in effect ?
+			this.cleanEffect = createEffect(() => {
+				this.blbllbl()
+			})
+		}
 
+		blbllbl() {
+			// const stages = $stages.get()
+			// const myMatch = getMyAwaitingMatchFromStages(stages)
+			// if (myMatch && !setMatchId(myMatch.id)) {
+			// 	throw new Error('match already set')
+			// }
+			// const match = stages.flat().find((m) => m.id === matchId)
+			// if (!match) throw new Error('Match not found in stages')
 			this.classList.add('flex', 'justify-center')
-			const stages = $stages.get()
+			const match = $match.get()
 
-			const myMatch = getMyMatch(stages)
-			if (myMatch && !setMatchId(myMatch.id)) {
-				throw new Error('match already set')
-			}
-
-			console.log('RENDER PONG REMOTE', $matchId.get())
-			const user = $user.get()
-			const tournament = $tournament.get()
-			if (!user || !tournament) return // TODO: handle
-			const matchId = $matchId.get()
-			if (matchId === -1) {
-				this.innerHTML = /*html*/ `<h3>MatchId is required</h3>`
+			if (!this.user) return // TODO: handle
+			if (!match) {
+				this.innerHTML = /*html*/ `
+					<div class="h-[100%] w-[100%] flex flex-row items-center justify-center">
+						You don't have any match, you idiot.
+					</div>
+					` //TODO: Remove above
 				return
 			}
+			console.log('RENDER PONG REMOTE', match.id)
 			this.initCanvas() // TODO: use babylon
 			this.channel = openChannel(
 				'matches',
-				{ matchId: matchId.toString() },
+				{ matchId: match.id.toString() },
 				{
 					onEngineEvent: (data) => {
 						if (data.onTimerTick !== undefined) {
@@ -101,9 +111,7 @@ customElements.define(
 				},
 			)
 
-			const match = stages.flat().find((m) => m.id === matchId)
-			if (!match) throw new Error('Match not found in stages')
-			const player: Player = user.id === match.player1Id ? 'p1' : 'p2'
+			const player: Player = this.user.id === match.player1Id ? 'p1' : 'p2'
 
 			const setInput = (move: Move, value: boolean) => {
 				this.channel.emit('onPlayerInput', { player, move, value })

@@ -1,7 +1,8 @@
 import { type ChannelSocket, openChannel } from '../../lib/socketChannels.js'
+import type { MatchBasic } from '../../lib/type.js'
 import { toast } from '../components/ft-toast.js'
 import { getAvatarSrc } from '../utils/avatar.js'
-import { getMyMatch, setMatchId } from '../utils/match.js'
+import { getMyAwaitingMatchFromStages, setMatch } from '../utils/match.js'
 import { type CleanEffect, createEffect } from '../utils/signal.js'
 import { $participants, $stages, $tournament, $user } from '../utils/store.js'
 
@@ -25,6 +26,7 @@ customElements.define(
 				{ tournamentId },
 				{
 					onParticipantJoin: (newParticipant) => {
+						console.log('onParticipantJoin')
 						toast.success(`${newParticipant.user.name} joined the tournament !`)
 						$participants.update((participants) => {
 							const isParticipantExist = participants.find(
@@ -35,6 +37,7 @@ customElements.define(
 						})
 					},
 					onParticipantQuit: (participant) => {
+						console.log('onParticipantQuit')
 						toast.error(`${participant.user.name} left the tournament !`)
 						$participants.update((participants) => {
 							return participants.filter(
@@ -43,34 +46,38 @@ customElements.define(
 						})
 					},
 					onStart: ({ stages }) => {
+						console.log('onStart')
 						toast.success('Tournament starting')
-						const myMatch = getMyMatch(stages)
-						if (!myMatch) return
-						setMatchId(myMatch.id)
 						$stages.set(stages)
+						const myMatch: MatchBasic | undefined =
+							getMyAwaitingMatchFromStages(stages)
+						if (!myMatch) return
+						setMatch(myMatch)
 						$tournament.update((t) => {
 							if (!t) return undefined
 							return { ...t, state: 'ongoing' }
 						})
 					},
 					onMatchChange: ({ match }) => {
+						console.log('onMatchChange')
 						$stages.update((stages) => {
 							const m = stages.flat().find((m) => m.id === match.id)
 							if (!m) return stages
-							console.log('match: ', match)
-							console.log('before: ', m)
+							// console.log('match: ', match)
+							// console.log('before: ', m)
 							Object.assign(m, match)
-							console.log('after:', m)
+							// console.log('after:', m)
 							if (
 								m.player1Id === this.user?.id ||
 								m.player2Id === this.user?.id
 							) {
-								setMatchId(m.id)
+								setMatch(m)
 							}
 							return stages
 						})
 					},
 					onEnd: () => {
+						console.log('onEnd')
 						toast.success('Tournament terminated')
 						$tournament.update((t) => (!t ? t : { ...t, state: 'finished' }))
 					},
