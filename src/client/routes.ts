@@ -44,7 +44,6 @@ export const API_GET: {
 		store.$participants.set(t.participants)
 		store.$stages.set(t.stages)
 	},
-	'/auth/oauth/google': store.$oauth2.set,
 }
 
 export const API_POST: {

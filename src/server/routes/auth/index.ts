@@ -20,9 +20,9 @@ export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 		async (req, res) => {
 			const { name, password } = req.body
 			const authUser = await getAuthUser(name)
-			if (authUser?.isOAuth2 === true || !authUser?.passwordHash)
-				return res.forbidden('This user uses a google account to authenticate')
 			if (!authUser) return res.forbidden('Wrong username or password')
+			if (authUser.isOAuth2 === true || !authUser.passwordHash)
+				return res.forbidden('This user uses a google account to authenticate')
 			const passwordOk = await argon2.verify(authUser.passwordHash, password)
 			if (!passwordOk) return res.forbidden('Wrong username or password')
 			await setSessionCookie(authUser.id, res)
@@ -30,6 +30,7 @@ export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 			res.send({ message: 'Connection success !', user })
 		},
 	)
+
 	server.post(
 		'/signup',
 		postSchema('/auth/signup', signupSchema),
@@ -41,6 +42,7 @@ export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 			res.send({ message: 'Signup success !', user })
 		},
 	)
+
 	server.post(
 		'/logout',
 		postSchema('/auth/logout', null),
@@ -53,7 +55,7 @@ export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 		},
 	)
 
-	server.get('/login/google/callback', async (req, res) => {
+	server.get('/oauth/google/callback', async (req, res) => {
 		const { token } =
 			//@ts-ignore
 			await server.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(req)
@@ -72,11 +74,11 @@ export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 		if (authUser) {
 			if (!authUser.isOAuth2)
 				return res.forbidden(
-					`This user doesn't use a google account to authenticate`,
+					`A user with this name already exist and doesn't use a google account to authenticate`,
 				)
 		} else {
 			authUser = await createUserOAuth2({
-				name: googleUser.name,
+				name,
 				avatarUrl: googleUser.picture,
 			})
 		}

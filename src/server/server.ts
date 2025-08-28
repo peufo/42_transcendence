@@ -6,7 +6,7 @@ import fastifyOauth2 from '@fastify/oauth2'
 import fastifySensible from '@fastify/sensible'
 import fastifyStatic from '@fastify/static'
 import fastifyWebsocket from '@fastify/websocket'
-import fastify, { type FastifyRequest } from 'fastify'
+import fastify from 'fastify'
 
 import {
 	serializerCompiler,
@@ -46,22 +46,7 @@ const oauth2Options = {
 		auth: googleAuthConfig,
 	},
 	startRedirectPath: '/auth/oauth/google',
-	callbackUri: 'http://localhost:8000/auth/login/google/callback',
-	generateStateFunction: (request: FastifyRequest) => {
-		//@ts-ignore
-		return request.query.state
-	},
-	checkStateFunction: (
-		request: FastifyRequest,
-		callback: (err?: Error | null) => void,
-	) => {
-		//@ts-ignore
-		if (request.query.state) {
-			callback()
-			return
-		}
-		callback(new Error('Invalid state'))
-	},
+	callbackUri: 'http://localhost:8000/auth/oauth/google/callback',
 }
 
 export const server = fastify({ logger, bodyLimit: BODY_SIZE_LIMIT })
@@ -76,7 +61,6 @@ export function startServer() {
 	server.register(fastifyCookie, {
 		secret: env.COOKIE_SECRET,
 	})
-	// @ts-ignore
 	server.register(fastifyOauth2, oauth2Options)
 	server.register(fastifyStatic, {
 		root: [path.resolve('public'), path.resolve('build/public')],
