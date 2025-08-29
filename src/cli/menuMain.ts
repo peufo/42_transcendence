@@ -6,11 +6,13 @@ import { startGameLocal } from './game.js'
 import type { Scope, ScopeOptions } from './main.js'
 import { menuFriendships } from './menuFriendships.js'
 import { menuNewTournament } from './menuTournament.js'
+import { renderTest } from './renderer.js'
 
 export const menuMain: Scope = async () => {
 	const options: ScopeOptions = []
 
 	if (!api.user()) {
+		options.push({ label: 'Test render', value: renderTest })
 		options.push({ label: 'Login', value: login })
 	} else {
 		options.push({ label: 'Logout', value: logout })
