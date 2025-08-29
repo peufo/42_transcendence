@@ -8,8 +8,8 @@ export const SCREEN_WIDTH = Math.floor(ARENA_WIDTH / RESOLUTION) + 4
 export const SCREEN_HEIGHT = Math.floor(ARENA_HEIGHT / (RESOLUTION * 2)) + 2
 export const getW = (w: number) => w / RESOLUTION
 export const getH = (h: number) => h / (RESOLUTION * 2)
-export const getX = (x: number) => clamp(getW(x) + 2, 0, SCREEN_WIDTH - 4)
-export const getY = (y: number) => clamp(getH(y) + 1, 0, SCREEN_HEIGHT - 2)
+export const getX = (x: number) => clamp(getW(x) + 2, 2, SCREEN_WIDTH - 4)
+export const getY = (y: number) => clamp(getH(y) + 1, 1, SCREEN_HEIGHT - 2)
 
 function clamp(v: number, min: number, max: number) {
 	if (v < min) return min

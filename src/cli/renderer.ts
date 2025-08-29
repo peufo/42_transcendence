@@ -1,6 +1,6 @@
 import { stdin, stdout } from 'node:process'
 import { createInterface } from 'node:readline'
-import chalk from 'chalk'
+import chalk, { type ChalkInstance } from 'chalk'
 import {
 	BALL_BASE_SIZE,
 	PADDLE_BASE_HEIGHT,
@@ -49,6 +49,10 @@ export function useRenderer() {
 		renderFrame()
 		render()
 	}
+
+	const renderBall = useRenderBall()
+	const renderPaddles = useRenderPaddles()
+
 	async function render() {
 		const now = Date.now()
 		if (!screenSizeIsOk()) {
@@ -78,9 +82,11 @@ function getRounded(n: number) {
 	}
 }
 
-function drawRect(x: number, y: number, w: number, h: number) {
-	const startX = getRounded(getX(x) + 0.5)
-	const startY = getRounded(getY(y) + 1)
+type Cleaner = (format: ChalkInstance) => void
+
+function drawRect(x: number, y: number, w: number, h: number): Cleaner {
+	const startX = getRounded(getX(x))
+	const startY = getRounded(getY(y))
 	const width = Math.floor(getW(w))
 	const height = Math.floor(getH(h))
 	const endY = startY.value + height
@@ -89,25 +95,44 @@ function drawRect(x: number, y: number, w: number, h: number) {
 		stdout.cursorTo(startX.value, _y)
 		stdout.write(line)
 	}
+
+	return (format: ChalkInstance) => {
+		const line = format(' '.repeat(width))
+		for (let _y = startY.value; _y < endY; _y++) {
+			stdout.cursorTo(startX.value, _y)
+			stdout.write(line)
+		}
+	}
 }
 
-function renderBall({ b }: State) {
-	drawRect(
-		b.x - BALL_BASE_SIZE / 2,
-		b.y - BALL_BASE_SIZE / 2,
-		BALL_BASE_SIZE,
-		BALL_BASE_SIZE,
-	)
+function useRenderBall() {
+	let cleaner: Cleaner = () => {}
+	return ({ b }: State) => {
+		cleaner(chalk.bgHex('#eee'))
+		cleaner = drawRect(b.x, b.y, BALL_BASE_SIZE, BALL_BASE_SIZE)
+	}
 }
 
-function renderPaddles({ p1, p2 }: State) {
-	drawRect(PADDLE_BASE_P1_POSITION.x, p1, PADDLE_BASE_WIDTH, PADDLE_BASE_HEIGHT)
-	drawRect(
-		PADDLE_BASE_P2_POSITION.x - PADDLE_BASE_WIDTH,
-		p2,
-		PADDLE_BASE_WIDTH,
-		PADDLE_BASE_HEIGHT,
-	)
+function useRenderPaddles() {
+	let cleaner1: Cleaner = () => {}
+	let cleaner2: Cleaner = () => {}
+
+	return ({ p1, p2 }: State) => {
+		cleaner1(chalk.reset)
+		cleaner2(chalk.reset)
+		cleaner1 = drawRect(
+			PADDLE_BASE_P1_POSITION.x,
+			p1,
+			PADDLE_BASE_WIDTH,
+			PADDLE_BASE_HEIGHT,
+		)
+		cleaner2 = drawRect(
+			PADDLE_BASE_P2_POSITION.x - PADDLE_BASE_WIDTH,
+			p2,
+			PADDLE_BASE_WIDTH,
+			PADDLE_BASE_HEIGHT,
+		)
+	}
 }
 
 function renderScore() {
