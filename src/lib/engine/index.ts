@@ -44,13 +44,15 @@ export type EngineEventData = {
 	onTimerTick?: number
 }
 
-type EngineOptions = {
-	scoreToWin: number
-	onEvent?: (event: EngineEventData) => void
-} & {
+export type EngineOptionsEvents = {
 	[EventName in keyof EngineEventData]: (
 		data: Required<EngineEventData>[EventName],
 	) => void
+}
+
+export type EngineOptions = EngineOptionsEvents & {
+	scoreToWin: number
+	onEvent?: (event: EngineEventData) => void
 }
 
 // Game properties

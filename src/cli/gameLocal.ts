@@ -4,26 +4,29 @@ import { Engine } from '../lib/engine/index.js'
 import type { Scope } from './main.js'
 import { menuMain } from './menuMain.js'
 import { useRenderer } from './renderer.js'
+import { ensureSreenSize } from './resolution.js'
 
 export const startGameLocal: Scope = () => {
 	emitKeypressEvents(stdin)
 	const rl = createInterface({ input: stdin, terminal: true })
 	const renderer = useRenderer()
 
-	const engine = new Engine({
-		scoreToWin: 3,
-		onTick(data) {
-			renderer.updateState(data)
-		},
-		onRoundEnd() {
-			engine.setInput('p1', 'down', false)
-			engine.setInput('p1', 'up', false)
-			engine.setInput('p2', 'down', false)
-			engine.setInput('p2', 'up', false)
-		},
-	})
-
 	return new Promise((resolve) => {
+		const engine = new Engine({
+			scoreToWin: 3,
+			...renderer,
+			onRoundEnd(round) {
+				engine.setInput('p1', 'down', false)
+				engine.setInput('p1', 'up', false)
+				engine.setInput('p2', 'down', false)
+				engine.setInput('p2', 'up', false)
+				renderer.onRoundEnd(round)
+			},
+			onGameEnd(data) {
+				renderer.onGameEnd(data)
+				setTimeout(terminate, 2500)
+			},
+		})
 		const keyHandlers: Record<string, () => void> = {
 			w() {
 				engine.setInput('p1', 'up', true)
@@ -66,7 +69,9 @@ export const startGameLocal: Scope = () => {
 		}
 		rl.once('SIGINT', terminate)
 		stdin.on('keypress', onKeyPress)
-		engine.start()
-		renderer.start()
+		ensureSreenSize().then(() => {
+			console.clear()
+			engine.start()
+		})
 	})
 }
