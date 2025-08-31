@@ -1,5 +1,6 @@
-import { type ChannelSocket, openChannel } from '../lib/socketChannels.js'
+import type { ChannelSocket } from '../lib/useSocketChannels.js'
 import { toast } from './components/ft-toast.js'
+import { socketChannel } from './socketChannel.js'
 import { createEffect } from './utils/signal.js'
 import {
 	$friendshipsFriend,
@@ -20,7 +21,7 @@ createEffect(() => {
 		return
 	}
 	if (friendshipChannel) return
-	friendshipChannel = openChannel('friendships', null, {
+	friendshipChannel = socketChannel('friendships', null, {
 		onCreated({ friendship }) {
 			toast.info(`New invitation from ${friendship.withUser.name}`)
 			$friendshipsInvitation.update((friendships) => [

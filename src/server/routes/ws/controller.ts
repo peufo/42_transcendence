@@ -1,7 +1,7 @@
 import EventEmitter from 'node:events'
 import type { WebSocket } from 'ws'
-import type { ServerEvents } from '../../../lib/socketChannels.js'
 import type { SocketChannels } from '../../../lib/type.js'
+import type { ServerEvents } from '../../../lib/useSocketChannels.js'
 import { getFriendshipsId } from '../friendships/model.js'
 
 type EventMessage<Channel extends keyof SocketChannels> = {

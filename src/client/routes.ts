@@ -85,9 +85,6 @@ export const API_POST: {
 		redirectTo: ({ tournamentId }) =>
 			`/tournament/play?tournamentId=${tournamentId}`,
 	},
-	'/tournaments/delete': {
-		redirectTo: () => '/me',
-	},
 	'/tournaments/join': {
 		redirectTo: ({ tournamentId }) =>
 			`/tournament/play?tournamentId=${tournamentId}`,

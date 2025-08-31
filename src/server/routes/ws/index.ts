@@ -37,7 +37,6 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 		},
 		async (socket, req) => {
 			const session = await getSessionFromRequest(req)
-			// TODO: What is the behaviour of an http error here
 			if (!session) {
 				socket.close(3000, 'Authentification required')
 				return

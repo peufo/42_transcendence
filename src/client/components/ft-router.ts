@@ -240,7 +240,6 @@ async function onSubmitForm(event: SubmitEvent) {
 			setTimeout(() => div?.classList.remove('animate-shakeX'), 600)
 			return
 		}
-		// TODO use a Component instead
 		div = document.createElement('div')
 		div.classList.add('badge', 'badge-red', 'w-max', 'my-1')
 		div.textContent = error

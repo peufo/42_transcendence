@@ -28,8 +28,8 @@ export const logout: Scope = async () => {
 async function getApiOptions(): Promise<ApiOptions> {
 	const host = await p.text({
 		message: 'hostname ?',
-		placeholder: 'http://localhost:8000',
-		defaultValue: 'http://localhost:8000',
+		placeholder: api.host(),
+		defaultValue: api.host(),
 	})
 	if (p.isCancel(host)) exit(0)
 
@@ -67,7 +67,8 @@ async function getApiOptions(): Promise<ApiOptions> {
 	s.start('Connection')
 	try {
 		const action = isSignin ? 'login' : 'signup'
-		const res = await fetch(`${host}/auth/${action}`, {
+		// TODO: use https
+		const res = await fetch(`http://${host}/auth/${action}`, {
 			method: 'post',
 			headers: {
 				'Content-Type': 'application/json',

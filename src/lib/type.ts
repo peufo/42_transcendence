@@ -188,10 +188,6 @@ export type RoutesPost = {
 		body: { numberOfPlayers: number }
 		res: { success: boolean; tournamentId: number }
 	}
-	'/tournaments/delete': {
-		body: { tournamentId: number }
-		res: { success: boolean; message: string }
-	}
 	'/tournaments/join': {
 		body: { tournamentId: number }
 		res: { success: boolean; tournamentId: number }

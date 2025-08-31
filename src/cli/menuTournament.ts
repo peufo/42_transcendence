@@ -1,10 +1,12 @@
-import { exit } from 'node:process'
+import { exit, stdin, stdout } from 'node:process'
+import { createInterface } from 'node:readline'
 import * as p from '@clack/prompts'
+import chalk from 'chalk'
+import type { Match } from '../lib/type.js'
 import { api } from './api.js'
 import type { Scope } from './main.js'
 import { menuMain } from './menuMain.js'
-
-// let ownedTournamentId: number | null = null
+import { socketChannelCLI } from './socketChannelCLI.js'
 
 export const menuNewTournament: Scope = async () => {
 	const numberOfPlayers = await p.select({
@@ -18,54 +20,104 @@ export const menuNewTournament: Scope = async () => {
 	})
 
 	p.log.success('Tournament created')
-	// ownedTournamentId = tournamentId
-	return await createMenuTounament(tournamentId)
+	return await useMenuTournament(tournamentId)
 }
 
-export async function createMenuTounament(
-	tournamentId: number,
-): Promise<Scope> {
-	const { participants, numberOfPlayers } = await api.get('/tournaments', {
+export async function useMenuTournament(tournamentId: number): Promise<Scope> {
+	const rl = createInterface({ input: stdin, terminal: true })
+	const tournament = await api.get('/tournaments', {
 		tournamentId,
 	})
-	return async () => {
+	return new Promise((resolve) => {
 		const spinner = p.spinner()
-		const waitingMessage = () =>
-			`waiting for your friends (${participants.length} / ${numberOfPlayers})`
-		spinner.start(waitingMessage())
-		// TODO: wait on users and start tournament
+		const stateMessage = () => {
+			if (tournament.participants.length === tournament.numberOfPlayers)
+				return 'Ready to start'
+			return `Waiting for participants (${tournament.participants.length} / ${tournament.numberOfPlayers})`
+		}
+		spinner.start(stateMessage())
 
-		const action = await p.select({
-			message: `${api.host()}/tournament?tournamentId=${tournamentId}`,
-			options: [
-				{
-					label: 'Start tournament',
-					value: async () => {
-						if (participants.length < numberOfPlayers) {
-							spinner.stop('Tournament incomplet', 1)
-							return createMenuTounament(tournamentId)
-						}
-						return menuMatch
-					},
+		const tournamentChannel = socketChannelCLI(
+			'tournaments',
+			{ tournamentId: tournamentId.toString() },
+			{
+				onParticipantJoin(data) {
+					tournament.participants.push(data)
+					spinner.stop(`${data.user.name} joined the tournament`)
+					spinner.start(stateMessage())
 				},
-				{
-					label: 'Cancel tournament',
-					value: async () => {
-						await api.post('/tournaments/delete', { tournamentId })
-						spinner.stop('Tournament canceled')
-						return menuMain
-					},
+				onParticipantQuit(data) {
+					tournament.participants = tournament.participants.filter(
+						({ user }) => user.id !== data.user.id,
+					)
+					spinner.stop(`${data.user.name} leaved the tournament`)
+					spinner.start(stateMessage())
 				},
-			],
-		})
-		if (p.isCancel(action)) exit(0)
-		return action()
+				onStart(data) {
+					spinner.stop('Tournament starting')
+					tournament.stages = data.stages
+					renderStages([...tournament.stages].reverse())
+					// const myMatch = getMyMatch(stages)
+					// if (!myMatch) return
+					// setMatchId(myMatch.id)
+					// $stages.set(stages)
+					// $tournament.update((t) => {
+					// 	if (!t) return undefined
+					// 	return { ...t, state: 'ongoing' }
+					// })
+				},
+				onMatchChange(_data) {},
+				onEnd(_data) {},
+			},
+		)
+
+		function terminate() {
+			tournamentChannel.close()
+			rl.off('SIGINT', terminate)
+			resolve(menuMain)
+		}
+
+		rl.once('SIGINT', terminate)
+	})
+}
+
+function renderStages(stages: Match[][], level = 0, index = 0) {
+	if (!stages[level]) return
+	renderMatchVersus(stages[level][index], level)
+	renderStages(stages, level + 1, index * 2)
+	if (level > 0) {
+		index++
+		renderMatchVersus(stages[level][index], level)
+		renderStages(stages, level + 1, index * 2)
 	}
 }
 
-const menuMatch: Scope = async () => {
-	const isReady = await p.confirm({ message: 'Ready ?' })
-	if (p.isCancel(isReady)) exit(0)
-	p.log.warn('TODO: enter in the game')
+function renderMatchVersus(match: Match, level: number) {
+	stdout.write(chalk.gray('│'))
+	stdout.write(chalk.grey(`${' │ '.repeat(level)} 1/${2 ** level} `))
+	renderPlayer(match, 'player1')
+	stdout.write(chalk.italic.grey(' vs '))
+	renderPlayer(match, 'player2')
+	stdout.write('\n')
+}
+
+function renderPlayer(match: Match, p: 'player1' | 'player2') {
+	if (!match[p]) {
+		stdout.write('?')
+		return
+	}
+	const opponent = p === 'player1' ? 'player2' : 'player1'
+	const score = match[`${p}Score`]
+	const scoreOpponent = match[`${opponent}Score`]
+	let str = `${match[p].name}(${score})`
+	if (score !== scoreOpponent) {
+		str = score > scoreOpponent ? chalk.green(str) : chalk.red(str)
+	}
+	stdout.write(str)
+}
+
+export async function testRenderStages(): Promise<Scope> {
+	const tournament = await api.get('/tournaments', { tournamentId: 1 })
+	renderStages([...tournament.stages].reverse())
 	return menuMain
 }

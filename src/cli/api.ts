@@ -5,6 +5,8 @@ import * as p from '@clack/prompts'
 import z from 'zod/v4'
 import type { RoutesGet, RoutesPost, User } from '../lib/type.js'
 
+const DEFAULT_HOST = 'localhost:8000'
+
 const HOME = process.env.HOME || ''
 const SAVE_FILE = path.resolve(HOME, '.transcendance.json')
 
@@ -25,7 +27,8 @@ function useApi() {
 	): Promise<RoutesGet[Route]['res']['data']> {
 		const { host, sessionToken } = options
 		if (!host || !sessionToken) throw new Error('Login required')
-		const url = new URL(route, host)
+		// TODO: change in https
+		const url = new URL(route, `http://${host}`)
 		if (query) {
 			for (const [name, value] of Object.entries(query))
 				url.searchParams.append(name, value as string)
@@ -46,7 +49,8 @@ function useApi() {
 	): Promise<RoutesPost[Route]['res']> {
 		const { host, sessionToken } = options
 		if (!host || !sessionToken) throw new Error('Login required')
-		const url = new URL(route, host)
+		// TODO: change in https
+		const url = new URL(route, `http://${host}`)
 		const res = await fetch(url, {
 			method: 'post',
 			headers: {
@@ -64,8 +68,9 @@ function useApi() {
 		setOptions(newOptions: ApiOptions) {
 			options = newOptions
 		},
+		sessionToken: () => options.sessionToken,
 		user: () => options.user,
-		host: () => options.host || '',
+		host: () => options.host || DEFAULT_HOST,
 		get: apiGet,
 		post: apiPost,
 	}

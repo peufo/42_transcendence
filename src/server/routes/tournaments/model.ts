@@ -34,9 +34,10 @@ export async function tournamentGet(
 		},
 	})
 	if (!tournament) throw server.httpErrors.notFound()
+	const { matches, ...restTournament } = tournament
 	return {
-		...tournament,
-		stages: getMatchesByStages(tournament.numberOfPlayers, tournament.matches),
+		...restTournament,
+		stages: getMatchesByStages(tournament.numberOfPlayers, matches),
 	}
 }
 

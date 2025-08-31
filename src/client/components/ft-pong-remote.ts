@@ -11,7 +11,8 @@ import {
 	type Scores,
 } from '../../lib/engine/index.js'
 import { useInterpolate } from '../../lib/interpolate.js'
-import { type OpenedChannel, openChannel } from '../../lib/socketChannels.js'
+import type { ChannelSocket } from '../../lib/useSocketChannels.js'
+import { socketChannel } from '../socketChannel.js'
 import { type CleanEffect, createEffect } from '../utils/signal.js'
 import { $match, $user } from '../utils/store.js'
 import { toast } from './ft-toast.js'
@@ -22,7 +23,7 @@ customElements.define(
 		animationFrameId = 0
 		canvas: HTMLCanvasElement
 		ctx: CanvasRenderingContext2D
-		channel: OpenedChannel<'matches'>
+		channel: ChannelSocket<'matches'>
 		interpolate = useInterpolate()
 		scores: Scores = {
 			p1: 0,
@@ -78,7 +79,7 @@ customElements.define(
 			}
 			console.log('RENDER PONG REMOTE', match.id)
 			this.initCanvas() // TODO: use babylon
-			this.channel = openChannel(
+			this.channel = socketChannel(
 				'matches',
 				{ matchId: match.id.toString() },
 				{

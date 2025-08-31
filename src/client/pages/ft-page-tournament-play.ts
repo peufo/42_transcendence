@@ -1,6 +1,7 @@
-import { type ChannelSocket, openChannel } from '../../lib/socketChannels.js'
+import type { ChannelSocket } from '../../lib/socketChannels.js'
 import type { MatchBasic } from '../../lib/type.js'
 import { toast } from '../components/ft-toast.js'
+import { socketChannel } from '../socketChannel.js'
 import { getAvatarSrc } from '../utils/avatar.js'
 import { getMyAwaitingMatchFromStages, setMatch } from '../utils/match.js'
 import { type CleanEffect, createEffect } from '../utils/signal.js'
@@ -21,7 +22,7 @@ customElements.define(
 			const tournamentId =
 				new URLSearchParams(document.location.search).get('tournamentId') || ''
 
-			this.tournamentChannel = openChannel(
+			this.tournamentChannel = socketChannel(
 				'tournaments',
 				{ tournamentId },
 				{
