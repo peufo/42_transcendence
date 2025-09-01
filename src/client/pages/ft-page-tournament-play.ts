@@ -1,5 +1,5 @@
-import type { ChannelSocket } from '../../lib/socketChannels.js'
 import type { MatchBasic } from '../../lib/type.js'
+import type { ChannelSocket } from '../../lib/useSocketChannels.js'
 import { toast } from '../components/ft-toast.js'
 import { socketChannel } from '../socketChannel.js'
 import { getAvatarSrc } from '../utils/avatar.js'

@@ -24,7 +24,7 @@ async function main() {
 					defaultValue: false,
 				}),
 				avatarPlaceholder: f.valuesFromArray({
-					values: new Array(10).fill('').map(getRandomAvatarPlaceholder),
+					values: new Array(20).fill('').map(getRandomAvatarPlaceholder),
 				}),
 				passwordHash: f.default({
 					defaultValue: passwordHash,

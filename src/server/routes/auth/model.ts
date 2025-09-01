@@ -40,7 +40,7 @@ export async function createUserOAuth2(name: string) {
 
 export function getRandomAvatarPlaceholder() {
 	const avatarUrl = new URL('https://api.dicebear.com/9.x/avataaars/svg')
-	avatarUrl.searchParams.append('seed', String(Math.random()))
+	avatarUrl.searchParams.append('seed', Math.random().toString())
 	return avatarUrl.toString()
 }
 
