@@ -17,7 +17,7 @@ customElements.define(
 				userContent += /*html*/ `
 					<div class="grid grid-cols-1 lg:grid-cols-2 grid-flow-row gap gap-4 p-10 max-w-7xl mx-auto">
 						<ft-stats></ft-stats>
-						<div class="flex flex-col gap-4">
+						<div class="flex flex-col justify-between">
 							<ft-goal-received-distribution></ft-goal-received-distribution>
 							<ft-goal-scored-distribution><ft-goal-scored-distribution>
 						</div>
@@ -347,27 +347,6 @@ customElements.define(
 		}
 	},
 )
-
-// <div class="grid grid-flow-col grid-rows-2 items-center gap-2">
-// 				<h2 class="p-2 text-center font-bold">Total match played</h2>
-// 				<h2 class="p-2 text-center">${this.user.numberOfMatches}</h2>
-// 				<h2 class="p-2 text-center font-bold">Total match won</h2>
-// 				<h2 class="p-2 text-center">${this.user.numberOfWin}</h2>
-// 				<h2 class="p-2 text-center font-bold">Winrate</h2>
-// 				<h2 class="p-2 text-center">${winRate} %</h2>
-// 				<h2 class="p-2 text-center font-bold">Average rally per round</h2>
-// 				<h2 class="p-2 text-center">${averageRally}</h2>
-// 				<h2 class="p-2 text-center font-bold">Rank</h2>
-// 				<h2 class="p-2 text-center">${formatOrdinals(rank)}</h2>
-// 				<div class="flex flex-row justify-center items-center">
-// 					<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold">League</h2>
-// 					<div class="flex flex-row justify-center items-center relative group">
-// 						<ft-icon name="message-circle-question" class="mr-1"></ft-icon>
-// 						${getLeagueModal()}
-// 					</div>
-// 				</div>
-// 				${leagueImage}
-// 			</div>
 
 customElements.define(
 	'ft-goal-received-distribution',
