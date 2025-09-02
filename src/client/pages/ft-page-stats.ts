@@ -358,7 +358,6 @@ customElements.define(
 				'flex',
 				'flex-col',
 				'flex-wrap',
-				'overflow-hidden',
 				'items-center',
 				'justify-around',
 				'gap-3',
@@ -386,7 +385,15 @@ customElements.define(
 			const goalTakenY = getGoalTakenY(matches, this.user)
 			const distributionPercentage = convertToPercentage(goalTakenY)
 			const html = /*html*/ `
-				<h2 class="flex flex-row p-2 items-center justify-center gap-2 font-bold">Most conceded zones</h2>
+				<h2 class="flex flex-row p-2 items-center justify-center gap-2 font-bold">
+					Most conceded zones
+					<div class="relative group inline-block">
+						<ft-icon name="message-circle-question" class="mb-3"></ft-icon>
+						<div class="absolute left-1/2 top-full transform -translate-x-1/2 p-4 border border-gray-400 rounded-2xl bg-white shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 z-12 h-auto w-100">
+							This graph displays the zones where you conceded the most goals. The more red a zone is the more you are vulnerable there.
+						</div>
+					</div>
+				</h2>
 				<div class="flex flex-col w-max items-center justify-center pl-1 pr-1 pb-1 gap-4 border-black border-l-2 border-r-2 border-b-2">
 					<div class="w-50 h-5 border-2 border-black rounded-4xl shadow-lg"></div>
 					${drawRectangle(distributionPercentage, 'conceded')}
@@ -407,7 +414,6 @@ customElements.define(
 				'flex',
 				'flex-col',
 				'flex-wrap',
-				'overflow-hidden',
 				'items-center',
 				'justify-around',
 				'gap-3',
@@ -435,7 +441,15 @@ customElements.define(
 			const goalTScoredY = getGoalScoredY(matches, this.user)
 			const distributionPercentage = convertToPercentage(goalTScoredY)
 			const html = /*html*/ `
-				<h2 class="flex flex-row p-2 items-center justify-center gap-2 font-bold">Best scoring zones</h2>
+				<h2 class="flex flex-row p-2 items-center justify-center gap-2 font-bold">
+					Best scoring zones
+					<div class="relative group inline-block">
+						<ft-icon name="message-circle-question" class="mb-3"></ft-icon>
+						<div class="absolute left-1/2 top-full transform -translate-x-1/2 p-4 border border-gray-400 rounded-2xl bg-white shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 z-12 h-auto w-100">
+							This graph displays the zones where you scored the most goals. The more blue a zone is the more you generally score there.
+						</div>
+					</div>
+				</h2>
 				<div class="flex flex-col w-max items-center justify-center pl-1 pr-1 pb-1 gap-4 border-black border-l-2 border-r-2 border-t-2">
 					${drawRectangle(distributionPercentage, 'scored')}
 					<div class="w-50 h-5 border-2 border-black rounded-4xl shadow-lg"></div>
@@ -452,9 +466,9 @@ function drawRectangle(values: number[], mode: string): string {
 	for (const value of values) {
 		let color = ''
 		if (mode === 'conceded')
-			color = `rgb(${255 - Math.floor((value * 255) / maxValue)}, ${255 - Math.floor((value * 255) / maxValue)}, 255)`
-		else
 			color = `rgb(255, ${255 - Math.floor((value * 255) / maxValue)}, ${255 - Math.floor((value * 255) / maxValue)})`
+		else
+			color = `rgb(${255 - Math.floor((value * 255) / maxValue)}, ${255 - Math.floor((value * 255) / maxValue)}, 255)`
 		html += /*html*/ `
 		<div class="w-1 h-4" style="background-color:${color}"></div>
 		`
