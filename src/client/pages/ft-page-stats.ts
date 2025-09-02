@@ -303,30 +303,71 @@ customElements.define(
 				return `${n}${suffix}`
 			}
 			const html = /*html*/ `
-			<div class="grid grid-flow-col grid-rows-2 items-center gap-2">
-				<h2 class="p-2 text-center font-bold">Total match played</h2>
-				<h2 class="p-2 text-center">${this.user.numberOfMatches}</h2>
-				<h2 class="p-2 text-center font-bold">Total match won</h2>
-				<h2 class="p-2 text-center">${this.user.numberOfWin}</h2>
-				<h2 class="p-2 text-center font-bold">Winrate</h2>
-				<h2 class="p-2 text-center">${winRate} %</h2>
-				<h2 class="p-2 text-center font-bold">Average rally per round</h2>
-				<h2 class="p-2 text-center">${averageRally}</h2>
-				<h2 class="p-2 text-center font-bold">Rank</h2>
-				<h2 class="p-2 text-center">${formatOrdinals(rank)}</h2>
-				<div class="flex flex-row justify-center items-center">
-					<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold">League</h2>
-					<div class="flex flex-row justify-center items-center relative group">
-						<ft-icon name="message-circle-question" class="mr-1"></ft-icon>
-						${getLeagueModal()}
+			<div class="p-4 bg-white rounded-lg md:p-8" id="stats">
+				<dl class="grid max-w-screen-xl gap-8 mx-auto text-gray-900 sm:grid-cols-2 xl:grid-cols-3 md:grid-cols-3">
+					<div class="flex flex-col items-center justify-center">
+						<dt class="mb-2 text-3xl font-extrabold">${this.user.numberOfMatches}</dt>
+						<dd class="text-gray-500 dark:text-gray-400 whitespace-nowrap">Total match played</dd>
 					</div>
-				</div>
-				${leagueImage}
+					<div class="flex flex-col items-center justify-center">
+						<dt class="mb-2 text-3xl font-extrabold">${this.user.numberOfWin}</dt>
+						<dd class="text-gray-500 dark:text-gray-400 whitespace-nowrap">Total match won</dd>
+					</div>
+					<div class="flex flex-col items-center justify-center">
+						<dt class="mb-2 text-3xl font-extrabold">${winRate} %</dt>
+						<dd class="text-gray-500 dark:text-gray-400 whitespace-nowrap">Winrate</dd>
+					</div>
+					<div class="flex flex-col items-center justify-center">
+						<dt class="mb-2 text-3xl font-extrabold">${averageRally}</dt>
+						<dd class="text-gray-500 dark:text-gray-400 whitespace-nowrap">Average rally per round</dd>
+					</div>
+					<div class="flex flex-col items-center justify-center">
+						<dt class="mb-2 text-3xl font-extrabold">${formatOrdinals(rank)}</dt>
+						<dd class="text-gray-500 dark:text-gray-400 whitespace-nowrap">Rank</dd>
+					</div>
+					<div class="flex flex-col items-center justify-center">
+						<dt class="mb-2 text-3xl font-extrabold">
+							<div class="flex flex-row justify-center items-center relative group">
+								${leagueImage}
+							</div>
+						</dt>
+						<div class="flex flex-row justify-center items-center">
+							<dd class="text-gray-500 dark:text-gray-400 whitespace-nowrap">
+								League
+							</dd>
+							<div class="flex flex-row justify-center items-center relative group">
+								<ft-icon name="message-circle-question" class="ml-1 mb-5"></ft-icon>
+		 						${getLeagueModal()}
+							</div>
+						</div>
+					</div>
+				</dl>
 			</div>`
 			return html
 		}
 	},
 )
+
+// <div class="grid grid-flow-col grid-rows-2 items-center gap-2">
+// 				<h2 class="p-2 text-center font-bold">Total match played</h2>
+// 				<h2 class="p-2 text-center">${this.user.numberOfMatches}</h2>
+// 				<h2 class="p-2 text-center font-bold">Total match won</h2>
+// 				<h2 class="p-2 text-center">${this.user.numberOfWin}</h2>
+// 				<h2 class="p-2 text-center font-bold">Winrate</h2>
+// 				<h2 class="p-2 text-center">${winRate} %</h2>
+// 				<h2 class="p-2 text-center font-bold">Average rally per round</h2>
+// 				<h2 class="p-2 text-center">${averageRally}</h2>
+// 				<h2 class="p-2 text-center font-bold">Rank</h2>
+// 				<h2 class="p-2 text-center">${formatOrdinals(rank)}</h2>
+// 				<div class="flex flex-row justify-center items-center">
+// 					<h2 class="flex flex-row p-2 items-center justify-center text-center gap-2 font-bold">League</h2>
+// 					<div class="flex flex-row justify-center items-center relative group">
+// 						<ft-icon name="message-circle-question" class="mr-1"></ft-icon>
+// 						${getLeagueModal()}
+// 					</div>
+// 				</div>
+// 				${leagueImage}
+// 			</div>
 
 customElements.define(
 	'ft-goal-received-distribution',
@@ -416,9 +457,9 @@ customElements.define(
 			const distributionPercentage = convertToPercentage(goalTScoredY)
 			const html = /*html*/ `
 				<h2 class="flex flex-row p-2 items-center justify-center gap-2 font-bold">Best scoring zones</h2>
-				<div class="flex flex-col w-max items-center justify-center pl-1 pr-1 pb-1 gap-4 border-black border-l-2 border-r-2 border-b-2">
-					<div class="w-50 h-5 border-2 border-black rounded-4xl shadow-lg"></div>
+				<div class="flex flex-col w-max items-center justify-center pl-1 pr-1 pb-1 gap-4 border-black border-l-2 border-r-2 border-t-2">
 					${drawRectangle(distributionPercentage, 'scored')}
+					<div class="w-50 h-5 border-2 border-black rounded-4xl shadow-lg"></div>
 				</div>
 			`
 			return html
@@ -530,12 +571,12 @@ function getLeagueDiv(league: League): string {
 		</ft-icon>
 	`
 	const leagueNameDiv = /*html*/ `
-		<span class="font-bold text-2xl" style="color:${league.color}">
+		<span class="font-bold text-2xl border-" style="color:${league.color}">
 			${league.name}
 		</span>
 	`
 	const leaguediv = /*html*/ `
-		<div class="flex flex-col justify-center items-center gap-4">
+		<div class="flex flex-col justify-center items-center gap-4 rounded-4xl">
 			${leagueNameDiv}
 			${leagueIconDiv}
 		</div>
@@ -549,6 +590,9 @@ function getLeagueModal(): string {
 			let styling = ''
 			if (league.name === 'Storm') styling = `style="stroke:${league.color};"`
 			else styling = `style="fill:${league.color}; stroke: black;"`
+			let value = ''
+			if (index === leagues.length - 1) value = `Starting`
+			else value = `Top ${league.threshold} %`
 			const content = /*html*/ `
 				<div class="flex flex-col p-2 items-center justify-center text-center gap-2">
 					<span class="font-bold" style="color:${league.color}">${league.name}</span>
@@ -556,7 +600,7 @@ function getLeagueModal(): string {
 						name="${league.icon}"
 						class="mr-1" ${styling}>
 					</ft-icon>
-					<div class="font-bold whitespace-nowrap" style="color: ${league.color};">Top ${league.threshold} %</div>
+					<div class="font-bold whitespace-nowrap" style="color: ${league.color};">${value}</div>
 				</div>
 			`
 			if (index > 0)
