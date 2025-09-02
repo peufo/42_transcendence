@@ -17,7 +17,10 @@ customElements.define(
 				userContent += /*html*/ `
 					<div class="grid grid-cols-1 lg:grid-cols-2 grid-flow-row gap gap-4 p-10 max-w-7xl mx-auto">
 						<ft-stats></ft-stats>
-						<ft-goal-distribution></ft-goal-distribution>
+						<div class="flex flex-col gap-4">
+							<ft-goal-received-distribution></ft-goal-received-distribution>
+							<ft-goal-scored-distribution><ft-goal-scored-distribution>
+						</div>
 						<ft-match-history></ft-match-history>
 						<ft-ranking></ft-ranking>
 					</div>
@@ -326,7 +329,7 @@ customElements.define(
 )
 
 customElements.define(
-	'ft-goal-distribution',
+	'ft-goal-received-distribution',
 	class extends HTMLElement {
 		private user = $user.get()
 
@@ -353,7 +356,7 @@ customElements.define(
 			const matches = $matches.get()
 			if (matches.length === 0) {
 				const html = /*html*/ `
-					<h2 class="flex flex-row p-2 items-center justify-center gap-2 font-bold">Weaknesses</h2>
+					<h2 class="flex flex-row p-2 items-center justify-center gap-2 font-bold">Most conceded zones</h2>
 					<div class="flex pl-4 p-2 items-center justify-around gap-2">
 					Not enough matches to calculate statistics.
 					</div>
@@ -363,10 +366,10 @@ customElements.define(
 			const goalTakenY = getGoalTakenY(matches, this.user)
 			const distributionPercentage = convertToPercentage(goalTakenY)
 			const html = /*html*/ `
-				<h2 class="flex flex-row p-2 items-center justify-center gap-2 font-bold">Weaknesses</h2>
+				<h2 class="flex flex-row p-2 items-center justify-center gap-2 font-bold">Most conceded zones</h2>
 				<div class="flex flex-col w-max items-center justify-center pl-1 pr-1 pb-1 gap-4 border-black border-l-2 border-r-2 border-b-2">
 					<div class="w-50 h-5 border-2 border-black rounded-4xl shadow-lg"></div>
-					${drawRectangle(distributionPercentage)}
+					${drawRectangle(distributionPercentage, 'conceded')}
 				</div>
 			`
 			return html
@@ -374,11 +377,64 @@ customElements.define(
 	},
 )
 
-function drawRectangle(values: number[]): string {
+customElements.define(
+	'ft-goal-scored-distribution',
+	class extends HTMLElement {
+		private user = $user.get()
+
+		connectedCallback() {
+			this.classList.add(
+				'flex',
+				'flex-col',
+				'flex-wrap',
+				'overflow-hidden',
+				'items-center',
+				'justify-around',
+				'gap-3',
+				'border',
+				'border-gray-200',
+				'rounded-xl',
+				'p-5',
+			)
+			createEffect(() => {
+				this.innerHTML = this.renderContent()
+			})
+		}
+		renderContent(): string {
+			if (!this.user) return ''
+			const matches = $matches.get()
+			if (matches.length === 0) {
+				const html = /*html*/ `
+					<h2 class="flex flex-row p-2 items-center justify-center gap-2 font-bold">Best scoring zones</h2>
+					<div class="flex pl-4 p-2 items-center justify-around gap-2">
+					Not enough matches to calculate statistics.
+					</div>
+				`
+				return html
+			}
+			const goalTScoredY = getGoalScoredY(matches, this.user)
+			const distributionPercentage = convertToPercentage(goalTScoredY)
+			const html = /*html*/ `
+				<h2 class="flex flex-row p-2 items-center justify-center gap-2 font-bold">Best scoring zones</h2>
+				<div class="flex flex-col w-max items-center justify-center pl-1 pr-1 pb-1 gap-4 border-black border-l-2 border-r-2 border-b-2">
+					<div class="w-50 h-5 border-2 border-black rounded-4xl shadow-lg"></div>
+					${drawRectangle(distributionPercentage, 'scored')}
+				</div>
+			`
+			return html
+		}
+	},
+)
+
+function drawRectangle(values: number[], mode: string): string {
 	let html = '<div class="flex items-center">'
 	const maxValue = Math.max(...values)
 	for (const value of values) {
-		const color = `rgb(${255 - Math.floor((value * 255) / maxValue)}, ${255 - Math.floor((value * 255) / maxValue)}, 255)`
+		let color = ''
+		if (mode === 'conceded')
+			color = `rgb(${255 - Math.floor((value * 255) / maxValue)}, ${255 - Math.floor((value * 255) / maxValue)}, 255)`
+		else
+			color = `rgb(255, ${255 - Math.floor((value * 255) / maxValue)}, ${255 - Math.floor((value * 255) / maxValue)})`
 		html += /*html*/ `
 		<div class="w-1 h-4" style="background-color:${color}"></div>
 		`
@@ -408,6 +464,20 @@ function getGoalTakenY(matches: Match[], user: UserBasic): number[] {
 		}
 	}
 	return goalTakenY
+}
+
+function getGoalScoredY(matches: Match[], user: UserBasic): number[] {
+	const goalScoredY: number[] = []
+	for (const match of matches) {
+		for (const round of match.rounds) {
+			if (
+				(match.player1Id === user.id && round.scorer === 'p1') ||
+				(match.player2Id === user.id && round.scorer === 'p2')
+			)
+				goalScoredY.push(round.ballPositionY)
+		}
+	}
+	return goalScoredY
 }
 
 function getAverageRally(matches: Match[]): number {
