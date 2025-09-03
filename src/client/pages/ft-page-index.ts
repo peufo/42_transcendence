@@ -13,16 +13,7 @@ customElements.define(
 								Welcome
 							</h3>
 
-							<div class="grid grid-cols-2 gap-2">
-								<a href="/local/new" class="btn btn-primary">
-									<ft-icon name="swords" class="h-5 w-5 mr-1"></ft-icon>
-									Local game
-								</a>
-								<a href="/tournament/new" class="btn btn-primary">
-									<ft-icon name="trophy" class="h-5 w-5 mr-1"></ft-icon>
-									New tournament
-								</a>
-							</div>
+							<ft-game-selection></ft-game-selection>
 						</div>
 					</div>
 				</div>
