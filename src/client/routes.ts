@@ -93,6 +93,9 @@ export const API_POST: {
 		redirectTo: () => '/me',
 	},
 	'/tournaments/start': {},
+	'/remote/new': {
+		redirectTo: () => '/remote/play',
+	},
 }
 
 export const PAGES = {

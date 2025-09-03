@@ -200,6 +200,10 @@ export type RoutesPost = {
 		body: { tournamentId: number }
 		res: { message: string; success: boolean }
 	}
+	'/remote/new': {
+		body: null
+		res: { success: boolean; matchId: number }
+	}
 	'/users/update': {
 		body: { name?: string; password?: string }
 		res: { message: string; success: boolean; user: User }
