@@ -206,6 +206,8 @@ customElements.define(
 		}
 
 		render(): string {
+			// TODO: set matchID
+
 			return /*html*/ `
 				<div class="grid grid-cols-4 gap-4 p-4 min-w-[1360px]">
 					<ft-bracket></ft-bracket>

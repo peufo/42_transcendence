@@ -53,22 +53,20 @@ customElements.define(
 
 		connectedCallback() {
 			this.cleanEffect = createEffect(() => {
-				this.blbllbl()
+				this.handle()
 			})
 		}
 
-		blbllbl() {
-			// const stages = $stages.get()
-			// const myMatch = getMyAwaitingMatchFromStages(stages)
-			// if (myMatch && !setMatchId(myMatch.id)) {
-			// 	throw new Error('match already set')
-			// }
-			// const match = stages.flat().find((m) => m.id === matchId)
-			// if (!match) throw new Error('Match not found in stages')
+		handle() {
 			this.classList.add('flex', 'justify-center')
 			const match = $match.get()
 
-			if (!this.user) return // TODO: handle
+			if (!this.user) {
+				this.innerHTML = /*html*/ `
+					No user found
+					`
+				return
+			}
 			if (!match) {
 				this.innerHTML = /*html*/ `
 					<div class="h-[100%] w-[100%] flex flex-row items-center justify-center">
