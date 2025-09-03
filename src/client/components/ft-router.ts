@@ -34,6 +34,7 @@ customElements.define(
 			document.addEventListener('click', onClickLink)
 			window.addEventListener('popstate', onPopState)
 			this.cleanEffect = createEffect(async () => {
+				console.log('RENDER PAGE ROUTER')
 				const url = $url.get()
 				const page = this.getPage(url.pathname)
 				if (page.layoutData) {

@@ -145,7 +145,7 @@ async function main() {
 		count: 10,
 	}))
 
-	const nbPlayers = 4
+	const nbPlayers = 8
 
 	const [tournament] = await db
 		.insert(tournaments)

@@ -190,20 +190,3 @@ async function updateMatchEnd(
 	])
 	return results[0]
 }
-
-// export async function updateMatchSurrender(
-// 	matchId: number,
-// 	surrenderer: Player,
-// ) {
-// 	const [match] = await db
-// 		.update(matches)
-// 		.set({
-// 			state: 'finished',
-// 			finishedAt: new Date(),
-// 			...(surrenderer === 'p1' ? { player1Score: -1 } : {}),
-// 			...(surrenderer === 'p2' ? { player2Score: -1 } : {}),
-// 		})
-// 		.where(eq(matches.id, matchId))
-// 		.returning()
-// 	return match
-// }

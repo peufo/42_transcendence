@@ -92,7 +92,10 @@ export const tournamentsRoute: FastifyPluginCallbackZod = (
 			const isEveryoneHere = tournament.participants.every((participant) => {
 				return emitter.payload?.users.has(participant.user.id)
 			})
-			if (!isEveryoneHere)
+			if (
+				!isEveryoneHere &&
+				tournament.participants.length === tournament.numberOfPlayers
+			)
 				return res.send({
 					success: false,
 					message: 'Not every player is connected to the tournament',

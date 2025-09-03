@@ -19,10 +19,23 @@ customElements.define(
 		private user = $user.get()
 		private cleanEffect: CleanEffect
 		private tournamentChannel: ChannelSocket<'tournaments'>
+		private labStores = { $user, $tournament, $stages, $participants, $match }
 
 		connectedCallback() {
+			const buttons = Object.entries(this.labStores).map(([key, value]) => {
+				const btn = document.createElement('button')
+				btn.addEventListener('click', () => {
+					// biome-ignore lint/suspicious/noExplicitAny: va chier
+					value.update((v: any) => v)
+				})
+				btn.classList.add('btn', 'btn-border')
+				btn.innerHTML = key
+				return btn
+			})
 			this.cleanEffect = createEffect(() => {
 				this.innerHTML = this.render()
+				const lab = this.querySelector('#lab')
+				lab?.append(...buttons)
 			})
 
 			const tournamentId =
@@ -187,7 +200,10 @@ customElements.define(
 				return html
 			}
 			let startButton = ``
-			if (this.user.id === participants[0].user.id)
+			if (
+				this.user.id === participants[0].user.id &&
+				participants.length === this.tournament.numberOfPlayers
+			)
 				startButton = /*html*/ `
 				<form action="/tournaments/start" method="post" class="contents">
 					<input type="hidden" name="tournamentId" value="${this.tournament.id}" />
@@ -231,17 +247,8 @@ customElements.define(
 				else this.pongRemoteDiv.innerHTML = ''
 			})
 		}
-
 		disconnectedCallback() {
 			this.cleanEffect()
-		}
-
-		render() {
-			// TODO: set matchID
-			// const stages=$stages.get()
-			// const myMatch: MatchBasic | undefined =
-			// getMyAwaitingMatchFromStages(stages)
-			// setMatch(myMatch)
 		}
 	},
 )

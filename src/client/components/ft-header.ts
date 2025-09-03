@@ -5,14 +5,21 @@ import { $user } from '../utils/store.js'
 customElements.define(
 	'ft-header',
 	class extends HTMLElement {
+		private cleanEffect: CleanEffect
 		connectedCallback() {
-			this.innerHTML = /*html*/ `
-				<header class="flex items-center p-2 pl-4 gap-2 border-b border-indigo-100">
-					<a href="/" class="text-2xl text-blue-600">Transcendance</a>
-					<div class="flex-grow"></div>
-					<ft-user-menu></ft-user-menu>
-				</header>
-			`
+			this.cleanEffect = createEffect(() => {
+				const user = $user.get()
+				this.innerHTML = /*html*/ `
+					<header class="flex items-center p-2 pl-4 gap-2 border-b border-indigo-100">
+						<a href="${user ? '/me' : '/'}" class="text-2xl text-blue-600">Transcendance</a>
+						<div class="flex-grow"></div>
+						<ft-user-menu></ft-user-menu>
+					</header>
+				`
+			})
+		}
+		disconnectedCallback() {
+			this.cleanEffect()
 		}
 	},
 )

@@ -111,7 +111,7 @@ customElements.define(
                     My friends
                 </h3>
             `
-			function renderFriendship(friendship: FriendshipFriend): string {
+			const renderFriendship = (friendship: FriendshipFriend): string => {
 				const { withUser: friend } = friendship
 
 				const removeBtn = /*html*/ `
@@ -123,12 +123,12 @@ customElements.define(
                     </form>`
 
 				let joinButtons = ''
+
 				if (friend.tournament?.state === 'open') {
 					joinButtons = /*html*/ `
-					<form method="post" action="/tournaments/join">
-                        <input type="hidden" name="tournamentId" value="${friend.tournament.id}">
-                        <input class="btn btn-border" type="submit" value="Join">
-                    </form>`
+					<a class="btn btn-border" href="/tournament/play?tournamentId=${friend.tournament.id}">
+                        Join
+					</a>`
 				}
 				if (friend.tournament?.state === 'ongoing') {
 					joinButtons = /*html*/ `

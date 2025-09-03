@@ -1,7 +1,13 @@
 import { getCurrentStage } from '../../lib/tournament.js'
 import type { Match } from '../../lib/type.js'
 import { type CleanEffect, createEffect } from '../utils/signal.js'
-import { $participants, $stages, $tournament, $user } from '../utils/store.js'
+import {
+	$match,
+	$participants,
+	$stages,
+	$tournament,
+	$user,
+} from '../utils/store.js'
 
 customElements.define(
 	'ft-bracket',
@@ -9,11 +15,18 @@ customElements.define(
 		private user = $user.get()
 		private tournament = $tournament.get()
 		private participants = $participants.get()
+		private match = $match.get()
 		private cleanEffect: CleanEffect
 
 		connectedCallback() {
 			this.cleanEffect = createEffect(() => {
 				this.innerHTML = this.render()
+				if (this.match)
+					setTimeout(() => {
+						this.querySelector(`#match_${this.match?.id}`)?.scrollIntoView({
+							behavior: 'smooth',
+						})
+					}, 500)
 			})
 		}
 
@@ -83,7 +96,7 @@ customElements.define(
 				else if (match.player2 && this.user?.id === match.player2.id)
 					colorP2 = 'text-indigo-600 font-bold'
 				return /*html*/ `
-                    <div class="bg-white border border-gray-200 rounded-md">
+                    <div id="${match.id}" class="bg-white border border-gray-200 rounded-md">
                         <div class="grid grid-cols-7 p-1 items-center justify-items-center">
                             <div class="text-xs break-word text-center col-span-3 ${colorP1}">
                                 ${match.player1 ? match.player1.name : '?'}

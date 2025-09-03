@@ -13,7 +13,6 @@ import {
 import { useInterpolate } from '../../lib/interpolate.js'
 import type { ChannelSocket } from '../../lib/useSocketChannels.js'
 import { socketChannel } from '../socketChannel.js'
-// import { type CleanEffect, createEffect } from '../utils/signal.js'
 import { $match, $user } from '../utils/store.js'
 import { toast } from './ft-toast.js'
 
@@ -32,6 +31,7 @@ customElements.define(
 		}
 		private user = $user.get()
 		private match = $match.get()
+		private cleanHandle: (() => void) | undefined
 
 		initCanvas() {
 			if (!this.canvas) {
@@ -48,12 +48,13 @@ customElements.define(
 			this.renderWaitingFrame()
 		}
 
-		disconnectedCallback() {
-			this.channel?.close()
+		connectedCallback() {
+			this.cleanHandle = this.handle()
 		}
 
-		connectedCallback() {
-			this.handle()
+		disconnectedCallback() {
+			this.cleanHandle?.()
+			this.channel?.close()
 		}
 
 		handle() {
@@ -66,7 +67,7 @@ customElements.define(
 					`
 				return
 			}
-			if (!match) {
+			if (!this.match) {
 				this.innerHTML = /*html*/ `
 					<div class="h-[100%] w-[100%] flex flex-row items-center justify-center">
 						You don't have any match.
@@ -74,11 +75,11 @@ customElements.define(
 					`
 				return
 			}
-			console.log('RENDER PONG REMOTE', match.id)
+			console.log('RENDER PONG REMOTE', this.match.id)
 			this.initCanvas() // TODO: use babylon
 			this.channel = socketChannel(
 				'matches',
-				{ matchId: match.id.toString() },
+				{ matchId: this.match.id.toString() },
 				{
 					onEngineEvent: (data) => {
 						if (data.onTimerTick !== undefined) {
@@ -108,7 +109,7 @@ customElements.define(
 				},
 			)
 
-			const player: Player = this.user.id === match.player1Id ? 'p1' : 'p2'
+			const player: Player = this.user.id === this.match.player1Id ? 'p1' : 'p2'
 
 			const setInput = (move: Move, value: boolean) => {
 				this.channel.emit('onPlayerInput', { player, move, value })
@@ -125,13 +126,21 @@ customElements.define(
 				ArrowRight: (value) => setInput('down', value),
 			}
 
-			document.addEventListener('keydown', (event) => {
+			const onKeydown = (event: KeyboardEvent) => {
 				keyHandlers[event.key]?.(true)
-			})
-
-			document.addEventListener('keyup', (event) => {
+			}
+			const onKeyup = (event: KeyboardEvent) => {
 				keyHandlers[event.key]?.(false)
-			})
+			}
+
+			document.addEventListener('keydown', onKeydown)
+			document.addEventListener('keyup', onKeyup)
+
+			return () => {
+				document.removeEventListener('keydown', onKeydown)
+				document.removeEventListener('keyup', onKeyup)
+				return
+			}
 		}
 
 		renderWaitingFrame() {

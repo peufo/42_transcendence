@@ -85,10 +85,10 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 				socket.close(3000, 'Match not exist')
 				return
 			}
-			// if (match.state === 'finished') {
-			// 	socket.close(3000, 'Match is over')
-			// 	return
-			// }
+			if (match.state === 'finished') {
+				socket.close(3000, 'Match is over')
+				return
+			}
 
 			let player: Player | null = null
 			if (session.userId === match.player1Id) player = 'p1'
