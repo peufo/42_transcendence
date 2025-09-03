@@ -2,7 +2,7 @@ import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import '@fastify/cookie'
 import { getSchema, permission, postSchema } from '../../utils/index.js'
 import { getUserBasic } from '../friendships/model.js'
-import { notify, notifyFriends } from '../ws/controller.js'
+import { emitterMaps, notify, notifyFriends } from '../ws/controller.js'
 import {
 	isTournamentEmptyAndOpen,
 	tournamentCreate,
@@ -61,10 +61,37 @@ export const tournamentsRoute: FastifyPluginCallbackZod = (
 			notify.tournaments(tournamentId, 'onParticipantJoin', { user })
 
 			if (isTournamentFull) {
-				setTimeout(() => tournamentStart(tournament.id), 1000) // TODO: is this the best way ? Probably not
+				// TODO: check that everyone is on the channel
 			}
 
 			res.send({ success: true, tournamentId })
+		},
+	)
+
+	server.post(
+		'/start',
+		postSchema('/tournaments/start', tournamentIdSchema),
+		async (req, res) => {
+			const { userId } = permission.session(res)
+			const { tournamentId } = req.body
+			const tournament = await tournamentGet(tournamentId)
+			if (tournament.participants[0].user.id !== userId)
+				return res.send({
+					success: false,
+					message: 'Only first player can start',
+				})
+			const emitter = emitterMaps.tournaments?.get(tournamentId)
+			if (!emitter) return res.send({ success: false, message: 'WTF' })
+			const isEveryoneHere = tournament.participants.every((participant) => {
+				return emitter.payload?.users.has(participant.user.id)
+			})
+			if (!isEveryoneHere)
+				return res.send({
+					success: false,
+					message: 'Not every player is connected to the tournament',
+				})
+			await tournamentStart(tournamentId)
+			res.send({ success: true, message: 'Tournament started' })
 		},
 	)
 

@@ -163,7 +163,7 @@ customElements.define(
 								class="
 									absolute w-2 h-2 rounded-full -bottom-1 -right-1 border
 									${friend.isActive ? 'bg-green-500 border-green-700' : 'bg-gray-300 border-gray-400'}
-									
+
 								"
 								title="${friend.name} is ${friend.isActive ? 'online' : 'offline'}"
 							></div>
@@ -257,7 +257,7 @@ customElements.define(
                         <div class="flex flex-col">
                             <span>${invitation.withUser.name}</span>
                             <span class="text-xs text-gray-900 leading-3">
-                                ${createdByMe ? 'Sent' : 'Received'} a ${formater.format(invitation.createdAt)}
+                                ${createdByMe ? 'Sent' : 'Received'} at ${formater.format(invitation.createdAt)}
                             </span>
                         </div>
                         <div class="flex-grow"></div>

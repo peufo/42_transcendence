@@ -51,7 +51,6 @@ customElements.define(
 						$stages.set(stages)
 						const myMatch: MatchBasic | undefined =
 							getMyAwaitingMatchFromStages(stages)
-						if (!myMatch) return
 						setMatch(myMatch)
 						$tournament.update((t) => {
 							if (!t) return undefined
@@ -63,10 +62,7 @@ customElements.define(
 						$stages.update((stages) => {
 							const m = stages.flat().find((m) => m.id === match.id)
 							if (!m) return stages
-							// console.log('match: ', match)
-							// console.log('before: ', m)
 							Object.assign(m, match)
-							// console.log('after:', m)
 							if (
 								m.player1Id === this.user?.id ||
 								m.player2Id === this.user?.id
@@ -94,7 +90,6 @@ customElements.define(
 			console.log('RENDER TOURNAMENT PAGE')
 			const tournament = $tournament.get()
 			if (!tournament) return /*html*/ `<span>Tournament not found</span>`
-
 			if (tournament.state === 'finished')
 				return `<span>${tournament.createdByUser.name}'s tournament is over</span>`
 			return `<ft-tournament-${tournament.state}></ft-tournament-${tournament.state}>`
@@ -184,6 +179,14 @@ customElements.define(
 				html += '</div>'
 				return html
 			}
+			let startButton = ``
+			if (this.user.id === participants[0].user.id)
+				startButton = /*html*/ `
+				<form action="/tournaments/start" method="post" class="contents">
+					<input type="hidden" name="tournamentId" value="${this.tournament.id}" />
+					<input type="submit" class="btn btn-border cursor-pointer" value="Start">
+				</form>
+				`
 
 			return /*html*/ `
 				<div class="flex flex-col gap-3 mt-10 sm:mx-auto sm:max-w-lg mx-4">
@@ -191,6 +194,7 @@ customElements.define(
 					${participantsCount}
 					${participantList()}
 					${participationForm}
+					${startButton}
 				</div>
 			`
 		}
@@ -203,10 +207,33 @@ customElements.define(
 		connectedCallback() {
 			console.log('RENDER TOURNAMENT ONGOING')
 			this.innerHTML = this.render()
+			// window.addEventListener('beforeunload', () => {
+			// 	(e: BeforeUnloadEvent) => {
+			// 		e.preventDefault()
+			// 	}
+			// })
 		}
 
+		// disconnectedCallback(){
+		// 	window.removeEventListener('beforeunload', () => {
+		// 		(e: BeforeUnloadEvent) => {
+		// 			e.preventDefault()
+		// 		}
+		// 	})
+		// }
+
 		render(): string {
+			// window.onbeforeunload = (e) => {
+			// 	if (e){
+			// 		e.preventDefault()
+			// 		e.returnValue = '';
+			// 	}
+			// };
 			// TODO: set matchID
+			// const stages=$stages.get()
+			// const myMatch: MatchBasic | undefined =
+			// getMyAwaitingMatchFromStages(stages)
+			// setMatch(myMatch)
 
 			return /*html*/ `
 				<div class="grid grid-cols-4 gap-4 p-4 min-w-[1360px]">

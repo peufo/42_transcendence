@@ -31,12 +31,8 @@ customElements.define(
 
 		render(): string {
 			this.renderCount++
-			const valueA = $valueA.get()
-			const valueB = $valueB.get()
 			return /*html*/ `
                 <h3>LABO</h3>
-				<h3>VALUE_A: ${valueA}</h3>
-                <h3>VALUE_B: ${valueB}</h3>
 				<h3>RENDERING: ${this.renderCount}</h3>
                 <ft-prout></ft-prout>
 			`
@@ -67,7 +63,6 @@ customElements.define(
                 <h3>VALUE_A: ${valueA}</h3>
                 <h3>VALUE_B: ${valueB}</h3>
                 <h3>RENDERING: ${this.renderCount}</h3>
-
 			`
 		}
 	},

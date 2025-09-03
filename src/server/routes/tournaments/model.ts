@@ -140,11 +140,11 @@ function getScoreToWin(stageIndex: number) {
 	// TODO: update values
 	switch (stageIndex) {
 		case 0: // finale
-			return 3
+			return 5
 		case 1: // demi finale
-			return 2
+			return 4
 		default: // le reste
-			return 1
+			return 3
 	}
 }
 

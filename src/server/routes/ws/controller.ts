@@ -19,7 +19,7 @@ type EmitterObject<Channel extends keyof SocketChannels> = {
 	payload?: ServerPayload<Channel>
 }
 
-const emitterMaps: Partial<{
+export const emitterMaps: Partial<{
 	[Channel in keyof SocketChannels]: Map<number, EmitterObject<Channel>>
 }> = {}
 

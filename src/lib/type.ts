@@ -115,6 +115,9 @@ export type SocketChannels = {
 			onMatchChange: { match: MatchBasic }
 			onEnd: null
 		}
+		serverPayload: {
+			users: Set<number>
+		}
 	}
 	matches: {
 		query: { matchId: string }
@@ -196,6 +199,10 @@ export type RoutesPost = {
 	'/tournaments/quit': {
 		body: { tournamentId: number }
 		res: { success: boolean }
+	}
+	'/tournaments/start': {
+		body: { tournamentId: number }
+		res: { message: string; success: boolean }
 	}
 	'/users/update': {
 		body: { name?: string; password?: string }

@@ -1,9 +1,5 @@
 import { eq } from 'drizzle-orm'
-import {
-	Engine,
-	type Player,
-	type RoundData,
-} from '../../../lib/engine/index.js'
+import { Engine, type RoundData } from '../../../lib/engine/index.js'
 import { db, matches, rounds } from '../../db/index.js'
 import type { DB } from '../../types.js'
 import { tournamentGetStages } from '../tournaments/model.js'
@@ -33,17 +29,15 @@ export function createMatchEngine(match: DB.Match): Engine {
 				})
 				await handleTournamentGameEnd({ ...updatedMatch, tournamentId })
 			}
+			deleteEmitter('matches', match.id)
 		},
 		async onEvent(data) {
 			notify.matches(match.id, 'onEngineEvent', data)
-			if (data.onGameEnd) {
-				deleteEmitter('matches', match.id)
-			}
 		},
 	})
 }
 
-async function handleTournamentGameEnd(
+export async function handleTournamentGameEnd(
 	match: DB.Match & { tournamentId: number },
 ) {
 	const winnerId =
@@ -133,19 +127,19 @@ async function updateMatchEnd(
 	return results[0]
 }
 
-export async function updateMatchSurrender(
-	matchId: number,
-	surrenderer: Player,
-) {
-	const [match] = await db
-		.update(matches)
-		.set({
-			state: 'finished',
-			finishedAt: new Date(),
-			...(surrenderer === 'p1' ? { player1Score: -1 } : {}),
-			...(surrenderer === 'p2' ? { player2Score: -1 } : {}),
-		})
-		.where(eq(matches.id, matchId))
-		.returning()
-	return match
-}
+// export async function updateMatchSurrender(
+// 	matchId: number,
+// 	surrenderer: Player,
+// ) {
+// 	const [match] = await db
+// 		.update(matches)
+// 		.set({
+// 			state: 'finished',
+// 			finishedAt: new Date(),
+// 			...(surrenderer === 'p1' ? { player1Score: -1 } : {}),
+// 			...(surrenderer === 'p2' ? { player2Score: -1 } : {}),
+// 		})
+// 		.where(eq(matches.id, matchId))
+// 		.returning()
+// 	return match
+// }

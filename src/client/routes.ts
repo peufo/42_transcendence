@@ -95,6 +95,7 @@ export const API_POST: {
 	'/tournaments/quit': {
 		redirectTo: () => '/me',
 	},
+	'/tournaments/start': {},
 }
 
 export const PAGES = {

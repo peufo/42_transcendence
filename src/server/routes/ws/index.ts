@@ -6,13 +6,8 @@ import { db, matches } from '../../db/index.js'
 import { getSessionFromRequest } from '../auth/hooks.js'
 import { findTournament } from '../tournaments/tournamentDb.js'
 import { setUserIsActive } from '../users/model.js'
-import {
-	bindEmitterWithSocket,
-	deleteEmitter,
-	notify,
-	notifyFriends,
-} from './controller.js'
-import { createMatchEngine, updateMatchSurrender } from './match.js'
+import { bindEmitterWithSocket, notifyFriends } from './controller.js'
+import { createMatchEngine } from './match.js'
 
 export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 	server.get('/friendships', { websocket: true }, async (socket, req) => {
@@ -53,7 +48,21 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 				socket.close(3000, 'Tournament not exist')
 				return
 			}
-			bindEmitterWithSocket('tournaments', tournament.id, socket)
+			bindEmitterWithSocket('tournaments', tournament.id, socket, {
+				onOpen(payload) {
+					if (!payload) {
+						const set = new Set<number>()
+						set.add(session.userId)
+						return { users: set }
+					}
+					payload.users.add(session.userId)
+					return payload
+				},
+				onClose(payload) {
+					payload?.users.delete(session.userId)
+					return payload
+				},
+			})
 		},
 	)
 
@@ -77,6 +86,10 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 				socket.close(3000, 'Match not exist')
 				return
 			}
+			// if (match.state === 'finished') {
+			// 	socket.close(3000, 'Match is over')
+			// 	return
+			// }
 
 			let player: Player | null = null
 			if (session.userId === match.player1Id) player = 'p1'
@@ -89,7 +102,9 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 
 			bindEmitterWithSocket('matches', matchId, socket, {
 				onOpen(payload) {
+					console.log('connection')
 					if (!payload) {
+						console.log('creating engine')
 						return {
 							engine: createMatchEngine(match),
 							player1Ready: player === 'p1',
@@ -104,7 +119,13 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 					if (player === 'p2') payload.player2Ready = true
 					if (payload.player1Ready && payload.player2Ready) {
 						// TODO : wait 1 sec ?
-						payload.engine.start()
+						db.update(matches)
+							.set({ state: 'ongoing' })
+							.where(eq(matches.id, matchId))
+							.then(() => {
+								match.state = 'ongoing'
+								payload.engine.start()
+							})
 					}
 					return payload
 				},
@@ -116,19 +137,26 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 				},
 				onClose(payload) {
 					if (!payload) return undefined
-					// get match
 					if (match.state === 'awaiting') {
 						if (player === 'p1') payload.player1Ready = false
 						if (player === 'p2') payload.player2Ready = false
 						return payload
 					}
-					if (match.state === 'ongoing') {
-						payload.engine.stop()
-						updateMatchSurrender(match.id, player).then((updatedMatch) => {
-							notify.matches(matchId, 'onSurrender', updatedMatch)
-							deleteEmitter('matches', match.id)
-						})
-					}
+					// if (match.state === 'ongoing') {
+					// 	console.log('player surrender')
+					// 	payload.engine.stop()
+					// 	updateMatchSurrender(match.id, player).then(async (updatedMatch) => {
+					// 		notify.matches(matchId, 'onSurrender', updatedMatch)
+					// 		const tournamentId = match.tournamentId
+					// 		if (tournamentId) {
+					// 			notify.tournaments(tournamentId, 'onMatchChange', {
+					// 				match: updatedMatch,
+					// 			})
+					// 			await handleTournamentGameEnd({ ...updatedMatch, tournamentId })
+					// 		}
+					// 		deleteEmitter('matches', match.id)
+					// 	})
+					// }
 				},
 			})
 		},

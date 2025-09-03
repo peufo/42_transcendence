@@ -58,6 +58,7 @@ customElements.define(
 		}
 
 		handle() {
+			// TODO: make responsive
 			this.classList.add('flex', 'justify-center')
 			const match = $match.get()
 
@@ -70,9 +71,9 @@ customElements.define(
 			if (!match) {
 				this.innerHTML = /*html*/ `
 					<div class="h-[100%] w-[100%] flex flex-row items-center justify-center">
-						You don't have any match, you idiot.
+						You don't have any match.
 					</div>
-					` //TODO: Remove above
+					`
 				return
 			}
 			console.log('RENDER PONG REMOTE', match.id)
@@ -103,8 +104,12 @@ customElements.define(
 							toast.success('Game end')
 						}
 					},
-					onSurrender: (_data) => {
-						toast.success('TODO: handle surrender')
+					onSurrender: (data) => {
+						this.scores = {
+							p1: data.player1Score,
+							p2: data.player2Score,
+						}
+						toast.error('a player surrendered')
 					},
 				},
 			)
