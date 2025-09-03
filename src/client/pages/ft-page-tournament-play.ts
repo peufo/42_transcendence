@@ -1,9 +1,9 @@
-import type { MatchBasic } from '../../lib/type.js'
+import { getAwaitingMatchFromStages } from '../../lib/tournament.js'
 import type { ChannelSocket } from '../../lib/useSocketChannels.js'
 import { toast } from '../components/ft-toast.js'
 import { socketChannel } from '../socketChannel.js'
 import { getAvatarSrc } from '../utils/avatar.js'
-import { getMyAwaitingMatchFromStages, setMatch } from '../utils/match.js'
+import { setMatch } from '../utils/match.js'
 import { type CleanEffect, createEffect } from '../utils/signal.js'
 import { $participants, $stages, $tournament, $user } from '../utils/store.js'
 
@@ -50,9 +50,11 @@ customElements.define(
 						console.log('onStart')
 						toast.success('Tournament starting')
 						$stages.set(stages)
-						const myMatch: MatchBasic | undefined =
-							getMyAwaitingMatchFromStages(stages)
-						setMatch(myMatch)
+						const userId = this.user?.id
+						if (userId) {
+							const myMatch = getAwaitingMatchFromStages(userId, stages)
+							setMatch(myMatch)
+						}
 						$tournament.update((t) => {
 							if (!t) return undefined
 							return { ...t, state: 'ongoing' }

@@ -1,4 +1,4 @@
-import type { MatchBasic } from './type.ts'
+import type { Match, MatchBasic } from './type.ts'
 
 export function getCurrentStage<M extends MatchBasic>(
 	stages: M[][],
@@ -14,5 +14,14 @@ export function getNextStage<M extends MatchBasic>(
 		if (isCurrentFound) return true
 		isCurrentFound = !!stage.find((m) => m.state !== 'finished')
 		return false
+	})
+}
+
+export function getAwaitingMatchFromStages(userId: number, stages: Match[][]) {
+	return stages.flat().find((m) => {
+		return (
+			(m.player1Id === userId || m.player2Id === userId) &&
+			m.state === 'awaiting'
+		)
 	})
 }

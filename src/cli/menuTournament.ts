@@ -2,6 +2,7 @@ import { exit, stdin, stdout } from 'node:process'
 import { createInterface } from 'node:readline'
 import * as p from '@clack/prompts'
 import chalk from 'chalk'
+// import { getAwaitingMatchFromStages } from '../lib/tournament.js'
 import type { Match } from '../lib/type.js'
 import { api } from './api.js'
 import type { Scope } from './main.js'
@@ -53,11 +54,16 @@ export async function useMenuTournament(tournamentId: number): Promise<Scope> {
 					spinner.stop(`${data.user.name} leaved the tournament`)
 					spinner.start(stateMessage())
 				},
-				onStart(data) {
+				onStart({ stages }) {
 					spinner.stop('Tournament starting')
-					tournament.stages = data.stages
+					tournament.stages = stages
 					renderStages([...tournament.stages].reverse())
-					// const myMatch = getMyMatch(stages)
+					const userId = api.user()?.id
+					if (!userId) {
+						throw new Error("Wtf, you can't be here")
+					}
+					//const match = getAwaitingMatchFromStages(userId, stages)
+
 					// if (!myMatch) return
 					// setMatchId(myMatch.id)
 					// $stages.set(stages)
@@ -66,8 +72,26 @@ export async function useMenuTournament(tournamentId: number): Promise<Scope> {
 					// 	return { ...t, state: 'ongoing' }
 					// })
 				},
-				onMatchChange(_data) {},
-				onEnd(_data) {},
+				onMatchChange(_data) {
+					// console.log('onMatchChange')
+					// $stages.update((stages) => {
+					// 	const m = stages.flat().find((m) => m.id === match.id)
+					// 	if (!m) return stages
+					// 	Object.assign(m, match)
+					// 	if (
+					// 		m.player1Id === this.user?.id ||
+					// 		m.player2Id === this.user?.id
+					// 	) {
+					// 		setMatch(m)
+					// 	}
+					// 	return stages
+					// })
+				},
+				onEnd(_data) {
+					// console.log('onEnd')
+					// toast.success('Tournament terminated')
+					// $tournament.update((t) => (!t ? t : { ...t, state: 'finished' }))
+				},
 			},
 		)
 
