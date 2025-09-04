@@ -94,7 +94,7 @@ export const API_POST: {
 	},
 	'/tournaments/start': {},
 	'/remote/new': {
-		redirectTo: () => '/remote/play',
+		redirectTo: ({ matchId }) => `/remote/play?matchId=${matchId}`,
 	},
 }
 

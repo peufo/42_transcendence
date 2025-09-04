@@ -390,7 +390,7 @@ customElements.define(
 					<div class="relative group inline-block">
 						<ft-icon name="message-circle-question" class="mb-3"></ft-icon>
 						<div class="absolute left-1/2 top-full transform -translate-x-1/2 p-4 border border-gray-400 rounded-2xl bg-white shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 z-12 h-auto w-100">
-							This graph displays the zones where you conceded the most goals. The more red a zone is the more you are vulnerable there.
+							This graph displays the zones where you conceded the most goals. The more red a zone is, the more you are vulnerable there.
 						</div>
 					</div>
 				</h2>
@@ -446,7 +446,7 @@ customElements.define(
 					<div class="relative group inline-block">
 						<ft-icon name="message-circle-question" class="mb-3"></ft-icon>
 						<div class="absolute left-1/2 top-full transform -translate-x-1/2 p-4 border border-gray-400 rounded-2xl bg-white shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 z-12 h-auto w-100">
-							This graph displays the zones where you scored the most goals. The more blue a zone is the more you generally score there.
+							This graph displays the zones where you scored the most goals. The more blue a zone is, the more you generally score there.
 						</div>
 					</div>
 				</h2>

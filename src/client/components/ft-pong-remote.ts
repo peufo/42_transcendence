@@ -13,7 +13,7 @@ import {
 import { useInterpolate } from '../../lib/interpolate.js'
 import type { ChannelSocket } from '../../lib/useSocketChannels.js'
 import { socketChannel } from '../socketChannel.js'
-import { type CleanEffect, createEffect } from '../utils/signal.js'
+// import { type CleanEffect, createEffect } from '../utils/signal.js'
 import { $match, $user } from '../utils/store.js'
 import { toast } from './ft-toast.js'
 
@@ -22,6 +22,7 @@ customElements.define(
 	class extends HTMLElement {
 		animationFrameId = 0
 		canvas: HTMLCanvasElement
+		header: HTMLElement
 		ctx: CanvasRenderingContext2D
 		channel: ChannelSocket<'matches'>
 		interpolate = useInterpolate()
@@ -30,7 +31,7 @@ customElements.define(
 			p2: 0,
 		}
 		private user = $user.get()
-		private cleanEffect: CleanEffect
+		private match = $match.get()
 
 		initCanvas() {
 			if (!this.canvas) {
@@ -47,20 +48,40 @@ customElements.define(
 			this.renderWaitingFrame()
 		}
 
+		initHeader() {
+			if (!this.user || !this.match) return
+			this.header = document.createElement('header')
+			this.header.classList.add(
+				'flex',
+				'flex-row',
+				'justify-center',
+				'items-center',
+				'w-[100%]',
+				'gap-(--arena-gap)',
+			)
+			this.style.setProperty('--arena-gap', '1000px')
+			this.header.innerHTML = /*html*/ `
+					<div class="text-4xl ${this.user.id === this.match.player1?.id ? 'text-indigo-600' : 'text-red-400'}">
+						${this.match.player1?.name}
+					</div>
+					<div class="text-4xl ${this.user.id === this.match.player2?.id ? 'text-indigo-600' : 'text-red-400'}">
+						${this.match.player2?.name}
+					</div>
+				`
+			this.appendChild(this.header)
+		}
+
 		disconnectedCallback() {
 			this.channel?.close()
-			this.cleanEffect()
 		}
 
 		connectedCallback() {
-			this.cleanEffect = createEffect(() => {
-				this.handle()
-			})
+			this.handle()
 		}
 
 		handle() {
 			// TODO: make responsive
-			this.classList.add('flex', 'justify-center')
+			this.classList.add('flex', 'justify-center', 'flex-col', 'items-center')
 			const match = $match.get()
 
 			if (!this.user) {
@@ -78,6 +99,7 @@ customElements.define(
 				return
 			}
 			console.log('RENDER PONG REMOTE', match.id)
+			this.initHeader()
 			this.initCanvas() // TODO: use babylon
 			this.channel = socketChannel(
 				'matches',

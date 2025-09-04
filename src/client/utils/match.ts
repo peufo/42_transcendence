@@ -1,7 +1,7 @@
-import type { MatchBasic } from '../../lib/type.js'
+import type { Match } from '../../lib/type.js'
 import { $match } from './store.js'
 
-export function setMatch(match: MatchBasic | undefined) {
+export function setMatch(match: Match | undefined) {
 	const currentMatch = $match.get()
 	if (currentMatch !== match) {
 		console.log(`setting match:`)
