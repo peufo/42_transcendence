@@ -201,8 +201,12 @@ export type RoutesPost = {
 		res: { message: string; success: boolean }
 	}
 	'/remote/new': {
-		body: null
+		body: { scoreToWin: number }
 		res: { success: boolean; matchId: number }
+	}
+	'/remote/join': {
+		body: { matchId: number }
+		res: { success: boolean; match: Match | undefined }
 	}
 	'/users/update': {
 		body: { name?: string; password?: string }

@@ -2,7 +2,7 @@ import fp from 'fastify-plugin'
 import { authHook } from './auth/hooks.js'
 import { authRoute } from './auth/index.js'
 import { friendshipsRoute } from './friendships/index.js'
-// import { remoteRoute } from './remote/index.js'
+import { remoteRoute } from './remote/index.js'
 import { statsRoute } from './stats/index.js'
 import { tournamentsRoute } from './tournaments/index.js'
 import { usersRoute } from './users/index.js'
@@ -16,6 +16,6 @@ export default fp((server, _options, done) => {
 	server.register(statsRoute, { prefix: '/stats' })
 	server.register(tournamentsRoute, { prefix: '/tournaments' })
 	server.register(wsRoute, { prefix: '/ws' })
-	// server.register(remoteRoute, { prefix: '/remote' })
+	server.register(remoteRoute, { prefix: '/remote' })
 	done()
 })

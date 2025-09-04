@@ -15,6 +15,8 @@ import { toast } from './ft-toast.js'
 customElements.define(
 	'ft-pong-local',
 	class extends HTMLElement {
+		player1Name: string | null
+		player2Name: string | null
 		animationFrameId = 0
 		canvas: HTMLCanvasElement
 		header: HTMLElement
@@ -29,30 +31,9 @@ customElements.define(
 
 		connectedCallback() {
 			const urlParams = new URLSearchParams(window.location.search)
-			const player1Name = urlParams.get('player1')
-			const player2Name = urlParams.get('player2')
+			this.player1Name = urlParams.get('player1')
+			this.player2Name = urlParams.get('player2')
 			const scoreToWin = urlParams.get('scoreToWin')
-
-			this.header = document.createElement('header')
-			this.header.classList.add(
-				'flex',
-				'flex-row',
-				'justify-center',
-				'items-center',
-				'w-[100%]',
-				'gap-(--arena-gap)',
-			)
-			this.header.innerHTML = /*html*/ `
-				<div class="text-4xl text-indigo-600">
-					${player1Name}
-				</div>
-				<div class="text-4xl text-indigo-600">
-					${player2Name}
-				</div>
-			`
-			this.header.style.setProperty('--arena-gap', '1000px')
-			this.appendChild(this.header)
-
 			this.classList.add('grid', 'place-items-center')
 			this.canvas = document.createElement('canvas')
 			this.canvas.setAttribute('width', ARENA_WIDTH.toString())
@@ -150,16 +131,19 @@ customElements.define(
 			// scores
 			const fontSize = 40
 			this.ctx.font = `${fontSize}px sans-serif`
+			this.ctx.fillStyle = '#7f22fe'
 			this.ctx.fillText(
-				`${this.scores.p1}`,
+				`${this.player1Name} : ${this.scores.p1}`,
 				ARENA_WIDTH / 2 - ARENA_WIDTH / 4,
 				fontSize,
 			)
+			this.ctx.fillStyle = '#7f22fe'
 			this.ctx.fillText(
-				`${this.scores.p2}`,
+				`${this.player2Name} : ${this.scores.p2}`,
 				ARENA_WIDTH / 2 + ARENA_WIDTH / 4,
 				fontSize,
 			)
+			this.ctx.fillStyle = 'black'
 			this.animationFrameId = requestAnimationFrame(this.renderFrame.bind(this))
 		}
 	},

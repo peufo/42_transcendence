@@ -48,29 +48,6 @@ customElements.define(
 			this.renderWaitingFrame()
 		}
 
-		initHeader() {
-			if (!this.user || !this.match) return
-			this.header = document.createElement('header')
-			this.header.classList.add(
-				'flex',
-				'flex-row',
-				'justify-center',
-				'items-center',
-				'w-[100%]',
-				'gap-(--arena-gap)',
-			)
-			this.style.setProperty('--arena-gap', '1000px')
-			this.header.innerHTML = /*html*/ `
-					<div class="text-4xl ${this.user.id === this.match.player1?.id ? 'text-indigo-600' : 'text-red-400'}">
-						${this.match.player1?.name}
-					</div>
-					<div class="text-4xl ${this.user.id === this.match.player2?.id ? 'text-indigo-600' : 'text-red-400'}">
-						${this.match.player2?.name}
-					</div>
-				`
-			this.appendChild(this.header)
-		}
-
 		disconnectedCallback() {
 			this.channel?.close()
 		}
@@ -99,7 +76,6 @@ customElements.define(
 				return
 			}
 			console.log('RENDER PONG REMOTE', match.id)
-			this.initHeader()
 			this.initCanvas() // TODO: use babylon
 			this.channel = socketChannel(
 				'matches',
@@ -214,16 +190,21 @@ customElements.define(
 			// scores
 			const fontSize = 40
 			this.ctx.font = `${fontSize}px sans-serif`
+			this.ctx.fillStyle =
+				this.user?.id === this.match?.player1Id ? '#7f22fe' : '#ff2056'
 			this.ctx.fillText(
-				`${this.scores.p1}`,
+				`${this.match?.player1?.name} : ${this.scores.p1}`,
 				ARENA_WIDTH / 2 - ARENA_WIDTH / 4,
 				fontSize,
 			)
+			this.ctx.fillStyle =
+				this.user?.id === this.match?.player2Id ? '#7f22fe' : '#ff2056'
 			this.ctx.fillText(
-				`${this.scores.p2}`,
+				`${this.match?.player2?.name} : ${this.scores.p2}`,
 				ARENA_WIDTH / 2 + ARENA_WIDTH / 4,
 				fontSize,
 			)
+			this.ctx.fillStyle = 'black'
 			this.animationFrameId = requestAnimationFrame(this.renderFrame.bind(this))
 		}
 	},

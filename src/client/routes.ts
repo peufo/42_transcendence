@@ -96,6 +96,7 @@ export const API_POST: {
 	'/remote/new': {
 		redirectTo: ({ matchId }) => `/remote/play?matchId=${matchId}`,
 	},
+	'/remote/join': {},
 }
 
 export const PAGES = {
