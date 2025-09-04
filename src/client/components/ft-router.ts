@@ -30,56 +30,65 @@ customElements.define(
 		private cleanEffect: CleanEffect
 
 		connectedCallback() {
+			console.log('ROUTER CONNECTED')
 			document.addEventListener('submit', onSubmitForm)
 			document.addEventListener('click', onClickLink)
 			window.addEventListener('popstate', onPopState)
-			this.cleanEffect = createEffect(async () => {
-				console.log('RENDER PAGE ROUTER')
+			this.cleanEffect = createEffect(() => {
+				console.log('ROUTER RENDER')
+				console.log('ROUTER GET URL')
 				const url = $url.get()
 				const page = this.getPage(url.pathname)
-				if (page.layoutData) {
-					await Promise.all(
-						page.layoutData.map((route) => api.get(route, url.search.slice(1))),
-					)
-				}
-				const user = $user.get()
 
-				if (!page.isPublic && !user) {
-					return goto(
-						new URL(`/login?redirectTo=${url.pathname}`, document.baseURI),
-					)
-				}
-				if (page.isPublic === 'only' && user) {
-					return goto(new URL(`/me`, document.baseURI))
-				}
-				if (page.pageData) {
-					await Promise.all(
+				Promise.all(
+					page.layoutData.map((route) => api.get(route, url.search.slice(1))),
+				).then(() => {
+					console.log('ROUTER GET USER')
+					const user = $user.get(false)
+
+					if (!page.isPublic && !user) {
+						return goto(
+							new URL(`/login?redirectTo=${url.pathname}`, document.baseURI),
+						)
+					}
+					if (page.isPublic === 'only' && user) {
+						return goto(new URL(`/me`, document.baseURI))
+					}
+
+					Promise.all(
 						page.pageData.map((route) => api.get(route, url.search.slice(1))),
-					)
-				}
-				this.innerHTML = /*html*/ `
-					<${page.component}></${page.component}>
-				`
+					).then(() => {
+						this.innerHTML = /*html*/ `
+							<${page.component}></${page.component}>
+						`
+					})
+				})
 			})
 		}
 
 		disconnectedCallback() {
+			console.log('ROUTER DISCONNECTED')
 			this.cleanEffect()
 		}
 
-		getPage(pathname: string): PageOption {
+		getPage(pathname: string) {
 			const routePage = pathname as RoutePage
+			const layoutData: RouteApiGet[] = []
 			if (!PAGES[routePage]) {
-				return { component: 'ft-page-404', isPublic: true }
+				return {
+					component: 'ft-page-404',
+					isPublic: true,
+					layoutData,
+					pageData: [],
+				}
 			}
 			const page = PAGES[routePage] as PageOption
-			const layoutData: RouteApiGet[] = []
 			for (const [path, options] of Object.entries(PAGES)) {
 				if ('layoutData' in options && pathname.startsWith(path)) {
 					layoutData.push(...options.layoutData)
 				}
 			}
-			return { ...page, layoutData }
+			return { ...page, layoutData, pageData: page.pageData || [] }
 		}
 	},
 )

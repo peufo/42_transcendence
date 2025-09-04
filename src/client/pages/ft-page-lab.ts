@@ -12,24 +12,33 @@ customElements.define(
 	class extends HTMLElement {
 		private cleanEffect: CleanEffect
 		private renderCount = 0
-		private interval: NodeJS.Timeout
+		private labStores = { $valueA, $valueB }
 
 		connectedCallback() {
+			console.log('LABO CONNECTED')
 			this.cleanEffect = createEffect(() => {
 				this.innerHTML = this.render()
 			})
-			this.interval = setInterval(() => {
-				$valueA.update((v) => v + 1)
-				$valueB.update((v) => v + 1)
-			}, 1000)
+			const buttons = Object.entries(this.labStores).map(([key, value]) => {
+				const btn = document.createElement('button')
+				btn.addEventListener('click', () => {
+					console.clear()
+					value.update((v) => v + 1)
+				})
+				btn.classList.add('btn', 'btn-border')
+				btn.innerHTML = key
+				return btn
+			})
+			this.prepend(...buttons)
 		}
 
 		disconnectedCallback() {
+			console.log('LABO DISCONNECTED')
 			this.cleanEffect()
-			clearInterval(this.interval)
 		}
 
 		render(): string {
+			console.log('LABO RENDER')
 			this.renderCount++
 			return /*html*/ `
                 <h3>LABO</h3>
@@ -47,20 +56,23 @@ customElements.define(
 		private cleanEffect: CleanEffect
 
 		connectedCallback() {
+			console.log('PROUT CONNECTED')
 			this.cleanEffect = createEffect(() => {
 				this.innerHTML = this.render()
 			})
 		}
 
 		disconnectedCallback() {
-			console.log('DISCONNECTED')
+			console.log('PROUT DISCONNECTED')
 			this.cleanEffect()
 		}
 
 		render(): string {
-			console.log('PROUT')
+			console.log('PROUT RENDER')
 			this.renderCount++
+			console.log('PROUT GET VALUE_A')
 			const valueA = $valueA.get()
+			console.log('PROUT GET VALUE_B')
 			const valueB = $valueB.get()
 
 			return /*html*/ `
@@ -79,22 +91,26 @@ customElements.define(
 	class extends HTMLElement {
 		private cleanEffect: CleanEffect
 		private renderCount = 0
+		private instanceId = Math.random().toFixed(3)
 
 		connectedCallback() {
+			console.log(`PIPI CONNECTED`, this.instanceId)
 			this.cleanEffect = createEffect(() => {
 				this.innerHTML = this.render()
 			})
 		}
 
 		disconnectedCallback() {
-			console.log('DISCONNECTED')
+			console.log('PIPI DISCONNECTED', this.instanceId)
 			this.cleanEffect()
 		}
 
 		render(): string {
-			console.log('PIPI')
+			console.log('PIPI RENDER', this.instanceId)
 			this.renderCount++
+			console.log('PIPI GET VALUE_A')
 			const valueA = $valueA.get()
+			console.log('PIPI GET VALUE_B')
 			const valueB = $valueB.get()
 
 			return /*html*/ `

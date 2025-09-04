@@ -3,47 +3,59 @@ type Signal<T> = {
 	set: Setter<T>
 	update: Updater<T>
 }
-const effectsToSubscribe: { effect: () => void; scopes: symbol[] }[] = []
+type Effect = {
+	parent?: Effect
+	func: () => void | Promise<void>
+	signals: symbol[]
+}
+const stackEffects: Effect[] = []
 const cleanerFactories: ((subscribes: SubscribeMap) => CleanEffect)[] = []
 const cleanersStack: CleanEffect[][] = []
-const scopes: symbol[] = []
 
 export type CleanEffect = () => void
-type SubscribeMap = Set<() => void>
-type Getter<T> = () => T
+type SubscribeMap = Set<Effect>
+type Getter<T> = (subscribe?: boolean) => T
 type Setter<T> = (newValue: T) => void
 type Updater<T> = (updater: (value: T) => T) => void
 
 export function createSignal<T>(initialValue: T): Signal<T> {
 	const subscribes: SubscribeMap = new Set()
 	let value = initialValue
-	const scope = Symbol('Representation of a signal scope')
+	const signal = Symbol('Signal symbol')
 
-	const get: Getter<T> = () => {
+	const get: Getter<T> = (subscribe = true) => {
+		if (!subscribe) {
+			return value
+		}
 		const cleanerFactory = cleanerFactories.at(-1)
 		const cleaners = cleanersStack.at(-1)
 		if (cleanerFactory && cleaners) {
 			cleaners.push(cleanerFactory(subscribes))
 		}
-		const effectToSubscribe = effectsToSubscribe.at(-1)
-		if (!effectToSubscribe) {
+		const effect = stackEffects.at(-1)
+		if (!effect) {
 			return value
 		}
-		const { effect, scopes } = effectToSubscribe
-		const parentEffect = effectsToSubscribe
-			.slice(0, -1)
-			.find(({ scopes: _scopes }) => _scopes.includes(scope))
-		if (!parentEffect) {
-			scopes.push(scope)
-			subscribes.add(effect)
+		let parentEffect = effect.parent
+		while (parentEffect) {
+			if (parentEffect.signals.includes(signal)) {
+				return value
+			}
+			parentEffect = parentEffect.parent
 		}
+		effect.signals.push(signal)
+		subscribes.add(effect)
+		// console.log('SUBSCRIBE COUNT: ', subscribes.size)
+		console.log({ subscribes })
 		return value
 	}
 
 	const set: Setter<T> = (newValue: T) => {
 		value = newValue
 		for (const effect of subscribes) {
-			effect()
+			stackEffects.push(effect)
+			effect.func()
+			stackEffects.pop()
 		}
 	}
 
@@ -51,24 +63,22 @@ export function createSignal<T>(initialValue: T): Signal<T> {
 		const newValue = updater(value)
 		set(newValue)
 	}
-
-	scopes.push(scope)
 	return { get, set, update }
 }
 
-export function createEffect(func: () => void | Promise<void>): CleanEffect {
+export function createEffect(func: () => void): CleanEffect {
 	cleanersStack.push([])
+	const effect = {
+		func,
+		parent: stackEffects.at(-1),
+		signals: [],
+	}
 	cleanerFactories.push((subscribes: SubscribeMap) => () => {
-		subscribes.delete(func)
+		subscribes.delete(effect)
 	})
-	effectsToSubscribe.push({ effect: func, scopes: [] })
-	const promise = func()
-	if (!promise) effectsToSubscribe.pop()
-	else
-		promise.then(() => {
-			effectsToSubscribe.pop()
-		})
-	effectsToSubscribe.pop()
+	stackEffects.push(effect)
+	func()
+	stackEffects.pop()
 	cleanerFactories.pop()
 	const cleaners = cleanersStack.pop() || []
 	return () => {
