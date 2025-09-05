@@ -1,4 +1,9 @@
-import type { Match, UserBasic, UserStats } from '../../lib/type.js'
+import type {
+	Match,
+	UserBasic,
+	UserStats,
+	UserWithTournament,
+} from '../../lib/type.js'
 import { getAvatarSrc } from '../utils/avatar.js'
 import { createEffect } from '../utils/signal.js'
 import { $matches, $rankedUsers, $user } from '../utils/store.js'
@@ -31,6 +36,70 @@ customElements.define(
 	},
 )
 
+function detailedMatch(match: Match, user: UserWithTournament): string {
+	let html = '<div class="flex flex-col justify-center items-center gap-2">'
+	let player1Score = 0
+	let player2Score = 0
+	if (!match.player2 || !match.player1)
+		return `No detailed history is available against AI.`
+	for (const round of match.rounds) {
+		if (match.player1 === user) {
+			if (round.scorer === 'p1') {
+				player1Score++
+				html += /*html*/ `
+					<div class="flex flex-row justify-center items-center text-indigo-600">
+						You scored ${player1Score} - ${player2Score}.
+					</div>
+					`
+			} else {
+				player2Score++
+				html += /*html*/ `
+					<div class="flex flex-row justify-center items-center text-red-600">
+						${match.player2.name} scored ${player1Score} - ${player2Score}.
+					</div>
+					`
+			}
+		} else {
+			if (round.scorer === 'p1') {
+				player1Score++
+				html += /*html*/ `
+					<div class="flex flex-row justify-center items-center text-indigo-600">
+						You scored ${player1Score} - ${player2Score}.
+					</div>
+					`
+			} else {
+				player2Score++
+				html += /*html*/ `
+					<div class="flex flex-row justify-center items-center text-red-600">
+						${match.player2.name} scored ${player1Score} - ${player2Score}.
+					</div>
+					`
+			}
+		}
+	}
+	html += `</div>`
+	return html
+}
+
+function addModalEvent(matchesHead: Match[]) {
+	for (const match of matchesHead) {
+		const matchHistory = document.querySelector(`#match-history-${match.id}`)
+		if (!matchHistory) continue
+		matchHistory.addEventListener('click', () => {
+			const matchModal = document.querySelector(`#modal-match-${match.id}`)
+			if (!matchModal) return
+			matchModal.classList.remove('hidden')
+		})
+		const cross = document.querySelector(`#cross-${match.id}`)
+		if (!cross) return
+		cross.addEventListener('click', () => {
+			const matchModal = document.querySelector(`#modal-match-${match.id}`)
+			if (!matchModal) return
+			matchModal.classList.add('hidden')
+		})
+	}
+}
+
 customElements.define(
 	'ft-match-history',
 	class extends HTMLElement {
@@ -47,12 +116,13 @@ customElements.define(
 				'p-5',
 			)
 			createEffect(() => {
-				this.innerHTML = this.renderContent()
+				const matches = $matches.get()
+				const matchesHead = matches.slice(0, 5)
+				this.innerHTML = this.renderContent(matchesHead)
+				addModalEvent(matchesHead)
 			})
 		}
-		renderContent(): string {
-			const matches = $matches.get()
-			const matchesHead = matches.slice(0, 5)
+		renderContent(matches: Match[] | null): string {
 			if (!this.user) return ''
 
 			let html = /*html*/ `
@@ -65,7 +135,7 @@ customElements.define(
 					</div>`
 				return html
 			} else {
-				for (const match of matchesHead) {
+				for (const match of matches) {
 					if (
 						!match.player1 ||
 						!match.player2 ||
@@ -112,7 +182,7 @@ customElements.define(
 					`
 
 					html += /*html*/ `
-						<div class="grid grid-cols-3 pl-4 p-2 items-center justify-center gap-2 border border-gray-200 rounded-xl">
+						<div class="grid grid-cols-3 pl-4 p-2 items-center justify-center gap-2 border border-gray-200 rounded-xl cursor-pointer" id ="match-history-${match.id}">
 							${user1}
 							<div class="flex items-center justify-center gap-4">
 								${score1}
@@ -123,6 +193,23 @@ customElements.define(
 								${score2}
 							</div>
 							${user2}
+						</div>
+						<div class="flex flex-col p-5 hidden gap-5 justify-center rounded-2xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border-2 bg-white border-gray-200 w-max z-[10]" id="modal-match-${match.id}">
+							<div class="flex-1 flex flex-row justify-end items-center p-4">
+								<ft-icon id="cross-${match.id}" name="x" class="cursor-pointer border-2 border-gray-200 rounded-2xl h-7 w-7"></ft-icon>
+							</div>
+							<div class="flex flex-row justify-around items-center">
+								<div class="flex flex-row justify-center items-center">
+									<img class="h-15 w-15" src="${match.player1.avatarPlaceholder}" alt="Player1 avatar">
+									<div class="flex-5 p-4">${match.player1.name}</div>
+								</div>
+								<div>VS</div>
+								<div class="flex flex-row justify-center items-center">
+									<div class="flex-5 p-4">${match.player2.name}</div>
+									<img class="h-15 w-15" src="${match.player2.avatarPlaceholder}" alt="Player2 avatar">
+								</div>
+							</div>
+							${detailedMatch(match, this.user)}
 						</div>
 					`
 				}
