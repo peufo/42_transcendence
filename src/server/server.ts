@@ -46,6 +46,7 @@ const oauth2Options = {
 		auth: googleAuthConfig,
 	},
 	startRedirectPath: '/auth/oauth/google',
+	// TODO: use the right URI
 	callbackUri: 'http://localhost:8000/auth/oauth/google/callback',
 }
 
@@ -101,7 +102,6 @@ export function startServer() {
 
 	process.on('SIGTERM', async () => {
 		// await deleteOpenTournaments()
-		// TODO: change tournament ongoing to finished ?
 		process.exit(0)
 	})
 }

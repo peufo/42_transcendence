@@ -43,7 +43,6 @@ customElements.define(
 					</a>`
 			}
 
-			// TODO: history === statistics ?
 			return /*html*/ `
 				<ft-dropdown>
 					<button class="btn btn-border flex shrink-0 flex-nowrap">
@@ -58,8 +57,8 @@ customElements.define(
 							Home
 						</a>
 						<a href="/stats" class="menu-item" role="menuitem" tabindex="-1">
-							<ft-icon name="chart-spline" class="h-5"></ft-icon>
-							History
+							<ft-icon name="ranking" class="h-5"></ft-icon>
+							Statistics
 						</a>
 						<a href="/account" class="menu-item" role="menuitem" tabindex="-1">
 							<ft-icon name="user" class="h-5"></ft-icon>

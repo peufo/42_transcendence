@@ -57,7 +57,6 @@ customElements.define(
 		}
 
 		handle() {
-			// TODO: make responsive
 			this.classList.add('flex', 'justify-center', 'flex-col', 'items-center')
 			const match = $match.get()
 

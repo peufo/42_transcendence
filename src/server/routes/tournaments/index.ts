@@ -52,17 +52,10 @@ export const tournamentsRoute: FastifyPluginCallbackZod = (
 		async (req, res) => {
 			const { userId } = permission.session(res)
 			const { tournamentId } = req.body
-			const { tournament, isTournamentFull } = await tournamentJoin(
-				tournamentId,
-				userId,
-			)
+			const { tournament } = await tournamentJoin(tournamentId, userId)
 			const user = await getUserBasic(userId)
 			await notifyFriends(userId, 'onTournamentJoin', { tournament, userId })
 			notify.tournaments(tournamentId, 'onParticipantJoin', { user })
-
-			if (isTournamentFull) {
-				// TODO: check that everyone is on the channel
-			}
 
 			res.send({ success: true, tournamentId })
 		},

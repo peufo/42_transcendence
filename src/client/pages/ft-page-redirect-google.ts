@@ -1,5 +1,3 @@
-// import { $oauth2 } from '../utils/store.js'
-
 customElements.define(
 	'ft-page-redirect-google',
 	class extends HTMLElement {
@@ -13,7 +11,8 @@ customElements.define(
 					</div>
 				</div>
 			`
-			window.location.href = 'http://localhost:8000/auth/oauth/google'
+
+			window.location.href = `${document.location.origin}/auth/oauth/google`
 		}
 	},
 )
