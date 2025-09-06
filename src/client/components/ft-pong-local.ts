@@ -64,6 +64,8 @@ customElements.define(
 				},
 				onGameEnd: (data) => {
 					this.scores = data.finalRound.scores
+					cancelAnimationFrame(this.animationFrameId)
+					this.renderGameOver()
 					toast.success('Game end')
 				},
 			})
@@ -73,8 +75,12 @@ customElements.define(
 			const keyHandlers: Record<string, (value: boolean) => void> = {
 				w: (value) => this.engine.setInput('p1', 'up', value),
 				s: (value) => this.engine.setInput('p1', 'down', value),
+				d: (value) => this.engine.setInput('p1', 'down', value),
+				a: (value) => this.engine.setInput('p1', 'up', value),
 				i: (value) => this.engine.setInput('p2', 'up', value),
 				k: (value) => this.engine.setInput('p2', 'down', value),
+				l: (value) => this.engine.setInput('p2', 'down', value),
+				j: (value) => this.engine.setInput('p2', 'up', value),
 			}
 
 			document.addEventListener('keydown', (event) => {
@@ -89,6 +95,24 @@ customElements.define(
 		disconnectedCallback() {
 			cancelAnimationFrame(this.frameId)
 			this.engine.stop()
+		}
+
+		renderGameOver() {
+			// this.ctx.clearRect(0, 0, ARENA_WIDTH, ARENA_HEIGHT)
+			const fontSize = 50
+			this.ctx.font = `${fontSize}px sans-serif`
+			this.ctx.fillText(
+				'GAME OVER',
+				ARENA_WIDTH / 2 + fontSize / 2,
+				ARENA_HEIGHT / 2,
+			)
+			const winner =
+				this.scores.p1 > this.scores.p2 ? this.player1Name : this.player2Name
+			this.ctx.fillText(
+				`${winner} won !`,
+				ARENA_WIDTH / 2 + fontSize / 2,
+				ARENA_HEIGHT / 2 + fontSize * 2,
+			)
 		}
 
 		renderTimer(timer: number) {

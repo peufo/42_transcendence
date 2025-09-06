@@ -21,8 +21,7 @@ customElements.define(
                         </a>
                     </div>
 					<div class="flex flex-col justify-center items-center gap-2">
-						<div>Player 1 (L): Use "W" and "S" to move.</div>
-						<div>Player 2 (R): Use "I" and "K" to move.</div>
+						<div>Use W/S or A/D or Up/Down or Left/Right to move.</div>
 					</div>
                 </div>
 			`
