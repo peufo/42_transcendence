@@ -117,7 +117,6 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 					if (player === 'p1') payload.player1Ready = true
 					if (player === 'p2') payload.player2Ready = true
 					if (payload.player1Ready && payload.player2Ready) {
-						// TODO : wait 1 sec ?
 						db.update(matches)
 							.set({ state: 'ongoing' })
 							.where(eq(matches.id, matchId))
@@ -141,21 +140,6 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 						if (player === 'p2') payload.player2Ready = false
 						return payload
 					}
-					// if (match.state === 'ongoing') {
-					// 	console.log('player surrender')
-					// 	payload.engine.stop()
-					// 	updateMatchSurrender(match.id, player).then(async (updatedMatch) => {
-					// 		notify.matches(matchId, 'onSurrender', updatedMatch)
-					// 		const tournamentId = match.tournamentId
-					// 		if (tournamentId) {
-					// 			notify.tournaments(tournamentId, 'onMatchChange', {
-					// 				match: updatedMatch,
-					// 			})
-					// 			await handleTournamentGameEnd({ ...updatedMatch, tournamentId })
-					// 		}
-					// 		deleteEmitter('matches', match.id)
-					// 	})
-					// }
 				},
 			})
 		},

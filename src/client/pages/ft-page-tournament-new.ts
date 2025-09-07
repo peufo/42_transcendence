@@ -4,21 +4,6 @@ customElements.define(
 		selectedValue: number = 4
 
 		connectedCallback() {
-			this.render()
-
-			// const radioButtons = this.querySelectorAll('fieldset input[type="radio"]')
-			// radioButtons.forEach((radio) => {
-			// 	radio.addEventListener('change', (ra) => {
-			// 		this.selectedValue = ra.value
-			// 		console.log(ra)
-			// 		this.render()
-			// 	})
-			// })
-		}
-
-		render() {
-			// const nbStages = Math.floor(Math.log2(this.selectedValue))
-
 			const nbPlayersOptions = [2, 4, 8, 16]
 				.map(
 					(nb) => /*html*/ `
@@ -48,6 +33,12 @@ customElements.define(
                             Create tournament
                         </button>
                     </form>
+                </div>
+				<div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+					<h2 class="font-bold">Points to win by stage:</h2>
+					Final: 7<br>
+					Semifinals: 5<br>
+					Other stages: 3
                 </div>
 			`
 		}

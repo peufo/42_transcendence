@@ -138,12 +138,11 @@ export async function isTournamentEmptyAndOpen(
 }
 
 function getScoreToWin(stageIndex: number) {
-	// TODO: update values
 	switch (stageIndex) {
 		case 0: // finale
-			return 5
+			return 7
 		case 1: // demi finale
-			return 4
+			return 5
 		default: // le reste
 			return 3
 	}

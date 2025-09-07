@@ -101,6 +101,9 @@ customElements.define(
 							this.scores = data.onGameEnd.finalRound.scores
 							toast.success('Game end')
 						}
+						if (data.onStart !== undefined) {
+							toast.success('Game start')
+						}
 					},
 					onSurrender: (data) => {
 						this.scores = {
