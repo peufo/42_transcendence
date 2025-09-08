@@ -23,8 +23,11 @@ customElements.define(
 					(nb) => /*html*/ `
                         <li class="w-full border-b border-gray-200 sm:border-b-0 sm:border-r">
                             <div class="flex items-center ps-3">
-                                <input id="opt-${nb}" type="radio" ${nb === this.selectedValue ? 'checked' : ''} value="${nb}" name="numberOfPlayers" class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300">
-                                <label for="opt-${nb}" class="w-full py-3 ms-2 text-gray-900">${nb}</label>
+                            <input id="opt-${nb}" type="radio"
+                                ${nb === this.selectedValue ? 'checked' : ''}
+                                value="${nb}" name="numberOfPlayers"
+                                class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300">
+                            <label for="opt-${nb}" class="w-full py-3 ms-2 text-gray-900">${nb}</label>
                             </div>
                         </li>
                     `,
