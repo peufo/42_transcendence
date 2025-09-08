@@ -122,7 +122,10 @@ customElements.define(
 			if (!this.tournament) return /*html*/ `<span>Tournament not found</span>`
 			if (!this.user) return ''
 			const participants = $participants.get()
-
+			participants.sort(
+				(prev, curr) =>
+					new Date(prev.joinedAt).getTime() - new Date(curr.joinedAt).getTime(),
+			)
 			const iParticipate = participants.find(
 				({ user: { id } }) => id === this.user?.id,
 			)

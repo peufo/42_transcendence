@@ -93,7 +93,10 @@ export async function deleteTournament(tournamentId: number) {
 }
 
 export async function insertParticipant(tournamentId: number, userId: number) {
-	await db.insert(tournamentsParticipants).values({ tournamentId, userId })
+	return await db
+		.insert(tournamentsParticipants)
+		.values({ tournamentId, userId, joinedAt: new Date() })
+		.returning()
 }
 
 export async function deleteParticipant(tournamentId: number, userId: number) {

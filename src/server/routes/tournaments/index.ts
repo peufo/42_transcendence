@@ -39,9 +39,9 @@ export const tournamentsRoute: FastifyPluginCallbackZod = (
 				...req.body,
 				createdBy: userId,
 			})
-			const user = await getUserBasic(userId)
 			await notifyFriends(userId, 'onTournamentJoin', { tournament, userId })
-			notify.tournaments(tournament.id, 'onParticipantJoin', { user })
+			// const user = await getUserBasic(userId)
+			// notify.tournaments(tournament.id, 'onParticipantJoin', { user })
 			return res.send({ success: true, tournamentId: tournament.id })
 		},
 	)
@@ -52,10 +52,16 @@ export const tournamentsRoute: FastifyPluginCallbackZod = (
 		async (req, res) => {
 			const { userId } = permission.session(res)
 			const { tournamentId } = req.body
-			const { tournament } = await tournamentJoin(tournamentId, userId)
+			const { tournament, joinedAt } = await tournamentJoin(
+				tournamentId,
+				userId,
+			)
 			const user = await getUserBasic(userId)
 			await notifyFriends(userId, 'onTournamentJoin', { tournament, userId })
-			notify.tournaments(tournamentId, 'onParticipantJoin', { user })
+			notify.tournaments(tournamentId, 'onParticipantJoin', {
+				joinedAt,
+				user,
+			})
 
 			res.send({ success: true, tournamentId })
 		},
@@ -68,7 +74,15 @@ export const tournamentsRoute: FastifyPluginCallbackZod = (
 			const { userId } = permission.session(res)
 			const { tournamentId } = req.body
 			const tournament = await tournamentGet(tournamentId)
-			if (tournament.participants[0].user.id !== userId)
+			if (tournament.participants.length !== tournament.numberOfPlayers)
+				return res.send({
+					success: false,
+					message: 'Tournament is not full',
+				})
+			const oldestParticipant = tournament.participants.reduce((prev, curr) =>
+				curr.joinedAt < prev.joinedAt ? curr : prev,
+			)
+			if (oldestParticipant.user.id !== userId)
 				return res.send({
 					success: false,
 					message: 'Only first player can start',

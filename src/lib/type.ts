@@ -84,7 +84,7 @@ export type Tournament = {
 export type TournamentWithLookup = Tournament & {
 	stages: Match[][]
 	createdByUser: UserBasic
-	participants: { user: UserBasic }[]
+	participants: { joinedAt: Date; user: UserBasic }[]
 }
 
 // ◦ ────────────────────────────── ◦
@@ -109,7 +109,7 @@ export type SocketChannels = {
 		query: { tournamentId: string }
 		clientEvents: null
 		serverEvents: {
-			onParticipantJoin: { user: UserBasic }
+			onParticipantJoin: { joinedAt: Date; user: UserBasic }
 			onParticipantQuit: { user: UserBasic }
 			onStart: { stages: Match[][] }
 			onMatchChange: { match: MatchBasic }
