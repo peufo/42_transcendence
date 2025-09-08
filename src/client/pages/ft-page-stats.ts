@@ -155,14 +155,14 @@ function getWinner(match: Match, user: UserWithTournament) {
 		(user.name === match.player2.name && match.player1Score === -1)
 	)
 		return /*html*/ `
-			<div class="text-indigo-600 flex flex-row justify-center items-center">You won by forfeit</div>
+			<div class="text-indigo-600 flex flex-row justify-center items-center">You won by forfeit!</div>
 		`
 	else if (
 		(user.name === match.player2.name && match.player2Score === -1) ||
 		(user.name === match.player1.name && match.player1Score === -1)
 	)
 		return /*html*/ `
-			<div class="text-red-400 flex flex-row justify-center items-center">You lost by forfeit</div>
+			<div class="text-red-400 flex flex-row justify-center items-center">You lost by forfeit.</div>
 		`
 	else if (
 		(user.name === match.player1.name &&
@@ -171,11 +171,11 @@ function getWinner(match: Match, user: UserWithTournament) {
 			match.player2Score > match.player1Score)
 	)
 		return /*html*/ `
-			<div class="text-indigo-600 flex flex-row justify-center items-center">You won</div>
+			<div class="text-indigo-600 flex flex-row justify-center items-center">You won!</div>
 		`
 	else
 		return /*html*/ `
-			<div class="text-red-400 flex flex-row justify-center items-center">You lost</div>
+			<div class="text-red-400 flex flex-row justify-center items-center">You lost.</div>
 		`
 }
 
@@ -261,8 +261,11 @@ customElements.define(
 							${match.player2Score}
 						</span>
 					`
-					const formater = new Intl.DateTimeFormat('fr-CH', {
-						dateStyle: 'short',
+					const formater = new Intl.DateTimeFormat('en-US', {
+						weekday: 'long',
+						year: 'numeric',
+						month: 'long',
+						day: '2-digit',
 					})
 					html += /*html*/ `
 						<div class="grid grid-cols-3 pl-4 p-2 items-center justify-center gap-2 border border-gray-200 rounded-xl cursor-pointer" id ="match-history-${match.id}">
@@ -284,7 +287,7 @@ customElements.define(
 							<div class="absolute top-0 end-0 m-2 btn btn-secondary border-2 border-gray-200 cursor-pointer" id="cross-${match.id}">
 									<ft-icon name="x" class="h-4 w-4"></ft-icon>
 								</div>
-							<div>${formater.format(match.finishedAt)}</div>
+							<div class="text-center">${formater.format(match.finishedAt)}</div>
 							<div class="flex flex-row justify-around items-center">
 								<div class="flex flex-row justify-center items-center">
 									<img class="h-15 w-15" src="${match.player1.avatarPlaceholder}" alt="Player1 avatar">
