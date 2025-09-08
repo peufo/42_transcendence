@@ -1,6 +1,11 @@
 import { and, eq, ne } from 'drizzle-orm'
 import type { Tournament } from '../../../lib/type.js'
-import { db, tournaments, tournamentsParticipants } from '../../db/index.js'
+import {
+	db,
+	matches,
+	tournaments,
+	tournamentsParticipants,
+} from '../../db/index.js'
 import type { DB } from '../../types.js'
 import { userBasicColumns } from '../friendships/model.js'
 
@@ -43,12 +48,38 @@ export async function findTournamentWithParticipants(tournamentId: number) {
 	})
 }
 
-export async function createTournament(data: DB.TournamentCreate) {
+const stageOrder: Record<number, string> = {
+	0: 'final',
+	1: 'semifinals',
+	2: 'quarterfinals',
+	3: 'eighthfinals',
+}
+
+export async function createTournament(
+	data: DB.TournamentCreate & {
+		pointsToWin: Record<string, number>
+	},
+) {
 	return db.transaction(async (tx) => {
 		const [tournament] = await tx.insert(tournaments).values(data).returning()
 		await tx
 			.insert(tournamentsParticipants)
 			.values({ tournamentId: tournament.id, userId: tournament.createdBy })
+		await tx.insert(matches).values(
+			Array(tournament.numberOfPlayers - 1)
+				.fill(0)
+				.map((_, index) => {
+					const stageIndex = Math.floor(
+						Math.log2(tournament.numberOfPlayers - index - 1),
+					)
+					const stageName = stageOrder[stageIndex]
+					const scoreToWin = data.pointsToWin[stageName] ?? 3
+					return {
+						tournamentId: tournament.id,
+						scoreToWin,
+					}
+				}),
+		)
 		return tournament
 	})
 }

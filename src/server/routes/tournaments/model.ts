@@ -64,7 +64,11 @@ function getMatchesByStages<M extends DB.Match>(
 	return matchesByStages
 }
 
-export async function tournamentCreate(data: DB.TournamentCreate) {
+export async function tournamentCreate(
+	data: DB.TournamentCreate & {
+		pointsToWin: Record<string, number>
+	},
+) {
 	const activeTournament = await getUserActiveTournament(data.createdBy)
 	if (activeTournament) throw server.httpErrors.forbidden(`Sorry, you're busy`)
 	return createTournament(data)
@@ -75,6 +79,7 @@ export async function tournamentDelete(tournamentId: number) {
 	if (!tournament) throw server.httpErrors.notFound()
 	if (tournament.state !== 'open')
 		throw server.httpErrors.forbidden('Tournament is ongoing or finished')
+	await db.delete(matches).where(eq(matches.tournamentId, tournamentId))
 	return deleteTournament(tournamentId)
 }
 
@@ -137,44 +142,12 @@ export async function isTournamentEmptyAndOpen(
 	return tournament.state === 'open' && tournament.participants.length === 0
 }
 
-function getScoreToWin(stageIndex: number) {
-	switch (stageIndex) {
-		case 0: // finale
-			return 7
-		case 1: // demi finale
-			return 5
-		default: // le reste
-			return 3
-	}
-}
-
 export async function tournamentStart(tournamentId: number) {
 	await tournamentUpdateState(tournamentId, 'ongoing')
 	const tournament = await tournamentGet(tournamentId)
-	const newMatches = await db
-		.insert(matches)
-		.values(
-			Array(tournament.numberOfPlayers - 1)
-				.fill(0)
-				.map((_, index) => {
-					const stageIndex = Math.floor(
-						Math.log2(tournament.numberOfPlayers - index - 1),
-					)
-					const scoreToWin = getScoreToWin(stageIndex)
-					return {
-						tournamentId,
-						scoreToWin,
-					}
-				}),
-		)
-		.returning()
-	const matchesByStage = getMatchesByStages(
-		tournament.numberOfPlayers,
-		newMatches,
-	)
 	const participants = getRandomizedParticipants()
 	await Promise.all(
-		matchesByStage[0].map((match) =>
+		tournament.stages[0].map((match) =>
 			db
 				.update(matches)
 				.set({

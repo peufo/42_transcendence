@@ -1,6 +1,6 @@
-import { eq } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 import { Engine, type RoundData } from '../../../lib/engine/index.js'
-import { db, matches, rounds } from '../../db/index.js'
+import { db, matches, rounds, users } from '../../db/index.js'
 import type { DB } from '../../types.js'
 import { tournamentGetStages } from '../tournaments/model.js'
 import { deleteEmitter, notify } from './controller.js'
@@ -22,6 +22,13 @@ export function createMatchEngine(match: DB.Match): Engine {
 				finalRound,
 				new Date(finishedAt),
 			)
+			await updateNumberOfMatch(updatedMatch.player1Id, updatedMatch.player2Id)
+			await updateNumberOfWin(
+				updatedMatch.player1Score > updatedMatch.player2Score
+					? updatedMatch.player1Id
+					: updatedMatch.player2Id,
+			)
+			await updateNumberOfGoals(updatedMatch)
 			const tournamentId = match.tournamentId
 			if (tournamentId) {
 				notify.tournaments(tournamentId, 'onMatchChange', {
@@ -91,6 +98,61 @@ export async function handleTournamentGameEnd(
 	})
 }
 
+async function updateNumberOfGoals(match: DB.Match) {
+	if (!match || !match.player1Id || !match.player2Id) return
+	await Promise.all([
+		db
+			.update(users)
+			.set({
+				numberOfGoals: sql`${users.numberOfGoals} + ${match.player1Score}`,
+			})
+			.where(eq(users.id, match.player1Id)),
+	])
+	await Promise.all([
+		db
+			.update(users)
+			.set({
+				numberOfGoals: sql`${users.numberOfGoals} + ${match.player2Score}`,
+			})
+			.where(eq(users.id, match.player2Id)),
+	])
+}
+
+async function updateNumberOfMatch(
+	user1Id: number | null,
+	user2Id: number | null,
+) {
+	if (!user1Id || !user2Id) return
+	await Promise.all([
+		db
+			.update(users)
+			.set({
+				numberOfMatches: sql`${users.numberOfMatches} + 1`,
+			})
+			.where(eq(users.id, user1Id)),
+	])
+	await Promise.all([
+		db
+			.update(users)
+			.set({
+				numberOfMatches: sql`${users.numberOfMatches} + 1`,
+			})
+			.where(eq(users.id, user2Id)),
+	])
+}
+
+async function updateNumberOfWin(winnerId: number | null) {
+	if (!winnerId) return
+	await Promise.all([
+		db
+			.update(users)
+			.set({
+				numberOfWin: sql`${users.numberOfWin} + 1`,
+			})
+			.where(eq(users.id, winnerId)),
+	])
+}
+
 async function updateMatchRound(matchId: number, round: RoundData) {
 	const [results] = await Promise.all([
 		db
@@ -122,7 +184,6 @@ async function updateMatchEnd(
 			})
 			.where(eq(matches.id, matchId))
 			.returning(),
-		db.insert(rounds).values({ matchId, ...round }),
 	])
 	return results[0]
 }

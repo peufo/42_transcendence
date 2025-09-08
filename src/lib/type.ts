@@ -185,7 +185,15 @@ export type RoutesPost = {
 		res: { success: boolean }
 	}
 	'/tournaments/new': {
-		body: { numberOfPlayers: number }
+		body: {
+			numberOfPlayers: number
+			pointsToWin: {
+				final?: number
+				semifinals?: number
+				quarterfinals?: number
+				eighthfinals?: number
+			}
+		}
 		res: { success: boolean; tournamentId: number }
 	}
 	'/tournaments/join': {
@@ -199,14 +207,6 @@ export type RoutesPost = {
 	'/tournaments/start': {
 		body: { tournamentId: number }
 		res: { message: string; success: boolean }
-	}
-	'/remote/new': {
-		body: { scoreToWin: number }
-		res: { success: boolean; matchId: number }
-	}
-	'/remote/join': {
-		body: { matchId: number }
-		res: { success: boolean; match: Match | undefined }
 	}
 	'/users/update': {
 		body: { name?: string; password?: string }

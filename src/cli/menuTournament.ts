@@ -18,6 +18,12 @@ export const menuNewTournament: Scope = async () => {
 
 	const { tournamentId } = await api.post('/tournaments/new', {
 		numberOfPlayers,
+		pointsToWin: {
+			final: 7,
+			semifinals: 5,
+			quarterfinals: 3,
+			eighthfinals: 2,
+		},
 	})
 
 	p.log.success('Tournament created')

@@ -24,10 +24,6 @@ customElements.define(
 					</div>
 					<div class="flex flex-col gap-5 p-5 justify-evenly ring-2 ring-indigo-500 rounded-lg">
 						<div class="text-center">Remote</div>
-						<a href="/remote/new" class="btn btn-primary">
-							<ft-icon name="swords" class="h-5 w-5 mr-1"></ft-icon>
-							Versus
-						</a>
 						<a href="/tournament/new" class="btn btn-primary">
 							<ft-icon name="trophy" class="h-5 w-5 mr-1"></ft-icon>
 							Create tournament

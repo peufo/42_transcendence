@@ -93,10 +93,6 @@ export const API_POST: {
 		redirectTo: () => '/me',
 	},
 	'/tournaments/start': {},
-	'/remote/new': {
-		redirectTo: ({ matchId }) => `/remote/play?matchId=${matchId}`,
-	},
-	'/remote/join': {},
 }
 
 export const PAGES = {
@@ -121,8 +117,6 @@ export const PAGES = {
 	'/account': { component: 'ft-page-account' },
 	'/local/new': { component: 'ft-page-local-new', isPublic: true },
 	'/local/play': { component: 'ft-page-local-play', isPublic: true },
-	'/remote/new': { component: 'ft-page-remote-new' },
-	'/remote/play': { component: 'ft-page-remote-play' },
 	'/tournament/new': { component: 'ft-page-tournament-new' },
 	'/tournament/play': {
 		component: 'ft-page-tournament-play',

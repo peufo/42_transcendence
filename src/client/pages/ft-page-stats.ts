@@ -1,3 +1,4 @@
+import { ARENA_HEIGHT } from '../../lib/engine/index.js'
 import type {
 	Match,
 	UserBasic,
@@ -22,7 +23,7 @@ customElements.define(
 				userContent += /*html*/ `
 					<div class="grid grid-cols-1 lg:grid-cols-2 grid-flow-row gap gap-4 p-10 max-w-7xl mx-auto">
 						<ft-stats></ft-stats>
-						<div class="flex flex-col justify-between">
+						<div class="flex flex-row justify-between border-1 border-gray-200 rounded-xl">
 							<ft-goal-received-distribution></ft-goal-received-distribution>
 							<ft-goal-scored-distribution><ft-goal-scored-distribution>
 						</div>
@@ -42,20 +43,32 @@ function detailedMatch(match: Match, user: UserWithTournament): string {
 	let player2Score = 0
 	if (!match.player2 || !match.player1)
 		return `No detailed history is available against AI.`
+	html += /*html*/ `
+		<div  class="flex flex-row" >Match start.</div>
+	`
 	for (const round of match.rounds) {
+		html += /*html*/ `
+			<div class="grid grid-cols-4 gap-2">
+		`
 		if (match.player1.name === user.name) {
 			if (round.scorer === 'p1') {
 				player1Score++
 				html += /*html*/ `
-					<div class="flex flex-row justify-center items-center text-indigo-600">
-						You scored ${player1Score} - ${player2Score}.
+					<div class="text-indigo-600 text-center">
+						You scored!
+					</div>
+					<div  class="text-indigo-600 text-center">
+						${player1Score} - ${player2Score}
 					</div>
 					`
 			} else {
 				player2Score++
 				html += /*html*/ `
-					<div class="flex flex-row justify-center items-center text-red-400">
-						${match.player2.name} scored ${player1Score} - ${player2Score}.
+					<div class= "text-red-400 text-center">
+						${match.player2.name} scored
+					</div>
+					<div class= "text-red-400 text-center">
+						${player1Score} - ${player2Score}
 					</div>
 					`
 			}
@@ -63,20 +76,38 @@ function detailedMatch(match: Match, user: UserWithTournament): string {
 			if (round.scorer === 'p1') {
 				player1Score++
 				html += /*html*/ `
-					<div class="flex flex-row justify-center items-center text-indigo-600">
-						You scored ${player1Score} - ${player2Score}.
+					<div class="text-indigo-600 text-center">
+						You scored!
+					</div>
+					<div class="text-indigo-600 text-center">
+						${player1Score} - ${player2Score}
 					</div>
 					`
 			} else {
 				player2Score++
 				html += /*html*/ `
-					<div class="flex flex-row justify-center items-center text-red-400">
-						${match.player2.name} scored ${player1Score} - ${player2Score}.
+					<div class="text-red-400 text-center">
+						${match.player2.name} scored
+					</div>
+					<div class="text-red-400 text-center">
+						${player1Score} - ${player2Score}
 					</div>
 					`
 			}
 		}
+		html += /*html*/ `
+			<div class="text-end">${round.rallyCount}</div>
+		`
+		html += /*html*/ `
+			<div>rallies.</div>
+		`
+		html += /*html*/ `
+			</div>
+		`
 	}
+	html += /*html*/ `
+		<div  class="flex flex-row justify-center items-center" >Match end.</div>
+	`
 	html += `</div>`
 	return html
 }
@@ -495,8 +526,6 @@ customElements.define(
 				'items-center',
 				'justify-around',
 				'gap-3',
-				'border',
-				'border-gray-200',
 				'rounded-xl',
 				'p-5',
 			)
@@ -528,9 +557,9 @@ customElements.define(
 						</div>
 					</div>
 				</h2>
-				<div class="flex flex-col w-max items-center justify-center pl-1 pr-1 pb-1 gap-4 border-black border-l-2 border-r-2 border-b-2">
-					<div class="w-50 h-5 border-2 border-black rounded-4xl shadow-lg"></div>
+				<div class="flex flex-row w-max items-center justify-center pl-1 gap-4 border-black border-l-2 border-t-2 border-b-2">
 					${drawRectangle(distributionPercentage, 'conceded')}
+					<div class="w-3 h-40 border-2 border-black shadow-xl bg-black"></div>
 				</div>
 			`
 			return html
@@ -551,8 +580,6 @@ customElements.define(
 				'items-center',
 				'justify-around',
 				'gap-3',
-				'border',
-				'border-gray-200',
 				'rounded-xl',
 				'p-5',
 			)
@@ -584,9 +611,9 @@ customElements.define(
 						</div>
 					</div>
 				</h2>
-				<div class="flex flex-col w-max items-center justify-center pl-1 pr-1 pt-1 gap-4 border-black border-l-2 border-r-2 border-t-2">
+				<div class="flex flex-row w-max items-center justify-center pr-1 gap-4 border-black border-r-2 border-b-2 border-t-2">
+					<div class="w-5 h-50 rounded-4xl"></div>
 					${drawRectangle(distributionPercentage, 'scored')}
-					<div class="w-50 h-5 border-2 border-black rounded-4xl shadow-lg"></div>
 				</div>
 			`
 			return html
@@ -595,7 +622,7 @@ customElements.define(
 )
 
 function drawRectangle(values: number[], mode: string): string {
-	let html = '<div class="flex items-center">'
+	let html = '<div class="flex flex-col items-center">'
 	const maxValue = Math.max(...values)
 	for (const value of values) {
 		let color = ''
@@ -604,7 +631,7 @@ function drawRectangle(values: number[], mode: string): string {
 		else
 			color = `rgb(${255 - Math.floor((value * 255) / maxValue)}, ${255 - Math.floor((value * 255) / maxValue)}, 255)`
 		html += /*html*/ `
-		<div class="w-1 h-4" style="background-color:${color}"></div>
+		<div class="w-1 h-1 rounded-full" style="background-color:${color}"></div>
 		`
 	}
 	html += '</div>'
@@ -615,7 +642,8 @@ function convertToPercentage(goalTakenY: number[]): number[] {
 	const distribution: number[] = []
 	let correctedDistribution: number[] = []
 	for (let i = 0; i < 100; i++) distribution.push(0)
-	for (const value of goalTakenY) distribution[value]++
+	for (const value of goalTakenY)
+		distribution[Math.round((value * 100) / ARENA_HEIGHT)]++
 	correctedDistribution = distribution.map((e) => (e * 100) / goalTakenY.length)
 	return correctedDistribution
 }

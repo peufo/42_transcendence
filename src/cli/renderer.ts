@@ -84,6 +84,7 @@ export function useRenderer(): Required<EngineOptionsEvents> & {
 			renderGameEnd(round.finalRound.scores)
 			renderScores(round.finalRound.scores, false)
 		},
+		onStart() {},
 	}
 }
 
