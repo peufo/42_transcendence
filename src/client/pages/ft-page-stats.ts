@@ -43,7 +43,7 @@ function detailedMatch(match: Match, user: UserWithTournament): string {
 	if (!match.player2 || !match.player1)
 		return `No detailed history is available against AI.`
 	for (const round of match.rounds) {
-		if (match.player1 === user) {
+		if (match.player1.name === user.name) {
 			if (round.scorer === 'p1') {
 				player1Score++
 				html += /*html*/ `
@@ -54,7 +54,7 @@ function detailedMatch(match: Match, user: UserWithTournament): string {
 			} else {
 				player2Score++
 				html += /*html*/ `
-					<div class="flex flex-row justify-center items-center text-red-600">
+					<div class="flex flex-row justify-center items-center text-red-400">
 						${match.player2.name} scored ${player1Score} - ${player2Score}.
 					</div>
 					`
@@ -70,7 +70,7 @@ function detailedMatch(match: Match, user: UserWithTournament): string {
 			} else {
 				player2Score++
 				html += /*html*/ `
-					<div class="flex flex-row justify-center items-center text-red-600">
+					<div class="flex flex-row justify-center items-center text-red-400">
 						${match.player2.name} scored ${player1Score} - ${player2Score}.
 					</div>
 					`
@@ -89,6 +89,11 @@ function addModalEvent(matchesHead: Match[]) {
 			const matchModal = document.querySelector(`#modal-match-${match.id}`)
 			if (!matchModal) return
 			matchModal.classList.remove('hidden')
+			for (const div of matchesHead) {
+				const otherdiv = document.querySelector(`#modal-match-${div.id}`)
+				if (!otherdiv) continue
+				if (div !== match) otherdiv.classList.add('hidden')
+			}
 		})
 		const cross = document.querySelector(`#cross-${match.id}`)
 		if (!cross) return
@@ -98,6 +103,43 @@ function addModalEvent(matchesHead: Match[]) {
 			matchModal.classList.add('hidden')
 		})
 	}
+}
+
+function modalWinner(match: Match, user: UserWithTournament) {
+	const formater = new Intl.DateTimeFormat('fr-CH', {
+		dateStyle: 'short',
+	})
+	if (!match.finishedAt || !match.player1 || !match.player2)
+		return /*html*/ `
+			<div class="text-indigo-600 flex flex-row justify-center items-center">Match not yet finished.</div>
+		`
+	if (
+		(user.name === match.player1.name && match.player2Score === -1) ||
+		(user.name === match.player2.name && match.player1Score === -1)
+	)
+		return /*html*/ `
+			<div class="text-indigo-600 flex flex-row justify-center items-center">You won by forfeit, the ${formater.format(match.finishedAt)}</div>
+		`
+	else if (
+		(user.name === match.player2.name && match.player2Score === -1) ||
+		(user.name === match.player1.name && match.player1Score === -1)
+	)
+		return /*html*/ `
+			<div class="text-red-400 flex flex-row justify-center items-center">You lost by forfeit, the ${formater.format(match.finishedAt)}</div>
+		`
+	else if (
+		(user.name === match.player1.name &&
+			match.player1Score > match.player2Score) ||
+		(user.name === match.player2.name &&
+			match.player2Score > match.player1Score)
+	)
+		return /*html*/ `
+			<div class="text-indigo-600 flex flex-row justify-center items-center">You won, the ${formater.format(match.finishedAt)}</div>
+		`
+	else
+		return /*html*/ `
+			<div class="text-red-400 flex flex-row justify-center items-center">You lost, the ${formater.format(match.finishedAt)}</div>
+		`
 }
 
 customElements.define(
@@ -180,7 +222,6 @@ customElements.define(
 							${match.player2Score}
 						</span>
 					`
-
 					html += /*html*/ `
 						<div class="grid grid-cols-3 pl-4 p-2 items-center justify-center gap-2 border border-gray-200 rounded-xl cursor-pointer" id ="match-history-${match.id}">
 							${user1}
@@ -194,16 +235,22 @@ customElements.define(
 							</div>
 							${user2}
 						</div>
-						<div class="flex flex-col p-5 hidden gap-5 justify-center rounded-2xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border-2 bg-white border-gray-200 w-max z-[10]" id="modal-match-${match.id}">
-							<div class="flex-1 flex flex-row justify-end items-center p-4">
-								<ft-icon id="cross-${match.id}" name="x" class="cursor-pointer border-2 border-gray-200 rounded-2xl h-7 w-7"></ft-icon>
+						<div class="flex flex-col p-5 hidden shadow-2xl gap-5 justify-center rounded-2xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border-2 bg-white border-gray-200 w-max z-[10]" id="modal-match-${match.id}">
+							<div class="flex-1 flex flex-row justify-around items-center pb-5">
+								<h2 class="flex flex-row justify-center items-center font-bold">Detailed match</h2>
+							</div>
+							<div class="absolute top-0 end-0 m-2 btn btn-secondary border-2 border-gray-200 cursor-pointer" id="cross-${match.id}">
+									<ft-icon name="x" class="h-4 w-4"></ft-icon>
+								</div>
+							<div>
+							${modalWinner(match, this.user)}
 							</div>
 							<div class="flex flex-row justify-around items-center">
 								<div class="flex flex-row justify-center items-center">
 									<img class="h-15 w-15" src="${match.player1.avatarPlaceholder}" alt="Player1 avatar">
 									<div class="flex-5 p-4">${match.player1.name}</div>
 								</div>
-								<div>VS</div>
+								<div class="font-bold">VS</div>
 								<div class="flex flex-row justify-center items-center">
 									<div class="flex-5 p-4">${match.player2.name}</div>
 									<img class="h-15 w-15" src="${match.player2.avatarPlaceholder}" alt="Player2 avatar">
@@ -537,7 +584,7 @@ customElements.define(
 						</div>
 					</div>
 				</h2>
-				<div class="flex flex-col w-max items-center justify-center pl-1 pr-1 pb-1 gap-4 border-black border-l-2 border-r-2 border-t-2">
+				<div class="flex flex-col w-max items-center justify-center pl-1 pr-1 pt-1 gap-4 border-black border-l-2 border-r-2 border-t-2">
 					${drawRectangle(distributionPercentage, 'scored')}
 					<div class="w-50 h-5 border-2 border-black rounded-4xl shadow-lg"></div>
 				</div>
