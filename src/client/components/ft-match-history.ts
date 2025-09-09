@@ -136,38 +136,92 @@ customElements.define(
 	},
 )
 
+function scoringGraph(match: Match, user: UserWithTournament): string {
+	const ralliesPerRound = match.rounds.map((r) => r.rallyCount)
+	const maxRallies = Math.max(...ralliesPerRound, 1)
+	const html = /*html*/ `
+	<div class="flex flex-col justify-center items-center">
+		<div class="grid grid-cols-[2fr_10fr] grid-rows-[12fr_1fr]">
+			<div class="h-[100%] pr-2">
+				<div class="flex flex-col justify-evenly items-center h-[100%] pr-2">
+					<div class="flex flex-col justify-center items-center">
+						<div class="bg-indigo-600 h-5 w-5 rounded" ></div>
+						<div>Won</div>
+					</div>
+					<div class="flex flex-col justify-center items-center">
+						<div class="bg-red-400 h-5 w-5 rounded"></div>
+						<div>Lost</div>
+					</div>
+				</div>
+			</div>
+				<div class="flex justify-between items-end w-full">
+				 ${ralliesPerRound
+						.map((rallies) => {
+							const heightPercent = (rallies / maxRallies) * 100
+							const color =
+								(match.player1Id === user.id &&
+									match.rounds[ralliesPerRound.indexOf(rallies)].scorer ===
+										'p1') ||
+								(match.player2Id === user.id &&
+									match.rounds[ralliesPerRound.indexOf(rallies)].scorer ===
+										'p2')
+									? 'bg-indigo-600'
+									: 'bg-red-400'
+							return `<div class="${color} w-6 rounded-t" style="height:${heightPercent}%;"></div>`
+						})
+						.join('')}
+			</div>
+			<div></div>
+			<div  class="flex flex-row justify-between items-center">
+				${match.rounds.map((r) => `<div class="text-center">${r.rallyCount}</div>`).join('')}
+			</div>
+			<div></div>
+			<div  class="flex flex-row justify-between items-center">
+				${match.rounds.map((_, i) => `<div class="text-center">R${i + 1}</div>`).join('')}
+			</div>
+		</div>
+	</div>
+	`
+	return html
+}
+
 function detailedMatch(match: Match, user: UserWithTournament): string {
 	let html = '<div class="flex flex-col justify-center items-center gap-2">'
 	let player1Score = 0
 	let player2Score = 0
 	if (!match.player2 || !match.player1)
 		return `No detailed history is available against AI.`
+	if (!match.rounds.length) {
+		html += /*html*/ `
+				<div class="text-center">No match data.</div>
+			</div>
+			`
+		return html
+	}
 	html += /*html*/ `
 		<div class="flex flex-row h-[100%] w-[100%] justify-center items-center">
 			<div class="flex-1 h-[1px] bg-black"></div>
-			<div class="flex-1 text-center whitespace-nowrap" >Match start</div>
+			<div class="flex-1 text-center whitespace-nowrap" >Match history</div>
 			<div class="flex-1 h-[1px] bg-black"></div>
 		</div>
 	`
-	if (!match.rounds.length)
-		html += /*html*/ `
-				<div class="text-center">No match data.</div>
-			`
-	else if (match.player1Score === -1 || match.player2Score === -1) {
+	if (match.player1Score === -1 || match.player2Score === -1) {
 		html += /*html*/ `
 				<div class="text-center">${match.player1Score === -1 ? match.player1.name : match.player2.name} forfeited.</div>
 			`
 	} else {
-		for (const round of match.rounds) {
-			html += /*html*/ `
-				<div class="grid grid-cols-4 gap-2">
+		html += /*html*/ `
+				<div class="grid grid-cols-2 gap-x-10">
+					<div class="text-center">Scorer</div>
+					<div class="text-center">Score</div>
 			`
+		for (const round of match.rounds) {
 			if (match.player1.name === user.name) {
 				if (round.scorer === 'p1') {
 					player1Score++
 					html += /*html*/ `
 						<div class="text-indigo-600 text-center">
-							You scored!
+							You
 						</div>
 						<div  class="text-indigo-600 text-center">
 							${player1Score} - ${player2Score}
@@ -177,7 +231,7 @@ function detailedMatch(match: Match, user: UserWithTournament): string {
 					player2Score++
 					html += /*html*/ `
 						<div class= "text-red-400 text-center">
-							${match.player2.name} scored
+							${match.player2.name}
 						</div>
 						<div class= "text-red-400 text-center">
 							${player1Score} - ${player2Score}
@@ -189,7 +243,7 @@ function detailedMatch(match: Match, user: UserWithTournament): string {
 					player1Score++
 					html += /*html*/ `
 						<div class="text-indigo-600 text-center">
-							You scored!
+							You
 						</div>
 						<div class="text-indigo-600 text-center">
 							${player1Score} - ${player2Score}
@@ -199,7 +253,7 @@ function detailedMatch(match: Match, user: UserWithTournament): string {
 					player2Score++
 					html += /*html*/ `
 						<div class="text-red-400 text-center">
-							${match.player2.name} scored
+							${match.player2.name}
 						</div>
 						<div class="text-red-400 text-center">
 							${player1Score} - ${player2Score}
@@ -207,25 +261,20 @@ function detailedMatch(match: Match, user: UserWithTournament): string {
 						`
 				}
 			}
-			html += /*html*/ `
-				<div class="text-end">${round.rallyCount}</div>
-			`
-			html += /*html*/ `
-				<div>rallies.</div>
-			`
-			html += /*html*/ `
+		}
+		html += /*html*/ `
 				</div>
 			`
-		}
 	}
-	html += /*html*/ `
-			<div class="flex flex-row h-[100%] w-[100%] justify-center items-center">
-				<div class="flex-1 h-[1px] bg-black"></div>
-				<div class="flex-1 text-center whitespace-nowrap" >Match end</div>
-				<div class="flex-1 h-[1px] bg-black"></div>
-			</div>
-		`
 	html += `</div>`
+	html += /*html*/ `
+		<div class="flex flex-row h-[100%] w-[100%] justify-center items-center">
+			<div class="flex-1 h-[1px] bg-black"></div>
+			<div class="flex-1 text-center whitespace-nowrap" >Rally per round</div>
+			<div class="flex-1 h-[1px] bg-black"></div>
+		</div>
+	`
+	html += scoringGraph(match, user)
 	return html
 }
 
