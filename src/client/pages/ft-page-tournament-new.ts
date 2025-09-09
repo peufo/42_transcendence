@@ -95,6 +95,7 @@ customElements.define(
 						)
 						.join('')
 
+				updateHidden()
 				stagesByPlayers[playerCount].forEach((round) => {
 					const id = `points-to-win-${round.toLowerCase()}`
 					const slider = this.querySelector<HTMLInputElement>(`#${id}`)

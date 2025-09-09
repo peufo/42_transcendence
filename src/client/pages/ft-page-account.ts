@@ -50,7 +50,7 @@ customElements.define(
                         ${user.isOAuth2 ? '' : modifyPassword}
                             <div class="flex flex-col items-center">
                                 <button type="submit" class="btn btn-primary w-full">
-                                    Update
+                                    Update Username/Password
                                 </button>
                             </div>
                         </form>
@@ -69,7 +69,7 @@ customElements.define(
 						</div>
                             <div class="flex flex-col items-center py-4">
                                 <button type="submit" class="btn btn-primary w-full">
-                                    Update
+                                    Update Avatar
                                 </button>
                             </div>
                         </form>
