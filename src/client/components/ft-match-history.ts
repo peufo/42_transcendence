@@ -199,9 +199,9 @@ function detailedMatch(match: Match, user: UserWithTournament): string {
 		return html
 	}
 	html += /*html*/ `
-		<div class="flex flex-row h-[100%] w-[100%] justify-center items-center">
+		<div class="flex flex-row h-[100%] w-[100%] justify-center items-center gap-2">
 			<div class="flex-1 h-[1px] bg-black"></div>
-			<div class="flex-1 text-center whitespace-nowrap" >Match history</div>
+			<div class="flex-1 text-center whitespace-nowrap">Rounds history</div>
 			<div class="flex-1 h-[1px] bg-black"></div>
 		</div>
 	`
@@ -268,7 +268,7 @@ function detailedMatch(match: Match, user: UserWithTournament): string {
 	}
 	html += `</div>`
 	html += /*html*/ `
-		<div class="flex flex-row h-[100%] w-[100%] justify-center items-center">
+		<div class="flex flex-row h-[100%] w-[100%] justify-center items-center gap-2">
 			<div class="flex-1 h-[1px] bg-black"></div>
 			<div class="flex-1 text-center whitespace-nowrap" >Rally per round</div>
 			<div class="flex-1 h-[1px] bg-black"></div>
@@ -313,14 +313,14 @@ function getWinner(match: Match, user: UserWithTournament) {
 		(user.name === match.player2.name && match.player1Score === -1)
 	)
 		return /*html*/ `
-			<div class="text-indigo-600 flex flex-row justify-center items-center font-bold">Victory by forfeit.</div>
+			<div class="text-indigo-600 flex flex-row justify-center items-center font-bold text-2xl">Victory by forfeit.</div>
 		`
 	else if (
 		(user.name === match.player2.name && match.player2Score === -1) ||
 		(user.name === match.player1.name && match.player1Score === -1)
 	)
 		return /*html*/ `
-			<div class="text-red-400 flex flex-row justify-center items-center font-bold">Defeat by forfeit</div>
+			<div class="text-red-400 flex flex-row justify-center items-center font-bold text-2xl">Defeat by forfeit</div>
 		`
 	else if (
 		(user.name === match.player1.name &&
@@ -329,10 +329,10 @@ function getWinner(match: Match, user: UserWithTournament) {
 			match.player2Score > match.player1Score)
 	)
 		return /*html*/ `
-			<div class="text-indigo-600 flex flex-row justify-center items-center font-bold">Victory!</div>
+			<div class="text-indigo-600 flex flex-row justify-center items-center font-bold text-2xl">Victory!</div>
 		`
 	else
 		return /*html*/ `
-			<div class="text-red-400 flex flex-row justify-center items-center font-bold">Defeat</div>
+			<div class="text-red-400 flex flex-row justify-center items-center font-bold text-2xl">Defeat</div>
 		`
 }
