@@ -13,25 +13,25 @@ import {
 	$user,
 } from '../utils/store.js'
 
+const buttonsLab = Object.entries({
+	$user,
+	$tournament,
+	$stages,
+	$participants,
+	$match,
+}).map(([key, value]) => {
+	const btn = document.createElement('button')
+	btn.addEventListener('click', () => {
+		// biome-ignore lint/suspicious/noExplicitAny: va chier
+		value.update((v: any) => v)
+	})
+	btn.classList.add('btn', 'btn-border')
+	btn.innerHTML = key
+	return btn
+})
+
 defineComponent('ft-page-tournament-play', () => {
 	let tournamentChannel: ChannelSocket<'tournaments'>
-
-	const buttonsLab = Object.entries({
-		$user,
-		$tournament,
-		$stages,
-		$participants,
-		$match,
-	}).map(([key, value]) => {
-		const btn = document.createElement('button')
-		btn.addEventListener('click', () => {
-			// biome-ignore lint/suspicious/noExplicitAny: va chier
-			value.update((v: any) => v)
-		})
-		btn.classList.add('btn', 'btn-border')
-		btn.innerHTML = key
-		return btn
-	})
 
 	return {
 		onMount() {
@@ -148,7 +148,6 @@ defineComponent('ft-tournament-open', () => {
 				participants.length === tournament.numberOfPlayers
 					? 'text-lime-400 font-bold a'
 					: 'text-gray-400'
-
 			const participantsCount = /*html*/ `
 			<div class="p-2 flex item-center justify-center ${participantsCountColor}">
 				${participants.length}
@@ -275,6 +274,43 @@ customElements.define(
 						<span>Exit</span>
 					</a>
 			</div>
+			`
+		},
+	}
+})
+
+defineComponent('ft-tournament-finished', () => {
+	return {
+		onMount() {
+			console.log('TOURNAMENT FINISHED MOUNT')
+		},
+		render() {
+			console.log('TOURNAMENT FINISHED RENDER')
+			const stages = $stages.get()
+			const final = stages[stages.length - 1][0]
+			const user = $user.get()
+			if (!user) return 'No user'
+			const IWin =
+				(user.id === final.player1Id &&
+					final.player1Score > final.player2Score) ||
+				(user.id === final.player2Id && final.player2Score > final.player1Score)
+			const color = IWin ? 'text-indigo-600 animate-bounce' : 'text-black'
+
+			return /*html*/ `
+				<div class="flex flex-col justify-center items-center gap-10">
+					<div class="flex flex-col justify-center items-center gap-10">
+						<div>
+							<ft-icon name="trophy" class="h-50 w-50 stroke-yellow-500"></ft-icon>
+						</div>
+						<div class="font-bold text-2xl">And the winner is ...</div>
+						<div class="font-bold text-4xl ${color}">${final.player1Score > final.player2Score ? final.player1?.name : final.player2?.name} !</div>
+					</div>
+					<ft-bracket></ft-bracket>
+					<a href="/me" class="btn btn-border flex shrink-0 flex-nowrap">
+							<ft-icon name="home"></ft-icon>
+							<span>Exit</span>
+						</a>
+				</div>
 			`
 		},
 	}
