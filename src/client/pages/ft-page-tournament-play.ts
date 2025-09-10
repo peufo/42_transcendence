@@ -3,8 +3,8 @@ import type { ChannelSocket } from '../../lib/useSocketChannels.js'
 import { toast } from '../components/ft-toast.js'
 import { socketChannel } from '../socketChannel.js'
 import { getAvatarSrc } from '../utils/avatar.js'
+import { defineComponent } from '../utils/component.js'
 import { setMatch } from '../utils/match.js'
-import { type CleanEffect, createEffect } from '../utils/signal.js'
 import {
 	$match,
 	$participants,
@@ -13,39 +13,37 @@ import {
 	$user,
 } from '../utils/store.js'
 
-customElements.define(
-	'ft-page-tournament-play',
-	class extends HTMLElement {
-		private user = $user.get()
-		private cleanEffect: CleanEffect
-		private tournamentChannel: ChannelSocket<'tournaments'>
-		private labStores = { $user, $tournament, $stages, $participants, $match }
+defineComponent('ft-page-tournament-play', () => {
+	let tournamentChannel: ChannelSocket<'tournaments'>
 
-		connectedCallback() {
-			const buttons = Object.entries(this.labStores).map(([key, value]) => {
-				const btn = document.createElement('button')
-				btn.addEventListener('click', () => {
-					// biome-ignore lint/suspicious/noExplicitAny: va chier
-					value.update((v: any) => v)
-				})
-				btn.classList.add('btn', 'btn-border')
-				btn.innerHTML = key
-				return btn
-			})
-			this.cleanEffect = createEffect(() => {
-				this.innerHTML = this.render()
-				const lab = this.querySelector('#lab')
-				lab?.append(...buttons)
-			})
+	const buttonsLab = Object.entries({
+		$user,
+		$tournament,
+		$stages,
+		$participants,
+		$match,
+	}).map(([key, value]) => {
+		const btn = document.createElement('button')
+		btn.addEventListener('click', () => {
+			// biome-ignore lint/suspicious/noExplicitAny: va chier
+			value.update((v: any) => v)
+		})
+		btn.classList.add('btn', 'btn-border')
+		btn.innerHTML = key
+		return btn
+	})
 
+	return {
+		onMount() {
+			console.log('TOURNAMENT PLAY MOUNT')
 			const tournamentId =
 				new URLSearchParams(document.location.search).get('tournamentId') || ''
 
-			this.tournamentChannel = socketChannel(
+			tournamentChannel = socketChannel(
 				'tournaments',
 				{ tournamentId },
 				{
-					onParticipantJoin: (newParticipant) => {
+					onParticipantJoin(newParticipant) {
 						console.log('onParticipantJoin')
 						toast.success(`${newParticipant.user.name} joined the tournament !`)
 						$participants.update((participants) => {
@@ -56,7 +54,7 @@ customElements.define(
 							return [...participants, newParticipant]
 						})
 					},
-					onParticipantQuit: (participant) => {
+					onParticipantQuit(participant) {
 						console.log('onParticipantQuit')
 						toast.error(`${participant.user.name} left the tournament !`)
 						$participants.update((participants) => {
@@ -65,11 +63,11 @@ customElements.define(
 							)
 						})
 					},
-					onStart: ({ stages }) => {
+					onStart({ stages }) {
 						console.log('onStart')
 						toast.success('Tournament starting')
 						$stages.set(stages)
-						const userId = this.user?.id
+						const userId = $user.get(false)?.id
 						if (userId) {
 							const myMatch = getAwaitingMatchFromStages(userId, stages)
 							setMatch(myMatch)
@@ -79,93 +77,82 @@ customElements.define(
 							return { ...t, state: 'ongoing' }
 						})
 					},
-					onMatchChange: ({ match }) => {
+					onMatchChange({ match }) {
+						const userId = $user.get(false)?.id
 						console.log('onMatchChange')
 						$stages.update((stages) => {
 							const m = stages.flat().find((m) => m.id === match.id)
 							if (!m) return stages
 							Object.assign(m, match)
-							if (
-								m.player1Id === this.user?.id ||
-								m.player2Id === this.user?.id
-							) {
+							if (m.player1Id === userId || m.player2Id === userId) {
 								setMatch(m)
 							}
 							return stages
 						})
 					},
-					onEnd: () => {
+					onEnd() {
 						console.log('onEnd')
 						toast.success('Tournament finished')
 						$tournament.update((t) => (!t ? t : { ...t, state: 'finished' }))
 					},
 				},
 			)
-		}
-
-		disconnectedCallback() {
-			this.cleanEffect()
-			this.tournamentChannel.close()
-		}
-
+		},
+		onRender(element) {
+			const lab = element.querySelector('#lab')
+			lab?.append(...buttonsLab)
+		},
+		onDestroy() {
+			tournamentChannel.close()
+		},
 		render() {
-			console.log('RENDER TOURNAMENT PAGE')
+			console.log('TOURNAMENT PLAY RENDER')
 			const tournament = $tournament.get()
 			if (!tournament) return /*html*/ `<span>Tournament not found</span>`
 			return `<h1 class="p-2 flex font-bold item-center justify-center">${tournament.createdByUser.name}'s tournament</h1>
 			<ft-tournament-${tournament.state}></ft-tournament-${tournament.state}>`
-		}
-	},
-)
+		},
+	}
+})
 
-customElements.define(
-	'ft-tournament-open',
-	class extends HTMLElement {
-		private user = $user.get()
-		private tournament = $tournament.get()
-		private cleanEffect: CleanEffect
-
-		connectedCallback() {
-			this.cleanEffect = createEffect(() => {
-				console.log('RENDER TOURNAMENT OPEN')
-				this.innerHTML = this.render()
-			})
-		}
-
-		disconnectedCallback() {
-			this.cleanEffect()
-		}
-
-		render(): string {
-			if (!this.tournament) return /*html*/ `<span>Tournament not found</span>`
-			if (!this.user) return ''
+defineComponent('ft-tournament-open', () => {
+	return {
+		onMount() {
+			console.log('TOURNAMENT OPEN MOUNT')
+		},
+		render() {
+			console.log('TOURNAMENT OPEN RENDER')
+			const tournament = $tournament.get()
+			const user = $user.get()
+			if (!tournament) return /*html*/ `<span>Tournament not found</span>`
+			if (!user) return ''
 			const participants = $participants.get()
 			participants.sort(
 				(prev, curr) =>
 					new Date(prev.joinedAt).getTime() - new Date(curr.joinedAt).getTime(),
 			)
 			const iParticipate = participants.find(
-				({ user: { id } }) => id === this.user?.id,
+				({ user: { id } }) => id === user?.id,
 			)
 			const action = iParticipate ? 'quit' : 'join'
 			const buttonText = action === 'quit' ? 'Quit' : 'Join'
 
 			const participationForm = /*html*/ `
 				<form action="/tournaments/${action}" method="post" class="contents">
-					<input type="hidden" name="tournamentId" value="${this.tournament.id}" />
+					<input type="hidden" name="tournamentId" value="${tournament.id}" />
 					<input type="submit" value="${buttonText}" class="btn btn-border cursor-pointer">
 				</form>
 			`
 
 			const participantsCountColor =
-				participants.length === this.tournament.numberOfPlayers
+				participants.length === tournament.numberOfPlayers
 					? 'text-lime-400 font-bold a'
 					: 'text-gray-400'
 
 			const participantsCount = /*html*/ `
 			<div class="p-2 flex item-center justify-center ${participantsCountColor}">
 				${participants.length}
-				/ ${this.tournament.numberOfPlayers} players
+				/ ${tournament.numberOfPlayers} players
 			</div>
 			`
 
@@ -184,7 +171,7 @@ customElements.define(
 					`
 					number++
 				}
-				const numberOfPlayers = this.tournament?.numberOfPlayers || 0
+				const numberOfPlayers = tournament?.numberOfPlayers || 0
 				while (number < numberOfPlayers) {
 					html += /*html*/ `
 						<div class="flex p-2 justify-center items-center gap-2 border border-gray-200 rounded-xl">
@@ -201,12 +188,12 @@ customElements.define(
 			}
 			let startButton = ``
 			if (
-				this.user.id === participants[0].user.id &&
-				participants.length === this.tournament.numberOfPlayers
+				user.id === participants[0].user.id &&
+				participants.length === tournament.numberOfPlayers
 			)
 				startButton = /*html*/ `
 				<form action="/tournaments/start" method="post" class="contents">
-					<input type="hidden" name="tournamentId" value="${this.tournament.id}" />
+					<input type="hidden" name="tournamentId" value="${tournament.id}" />
 					<input type="submit" class="btn btn-border cursor-pointer" value="Start">
 				</form>
 				`
@@ -219,9 +206,9 @@ customElements.define(
 					${startButton}
 				</div>
 			`
-		}
-	},
-)
+		},
+	}
+})
 
 customElements.define(
 	'ft-tournament-ongoing',
@@ -289,6 +276,6 @@ customElements.define(
 					</a>
 			</div>
 			`
-		}
-	},
-)
+		},
+	}
+})
