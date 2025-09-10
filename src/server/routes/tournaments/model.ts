@@ -70,7 +70,8 @@ export async function tournamentCreate(
 	},
 ) {
 	const activeTournament = await getUserActiveTournament(data.createdBy)
-	if (activeTournament) throw server.httpErrors.forbidden(`Sorry, you're busy`)
+	if (activeTournament)
+		throw server.httpErrors.forbidden(`You are already in a tournament`)
 	return createTournament(data)
 }
 
@@ -96,7 +97,7 @@ export async function tournamentJoin(
 }> {
 	const activeTournament = await getUserActiveTournament(userId)
 	if (activeTournament && activeTournament.id !== tournamentId)
-		throw server.httpErrors.forbidden(`Sorry, you're busy`)
+		throw server.httpErrors.forbidden(`You are already in a tournament`)
 	const tournament = await tournamentGet(tournamentId)
 	const participantInTournament = tournament.participants.find(
 		({ user }) => user.id === userId,

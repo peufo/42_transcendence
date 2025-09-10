@@ -5,7 +5,13 @@ import { socketChannel } from '../socketChannel.js'
 import { getAvatarSrc } from '../utils/avatar.js'
 import { setMatch } from '../utils/match.js'
 import { type CleanEffect, createEffect } from '../utils/signal.js'
-import { $participants, $stages, $tournament, $user } from '../utils/store.js'
+import {
+	$match,
+	$participants,
+	$stages,
+	$tournament,
+	$user,
+} from '../utils/store.js'
 
 customElements.define(
 	'ft-page-tournament-play',
@@ -204,46 +210,38 @@ customElements.define(
 customElements.define(
 	'ft-tournament-ongoing',
 	class extends HTMLElement {
+		pongRemoteDiv: HTMLDivElement | null
+		private cleanEffect: CleanEffect
+
 		connectedCallback() {
-			console.log('RENDER TOURNAMENT ONGOING')
-			this.innerHTML = this.render()
-			// window.addEventListener('beforeunload', () => {
-			// 	(e: BeforeUnloadEvent) => {
-			// 		e.preventDefault()
-			// 	}
-			// })
+			this.innerHTML = /*html*/ `
+				<div class="grid grid-cols-4 gap-4 p-4 min-w-[1360px]">
+					<ft-bracket></ft-bracket>
+					<div id="pong-remote-div" class="col-span-3"></div>
+				</div>
+			`
+			this.pongRemoteDiv =
+				this.querySelector<HTMLDivElement>('#pong-remote-div')
+			this.cleanEffect = createEffect(() => {
+				console.log('RENDER TOURNAMENT ONGOING')
+				const match = $match.get()
+				if (!this.pongRemoteDiv) return
+				if (match)
+					this.pongRemoteDiv.innerHTML = '<ft-pong-remote></ft-pong-remote>'
+				else this.pongRemoteDiv.innerHTML = ''
+			})
 		}
 
-		// disconnectedCallback(){
-		// 	window.removeEventListener('beforeunload', () => {
-		// 		(e: BeforeUnloadEvent) => {
-		// 			e.preventDefault()
-		// 		}
-		// 	})
-		// }
+		disconnectedCallback() {
+			this.cleanEffect()
+		}
 
-		render(): string {
-			// window.onbeforeunload = (e) => {
-			// 	if (e){
-			// 		e.preventDefault()
-			// 		e.returnValue = '';
-			// 	}
-			// };
+		render() {
 			// TODO: set matchID
 			// const stages=$stages.get()
 			// const myMatch: MatchBasic | undefined =
 			// getMyAwaitingMatchFromStages(stages)
 			// setMatch(myMatch)
-
-			return /*html*/ `
-				<div class="grid grid-cols-4 gap-4 p-4 min-w-[1360px]">
-					<ft-bracket></ft-bracket>
-					<div class="col-span-3">
-							<ft-pong-remote></ft-pong-remote>
-						</div>
-					</div>
-				</div>
-			`
 		}
 	},
 )

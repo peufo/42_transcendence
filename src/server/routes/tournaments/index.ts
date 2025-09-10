@@ -111,6 +111,7 @@ export const tournamentsRoute: FastifyPluginCallbackZod = (
 			await tournamentQuit(tournamentId, userId)
 			const user = await getUserBasic(userId)
 			await notifyFriends(userId, 'onTournamentQuit', { userId: userId })
+			// TODO: if ongoing, surrender
 			notify.tournaments(tournamentId, 'onParticipantQuit', { user })
 			if (await isTournamentEmptyAndOpen(tournamentId))
 				await tournamentDelete(tournamentId)

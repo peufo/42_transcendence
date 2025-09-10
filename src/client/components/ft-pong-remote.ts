@@ -105,13 +105,6 @@ customElements.define(
 							toast.success('Game start')
 						}
 					},
-					onSurrender: (data) => {
-						this.scores = {
-							p1: data.player1Score,
-							p2: data.player2Score,
-						}
-						toast.error('a player surrendered')
-					},
 				},
 			)
 

@@ -130,7 +130,6 @@ export type SocketChannels = {
 		}
 		serverEvents: {
 			onEngineEvent: EngineEventData
-			onSurrender: MatchBasic
 		}
 		serverPayload: {
 			engine: Engine
