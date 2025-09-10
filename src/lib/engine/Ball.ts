@@ -111,6 +111,7 @@ export class Ball {
 				x: this.position.x,
 				y: this.position.y + BALL_BASE_SIZE / 2,
 			}
+			return true
 		}
 		if (this.#isCollidingWithPaddle(paddles.p2)) {
 			this.#position.x = paddles.p2.position.x - BALL_BASE_SIZE

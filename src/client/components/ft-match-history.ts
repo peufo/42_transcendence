@@ -20,7 +20,13 @@ customElements.define(
 			)
 			createEffect(() => {
 				const matches = $matches.get()
-				const matchesHead = matches.slice(0, 5)
+				const matchesHead = matches
+					.sort((prev, curr) => {
+						if (!prev.finishedAt || !curr.finishedAt) return 0
+						return curr.finishedAt.getTime() - prev.finishedAt.getTime()
+					})
+					.slice(0, 5)
+
 				this.innerHTML = this.renderContent(matchesHead)
 				addModalEvent(matchesHead)
 			})
@@ -138,10 +144,11 @@ customElements.define(
 
 function scoringGraph(match: Match, user: UserWithTournament): string {
 	const ralliesPerRound = match.rounds.map((r) => r.rallyCount)
+	console.log(ralliesPerRound)
 	const maxRallies = Math.max(...ralliesPerRound, 1)
 	const html = /*html*/ `
-	<div class="flex flex-col justify-center items-center">
-		<div class="grid grid-cols-[2fr_10fr] grid-rows-[12fr_1fr]">
+	<div class="flex flex-col justify-center items-center h-max-[100px]">
+		<div class="grid grid-cols-[2fr_10fr] grid-rows-[6fr_1fr]">
 			<div class="h-[100%] pr-2">
 				<div class="flex flex-col justify-evenly items-center h-[100%] pr-2">
 					<div class="flex flex-col justify-center items-center">
@@ -154,7 +161,7 @@ function scoringGraph(match: Match, user: UserWithTournament): string {
 					</div>
 				</div>
 			</div>
-				<div class="flex justify-between items-end w-full">
+				<div class="flex justify-between items-end">
 				 ${ralliesPerRound
 						.map((rallies) => {
 							const heightPercent = (rallies / maxRallies) * 100
