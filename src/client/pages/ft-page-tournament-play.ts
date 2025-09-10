@@ -276,6 +276,13 @@ customElements.define(
 			</div>
 			`
 		},
+		onRender(element) {
+			pongRemoteDiv = element.querySelector<HTMLDivElement>('#pong-remote-div')
+			const match = $match.get()
+			if (!pongRemoteDiv) return
+			if (match) pongRemoteDiv.innerHTML = '<ft-pong-remote></ft-pong-remote>'
+			else pongRemoteDiv.innerHTML = ''
+		},
 	}
 })
 

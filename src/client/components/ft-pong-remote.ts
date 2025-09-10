@@ -115,7 +115,6 @@ defineComponent('ft-pong-remote', () => {
 	}
 
 	function handle(element: HTMLElement) {
-		// TODO: make responsive
 		element.classList.add('flex', 'justify-center')
 		const user = $user.get()
 		const match = $match.get()
@@ -162,7 +161,6 @@ defineComponent('ft-pong-remote', () => {
 							toast.success('Game start')
 						}
 					}
-					,
 				},
 			},
 		)
