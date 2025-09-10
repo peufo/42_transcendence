@@ -19,6 +19,7 @@ type Setter<T> = (newValue: T) => void
 type Updater<T> = (updater: (value: T) => T) => void
 
 // TODO: is only refreshing the last subscribed ?
+// TODO: fix recursion
 
 export function createSignal<T>(initialValue: T): Signal<T> {
 	const subscribes: SubscribeMap = new Set()
@@ -48,7 +49,7 @@ export function createSignal<T>(initialValue: T): Signal<T> {
 		effect.signals.push(signal)
 		subscribes.add(effect)
 		// console.log('SUBSCRIBE COUNT: ', subscribes.size)
-		console.log({ subscribes })
+		console.log(subscribes)
 		return value
 	}
 

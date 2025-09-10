@@ -138,7 +138,6 @@ defineComponent('ft-pong-remote', () => {
 			{ matchId: match.id.toString() },
 			{
 				onEngineEvent: (data) => {
-					console.log(data)
 					if (data.onTimerTick !== undefined) {
 						if (data.onTimerTick === 0) {
 							animationFrameId = requestAnimationFrame(renderFrame)

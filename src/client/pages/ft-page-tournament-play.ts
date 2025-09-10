@@ -127,6 +127,7 @@ defineComponent('ft-tournament-open', () => {
 			if (!tournament) return /*html*/ `<span>Tournament not found</span>`
 			if (!user) return ''
 			const participants = $participants.get()
+			if (!participants.length) return ''
 			participants.sort(
 				(prev, curr) =>
 					new Date(prev.joinedAt).getTime() - new Date(curr.joinedAt).getTime(),
@@ -140,7 +141,7 @@ defineComponent('ft-tournament-open', () => {
 			const participationForm = /*html*/ `
 				<form action="/tournaments/${action}" method="post" class="contents">
 					<input type="hidden" name="tournamentId" value="${tournament.id}" />
-					<input type="submit" value="${buttonText}" class="btn btn-border cursor-pointer">
+					<input type="submit" value="${buttonText}" class="btn btn-${buttonText === 'Quit' ? 'border' : 'primary'} cursor-pointer">
 				</form>
 			`
 
