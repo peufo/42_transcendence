@@ -3,8 +3,8 @@ import { type CleanEffect, createEffect } from './signal.js'
 export function defineComponent(
 	name: string,
 	getComponent: () => {
-		onMount?: (element: HTMLElement) => void
-		onRender?: (element: HTMLElement) => void
+		onLoad?: (element: HTMLElement) => void
+		postRender?: (element: HTMLElement) => void
 		onDestroy?: (element: HTMLElement) => void
 		render?: () => string
 	},
@@ -16,12 +16,10 @@ export function defineComponent(
 			private component = getComponent()
 
 			connectedCallback() {
-				this.component.onMount?.(this)
+				this.component.onLoad?.(this)
 				this.cleanEffect = createEffect(() => {
-					if (this.component.render) {
-						this.innerHTML = this.component.render()
-					}
-					this.component.onRender?.(this)
+					if (this.component.render) this.innerHTML = this.component.render()
+					this.component.postRender?.(this)
 				})
 			}
 			disconnectedCallback() {

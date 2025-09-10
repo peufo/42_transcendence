@@ -18,6 +18,8 @@ type Getter<T> = (subscribe?: boolean) => T
 type Setter<T> = (newValue: T) => void
 type Updater<T> = (updater: (value: T) => T) => void
 
+// TODO: is only refreshing the last subscribed ?
+
 export function createSignal<T>(initialValue: T): Signal<T> {
 	const subscribes: SubscribeMap = new Set()
 	let value = initialValue

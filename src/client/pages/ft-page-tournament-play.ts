@@ -34,8 +34,8 @@ defineComponent('ft-page-tournament-play', () => {
 	let tournamentChannel: ChannelSocket<'tournaments'>
 
 	return {
-		onMount() {
-			console.log('TOURNAMENT PLAY MOUNT')
+		onLoad() {
+			console.log('TOURNAMENT PLAY LOAD')
 			const tournamentId =
 				new URLSearchParams(document.location.search).get('tournamentId') || ''
 
@@ -78,8 +78,8 @@ defineComponent('ft-page-tournament-play', () => {
 						})
 					},
 					onMatchChange({ match }) {
-						const userId = $user.get(false)?.id
 						console.log('onMatchChange')
+						const userId = $user.get(false)?.id
 						$stages.update((stages) => {
 							const m = stages.flat().find((m) => m.id === match.id)
 							if (!m) return stages
@@ -98,10 +98,6 @@ defineComponent('ft-page-tournament-play', () => {
 				},
 			)
 		},
-		onRender(element) {
-			const lab = element.querySelector('#lab')
-			lab?.append(...buttonsLab)
-		},
 		onDestroy() {
 			tournamentChannel.close()
 		},
@@ -112,13 +108,17 @@ defineComponent('ft-page-tournament-play', () => {
 			return `<h1 class="p-2 flex font-bold item-center justify-center">${tournament.createdByUser.name}'s tournament</h1>
 			<ft-tournament-${tournament.state}></ft-tournament-${tournament.state}>`
 		},
+		postRender(element) {
+			const lab = element.querySelector('#lab')
+			lab?.append(...buttonsLab)
+		},
 	}
 })
 
 defineComponent('ft-tournament-open', () => {
 	return {
-		onMount() {
-			console.log('TOURNAMENT OPEN MOUNT')
+		onLoad() {
+			console.log('TOURNAMENT OPEN LOAD')
 		},
 		render() {
 			console.log('TOURNAMENT OPEN RENDER')
@@ -276,7 +276,7 @@ customElements.define(
 			</div>
 			`
 		},
-		onRender(element) {
+		postRender(element) {
 			pongRemoteDiv = element.querySelector<HTMLDivElement>('#pong-remote-div')
 			const match = $match.get()
 			if (!pongRemoteDiv) return
@@ -288,8 +288,8 @@ customElements.define(
 
 defineComponent('ft-tournament-finished', () => {
 	return {
-		onMount() {
-			console.log('TOURNAMENT FINISHED MOUNT')
+		onLoad() {
+			console.log('TOURNAMENT FINISHED LOAD')
 		},
 		render() {
 			console.log('TOURNAMENT FINISHED RENDER')

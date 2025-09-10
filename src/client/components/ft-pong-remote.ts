@@ -26,7 +26,7 @@ defineComponent('ft-pong-remote', () => {
 	let ctx: CanvasRenderingContext2D
 	let channel: ChannelSocket<'matches'>
 	const interpolate = useInterpolate()
-	const scores: Scores = {
+	let scores: Scores = {
 		p1: 0,
 		p2: 0,
 	}
@@ -115,10 +115,9 @@ defineComponent('ft-pong-remote', () => {
 	}
 
 	function handle(element: HTMLElement) {
-		element.classList.add('flex', 'justify-center')
-		const user = $user.get()
-		const match = $match.get()
-
+		console.log('POST RENDER PONG REMOTE')
+		user = $user.get()
+		match = $match.get()
 		if (!user) {
 			element.innerHTML = /*html*/ `
 					No user found
@@ -133,13 +132,13 @@ defineComponent('ft-pong-remote', () => {
 					`
 			return
 		}
-		console.log('RENDER PONG REMOTE', match.id)
 		initCanvas(element) // TODO: use babylon
 		channel = socketChannel(
 			'matches',
 			{ matchId: match.id.toString() },
 			{
 				onEngineEvent: (data) => {
+					console.log(data)
 					if (data.onTimerTick !== undefined) {
 						if (data.onTimerTick === 0) {
 							animationFrameId = requestAnimationFrame(renderFrame)
@@ -147,19 +146,19 @@ defineComponent('ft-pong-remote', () => {
 							renderTimer(data.onTimerTick)
 							cancelAnimationFrame(animationFrameId)
 						}
-						if (data.onTick) {
-							this.interpolate.updateState(data.onTick)
-						}
-						if (data.onRoundEnd) {
-							this.scores = data.onRoundEnd.scores
-						}
-						if (data.onGameEnd) {
-							this.scores = data.onGameEnd.finalRound.scores
-							toast.success('Game end')
-						}
-						if (data.onStart !== undefined) {
-							toast.success('Game start')
-						}
+					}
+					if (data.onTick) {
+						interpolate.updateState(data.onTick)
+					}
+					if (data.onRoundEnd) {
+						scores = data.onRoundEnd.scores
+					}
+					if (data.onGameEnd) {
+						scores = data.onGameEnd.finalRound.scores
+						toast.success('Game end')
+					}
+					if (data.onStart !== undefined) {
+						toast.success('Game start')
 					}
 				},
 			},
@@ -200,14 +199,12 @@ defineComponent('ft-pong-remote', () => {
 	}
 
 	return {
-		onRender(element) {
-			user = $user.get()
-			match = $match.get()
-			cleanHandle = handle(element)
-		},
 		onDestroy() {
 			cleanHandle?.()
 			channel?.close()
+		},
+		postRender(element) {
+			cleanHandle = handle(element)
 		},
 	}
 })

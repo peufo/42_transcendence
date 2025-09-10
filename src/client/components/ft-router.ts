@@ -10,6 +10,7 @@ import {
 	type RouteApiPost,
 	type RoutePage,
 } from '../routes.js'
+// import { defineComponent } from '../utils/component.js'
 import { type CleanEffect, createEffect } from '../utils/signal.js'
 import { $url, $user } from '../utils/store.js'
 import { slide, transitionIn, transitionOut } from '../utils/transition.js'
@@ -23,6 +24,67 @@ function goto(url: URL) {
 function onPopState() {
 	$url.set(new URL(document.location.href))
 }
+
+// defineComponent('ft-router', () => {
+// 	function getPage(pathname: string) {
+// 		const routePage = pathname as RoutePage
+// 		const layoutData: RouteApiGet[] = []
+// 		if (!PAGES[routePage]) {
+// 			return {
+// 				component: 'ft-page-404',
+// 				isPublic: true,
+// 				layoutData,
+// 				pageData: [],
+// 			}
+// 		}
+// 		const page = PAGES[routePage] as PageOption
+// 		for (const [path, options] of Object.entries(PAGES)) {
+// 			if ('layoutData' in options && pathname.startsWith(path)) {
+// 				layoutData.push(...options.layoutData)
+// 			}
+// 		}
+// 		return { ...page, layoutData, pageData: page.pageData || [] }
+// 	}
+
+// 	return {
+// 		onLoad() {
+// 			console.log('ROUTER LOAD')
+// 			document.addEventListener('submit', onSubmitForm)
+// 			document.addEventListener('click', onClickLink)
+// 			window.addEventListener('popstate', onPopState)
+// 		},
+// 		render() {
+// 			console.log('ROUTER RENDER')
+// 			console.log('ROUTER GET URL')
+// 			const url = $url.get()
+// 			const page = getPage(url.pathname)
+
+// 			Promise.all(
+// 				page.layoutData.map((route) => api.get(route, url.search.slice(1))),
+// 			).then(() => {
+// 				console.log('ROUTER GET USER')
+// 				const user = $user.get()
+
+// 				if (!page.isPublic && !user) {
+// 					return goto(
+// 						new URL(`/login?redirectTo=${url.pathname}`, document.baseURI),
+// 					)
+// 				}
+// 				if (page.isPublic === 'only' && user) {
+// 					return goto(new URL(`/me`, document.baseURI))
+// 				}
+
+// 				Promise.all(
+// 					page.pageData.map((route) => api.get(route, url.search.slice(1))),
+// 				).then(() => {
+// 					this.innerHTML = /*html*/ `
+// 						<${page.component}></${page.component}>
+// 					`
+// 				})
+// 			})
+// 		},
+// 	}
+// })
 
 customElements.define(
 	'ft-router',
@@ -44,7 +106,7 @@ customElements.define(
 					page.layoutData.map((route) => api.get(route, url.search.slice(1))),
 				).then(() => {
 					console.log('ROUTER GET USER')
-					const user = $user.get(false)
+					const user = $user.get()
 
 					if (!page.isPublic && !user) {
 						return goto(

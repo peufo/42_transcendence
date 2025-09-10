@@ -19,7 +19,7 @@ defineComponent('ft-page-lab', () => {
 	})
 
 	return {
-		onRender(element) {
+		postRender(element) {
 			console.log('LABO CONNECTED')
 			element.prepend(...buttons)
 		},
@@ -42,7 +42,7 @@ defineComponent('ft-prout', () => {
 	let renderCount = 0
 
 	return {
-		onMount() {
+		onLoad() {
 			console.log('PROUT CONNECTED')
 		},
 		onDestroy() {
@@ -71,7 +71,7 @@ defineComponent('ft-pipi', () => {
 	let renderCount = 0
 
 	return {
-		onMount() {
+		onLoad() {
 			console.log('PIPI CONNECTED')
 		},
 		onDestroy() {
