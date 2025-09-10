@@ -113,7 +113,7 @@ export type SocketChannels = {
 			onParticipantQuit: { user: UserBasic }
 			onStart: { stages: Match[][] }
 			onMatchChange: { match: MatchBasic }
-			onEnd: null
+			onEnd: boolean
 		}
 		serverPayload: {
 			users: Set<number>

@@ -249,20 +249,20 @@ function detailedMatch(match: Match, user: UserWithTournament): string {
 				if (round.scorer === 'p1') {
 					player1Score++
 					html += /*html*/ `
-						<div class="text-indigo-600 text-center">
-							You
+						<div class="text-red-400 text-center">
+							${match.player1.name}
 						</div>
-						<div class="text-indigo-600 text-center">
+						<div class="text-red-400 text-center">
 							${player1Score} - ${player2Score}
 						</div>
 						`
 				} else {
 					player2Score++
 					html += /*html*/ `
-						<div class="text-red-400 text-center">
-							${match.player2.name}
+						<div class="text-indigo-600 text-center">
+							You
 						</div>
-						<div class="text-red-400 text-center">
+						<div class="text-indigo-600 text-center">
 							${player1Score} - ${player2Score}
 						</div>
 						`

@@ -1,3 +1,5 @@
+const cache: Record<string, Promise<string>> = {}
+
 customElements.define(
 	'ft-icon',
 	class extends HTMLElement {
@@ -14,11 +16,19 @@ customElements.define(
 
 		async render() {
 			const iconUrl = `/public/icons/${this.getAttribute('name') || 'file-x'}.svg`
-			const res = await fetch(iconUrl)
-			if (!res.ok) {
-				return
+			if (!cache[iconUrl]) {
+				cache[iconUrl] = fetch(iconUrl)
+					.then((res) => {
+						if (!res.ok) throw new Error(`Failed to load ${iconUrl}`)
+						return res.text()
+					})
+					.catch((err) => {
+						console.error(err)
+						return ''
+					})
 			}
-			const iconSVG = await res.text()
+			const iconSVG = await cache[iconUrl]
+			if (!iconSVG) return
 			this.innerHTML = iconSVG
 			if (this.svgClass) {
 				const svg = this.querySelector('svg')

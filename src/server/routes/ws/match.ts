@@ -2,7 +2,10 @@ import { eq, sql } from 'drizzle-orm'
 import { Engine, type RoundData } from '../../../lib/engine/index.js'
 import { db, matches, rounds, users } from '../../db/index.js'
 import type { DB } from '../../types.js'
-import { tournamentGetStages } from '../tournaments/model.js'
+import {
+	tournamentGetStages,
+	tournamentUpdateState,
+} from '../tournaments/model.js'
 import { deleteEmitter, notify } from './controller.js'
 
 export function createMatchEngine(match: DB.Match): Engine {
@@ -58,9 +61,10 @@ export async function handleTournamentGameEnd(
 	if (matchStageIndex === -1) throw new Error('matchStage not found')
 	const isTournamentEnd = matchStageIndex + 1 === stages.length
 	if (isTournamentEnd) {
-		// Close tournament socket ?
-		// tournament state finished
-		notify.tournaments(match.tournamentId, 'onEnd', null)
+		// TODO: Close tournament socket ?
+		// remove all participants ?
+		await tournamentUpdateState(match.tournamentId, 'finished')
+		notify.tournaments(match.tournamentId, 'onEnd', true)
 		return
 	}
 
@@ -81,7 +85,6 @@ export async function handleTournamentGameEnd(
 			player2Id: nextMatch.player1Id ? winnerId : null,
 		})
 		.where(eq(matches.id, nextMatch.id))
-
 	const updatedNextMatch = await db.query.matches.findFirst({
 		where: eq(matches.id, nextMatch.id),
 		with: {

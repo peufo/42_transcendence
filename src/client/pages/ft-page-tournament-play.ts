@@ -77,7 +77,7 @@ customElements.define(
 					},
 					onEnd: () => {
 						console.log('onEnd')
-						toast.success('Tournament terminated')
+						toast.success('Tournament finished')
 						$tournament.update((t) => (!t ? t : { ...t, state: 'finished' }))
 					},
 				},
@@ -93,9 +93,8 @@ customElements.define(
 			console.log('RENDER TOURNAMENT PAGE')
 			const tournament = $tournament.get()
 			if (!tournament) return /*html*/ `<span>Tournament not found</span>`
-			if (tournament.state === 'finished')
-				return `<span>${tournament.createdByUser.name}'s tournament is over</span>`
-			return `<ft-tournament-${tournament.state}></ft-tournament-${tournament.state}>`
+			return `<h1 class="p-2 flex font-bold item-center justify-center">${tournament.createdByUser.name}'s tournament</h1>
+			<ft-tournament-${tournament.state}></ft-tournament-${tournament.state}>`
 		}
 	},
 )
@@ -137,10 +136,6 @@ customElements.define(
 					<input type="hidden" name="tournamentId" value="${this.tournament.id}" />
 					<input type="submit" value="${buttonText}" class="btn btn-border cursor-pointer">
 				</form>
-			`
-
-			const title = /*html*/ `
-			<h1 class="p-2 flex font-bold item-center justify-center">${this.tournament.createdByUser.name}'s tournament</h1>
 			`
 
 			const participantsCountColor =
@@ -196,7 +191,6 @@ customElements.define(
 
 			return /*html*/ `
 				<div class="flex flex-col gap-3 mt-10 sm:mx-auto sm:max-w-lg mx-4">
-					${title}
 					${participantsCount}
 					${participantList()}
 					${participationForm}
@@ -249,6 +243,46 @@ customElements.define(
 						</div>
 					</div>
 				</div>
+			`
+		}
+	},
+)
+
+customElements.define(
+	'ft-tournament-finished',
+	class extends HTMLElement {
+		private user = $user.get()
+
+		connectedCallback() {
+			console.log('RENDER TOURNAMENT FINISHED')
+			this.innerHTML = this.render()
+		}
+
+		render(): string {
+			const stages = $stages.get()
+			const final = stages[stages.length - 1][0]
+			if (!this.user) return 'No user'
+			const IWin =
+				(this.user.id === final.player1Id &&
+					final.player1Score > final.player2Score) ||
+				(this.user.id === final.player2Id &&
+					final.player2Score > final.player1Score)
+			const color = IWin ? 'text-indigo-600 animate-bounce' : 'text-black'
+			return /*html*/ `
+			<div class="flex flex-col justify-center items-center gap-10">
+				<div class="flex flex-col justify-center items-center gap-10">
+					<div>
+						<ft-icon name="trophy" class="h-50 w-50 stroke-yellow-500"></ft-icon>
+					</div>
+					<div class="font-bold text-2xl">And the winner is ...</div>
+					<div class="font-bold text-4xl ${color}">${final.player1Score > final.player2Score ? final.player1?.name : final.player2?.name} !</div>
+				</div>
+				<ft-bracket></ft-bracket>
+				<a href="/me" class="btn btn-border flex shrink-0 flex-nowrap">
+						<ft-icon name="home"></ft-icon>
+						<span>Exit</span>
+					</a>
+			</div>
 			`
 		}
 	},

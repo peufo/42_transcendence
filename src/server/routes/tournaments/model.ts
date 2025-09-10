@@ -122,7 +122,7 @@ export async function tournamentJoin(
 	}
 }
 
-function tournamentUpdateState(
+export function tournamentUpdateState(
 	tournamentId: number,
 	newState: Tournament['state'],
 ) {

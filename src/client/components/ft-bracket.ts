@@ -104,11 +104,10 @@ customElements.define(
 
 			return /*html*/ `
 				<aside class="flex flex-col gap-4">
-					<h2 class="text-lg font-semi px-2">${this.tournament?.createdByUser.name}'s tournament</h2>
 					<div class="overflow-x-scroll rounded-md border border-gray-200 snap-x snap-mandatory">
 						${renderStages()}
 					</div>
-					${iParticipate ? quitButton : ''}
+					${iParticipate && this.tournament.state !== 'finished' ? quitButton : ''}
 				</aside>
             `
 		}
