@@ -105,7 +105,11 @@ defineComponent('ft-page-tournament-play', () => {
 			console.log('TOURNAMENT PLAY RENDER')
 			const tournament = $tournament.get()
 			if (!tournament) return /*html*/ `<span>Tournament not found</span>`
-			return `<h1 class="p-2 flex font-bold item-center justify-center">${tournament.createdByUser.name}'s tournament</h1>
+
+			const lab = /*html*/ `<div class="flex gap-2" id="lab"></div>`
+
+			return `${lab}
+			<h1 class="p-2 flex font-bold item-center justify-center">${tournament.createdByUser.name}'s tournament</h1>
 			<ft-tournament-${tournament.state}></ft-tournament-${tournament.state}>`
 		},
 		postRender(element) {
@@ -210,71 +214,26 @@ defineComponent('ft-tournament-open', () => {
 	}
 })
 
-customElements.define(
-	'ft-tournament-ongoing',
-	class extends HTMLElement {
-		pongRemoteDiv: HTMLDivElement | null
-		private cleanEffect: CleanEffect
+defineComponent('ft-tournament-ongoing', () => {
+	let pongRemoteDiv: HTMLDivElement | null
 
-		connectedCallback() {
-			this.innerHTML = /*html*/ `
+	return {
+		onLoad() {
+			console.log('TOURNAMENT ONGOING LOAD')
+		},
+		render() {
+			console.log('TOURNAMENT ONGOING RENDER')
+			const user = $user.get(false)
+			if (!user) return 'pipi'
+			const stages = $stages.get(false)
+			const myMatch = getAwaitingMatchFromStages(user.id, stages)
+			setMatch(myMatch)
+
+			return /*html*/ `
 				<div class="grid grid-cols-4 gap-4 p-4 min-w-[1360px]">
 					<ft-bracket></ft-bracket>
 					<div id="pong-remote-div" class="col-span-3"></div>
 				</div>
-			`
-			this.pongRemoteDiv =
-				this.querySelector<HTMLDivElement>('#pong-remote-div')
-			this.cleanEffect = createEffect(() => {
-				console.log('RENDER TOURNAMENT ONGOING')
-				const match = $match.get()
-				if (!this.pongRemoteDiv) return
-				if (match)
-					this.pongRemoteDiv.innerHTML = '<ft-pong-remote></ft-pong-remote>'
-				else this.pongRemoteDiv.innerHTML = ''
-			})
-		}
-		disconnectedCallback() {
-			this.cleanEffect()
-		}
-	},
-)
-
-customElements.define(
-	'ft-tournament-finished',
-	class extends HTMLElement {
-		private user = $user.get()
-
-		connectedCallback() {
-			console.log('RENDER TOURNAMENT FINISHED')
-			this.innerHTML = this.render()
-		}
-
-		render(): string {
-			const stages = $stages.get()
-			const final = stages[stages.length - 1][0]
-			if (!this.user) return 'No user'
-			const IWin =
-				(this.user.id === final.player1Id &&
-					final.player1Score > final.player2Score) ||
-				(this.user.id === final.player2Id &&
-					final.player2Score > final.player1Score)
-			const color = IWin ? 'text-indigo-600 animate-bounce' : 'text-black'
-			return /*html*/ `
-			<div class="flex flex-col justify-center items-center gap-10">
-				<div class="flex flex-col justify-center items-center gap-10">
-					<div>
-						<ft-icon name="trophy" class="h-50 w-50 stroke-yellow-500"></ft-icon>
-					</div>
-					<div class="font-bold text-2xl">And the winner is ...</div>
-					<div class="font-bold text-4xl ${color}">${final.player1Score > final.player2Score ? final.player1?.name : final.player2?.name} !</div>
-				</div>
-				<ft-bracket></ft-bracket>
-				<a href="/me" class="btn btn-border flex shrink-0 flex-nowrap">
-						<ft-icon name="home"></ft-icon>
-						<span>Exit</span>
-					</a>
-			</div>
 			`
 		},
 		postRender(element) {
