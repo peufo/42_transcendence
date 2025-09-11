@@ -134,10 +134,15 @@ const leagues: League[] = [
 ] as const
 
 function getLeagueHtml(usersStats: UserStats[], userRank: number): string {
-	const percentage = (userRank / usersStats.length) * 100
-	const league =
-		leagues.find(({ threshold }) => percentage < threshold) ||
-		leagues[leagues.length - 1]
+	let league: League = leagues[leagues.length - 1]
+	if (usersStats.length <= leagues.length)
+		league = leagues[leagues.length - userRank]
+	else {
+		const percentage = (userRank / usersStats.length) * 100
+		league =
+			leagues.find(({ threshold }) => percentage < threshold) ||
+			leagues[leagues.length - 1]
+	}
 	const leagueDiv = getLeagueDiv(league)
 	return leagueDiv
 }

@@ -45,7 +45,7 @@ async function main() {
 				isInTournament: f.default({ defaultValue: 0 }),
 				isOAuth2: f.default({ defaultValue: false }),
 			},
-			count: 20,
+			count: 500,
 		},
 	}))
 
