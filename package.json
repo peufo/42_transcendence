@@ -8,6 +8,7 @@
 	"license": "ISC",
 	"packageManager": "pnpm@10.11.0",
 	"scripts": {
+		"prestart": "drizzle-kit migrate",
 		"start": "node ./build/server/main.js",
 		"cli": "node ./build/cli/main.js",
 		"build": "rm -rf build && run-s build:*",
