@@ -53,10 +53,13 @@ const oauth2Options = {
 export const server = fastify({
 	logger,
 	bodyLimit: BODY_SIZE_LIMIT,
-	https: {
-		key: fs.readFileSync('/ssl.key'),
-		cert: fs.readFileSync('/ssl.cert'),
-	},
+	https:
+		env.FILE_CERT && env.FILE_KEY
+			? {
+					key: fs.readFileSync(env.FILE_KEY),
+					cert: fs.readFileSync(env.FILE_CERT),
+				}
+			: null,
 })
 
 export function startServer() {
@@ -77,7 +80,7 @@ export function startServer() {
 
 	server.register(fastifyStatic, {
 		root: path.resolve(env.MEDIA_DIR),
-		prefix: env.MEDIA_DIR,
+		prefix: '/upload',
 		decorateReply: false,
 	})
 

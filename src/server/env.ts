@@ -9,6 +9,11 @@ if (!process.env.GOOGLE_CLIENT_ID)
 	throw new Error('GOOGLE_CLIENT_ID environment value is required')
 if (!process.env.GOOGLE_SECRET)
 	throw new Error('GOOGLE_SECRET environment value is required')
+if (!process.env.FILE_CERT || !process.env.FILE_KEY) {
+	console.warn(
+		'Warning, you need set FILE_CERT and FILE_KEY environment value for use https !',
+	)
+}
 
 export const env = {
 	PORT: +(process.env.PORT || 8000),
@@ -19,4 +24,6 @@ export const env = {
 	dev: process.env.NODE_ENV === 'development',
 	GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
 	GOOGLE_SECRET: process.env.GOOGLE_SECRET,
+	FILE_CERT: process.env.FILE_CERT,
+	FILE_KEY: process.env.FILE_KEY,
 } as const

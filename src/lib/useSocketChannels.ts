@@ -17,7 +17,7 @@ export type ChannelSocket<Channel extends keyof SocketChannels> = {
 }
 
 export function useSocketChannel(
-	host: string,
+	origin: string,
 	createWebSocket = (url: string) => new WebSocket(url),
 ) {
 	return function socketChannel<Channel extends keyof SocketChannels>(
@@ -30,7 +30,9 @@ export function useSocketChannel(
 		},
 	): ChannelSocket<Channel> {
 		const searchParams = new URLSearchParams(Object.entries(query || {}))
-		const url = `wss://${host}/ws/${channel}?${searchParams.toString()}`
+		const [protocol, host] = origin.split('//')
+		const wsProtocol = protocol.startsWith('https') ? 'wss' : 'ws'
+		const url = `${wsProtocol}://${host}/ws/${channel}?${searchParams.toString()}`
 		function onMessage(event: { data: RawData }) {
 			const data: ServerEvents<Channel> = JSON.parse(event.data.toString())
 			deserialize(data)
