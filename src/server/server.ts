@@ -1,3 +1,4 @@
+import fs from 'node:fs'
 import path from 'node:path'
 import fastifyCookie from '@fastify/cookie'
 import fastifyFormbody from '@fastify/formbody'
@@ -11,7 +12,6 @@ import {
 	serializerCompiler,
 	validatorCompiler,
 } from 'fastify-type-provider-zod'
-import fs from 'fs'
 import type { LoggerOptions } from 'pino'
 import { BODY_SIZE_LIMIT } from '../lib/constants.js'
 import { env } from './env.js'

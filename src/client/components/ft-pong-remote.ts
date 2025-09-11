@@ -1,118 +1,18 @@
-import {
-	ARENA_HEIGHT,
-	ARENA_WIDTH,
-	BALL_BASE_SIZE,
-	type Move,
-	PADDLE_BASE_HEIGHT,
-	PADDLE_BASE_P1_POSITION,
-	PADDLE_BASE_P2_POSITION,
-	PADDLE_BASE_WIDTH,
-	type Player,
-	type Scores,
-} from '../../lib/engine/index.js'
-import { useInterpolate } from '../../lib/interpolate.js'
+import type { Move, Player } from '../../lib/engine/index.js'
 import type { Match, UserWithTournament } from '../../lib/type.js'
 import type { ChannelSocket } from '../../lib/useSocketChannels.js'
 import { socketChannel } from '../socketChannel.js'
 import { defineComponent } from '../utils/component.js'
+import { type Renderer, renderer2D } from '../utils/renderer.js'
 import { $match, $user } from '../utils/store.js'
 import { toast } from './ft-toast.js'
 
 defineComponent('ft-pong-remote', () => {
-	let animationFrameId = 0
 	let user: UserWithTournament | undefined
 	let match: Match | undefined
-	let canvas: HTMLCanvasElement
-	let ctx: CanvasRenderingContext2D
 	let channel: ChannelSocket<'matches'>
-	const interpolate = useInterpolate()
-	let scores: Scores = {
-		p1: 0,
-		p2: 0,
-	}
 	let cleanHandle: (() => void) | undefined
-
-	function initCanvas(element: HTMLElement) {
-		if (!canvas) {
-			canvas = document.createElement('canvas')
-			canvas.setAttribute('width', ARENA_WIDTH.toString())
-			canvas.setAttribute('height', ARENA_HEIGHT.toString())
-			canvas.classList.add('border')
-			element.appendChild(canvas)
-			const newCtx = canvas.getContext('2d')
-			if (!newCtx) throw new Error('Canvas context failed')
-			ctx = newCtx
-			ctx.textAlign = 'center'
-		}
-		renderWaitingFrame()
-	}
-
-	function renderWaitingFrame() {
-		ctx.clearRect(0, 0, ARENA_WIDTH, ARENA_HEIGHT)
-		const fontSize = 50
-		ctx.font = `${fontSize}px sans-serif`
-		ctx.fillText(
-			'Waiting on player',
-			ARENA_WIDTH / 2 + fontSize / 2,
-			ARENA_HEIGHT / 2,
-		)
-	}
-
-	function renderTimer(timer: number) {
-		ctx.clearRect(0, 0, ARENA_WIDTH, ARENA_HEIGHT)
-		const fontSize = 50
-		ctx.font = `${fontSize}px sans-serif`
-		ctx.fillText(
-			timer.toString(),
-			ARENA_WIDTH / 2 + fontSize / 2,
-			ARENA_HEIGHT / 2,
-		)
-	}
-
-	function renderFrame() {
-		ctx.clearRect(0, 0, ARENA_WIDTH, ARENA_HEIGHT)
-		const state = interpolate.getState()
-		// ball
-		ctx.beginPath()
-		ctx.rect(state.b.x, state.b.y, BALL_BASE_SIZE, BALL_BASE_SIZE)
-		ctx.fill()
-
-		// paddle
-		ctx.beginPath()
-		ctx.rect(
-			PADDLE_BASE_P1_POSITION.x,
-			state.p1,
-			PADDLE_BASE_WIDTH,
-			PADDLE_BASE_HEIGHT,
-		)
-		ctx.fill()
-		ctx.beginPath()
-		ctx.rect(
-			PADDLE_BASE_P2_POSITION.x,
-			state.p2,
-			PADDLE_BASE_WIDTH,
-			PADDLE_BASE_HEIGHT,
-		)
-		ctx.fill()
-
-		// scores
-		const fontSize = 40
-		ctx.font = `${fontSize}px sans-serif`
-		ctx.fillStyle = user?.id === match?.player1Id ? '#7f22fe' : '#ff2056'
-		ctx.fillText(
-			`${match?.player1?.name} : ${scores.p1}`,
-			ARENA_WIDTH / 2 - ARENA_WIDTH / 4,
-			fontSize,
-		)
-		ctx.fillStyle = user?.id === match?.player2Id ? '#7f22fe' : '#ff2056'
-		ctx.fillText(
-			`${match?.player2?.name} : ${scores.p2}`,
-			ARENA_WIDTH / 2 + ARENA_WIDTH / 4,
-			fontSize,
-		)
-		ctx.fillStyle = 'black'
-		animationFrameId = requestAnimationFrame(renderFrame)
-	}
+	let renderer: Renderer
 
 	function handle(element: HTMLElement) {
 		console.log('POST RENDER PONG REMOTE')
@@ -132,32 +32,30 @@ defineComponent('ft-pong-remote', () => {
 					`
 			return
 		}
-		initCanvas(element) // TODO: use babylon
 		channel = socketChannel(
 			'matches',
 			{ matchId: match.id.toString() },
 			{
 				onEngineEvent: (data) => {
 					if (data.onTimerTick !== undefined) {
-						if (data.onTimerTick === 0) {
-							animationFrameId = requestAnimationFrame(renderFrame)
-						} else {
-							renderTimer(data.onTimerTick)
-							cancelAnimationFrame(animationFrameId)
-						}
+						renderer.onTimerTick(data.onTimerTick)
 					}
-					if (data.onTick) {
-						interpolate.updateState(data.onTick)
+					if (data.onTick !== undefined) {
+						renderer.onTick(data.onTick)
 					}
-					if (data.onRoundEnd) {
-						scores = data.onRoundEnd.scores
+					if (data.onRoundEnd !== undefined) {
+						renderer.onRoundEnd(data.onRoundEnd)
 					}
-					if (data.onGameEnd) {
-						scores = data.onGameEnd.finalRound.scores
+					if (data.onGameEnd !== undefined) {
+						renderer.onGameEnd(data.onGameEnd)
 						toast.success('Game end')
 					}
-					if (data.onStart !== undefined) {
+					if (data.onEngineStart !== undefined) {
+						renderer.onEngineStart()
 						toast.success('Game start')
+					}
+					if (data.onCollision !== undefined) {
+						renderer.onCollision(data.onCollision)
 					}
 				},
 			},
@@ -198,6 +96,10 @@ defineComponent('ft-pong-remote', () => {
 	}
 
 	return {
+		onLoad(element) {
+			renderer = renderer2D(element)
+			renderer.setPlayerNames(user?.name)
+		},
 		onDestroy() {
 			cleanHandle?.()
 			channel?.close()

@@ -14,7 +14,7 @@ export type RoundData = {
 	rallyCount: number
 	ballPositionY: number
 }
-type GameOverData = {
+export type GameOverData = {
 	finalRound: RoundData
 	finishedAt: number
 }
@@ -42,7 +42,7 @@ export type EngineEventData = {
 	onGameEnd?: GameOverData
 	onCollision?: Collision
 	onTimerTick?: number
-	onStart?: null
+	onEngineStart?: null
 }
 
 export type EngineOptionsEvents = {
@@ -204,7 +204,7 @@ export class Engine {
 	}
 
 	start() {
-		this.onEvent({ onStart: null })
+		this.onEvent({ onEngineStart: null })
 		setTimeout(() => {
 			this.#newRound()
 		}, 1000)
