@@ -57,12 +57,8 @@ export const usersRoute: FastifyPluginCallbackZod = (
 		}
 
 		const user = permission.user(res)
-		const avatarPath = path.resolve(
-			`./${env.MEDIA_DIR}`,
-			'avatars',
-			`${user.id}.webp`,
-		)
-		await fs.mkdir(path.resolve(`./${env.MEDIA_DIR}`, 'avatars'), {
+		const avatarPath = path.resolve(env.MEDIA_DIR, 'avatars', `${user.id}.webp`)
+		await fs.mkdir(path.resolve(env.MEDIA_DIR, 'avatars'), {
 			recursive: true,
 		})
 		await sharp(await data.toBuffer())

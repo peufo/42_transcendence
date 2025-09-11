@@ -77,7 +77,7 @@ export function startServer() {
 
 	server.register(fastifyStatic, {
 		root: path.resolve(env.MEDIA_DIR),
-		prefix: `/${env.MEDIA_DIR}`,
+		prefix: env.MEDIA_DIR,
 		decorateReply: false,
 	})
 
