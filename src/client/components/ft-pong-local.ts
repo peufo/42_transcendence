@@ -42,8 +42,8 @@ defineComponent('ft-pong-local', () => {
 			renderer = renderer2D(element)
 			const urlParams = new URLSearchParams(window.location.search)
 			renderer.setPlayerNames({
-				p1: urlParams.get('player1'),
-				p2: urlParams.get('player2'),
+				p1: urlParams.get('player1') ?? undefined,
+				p2: urlParams.get('player2') ?? undefined,
 			})
 			const scoreToWin = urlParams.get('scoreToWin')
 			engine = new Engine({
