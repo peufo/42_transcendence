@@ -135,8 +135,7 @@ const leagues: League[] = [
 
 function getLeagueHtml(usersStats: UserStats[], userRank: number): string {
 	let league: League = leagues[leagues.length - 1]
-	if (usersStats.length <= leagues.length)
-		league = leagues[leagues.length - userRank]
+	if (usersStats.length <= leagues.length) league = leagues[userRank - 1]
 	else {
 		const percentage = (userRank / usersStats.length) * 100
 		league =
