@@ -7,11 +7,11 @@ import fastifySensible from '@fastify/sensible'
 import fastifyStatic from '@fastify/static'
 import fastifyWebsocket from '@fastify/websocket'
 import fastify from 'fastify'
-
 import {
 	serializerCompiler,
 	validatorCompiler,
 } from 'fastify-type-provider-zod'
+import fs from 'fs'
 import type { LoggerOptions } from 'pino'
 import { BODY_SIZE_LIMIT } from '../lib/constants.js'
 import { env } from './env.js'
@@ -37,7 +37,7 @@ const googleAuthConfig = {
 
 const oauth2Options = {
 	name: 'googleOAuth2',
-	scope: ['profile', 'email'],
+	scope: ['profile'],
 	credentials: {
 		client: {
 			id: env.GOOGLE_CLIENT_ID,
@@ -47,10 +47,17 @@ const oauth2Options = {
 	},
 	startRedirectPath: '/auth/oauth/google',
 	// TODO: use the right URI
-	callbackUri: 'http://localhost:8000/auth/oauth/google/callback',
+	callbackUri: 'https://localhost:8000/auth/oauth/google/callback',
 }
 
-export const server = fastify({ logger, bodyLimit: BODY_SIZE_LIMIT })
+export const server = fastify({
+	logger,
+	bodyLimit: BODY_SIZE_LIMIT,
+	https: {
+		key: fs.readFileSync('/ssl.key'),
+		cert: fs.readFileSync('/ssl.cert'),
+	},
+})
 
 export function startServer() {
 	server.setValidatorCompiler(validatorCompiler)

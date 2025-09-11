@@ -30,8 +30,7 @@ export function useSocketChannel(
 		},
 	): ChannelSocket<Channel> {
 		const searchParams = new URLSearchParams(Object.entries(query || {}))
-		// TODO: wss
-		const url = `ws://${host}/ws/${channel}?${searchParams.toString()}`
+		const url = `wss://${host}/ws/${channel}?${searchParams.toString()}`
 		function onMessage(event: { data: RawData }) {
 			const data: ServerEvents<Channel> = JSON.parse(event.data.toString())
 			deserialize(data)

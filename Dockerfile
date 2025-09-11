@@ -2,6 +2,8 @@ FROM node:24-alpine3.22 AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
+RUN apk add --no-cache openssl
+RUN openssl req -x509 -newkey rsa:2048 -nodes -keyout ssl.key -out ssl.cert -sha256 -days 365 -subj "/C=CH/ST=Vaud/L=Lausanne/O=42/OU=Transcendance/CN=localhost"
 COPY . /app
 WORKDIR /app
 RUN corepack install

@@ -27,8 +27,7 @@ function useApi() {
 	): Promise<RoutesGet[Route]['res']['data']> {
 		const { host, sessionToken } = options
 		if (!host || !sessionToken) throw new Error('Login required')
-		// TODO: https
-		const url = new URL(route, `http://${host}`)
+		const url = new URL(route, `https://${host}`)
 		if (query) {
 			for (const [name, value] of Object.entries(query))
 				url.searchParams.append(name, value as string)
@@ -49,8 +48,7 @@ function useApi() {
 	): Promise<RoutesPost[Route]['res']> {
 		const { host, sessionToken } = options
 		if (!host || !sessionToken) throw new Error('Login required')
-		// TODO: https
-		const url = new URL(route, `http://${host}`)
+		const url = new URL(route, `https://${host}`)
 		const res = await fetch(url, {
 			method: 'post',
 			headers: {
