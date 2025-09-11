@@ -6,7 +6,7 @@ import { db, matches } from '../../db/index.js'
 import { getSessionFromRequest } from '../auth/hooks.js'
 import { findTournament } from '../tournaments/tournamentDb.js'
 import { setUserIsActive } from '../users/model.js'
-import { bindEmitterWithSocket, notifyFriends } from './controller.js'
+import { bindEmitterWithSocket, notify, notifyFriends } from './controller.js'
 import { createMatchEngine } from './match.js'
 
 export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
@@ -80,6 +80,10 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 			const { matchId } = req.query
 			const match = await db.query.matches.findFirst({
 				where: eq(matches.id, matchId),
+				with: {
+					player1: true,
+					player2: true,
+				},
 			})
 			if (!match) {
 				socket.close(3000, 'Match not exist')
@@ -93,7 +97,6 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 			let player: Player | null = null
 			if (session.userId === match.player1Id) player = 'p1'
 			else if (session.userId === match.player2Id) player = 'p2'
-
 			if (!player) {
 				socket.close(3000, 'Only players can open this channel')
 				return
@@ -122,6 +125,10 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 							.where(eq(matches.id, matchId))
 							.then(() => {
 								match.state = 'ongoing'
+								notify.matches(matchId, 'playerNames', {
+									p1: match.player1?.name,
+									p2: match.player2?.name,
+								})
 								payload.engine.start()
 							})
 					}

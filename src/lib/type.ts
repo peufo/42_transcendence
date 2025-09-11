@@ -130,7 +130,7 @@ export type SocketChannels = {
 		}
 		serverEvents: {
 			onEngineEvent: EngineEventData
-			// TODO: player join for name
+			playerNames: Record<Player, string | undefined>
 		}
 		serverPayload: {
 			engine: Engine

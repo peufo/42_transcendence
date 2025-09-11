@@ -8,6 +8,7 @@ import {
 	PADDLE_BASE_P1_POSITION,
 	PADDLE_BASE_P2_POSITION,
 	PADDLE_BASE_WIDTH,
+	type Player,
 	type RoundData,
 	type Scores,
 	type State,
@@ -22,8 +23,7 @@ export type Renderer = {
 	onCollision: (data: Collision) => void
 	onTimerTick: (data: number) => void
 	onEngineStart: () => void
-	stop: () => void
-	setPlayerNames: (p1?: string | null, p2?: string | null) => void
+	setPlayerNames: (names: Record<Player, string | undefined>) => void
 }
 
 type Pok = { x: number; y: number; text: string; size: number; color: string }
@@ -35,8 +35,10 @@ export function renderer2D(element: HTMLElement): Renderer {
 		p1: 0,
 		p2: 0,
 	}
-	let player1Name: string = 'Player 1'
-	let player2Name: string = 'Player 2'
+	const playerNames = {
+		p1: 'Player 1',
+		p2: 'Player 2',
+	}
 	const user = $user.get(false)
 	const pokNoises: string[] = ['POK', 'PAK', 'PIK', 'PUK', 'PEK']
 	const pokColors: string[] = [
@@ -64,16 +66,15 @@ export function renderer2D(element: HTMLElement): Renderer {
 	ctx.textAlign = 'center'
 
 	renderWaitingFrame()
-	animationFrameId = requestAnimationFrame(renderFrame)
 
 	function renderWaitingFrame() {
 		ctx.clearRect(0, 0, ARENA_WIDTH, ARENA_HEIGHT)
 		const fontSize = 50
 		ctx.font = `${fontSize}px sans-serif`
 		ctx.fillText(
-			'Waiting on player',
+			'Waiting for game to start',
 			ARENA_WIDTH / 2 + fontSize / 2,
-			ARENA_HEIGHT / 2,
+			ARENA_HEIGHT / 2 - fontSize,
 		)
 	}
 
@@ -86,7 +87,7 @@ export function renderer2D(element: HTMLElement): Renderer {
 			ARENA_WIDTH / 2 + fontSize / 2,
 			ARENA_HEIGHT / 2 - fontSize * 2,
 		)
-		const winner = scores.p1 > scores.p2 ? player1Name : player2Name
+		const winner = scores.p1 > scores.p2 ? playerNames.p1 : playerNames.p2
 		ctx.fillText(
 			`${winner} won !`,
 			ARENA_WIDTH / 2 + fontSize / 2,
@@ -134,20 +135,19 @@ export function renderer2D(element: HTMLElement): Renderer {
 		// scores
 		const fontSize = 40
 		ctx.font = `${fontSize}px sans-serif`
-		ctx.fillStyle = user?.name === player1Name ? '#7f22fe' : '#ff2056'
+		ctx.fillStyle = user?.name === playerNames.p1 ? '#7f22fe' : '#ff2056'
 		ctx.fillText(
-			`${player1Name} : ${scores.p1}`,
+			`${playerNames.p1} : ${scores.p1}`,
 			ARENA_WIDTH / 2 - ARENA_WIDTH / 4,
 			fontSize,
 		)
-		ctx.fillStyle = user?.name === player2Name ? '#7f22fe' : '#ff2056'
+		ctx.fillStyle = user?.name === playerNames.p2 ? '#7f22fe' : '#ff2056'
 		ctx.fillText(
-			`${player2Name} : ${scores.p2}`,
+			`${playerNames.p2} : ${scores.p2}`,
 			ARENA_WIDTH / 2 + ARENA_WIDTH / 4,
 			fontSize,
 		)
 		ctx.fillStyle = 'black'
-		animationFrameId = requestAnimationFrame(renderFrame)
 
 		// poks
 		poks.forEach((pok) => {
@@ -156,21 +156,23 @@ export function renderer2D(element: HTMLElement): Renderer {
 			ctx.fillText(pok.text, pok.x, pok.y + fontSize / 2)
 		})
 		ctx.fillStyle = 'black'
+
+		animationFrameId = requestAnimationFrame(renderFrame)
 	}
 
 	return {
-		onTick(data: State) {
+		onTick(data) {
 			interpolate.updateState(data)
 		},
-		onRoundEnd(data: RoundData) {
+		onRoundEnd(data) {
 			scores = data.scores
 		},
-		onGameEnd(data: GameOverData) {
+		onGameEnd(data) {
 			scores = data.finalRound.scores
 			cancelAnimationFrame(animationFrameId)
 			renderGameOver()
 		},
-		onCollision(data: Collision) {
+		onCollision(data) {
 			const obj: Pok = {
 				...data,
 				text: pokNoises[Math.floor(Math.random() * pokNoises.length)],
@@ -182,7 +184,7 @@ export function renderer2D(element: HTMLElement): Renderer {
 				poks.shift()
 			}, 1500)
 		},
-		onTimerTick(data: number) {
+		onTimerTick(data) {
 			if (data === 0) {
 				animationFrameId = requestAnimationFrame(renderFrame)
 			} else {
@@ -190,13 +192,12 @@ export function renderer2D(element: HTMLElement): Renderer {
 				cancelAnimationFrame(animationFrameId)
 			}
 		},
-		onEngineStart() {},
-		stop() {
-			cancelAnimationFrame(animationFrameId)
+		onEngineStart() {
+			animationFrameId = requestAnimationFrame(renderFrame)
 		},
-		setPlayerNames(p1?: string | null, p2?: string | null) {
-			if (p1) player1Name = p1
-			if (p2) player2Name = p2
+		setPlayerNames(names) {
+			if (names.p1) playerNames.p1 = names.p1
+			if (names.p2) playerNames.p2 = names.p2
 		},
 	}
 }

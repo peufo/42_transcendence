@@ -1,5 +1,4 @@
 import type { Move, Player } from '../../lib/engine/index.js'
-import type { Match, UserWithTournament } from '../../lib/type.js'
 import type { ChannelSocket } from '../../lib/useSocketChannels.js'
 import { socketChannel } from '../socketChannel.js'
 import { defineComponent } from '../utils/component.js'
@@ -8,16 +7,47 @@ import { $match, $user } from '../utils/store.js'
 import { toast } from './ft-toast.js'
 
 defineComponent('ft-pong-remote', () => {
-	let user: UserWithTournament | undefined
-	let match: Match | undefined
 	let channel: ChannelSocket<'matches'>
-	let cleanHandle: (() => void) | undefined
+	let cleanInputs: (() => void) | undefined
 	let renderer: Renderer
+
+	function setupInputs(player: Player) {
+		const setInput = (move: Move, value: boolean) => {
+			channel.emit('onPlayerInput', { player, move, value })
+		}
+
+		const keyHandlers: Record<string, (value: boolean) => void> = {
+			w: (value) => setInput('up', value),
+			s: (value) => setInput('down', value),
+			ArrowUp: (value) => setInput('up', value),
+			ArrowDown: (value) => setInput('down', value),
+			a: (value) => setInput('up', value),
+			d: (value) => setInput('down', value),
+			ArrowLeft: (value) => setInput('up', value),
+			ArrowRight: (value) => setInput('down', value),
+		}
+
+		const onKeyDown = (event: KeyboardEvent) => {
+			keyHandlers[event.key]?.(true)
+		}
+		const onKeyUp = (event: KeyboardEvent) => {
+			keyHandlers[event.key]?.(false)
+		}
+
+		document.addEventListener('keydown', onKeyDown)
+		document.addEventListener('keyup', onKeyUp)
+
+		return () => {
+			document.removeEventListener('keydown', onKeyDown)
+			document.removeEventListener('keyup', onKeyUp)
+			return
+		}
+	}
 
 	function handle(element: HTMLElement) {
 		console.log('POST RENDER PONG REMOTE')
-		user = $user.get()
-		match = $match.get()
+		const user = $user.get()
+		const match = $match.get()
 		if (!user) {
 			element.innerHTML = /*html*/ `
 					No user found
@@ -36,6 +66,9 @@ defineComponent('ft-pong-remote', () => {
 			'matches',
 			{ matchId: match.id.toString() },
 			{
+				playerNames: (names) => {
+					renderer.setPlayerNames(names)
+				},
 				onEngineEvent: (data) => {
 					if (data.onTimerTick !== undefined) {
 						renderer.onTimerTick(data.onTimerTick)
@@ -62,50 +95,19 @@ defineComponent('ft-pong-remote', () => {
 		)
 
 		const player: Player = user.id === match.player1Id ? 'p1' : 'p2'
-
-		const setInput = (move: Move, value: boolean) => {
-			channel.emit('onPlayerInput', { player, move, value })
-		}
-
-		const keyHandlers: Record<string, (value: boolean) => void> = {
-			w: (value) => setInput('up', value),
-			s: (value) => setInput('down', value),
-			ArrowUp: (value) => setInput('up', value),
-			ArrowDown: (value) => setInput('down', value),
-			a: (value) => setInput('up', value),
-			d: (value) => setInput('down', value),
-			ArrowLeft: (value) => setInput('up', value),
-			ArrowRight: (value) => setInput('down', value),
-		}
-
-		const onKeydown = (event: KeyboardEvent) => {
-			keyHandlers[event.key]?.(true)
-		}
-		const onKeyup = (event: KeyboardEvent) => {
-			keyHandlers[event.key]?.(false)
-		}
-
-		document.addEventListener('keydown', onKeydown)
-		document.addEventListener('keyup', onKeyup)
-
-		return () => {
-			document.removeEventListener('keydown', onKeydown)
-			document.removeEventListener('keyup', onKeyup)
-			return
-		}
+		cleanInputs = setupInputs(player)
 	}
 
 	return {
 		onLoad(element) {
 			renderer = renderer2D(element)
-			renderer.setPlayerNames(user?.name)
 		},
 		onDestroy() {
-			cleanHandle?.()
+			cleanInputs?.()
 			channel?.close()
 		},
 		postRender(element) {
-			cleanHandle = handle(element)
+			handle(element)
 		},
 	}
 })
