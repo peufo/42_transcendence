@@ -1,10 +1,10 @@
 import { getAwaitingMatchFromStages } from '../../lib/tournament.js'
+import type { Match } from '../../lib/type.js'
 import type { ChannelSocket } from '../../lib/useSocketChannels.js'
 import { toast } from '../components/ft-toast.js'
 import { socketChannel } from '../socketChannel.js'
 import { getAvatarSrc } from '../utils/avatar.js'
 import { defineComponent } from '../utils/component.js'
-import { setMatch } from '../utils/match.js'
 import {
 	$match,
 	$participants,
@@ -22,6 +22,7 @@ const buttonsLab = Object.entries({
 }).map(([key, value]) => {
 	const btn = document.createElement('button')
 	btn.addEventListener('click', () => {
+		console.clear()
 		// biome-ignore lint/suspicious/noExplicitAny: va chier
 		value.update((v: any) => v)
 	})
@@ -29,6 +30,13 @@ const buttonsLab = Object.entries({
 	btn.innerHTML = key
 	return btn
 })
+
+function setMatch(match: Match | undefined) {
+	const currentMatch = $match.get(false)
+	if (!currentMatch || currentMatch.id !== match?.id) {
+		$match.set(match)
+	}
+}
 
 defineComponent('ft-page-tournament-play', () => {
 	let tournamentChannel: ChannelSocket<'tournaments'>
@@ -215,8 +223,6 @@ defineComponent('ft-tournament-open', () => {
 })
 
 defineComponent('ft-tournament-ongoing', () => {
-	let pongRemoteDiv: HTMLDivElement | null
-
 	return {
 		onLoad() {
 			console.log('TOURNAMENT ONGOING LOAD')
@@ -232,16 +238,9 @@ defineComponent('ft-tournament-ongoing', () => {
 			return /*html*/ `
 				<div class="grid grid-cols-4 gap-4 p-4 min-w-[1360px]">
 					<ft-bracket></ft-bracket>
-					<div id="pong-remote-div" class="col-span-3"></div>
+					<ft-pong-remote></ft-pong-remote>
 				</div>
 			`
-		},
-		postRender(element) {
-			pongRemoteDiv = element.querySelector<HTMLDivElement>('#pong-remote-div')
-			const match = $match.get()
-			if (!pongRemoteDiv) return
-			if (match) pongRemoteDiv.innerHTML = '<ft-pong-remote></ft-pong-remote>'
-			else pongRemoteDiv.innerHTML = ''
 		},
 	}
 })

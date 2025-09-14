@@ -6,7 +6,7 @@ type Signal<T> = {
 type Effect = {
 	parent?: Effect
 	func: () => void | Promise<void>
-	signals: symbol[]
+	signals: Set<symbol>
 }
 const stackEffects: Effect[] = []
 const cleanerFactories: ((subscribes: SubscribeMap) => CleanEffect)[] = []
@@ -41,12 +41,12 @@ export function createSignal<T>(initialValue: T): Signal<T> {
 		}
 		let parentEffect = effect.parent
 		while (parentEffect) {
-			if (parentEffect.signals.includes(signal)) {
+			if (parentEffect.signals.has(signal)) {
 				return value
 			}
 			parentEffect = parentEffect.parent
 		}
-		effect.signals.push(signal)
+		effect.signals.add(signal)
 		subscribes.add(effect)
 		// console.log('SUBSCRIBE COUNT: ', subscribes.size)
 		console.log(subscribes)
@@ -71,10 +71,10 @@ export function createSignal<T>(initialValue: T): Signal<T> {
 
 export function createEffect(func: () => void): CleanEffect {
 	cleanersStack.push([])
-	const effect = {
+	const effect: Effect = {
 		func,
 		parent: stackEffects.at(-1),
-		signals: [],
+		signals: new Set(),
 	}
 	cleanerFactories.push((subscribes: SubscribeMap) => () => {
 		subscribes.delete(effect)

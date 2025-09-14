@@ -18,10 +18,20 @@ defineComponent('ft-page-lab', () => {
 		return btn
 	})
 
+	const btn = document.createElement('button')
+	btn.addEventListener('click', () => {
+		console.clear()
+		const v = $valueA.get()
+		$valueB.set(v + 2)
+	})
+	btn.classList.add('btn', 'btn-border')
+	btn.innerHTML = 'RECURSIVE ?'
+
 	return {
 		postRender(element) {
 			console.log('LABO CONNECTED')
 			element.prepend(...buttons)
+			element.prepend(btn)
 		},
 		onDestroy() {
 			console.log('LABO DISCONNECTED')

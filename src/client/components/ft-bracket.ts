@@ -1,6 +1,6 @@
 import { getCurrentStage } from '../../lib/tournament.js'
 import type { Match } from '../../lib/type.js'
-import { type CleanEffect, createEffect } from '../utils/signal.js'
+import { defineComponent } from '../utils/component.js'
 import {
 	$match,
 	$participants,
@@ -9,42 +9,36 @@ import {
 	$user,
 } from '../utils/store.js'
 
-customElements.define(
-	'ft-bracket',
-	class extends HTMLElement {
-		private user = $user.get()
-		private tournament = $tournament.get()
-		private participants = $participants.get()
-		private match = $match.get()
-		private cleanEffect: CleanEffect
+defineComponent('ft-bracket', () => {
+	return {
+		onLoad() {},
+		onDestroy() {},
+		postRender(element) {
+			const match = $match.get()
+			if (match) {
+				setTimeout(() => {
+					element.querySelector(`#match-${match?.id}`)?.scrollIntoView({
+						behavior: 'smooth',
+					})
+				}, 500)
+			}
+		},
+		render() {
+			const tournament = $tournament.get()
+			const user = $user.get()
+			const participants = $participants.get()
 
-		connectedCallback() {
-			this.cleanEffect = createEffect(() => {
-				this.innerHTML = this.render()
-				if (this.match)
-					setTimeout(() => {
-						this.querySelector(`#match_${this.match?.id}`)?.scrollIntoView({
-							behavior: 'smooth',
-						})
-					}, 500)
-			})
-		}
-
-		disconnectedCallback() {
-			this.cleanEffect()
-		}
-
-		render(): string {
+			console.log('RENDER BRACKET')
 			const stages = $stages.get()
-			if (!this.user || !this.tournament) return 'user or tournament not found'
+			if (!user || !tournament) return 'user or tournament not found'
 
-			const iParticipate = this.participants.find(
-				({ user: { id } }) => id === this.user?.id,
+			const iParticipate = participants.find(
+				({ user: { id } }) => id === user?.id,
 			)
 
 			const quitButton = /*html*/ `
 				<form action="/tournaments/quit" method="post" class="contents">
-					<input type="hidden" name="tournamentId" value="${this.tournament.id}" />
+					<input type="hidden" name="tournamentId" value="${tournament.id}" />
 					<input type="submit" value="Quit" class="btn btn-border cursor-pointer">
 				</form>
 			`
@@ -91,12 +85,12 @@ customElements.define(
 			const renderMatch = (match: Match) => {
 				let colorP1 = ''
 				let colorP2 = ''
-				if (match.player1 && this.user?.id === match.player1.id)
+				if (match.player1 && user?.id === match.player1.id)
 					colorP1 = 'text-indigo-600 font-bold'
-				else if (match.player2 && this.user?.id === match.player2.id)
+				else if (match.player2 && user?.id === match.player2.id)
 					colorP2 = 'text-indigo-600 font-bold'
 				return /*html*/ `
-                    <div id="${match.id}" class="bg-white border border-gray-200 rounded-md">
+                    <div id="match-${match.id}" class="bg-white border border-gray-200 rounded-md">
                         <div class="grid grid-cols-7 p-1 items-center justify-items-center">
                             <div class="text-xs break-word text-center col-span-3 ${colorP1}">
                                 ${match.player1 ? match.player1.name : '?'}
@@ -120,9 +114,9 @@ customElements.define(
 					<div class="overflow-x-scroll rounded-md border border-gray-200 snap-x snap-mandatory">
 						${renderStages()}
 					</div>
-					${iParticipate && this.tournament.state !== 'finished' ? quitButton : ''}
+					${iParticipate && tournament.state !== 'finished' ? quitButton : ''}
 				</aside>
             `
-		}
-	},
-)
+		},
+	}
+})

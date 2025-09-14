@@ -45,24 +45,22 @@ defineComponent('ft-pong-remote', () => {
 		}
 	}
 
-	function handle(element: HTMLElement) {
-		console.log('POST RENDER PONG REMOTE')
+	const setup = (element: HTMLElement) => {
 		const user = $user.get()
 		const match = $match.get()
 		if (!user) {
-			element.innerHTML = /*html*/ `
-					No user found
-					`
+			element.innerHTML = /*html*/ `No user found`
 			return
 		}
 		if (!match) {
 			element.innerHTML = /*html*/ `
-					<div class="h-[100%] w-[100%] flex flex-row items-center justify-center">
-						You don't have any match.
-					</div>
-					`
+				<div class="h-[100%] w-[100%] flex flex-row items-center justify-center">
+					You don't have any match.
+				</div>
+				`
 			return
 		}
+		channel?.close()
 		channel = socketChannel(
 			'matches',
 			{ matchId: match.id.toString() },
@@ -83,6 +81,7 @@ defineComponent('ft-pong-remote', () => {
 		)
 
 		const player: Player = user.id === match.player1Id ? 'p1' : 'p2'
+		cleanInputs?.()
 		cleanInputs = setupInputs(player)
 	}
 
@@ -95,7 +94,7 @@ defineComponent('ft-pong-remote', () => {
 			channel?.close()
 		},
 		postRender(element) {
-			handle(element)
+			setup(element)
 		},
 	}
 })
