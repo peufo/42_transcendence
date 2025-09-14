@@ -12,34 +12,46 @@ export function createMatchEngine(match: DB.Match): Engine {
 	return new Engine({
 		pointsToWin: match.pointsToWin,
 		async onRoundEnd(round) {
-			const updatedMatch = await updateMatchRound(match.id, round)
+			const updatedMatch = await updateMatchRound(match.id, round).catch(
+				(err) => {
+					console.error(err)
+					return match
+				},
+			)
 			if (match.tournamentId)
 				notify.tournaments(match.tournamentId, 'onMatchChange', {
 					match: updatedMatch,
 				})
 		},
 		async onGameEnd({ finishedAt, finalRound }) {
-			await updateMatchRound(match.id, finalRound)
-			const updatedMatch = await updateMatchEnd(
-				match.id,
-				finalRound,
-				new Date(finishedAt),
-			)
-			await updateNumberOfMatch(updatedMatch.player1Id, updatedMatch.player2Id)
-			await updateNumberOfWin(
-				updatedMatch.player1Score > updatedMatch.player2Score
-					? updatedMatch.player1Id
-					: updatedMatch.player2Id,
-			)
-			await updateNumberOfGoals(updatedMatch)
-			const tournamentId = match.tournamentId
-			if (tournamentId) {
-				notify.tournaments(tournamentId, 'onMatchChange', {
-					match: updatedMatch,
-				})
-				await handleTournamentGameEnd({ ...updatedMatch, tournamentId })
+			try {
+				await updateMatchRound(match.id, finalRound)
+				const updatedMatch = await updateMatchEnd(
+					match.id,
+					finalRound,
+					new Date(finishedAt),
+				)
+				await updateNumberOfMatch(
+					updatedMatch.player1Id,
+					updatedMatch.player2Id,
+				)
+				await updateNumberOfWin(
+					updatedMatch.player1Score > updatedMatch.player2Score
+						? updatedMatch.player1Id
+						: updatedMatch.player2Id,
+				)
+				await updateNumberOfGoals(updatedMatch)
+				const tournamentId = match.tournamentId
+				if (tournamentId) {
+					notify.tournaments(tournamentId, 'onMatchChange', {
+						match: updatedMatch,
+					})
+					await handleTournamentGameEnd({ ...updatedMatch, tournamentId })
+				}
+				deleteEmitter('matches', match.id)
+			} catch (error) {
+				console.error(error)
 			}
-			deleteEmitter('matches', match.id)
 		},
 		async onEvent(data) {
 			notify.matches(match.id, 'onEngineEvent', data)
@@ -52,17 +64,14 @@ export async function handleTournamentGameEnd(
 ) {
 	const winnerId =
 		match.player1Score > match.player2Score ? match.player1Id : match.player2Id
-	if (!winnerId) throw new Error('winner is not defined') // TODO: where is catched this error
+	if (!winnerId) throw new Error('winner is not defined')
 	const stages = await tournamentGetStages(match.tournamentId)
-
 	const matchStageIndex = stages.findIndex((stage) =>
 		stage.find((m) => m.id === match.id),
 	)
 	if (matchStageIndex === -1) throw new Error('matchStage not found')
 	const isTournamentEnd = matchStageIndex + 1 === stages.length
 	if (isTournamentEnd) {
-		// TODO: Close tournament socket ?
-		// remove all participants ?
 		await tournamentUpdateState(match.tournamentId, 'finished')
 		notify.tournaments(match.tournamentId, 'onEnd', true)
 		return

@@ -46,8 +46,7 @@ const oauth2Options = {
 		auth: googleAuthConfig,
 	},
 	startRedirectPath: '/auth/oauth/google',
-	// TODO: use the right URI
-	callbackUri: 'https://localhost:8000/auth/oauth/google/callback',
+	callbackUri: `https://localhost:${env.PORT}/auth/oauth/google/callback`,
 }
 
 export const server = fastify({

@@ -151,7 +151,7 @@ type Get<Result, Query = null> = {
 
 export type RoutesGet = {
 	'/auth/user': Get<UserWithTournament | undefined>
-	'/users': Get<UserBasic[], { search: string }> // TODO: /users/notMyFriends
+	'/users': Get<UserBasic[], { search: string }>
 	'/friendships/invitation': Get<FriendshipInvitation[]>
 	'/friendships/friend': Get<FriendshipFriend[]>
 	'/tournaments': Get<TournamentWithLookup, { tournamentId: number }>

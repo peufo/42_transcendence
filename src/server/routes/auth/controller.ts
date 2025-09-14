@@ -27,7 +27,6 @@ function generateSecureRandomString(len = 24): string {
 	return id
 }
 
-// TODO: use argon2id instead ?
 async function hashSecret(secret: string): Promise<Uint8Array> {
 	const secretBytes = new TextEncoder().encode(secret)
 	const secretHashBuffer = await crypto.subtle.digest('SHA-256', secretBytes)
