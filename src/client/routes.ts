@@ -122,10 +122,6 @@ export const PAGES = {
 		component: 'ft-page-tournament-play',
 		pageData: ['/tournaments'],
 	},
-	'/local/play/babylon': {
-		component: 'ft-page-local-play-babylon',
-		isPublic: true,
-	},
 	'/login/waiting/google': {
 		component: 'ft-page-redirect-google',
 		isPublic: 'only',

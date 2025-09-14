@@ -13,7 +13,7 @@ export const startGameLocal: Scope = () => {
 
 	return new Promise((resolve) => {
 		const engine = new Engine({
-			scoreToWin: 3,
+			pointsToWin: 3,
 			...renderer,
 			onRoundEnd(round) {
 				engine.setInput('p1', 'down', false)

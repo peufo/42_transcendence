@@ -10,7 +10,7 @@ import { deleteEmitter, notify } from './controller.js'
 
 export function createMatchEngine(match: DB.Match): Engine {
 	return new Engine({
-		scoreToWin: match.scoreToWin,
+		pointsToWin: match.pointsToWin,
 		async onRoundEnd(round) {
 			const updatedMatch = await updateMatchRound(match.id, round)
 			if (match.tournamentId)

@@ -52,7 +52,7 @@ export type EngineOptionsEvents = {
 }
 
 export type EngineOptions = EngineOptionsEvents & {
-	scoreToWin: number
+	pointsToWin: number
 	onEvent?: (event: EngineEventData) => void
 }
 
@@ -178,7 +178,7 @@ export class Engine {
 		const { scorer } = roundInfo
 		this.#scores[scorer]++
 		roundInfo.scores = this.#scores
-		if (this.#scores[scorer] >= this.#options.scoreToWin) {
+		if (this.#scores[scorer] >= this.#options.pointsToWin) {
 			this.tickData.onGameEnd = {
 				finalRound: roundInfo,
 				finishedAt: Date.now(),

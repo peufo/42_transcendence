@@ -41,10 +41,10 @@ customElements.define(
                 <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
                 <form action="/tournaments/new" method="post" class="space-y-6">
                     <fieldset>
-                    <legend class="my-2 font-bold">Player count</legend>
-                    <ul class="items-center w-full text-md font-medium text-gray-900 bg-white border border-gray-200 rounded-lg sm:flex">
-                        ${nbPlayersOptions}
-                    </ul>
+						<legend class="my-2 font-bold">Player count</legend>
+						<ul class="items-center w-full text-md font-medium text-gray-900 bg-white border border-gray-200 rounded-lg sm:flex">
+							${nbPlayersOptions}
+						</ul>
                     </fieldset>
                     <input type="hidden" name="pointsToWin" id="points-to-win-json">
                     <div id="points-to-win-container"></div>

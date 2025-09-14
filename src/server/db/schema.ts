@@ -135,7 +135,7 @@ export const matches = sqliteTable('matches', {
 	player2Id: int().references(() => users.id),
 	player1Score: int().default(0).notNull(),
 	player2Score: int().default(0).notNull(),
-	scoreToWin: int().default(3).notNull(),
+	pointsToWin: int().default(3).notNull(),
 	tournamentId: int().references(() => tournaments.id),
 	finishedAt: int({ mode: 'timestamp' }),
 })

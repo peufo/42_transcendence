@@ -73,10 +73,10 @@ export async function createTournament(
 						Math.log2(tournament.numberOfPlayers - index - 1),
 					)
 					const stageName = stageOrder[stageIndex]
-					const scoreToWin = data.pointsToWin[stageName] ?? 3
+					const pointsToWin = data.pointsToWin[stageName] ?? 3
 					return {
 						tournamentId: tournament.id,
-						scoreToWin,
+						pointsToWin,
 					}
 				}),
 		)

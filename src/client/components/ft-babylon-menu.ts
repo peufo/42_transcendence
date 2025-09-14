@@ -271,7 +271,7 @@ myParticleSystem.gravity = new BABYLON.Vector3(0, -1, 0); // tire vers le bas (e
 
 		startGameEngine() {
 			this.gameLogicEngine = new GameEngine({
-				scoreToWin: 5,
+				pointsToWin: 5,
 				onTick: this.renderGameState.bind(this),
 				onRoundEnd: this.handleScoreUpdate.bind(this),
 			})

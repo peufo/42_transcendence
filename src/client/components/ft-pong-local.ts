@@ -1,6 +1,6 @@
 import { Engine } from '../../lib/engine/index.js'
 import { defineComponent } from '../utils/component.js'
-import { type Renderer, Renderer2D } from '../utils/renderer.js'
+import { type Renderer, Renderer2D, Renderer3D } from '../utils/renderer.js'
 
 defineComponent('ft-pong-local', () => {
 	let renderer: Renderer
@@ -39,15 +39,19 @@ defineComponent('ft-pong-local', () => {
 	return {
 		onLoad(element) {
 			element.classList.add('grid', 'place-items-center')
-			renderer = new Renderer2D(element)
 			const urlParams = new URLSearchParams(window.location.search)
+			const selectedRenderer = urlParams.get('renderer')
+			renderer =
+				selectedRenderer === '3d'
+					? new Renderer3D(element)
+					: new Renderer2D(element)
 			renderer.setPlayerNames({
 				p1: urlParams.get('player1') ?? undefined,
 				p2: urlParams.get('player2') ?? undefined,
 			})
-			const scoreToWin = urlParams.get('scoreToWin')
+			const pointsToWin = urlParams.get('points-to-win')
 			engine = new Engine({
-				scoreToWin: Number(scoreToWin),
+				pointsToWin: Number(pointsToWin),
 				onTick: renderer.onTick.bind(renderer),
 				onRoundEnd: renderer.onRoundEnd.bind(renderer),
 				onGameEnd: renderer.onGameEnd.bind(renderer),
