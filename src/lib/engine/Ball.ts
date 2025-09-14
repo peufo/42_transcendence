@@ -26,7 +26,7 @@ export class Ball {
 	#velocity = new Vector2(
 		Math.random() < 0.5 ? 1 : -1,
 		getRandomArbitrary(-0.3, 0.3),
-	)
+	).normalize()
 	#engine: Engine
 	#rallyCount: number = 0
 	get position() {
@@ -90,15 +90,6 @@ export class Ball {
 		this.#velocity.x = Math.cos(bounceAngle)
 		this.#velocity.y = -Math.sin(bounceAngle)
 		this.#velocity.x *= -vSign
-		if (this.#speed !== BALL_MAX_SPEED) {
-			const t =
-				(Date.now() - this.#engine.roundStartTime) /
-				BALL_TIME_TO_REACH_MAX_SPEED
-			if (t <= 1)
-				this.#speed =
-					BALL_BASE_SPEED + (BALL_MAX_SPEED - BALL_BASE_SPEED) * cubicOut(t)
-			else this.#speed = BALL_MAX_SPEED
-		}
 	}
 
 	#handlePaddlesCollisions(): boolean {
@@ -144,11 +135,18 @@ export class Ball {
 				this.#velocity.x * (TICK_INTERVAL / BALL_SUBSTEPS) * this.#speed
 			this.#position.y +=
 				this.#velocity.y * (TICK_INTERVAL / BALL_SUBSTEPS) * this.#speed
-			if (this.#handlePaddlesCollisions()) {
-				this.#rallyCount++
-				return null
-			}
-			if (this.#handleVerticalWallCollision()) {
+			const paddleCol = this.#handlePaddlesCollisions()
+			if (paddleCol || this.#handleVerticalWallCollision()) {
+				if (paddleCol) this.#rallyCount++
+				if (this.#speed !== BALL_MAX_SPEED) {
+					const t =
+						(Date.now() - this.#engine.roundStartTime) /
+						BALL_TIME_TO_REACH_MAX_SPEED
+					if (t <= 1)
+						this.#speed =
+							BALL_BASE_SPEED + (BALL_MAX_SPEED - BALL_BASE_SPEED) * cubicOut(t)
+					else this.#speed = BALL_MAX_SPEED
+				}
 				return null
 			}
 		}

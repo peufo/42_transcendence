@@ -65,8 +65,8 @@ export const ARENA_HEIGHT = 700
 
 // Ball properties
 export const BALL_MAX_BOUNCE_ANGLE = (4 * Math.PI) / 12 // <- 60 degrees in radians
-export const BALL_BASE_SPEED = 0.35
-export const BALL_MAX_SPEED = 1.2
+export const BALL_BASE_SPEED = 0.45
+export const BALL_MAX_SPEED = 1.1
 export const BALL_TIME_TO_REACH_MAX_SPEED = 50000
 export const BALL_BASE_SIZE = ARENA_WIDTH / 70
 export const BALL_BASE_POSITION = new Vector2(
@@ -207,7 +207,7 @@ export class Engine {
 		this.onEvent({ onEngineStart: null })
 		setTimeout(() => {
 			this.#newRound()
-		}, 1000)
+		}, 500)
 	}
 
 	stop() {

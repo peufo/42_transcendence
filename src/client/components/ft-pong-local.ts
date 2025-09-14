@@ -1,6 +1,6 @@
 import { Engine } from '../../lib/engine/index.js'
 import { defineComponent } from '../utils/component.js'
-import { type Renderer, renderer2D } from '../utils/renderer.js'
+import { type Renderer, Renderer2D } from '../utils/renderer.js'
 
 defineComponent('ft-pong-local', () => {
 	let renderer: Renderer
@@ -39,7 +39,7 @@ defineComponent('ft-pong-local', () => {
 	return {
 		onLoad(element) {
 			element.classList.add('grid', 'place-items-center')
-			renderer = renderer2D(element)
+			renderer = new Renderer2D(element)
 			const urlParams = new URLSearchParams(window.location.search)
 			renderer.setPlayerNames({
 				p1: urlParams.get('player1') ?? undefined,
@@ -48,12 +48,12 @@ defineComponent('ft-pong-local', () => {
 			const scoreToWin = urlParams.get('scoreToWin')
 			engine = new Engine({
 				scoreToWin: Number(scoreToWin),
-				onEngineStart: () => renderer.onEngineStart(),
-				onTimerTick: (data) => renderer.onTimerTick(data),
-				onTick: (data) => renderer.onTick(data),
-				onCollision: (data) => renderer.onCollision(data),
-				onRoundEnd: (data) => renderer.onRoundEnd(data),
-				onGameEnd: (data) => renderer.onGameEnd(data),
+				onTick: renderer.onTick.bind(renderer),
+				onRoundEnd: renderer.onRoundEnd.bind(renderer),
+				onGameEnd: renderer.onGameEnd.bind(renderer),
+				onCollision: renderer.onCollision.bind(renderer),
+				onTimerTick: renderer.onTimerTick.bind(renderer),
+				onEngineStart: renderer.onEngineStart.bind(renderer),
 			})
 			engine.start()
 			cleanInputs = setupInputs()
