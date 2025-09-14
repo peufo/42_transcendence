@@ -1,5 +1,6 @@
 import type {
 	Collision,
+	EngineEventData,
 	EngineOptionsEvents,
 	GameOverData,
 	Player,
@@ -10,7 +11,7 @@ import type {
 import { useInterpolate } from '../../lib/interpolate.js'
 import { $user } from '../utils/store.js'
 
-export abstract class Renderer implements EngineOptionsEvents {
+export abstract class Renderer implements Required<EngineOptionsEvents> {
 	protected element: HTMLElement
 	protected user = $user.get(false)
 	protected interpolate = useInterpolate()
@@ -31,7 +32,6 @@ export abstract class Renderer implements EngineOptionsEvents {
 		if (names.p1) this.playerNames.p1 = names.p1
 		if (names.p2) this.playerNames.p2 = names.p2
 	}
-
 	onTick(data: State) {
 		this.interpolate.updateState(data)
 	}
@@ -41,6 +41,14 @@ export abstract class Renderer implements EngineOptionsEvents {
 	onGameEnd(data: GameOverData) {
 		this.scores = data.finalRound.scores
 	}
+
+	onEngineEvent(data: EngineEventData) {
+		for (const eventName of Object.keys(data) as (keyof EngineEventData)[]) {
+			//@ts-ignore
+			this[eventName](data[eventName])
+		}
+	}
+
 	abstract onCollision(data: Collision): void
 	abstract onTimerTick(data: number): void
 	abstract onEngineStart(): void

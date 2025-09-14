@@ -198,7 +198,7 @@ defineComponent('ft-tournament-open', () => {
 				startButton = /*html*/ `
 				<form action="/tournaments/start" method="post" class="contents">
 					<input type="hidden" name="tournamentId" value="${tournament.id}" />
-					<input type="submit" class="btn btn-border cursor-pointer" value="Start">
+					<input type="submit" class="btn btn-primary cursor-pointer" value="Start">
 				</form>
 				`
 

@@ -11,21 +11,29 @@ import {
 	type RoundData,
 	type State,
 } from '../../lib/engine/index.js'
+import { getRandomArbitrary } from '../../lib/utils.js'
 import { Renderer } from './Renderer.js'
 
-type Pok = { x: number; y: number; text: string; size: number; color: string }
+type Pok = {
+	x: number
+	y: number
+	text: string
+	size: number
+	opacity: number
+	color: string
+}
 const pokNoises: string[] = ['POK', 'PAK', 'PIK', 'PUK', 'PEK']
 const pokColors: string[] = [
-	'#3FA7D6',
-	'#F6D743',
-	'#F45B69',
-	'#9B5DE5',
-	'#00BBF9',
-	'#FEE440',
-	'#00F5D4',
-	'#FB5607',
-	'#8338EC',
-	'#FF006E',
+	'rgba(63, 167, 214, 1)',
+	'rgba(246, 215, 67, 1)',
+	'rgba(244, 91, 105, 1)',
+	'rgba(155, 93, 229, 1)',
+	'rgba(0, 187, 249, 1)',
+	'rgba(254, 228, 64, 1)',
+	'rgba(0, 245, 212, 1)',
+	'rgba(251, 86, 7, 1)',
+	'rgba(131, 56, 236, 1)',
+	'rgba(255, 0, 110, 1)',
 ]
 
 export class Renderer2D extends Renderer {
@@ -136,12 +144,13 @@ export class Renderer2D extends Renderer {
 
 		// poks
 		this.poks.forEach((pok) => {
-			this.ctx.fillStyle = pok.color
+			this.ctx.fillStyle = pok.color.replace(/1\)$/, `${pok.opacity})`)
 			this.ctx.font = `${pok.size}px sans-serif`
 			this.ctx.fillText(pok.text, pok.x, pok.y + fontSize / 2)
+			pok.size = pok.size + 0.05 * state.t
+			pok.opacity = Math.max(0, pok.opacity - 0.0024 * state.t)
 		})
 		this.ctx.fillStyle = 'black'
-
 		this.animationFrameId = requestAnimationFrame(this.renderFrame)
 	}
 
@@ -161,12 +170,14 @@ export class Renderer2D extends Renderer {
 			...data,
 			text: pokNoises[Math.floor(Math.random() * pokNoises.length)],
 			color: pokColors[Math.floor(Math.random() * pokColors.length)],
-			size: Math.floor(Math.random() * (60 - 30 + 1) + 30),
+			opacity: 1.5,
+			size: getRandomArbitrary(15, 30),
 		}
+
 		this.poks.push(obj)
 		setTimeout(() => {
 			this.poks.shift()
-		}, 1500)
+		}, 1000)
 	}
 	onTimerTick(data: number) {
 		if (data === 0) {

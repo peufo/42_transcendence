@@ -1,8 +1,9 @@
 import type { Move, Player } from '../../lib/engine/index.js'
 import type { ChannelSocket } from '../../lib/useSocketChannels.js'
+import type { Renderer } from '../renderer/Renderer.js'
+import { Renderer2D } from '../renderer/Renderer2D.js'
 import { socketChannel } from '../socketChannel.js'
 import { defineComponent } from '../utils/component.js'
-import { type Renderer, Renderer2D } from '../utils/renderer.js'
 import { $match, $user } from '../utils/store.js'
 import { toast } from './ft-toast.js'
 
@@ -70,25 +71,12 @@ defineComponent('ft-pong-remote', () => {
 					renderer.setPlayerNames(names)
 				},
 				onEngineEvent: (data) => {
-					if (data.onTimerTick !== undefined) {
-						renderer.onTimerTick(data.onTimerTick)
-					}
-					if (data.onTick !== undefined) {
-						renderer.onTick(data.onTick)
-					}
-					if (data.onRoundEnd !== undefined) {
-						renderer.onRoundEnd(data.onRoundEnd)
-					}
+					renderer.onEngineEvent(data)
 					if (data.onGameEnd !== undefined) {
-						renderer.onGameEnd(data.onGameEnd)
 						toast.success('Game end')
 					}
 					if (data.onEngineStart !== undefined) {
-						renderer.onEngineStart()
 						toast.success('Game start')
-					}
-					if (data.onCollision !== undefined) {
-						renderer.onCollision(data.onCollision)
 					}
 				},
 			},

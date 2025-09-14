@@ -1,6 +1,8 @@
 import { Engine } from '../../lib/engine/index.js'
+import type { Renderer } from '../renderer/Renderer.js'
+import { Renderer2D } from '../renderer/Renderer2D.js'
+import { Renderer3D } from '../renderer/Renderer3D.js'
 import { defineComponent } from '../utils/component.js'
-import { type Renderer, Renderer2D, Renderer3D } from '../utils/renderer.js'
 
 defineComponent('ft-pong-local', () => {
 	let renderer: Renderer
