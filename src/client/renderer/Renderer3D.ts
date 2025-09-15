@@ -142,6 +142,10 @@ export class Renderer3D extends Renderer {
 			this.wallParticleSystem,
 		)
 	}
-	onTimerTick(_data: number) {}
-	onEngineStart() {}
+	onTimerTick(_data: number) {
+		// TODO: implement
+	}
+	onEngineStart() {
+		// TODO: implement
+	}
 }

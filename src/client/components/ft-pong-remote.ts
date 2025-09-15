@@ -1,6 +1,6 @@
 import type { Move, Player } from '../../lib/engine/index.js'
 import type { ChannelSocket } from '../../lib/useSocketChannels.js'
-import type { Renderer } from '../renderer/Renderer.js'
+import { myRendering, type Renderer } from '../renderer/Renderer.js'
 import { Renderer2D } from '../renderer/Renderer2D.js'
 import { Renderer3D } from '../renderer/Renderer3D.js'
 import { socketChannel } from '../socketChannel.js'
@@ -68,7 +68,10 @@ defineComponent('ft-pong-remote', () => {
 			{
 				matchReady: (names) => {
 					renderer?.clear()
-					renderer = new Renderer3D(element, names)
+					renderer =
+						myRendering === '2D'
+							? new Renderer2D(element, names)
+							: new Renderer3D(element, names)
 				},
 				onEngineEvent: (data) => {
 					renderer.onEngineEvent(data)

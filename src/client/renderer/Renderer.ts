@@ -13,6 +13,12 @@ import {
 import { useInterpolate } from '../../lib/interpolate.js'
 import { $user } from '../utils/store.js'
 
+export let myRendering: '2D' | '3D' = '2D'
+
+export function setMyRendering(value: '2D' | '3D') {
+	myRendering = value
+}
+
 export abstract class Renderer implements Required<EngineOptionsEvents> {
 	protected element: HTMLElement
 	protected user = $user.get(false)

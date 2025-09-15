@@ -1,3 +1,5 @@
+import { goto } from '../components/ft-router.js'
+
 customElements.define(
 	'ft-page-local-new',
 	class extends HTMLElement {
@@ -5,7 +7,6 @@ customElements.define(
 			const player1Default = 'Player 1'
 			const player2Default = 'Player 2'
 			const pointsToWinDefault = '3'
-			const rendererDefault = '2d'
 
 			this.innerHTML = /*html*/ `
                 <div class="max-w-lg m-auto flex flex-col gap-6 ring-2 ring-indigo-500 rounded-lg mt-5 p-5">
@@ -23,25 +24,6 @@ customElements.define(
 								<input name="points-to-win" type="range" id="points-to-win" min="1" max="10" value="3" class="text-center">
 								<span class="h-auto w-15" id="points-to-win-info"></span>
 							</div>
-							<div class="flex flex-row items-center">Rendering</div>
-							<fieldset class="flex flex-row items-center justify-center gap-2">
-								<ul class="flex flex-row items-center justify-center text-md font-medium text-gray-900 bg-white gap-2">
-									<li>
-										<div class="flex items-center ps-3">
-										<input id="opt-2d" type="radio" checked	value="2d" name="renderer"
-											class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300">
-										<label for="opt-2d" class="w-full py-3 ms-2 text-gray-900">2D</label>
-										</div>
-									</li>
-									<li>
-										<div class="flex items-center ps-3">
-										<input id="opt-3d" type="radio"	value="3d" name="renderer"
-											class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300">
-										<label for="opt-3d" class="w-full py-3 ms-2 text-gray-900">3D</label>
-										</div>
-									</li>
-								</ul>
-							</fieldset>
 							<input class="btn btn-border col-span-2" type="submit" id="submit-button" value="Play">
                         </form>
                     </div>
@@ -69,12 +51,22 @@ customElements.define(
 				e.stopPropagation()
 				const form = e.target as HTMLFormElement
 				const formData = new FormData(form)
-				let href = 'play?'
-				href += `&player1=${encodeURIComponent(formData.get('player-1-name')?.toString() || player1Default)}`
-				href += `&player2=${encodeURIComponent(formData.get('player-2-name')?.toString() || player2Default)}`
-				href += `&points-to-win=${encodeURIComponent(formData.get('points-to-win')?.toString() || pointsToWinDefault)}`
-				href += `&renderer=${encodeURIComponent(formData.get('renderer')?.toString() || rendererDefault)}`
-				window.location.href = href
+				const url = new URL('play', document.baseURI)
+				const params = new URLSearchParams()
+				params.set(
+					'player1',
+					formData.get('player-1-name')?.toString() || player1Default,
+				)
+				params.set(
+					'player2',
+					formData.get('player-2-name')?.toString() || player2Default,
+				)
+				params.set(
+					'points-to-win',
+					formData.get('points-to-win')?.toString() || pointsToWinDefault,
+				)
+				url.search = params.toString()
+				goto(url)
 			})
 		}
 	},

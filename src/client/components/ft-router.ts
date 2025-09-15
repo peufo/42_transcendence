@@ -16,7 +16,7 @@ import { $url, $user } from '../utils/store.js'
 import { slide, transitionIn, transitionOut } from '../utils/transition.js'
 import { toast } from './ft-toast.js'
 
-function goto(url: URL) {
+export function goto(url: URL) {
 	window.history.pushState({}, '', url)
 	$url.set(url)
 }
