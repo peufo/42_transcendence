@@ -44,16 +44,17 @@ export class Renderer2D extends Renderer {
 	private animationFrameId = 0
 	private poks: Pok[] = []
 	private ctx: CanvasRenderingContext2D
+	private canvas: HTMLCanvasElement
 	private lastFrameTime = 0
 
 	constructor(element: HTMLElement) {
 		super(element)
-		const canvas: HTMLCanvasElement = document.createElement('canvas')
-		canvas.setAttribute('width', ARENA_WIDTH.toString())
-		canvas.setAttribute('height', ARENA_HEIGHT.toString())
-		canvas.classList.add('border')
-		this.element.appendChild(canvas)
-		const newCtx = canvas.getContext('2d')
+		this.canvas = document.createElement('canvas')
+		this.canvas.setAttribute('width', ARENA_WIDTH.toString())
+		this.canvas.setAttribute('height', ARENA_HEIGHT.toString())
+		this.canvas.classList.add('border')
+		this.element.appendChild(this.canvas)
+		const newCtx = this.canvas.getContext('2d')
 		if (!newCtx) throw new Error('Canvas context failed')
 		this.ctx = newCtx
 		this.ctx.textAlign = 'center'
@@ -163,6 +164,10 @@ export class Renderer2D extends Renderer {
 
 		this.lastFrameTime = Date.now()
 		this.animationFrameId = requestAnimationFrame(this.renderFrame)
+	}
+
+	clear(): void {
+		this.element.removeChild(this.canvas)
 	}
 
 	onTick(data: State) {

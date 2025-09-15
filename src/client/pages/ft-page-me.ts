@@ -46,7 +46,7 @@ customElements.define(
 customElements.define(
 	'ft-users',
 	class extends HTMLElement {
-		private cleanEffect: CleanEffect
+		private cleanEffect: CleanEffect | undefined
 
 		connectedCallback() {
 			this.classList.add('contents')
@@ -56,7 +56,7 @@ customElements.define(
 		}
 
 		disconnectedCallback() {
-			this.cleanEffect()
+			this.cleanEffect?.()
 		}
 
 		render() {
@@ -88,7 +88,7 @@ customElements.define(
 customElements.define(
 	'ft-friends',
 	class extends HTMLElement {
-		private cleanEffect: CleanEffect
+		private cleanEffect: CleanEffect | undefined | undefined
 
 		connectedCallback() {
 			this.classList.add('flex', 'flex-col', 'gap-3')
@@ -98,7 +98,7 @@ customElements.define(
 		}
 
 		disconnectedCallback() {
-			this.cleanEffect()
+			this.cleanEffect?.()
 		}
 
 		renderContent(): string {
@@ -182,7 +182,7 @@ customElements.define(
 customElements.define(
 	'ft-invitations',
 	class extends HTMLElement {
-		private cleanEffect: CleanEffect
+		private cleanEffect: CleanEffect | undefined
 		private user = $user.get()
 
 		connectedCallback() {
@@ -193,7 +193,7 @@ customElements.define(
 		}
 
 		disconnectedCallback() {
-			this.cleanEffect()
+			this.cleanEffect?.()
 		}
 
 		render(): string {

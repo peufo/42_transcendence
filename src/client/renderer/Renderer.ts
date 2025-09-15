@@ -15,14 +15,8 @@ export abstract class Renderer implements Required<EngineOptionsEvents> {
 	protected element: HTMLElement
 	protected user = $user.get(false)
 	protected interpolate = useInterpolate()
-	protected scores: Scores = {
-		p1: 0,
-		p2: 0,
-	}
-	protected playerNames = {
-		p1: 'Player 1',
-		p2: 'Player 2',
-	}
+	protected scores: Scores = { p1: 0, p2: 0 }
+	protected playerNames = { p1: 'Player 1', p2: 'Player 2' }
 
 	constructor(element: HTMLElement) {
 		this.element = element
@@ -51,4 +45,5 @@ export abstract class Renderer implements Required<EngineOptionsEvents> {
 	abstract onCollision(data: Collision): void
 	abstract onTimerTick(data: number): void
 	abstract onEngineStart(): void
+	abstract clear(): void
 }

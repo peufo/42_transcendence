@@ -112,6 +112,7 @@ export class Renderer3D extends Renderer {
 
 	onTick(data: State): void {
 		super.onTick(data)
+		// TODO: not update graphics in ontick
 		Graphics.updateGraphics(
 			this.interpolate.getState(),
 			this.ballMesh,

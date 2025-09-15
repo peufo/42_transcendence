@@ -144,7 +144,6 @@ customElements.define(
 
 function scoringGraph(match: Match, user: UserWithTournament): string {
 	const ralliesPerRound = match.rounds.map((r) => r.rallyCount)
-	console.log(ralliesPerRound)
 	const maxRallies = Math.max(...ralliesPerRound, 1)
 	const html = /*html*/ `
 	<div class="flex flex-col justify-center items-center h-max-[100px]">

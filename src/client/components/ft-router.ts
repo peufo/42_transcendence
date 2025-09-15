@@ -89,7 +89,7 @@ function onPopState() {
 customElements.define(
 	'ft-router',
 	class extends HTMLElement {
-		private cleanEffect: CleanEffect
+		private cleanEffect: CleanEffect | undefined
 
 		connectedCallback() {
 			console.log('ROUTER CONNECTED')
@@ -130,7 +130,7 @@ customElements.define(
 
 		disconnectedCallback() {
 			console.log('ROUTER DISCONNECTED')
-			this.cleanEffect()
+			this.cleanEffect?.()
 		}
 
 		getPage(pathname: string) {

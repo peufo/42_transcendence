@@ -60,6 +60,8 @@ defineComponent('ft-pong-remote', () => {
 				`
 			return
 		}
+		renderer?.clear()
+		renderer = new Renderer2D(element)
 		channel?.close()
 		channel = socketChannel(
 			'matches',
@@ -86,9 +88,6 @@ defineComponent('ft-pong-remote', () => {
 	}
 
 	return {
-		onLoad(element) {
-			renderer = new Renderer2D(element)
-		},
 		onDestroy() {
 			cleanInputs?.()
 			channel?.close()

@@ -126,10 +126,10 @@ function getUserRank(usersStats: UserStats[], user: UserBasic): number {
 
 type League = { name: string; color: string; icon: string; threshold: number }
 const leagues: League[] = [
-	{ name: 'Summit', color: '#CC04A6', icon: 'mountain', threshold: 2 },
-	{ name: 'Ruby', color: '#E0115F', icon: 'diamond', threshold: 10 },
-	{ name: 'Storm', color: '#04B1C9', icon: 'tornado', threshold: 30 },
-	{ name: 'Mist', color: '#C9D6DF', icon: 'cloud', threshold: 60 },
+	{ name: 'Summit', color: '#CC04A6', icon: 'mountain', threshold: 20 },
+	{ name: 'Ruby', color: '#E0115F', icon: 'diamond', threshold: 40 },
+	{ name: 'Storm', color: '#04B1C9', icon: 'tornado', threshold: 60 },
+	{ name: 'Mist', color: '#C9D6DF', icon: 'cloud', threshold: 80 },
 	{ name: 'Bud', color: '#7AC74F', icon: 'sprout', threshold: 100 },
 ] as const
 

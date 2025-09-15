@@ -11,8 +11,6 @@ import {
 
 defineComponent('ft-bracket', () => {
 	return {
-		onLoad() {},
-		onDestroy() {},
 		postRender(element) {
 			const match = $match.get()
 			if (match) {
@@ -20,7 +18,7 @@ defineComponent('ft-bracket', () => {
 					element.querySelector(`#match-${match?.id}`)?.scrollIntoView({
 						behavior: 'smooth',
 					})
-				}, 500)
+				}, 80)
 			}
 		},
 		render() {
