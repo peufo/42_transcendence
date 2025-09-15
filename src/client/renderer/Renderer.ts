@@ -32,6 +32,13 @@ export abstract class Renderer implements Required<EngineOptionsEvents> {
 		if (names.p1) this.playerNames.p1 = names.p1
 		if (names.p2) this.playerNames.p2 = names.p2
 	}
+
+	onEngineEvent(data: EngineEventData) {
+		for (const eventName of Object.keys(data) as (keyof EngineEventData)[]) {
+			//@ts-ignore
+			this[eventName](data[eventName])
+		}
+	}
 	onTick(data: State) {
 		this.interpolate.updateState(data)
 	}
@@ -41,14 +48,6 @@ export abstract class Renderer implements Required<EngineOptionsEvents> {
 	onGameEnd(data: GameOverData) {
 		this.scores = data.finalRound.scores
 	}
-
-	onEngineEvent(data: EngineEventData) {
-		for (const eventName of Object.keys(data) as (keyof EngineEventData)[]) {
-			//@ts-ignore
-			this[eventName](data[eventName])
-		}
-	}
-
 	abstract onCollision(data: Collision): void
 	abstract onTimerTick(data: number): void
 	abstract onEngineStart(): void

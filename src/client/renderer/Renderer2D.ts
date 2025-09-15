@@ -1,3 +1,4 @@
+import { cubicOut } from '../../lib/easing.js'
 import {
 	ARENA_HEIGHT,
 	ARENA_WIDTH,
@@ -14,13 +15,16 @@ import {
 import { getRandomArbitrary } from '../../lib/utils.js'
 import { Renderer } from './Renderer.js'
 
+const POK_DURATION = 750
+
 type Pok = {
 	x: number
 	y: number
 	text: string
-	size: number
-	opacity: number
+	maxSize: number
+	maxOpacity: number
 	color: string
+	lifetime: number
 }
 const pokNoises: string[] = ['POK', 'PAK', 'PIK', 'PUK', 'PEK']
 const pokColors: string[] = [
@@ -40,6 +44,7 @@ export class Renderer2D extends Renderer {
 	private animationFrameId = 0
 	private poks: Pok[] = []
 	private ctx: CanvasRenderingContext2D
+	private lastFrameTime = 0
 
 	constructor(element: HTMLElement) {
 		super(element)
@@ -98,6 +103,8 @@ export class Renderer2D extends Renderer {
 	}
 
 	private renderFrame = () => {
+		const timeSinceLastFrame = Date.now() - this.lastFrameTime
+
 		this.ctx.clearRect(0, 0, ARENA_WIDTH, ARENA_HEIGHT)
 		const state = this.interpolate.getState()
 		// ball
@@ -144,13 +151,17 @@ export class Renderer2D extends Renderer {
 
 		// poks
 		this.poks.forEach((pok) => {
-			this.ctx.fillStyle = pok.color.replace(/1\)$/, `${pok.opacity})`)
-			this.ctx.font = `${pok.size}px sans-serif`
+			const opacity =
+				pok.maxOpacity - pok.maxOpacity * cubicOut(pok.lifetime / POK_DURATION)
+			this.ctx.fillStyle = pok.color.replace(/1\)$/, `${opacity})`)
+			const size = pok.maxSize * cubicOut(pok.lifetime / POK_DURATION)
+			this.ctx.font = `${size}px sans-serif`
 			this.ctx.fillText(pok.text, pok.x, pok.y + fontSize / 2)
-			pok.size = pok.size + 0.05 * state.t
-			pok.opacity = Math.max(0, pok.opacity - 0.0024 * state.t)
+			pok.lifetime += timeSinceLastFrame
 		})
 		this.ctx.fillStyle = 'black'
+
+		this.lastFrameTime = Date.now()
 		this.animationFrameId = requestAnimationFrame(this.renderFrame)
 	}
 
@@ -170,14 +181,14 @@ export class Renderer2D extends Renderer {
 			...data,
 			text: pokNoises[Math.floor(Math.random() * pokNoises.length)],
 			color: pokColors[Math.floor(Math.random() * pokColors.length)],
-			opacity: 1.5,
-			size: getRandomArbitrary(15, 30),
+			maxOpacity: 5,
+			maxSize: getRandomArbitrary(40, 70),
+			lifetime: 0,
 		}
-
 		this.poks.push(obj)
 		setTimeout(() => {
 			this.poks.shift()
-		}, 1000)
+		}, POK_DURATION)
 	}
 	onTimerTick(data: number) {
 		if (data === 0) {

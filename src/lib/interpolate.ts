@@ -26,12 +26,11 @@ export function useInterpolate() {
 			currentState = JSON.parse(JSON.stringify(newState))
 			lastUpdateTime = Date.now()
 		},
-		getState(): State & { t: number } {
-			if (!previousState || !currentState) return { ...baseState, t: 0 }
+		getState(): State {
+			if (!previousState || !currentState) return { ...baseState }
 			const timeSinceLastUpdate = Date.now() - lastUpdateTime
 			const t = Math.min(1, timeSinceLastUpdate / TICK_INTERVAL)
 			return {
-				t: timeSinceLastUpdate,
 				b: {
 					x: lerp(previousState.b.x, currentState.b.x, t),
 					y: lerp(previousState.b.y, currentState.b.y, t),

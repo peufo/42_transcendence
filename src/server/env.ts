@@ -11,7 +11,7 @@ if (!process.env.GOOGLE_SECRET)
 	throw new Error('GOOGLE_SECRET environment value is required')
 if (!process.env.FILE_CERT || !process.env.FILE_KEY) {
 	console.warn(
-		'Warning, you need set FILE_CERT and FILE_KEY environment value for use https !',
+		'Warning, you need to set FILE_CERT and FILE_KEY environment value to use https !',
 	)
 }
 
