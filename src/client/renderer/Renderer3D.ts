@@ -1,3 +1,6 @@
+/// <reference path="../../../node_modules/babylonjs/babylon.d.ts" />
+/// <reference path="../../../node_modules/babylonjs-gui/babylon.gui.d.ts" />
+
 import {
 	ARENA_HEIGHT,
 	type Collision,
