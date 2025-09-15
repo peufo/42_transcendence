@@ -1,4 +1,6 @@
-// graphics/index.ts
+/// <reference path="../../../node_modules/babylonjs/babylon.d.ts" />
+/// <reference path="../../../node_modules/babylonjs-gui/babylon.gui.d.ts" />
+
 export * from './arena.js'
 export * from './ball.js'
 export * from './camera.js'

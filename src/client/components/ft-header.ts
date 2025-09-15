@@ -12,7 +12,7 @@ customElements.define(
 				const user = $user.get()
 				this.innerHTML = /*html*/ `
 					<header class="flex items-center p-2 pl-4 gap-2 border-b border-indigo-100">
-						<a href="${user ? '/me' : '/'}" class="text-2xl text-blue-600">Transcendance</a>
+						<a href="${user ? '/me' : '/'}" class="text-2xl text-indigo-600">Transcendance</a>
 						<div class="flex-grow"></div>
 						<ft-user-menu></ft-user-menu>
 					</header>

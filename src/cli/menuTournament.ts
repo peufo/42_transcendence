@@ -27,10 +27,10 @@ export const menuNewTournament: Scope = async () => {
 	})
 
 	p.log.success('Tournament created')
-	return await useMenuTournament(tournamentId)
+	return await menuTournament(tournamentId)
 }
 
-export async function useMenuTournament(tournamentId: number): Promise<Scope> {
+export const menuTournament: Scope<[number]> = async (tournamentId) => {
 	const rl = createInterface({ input: stdin, terminal: true })
 	const tournament = await api.get('/tournaments', {
 		tournamentId,
@@ -112,7 +112,7 @@ export async function useMenuTournament(tournamentId: number): Promise<Scope> {
 }
 
 function renderStages(stages: Match[][], level = 0, index = 0) {
-	if (!stages[level]) return
+	if (!stages || !stages[level]) return
 	renderMatchVersus(stages[level][index], level)
 	renderStages(stages, level + 1, index * 2)
 	if (level > 0) {
@@ -122,7 +122,7 @@ function renderStages(stages: Match[][], level = 0, index = 0) {
 	}
 }
 
-function renderMatchVersus(match: Match, level: number) {
+function renderMatchVersus(match: Match | undefined, level: number) {
 	stdout.write(chalk.gray('│'))
 	stdout.write(chalk.grey(`${' │ '.repeat(level)} 1/${2 ** level} `))
 	renderPlayer(match, 'player1')
@@ -131,15 +131,15 @@ function renderMatchVersus(match: Match, level: number) {
 	stdout.write('\n')
 }
 
-function renderPlayer(match: Match, p: 'player1' | 'player2') {
-	if (!match[p]) {
+function renderPlayer(match: Match | undefined, p: 'player1' | 'player2') {
+	if (!match || !match[p]) {
 		stdout.write('?')
 		return
 	}
 	const opponent = p === 'player1' ? 'player2' : 'player1'
 	const score = match[`${p}Score`]
 	const scoreOpponent = match[`${opponent}Score`]
-	let str = `${match[p].name}(${score})`
+	let str = `${match[p]?.name || p}(${score})`
 	if (score !== scoreOpponent) {
 		str = score > scoreOpponent ? chalk.green(str) : chalk.red(str)
 	}

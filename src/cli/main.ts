@@ -1,4 +1,6 @@
-export type Scope = () => Promise<Scope | null> | (Scope | null)
+export type Scope<Args extends unknown[] = unknown[]> = (
+	...args: Args
+) => Promise<Scope | null> | (Scope | null)
 export type ScopeOptions = p.SelectOptions<Scope | null>['options']
 
 import * as p from '@clack/prompts'
@@ -13,7 +15,10 @@ while (scope) {
 	try {
 		scope = await scope()
 	} catch (err: unknown) {
-		if (err instanceof Error) p.log.error(err.message)
+		if (err instanceof Error) {
+			p.log.error(err.message)
+			console.error(err)
+		}
 		if (scope === menuMain) {
 			api.setOptions({})
 		}

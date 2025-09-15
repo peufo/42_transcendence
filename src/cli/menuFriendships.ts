@@ -1,8 +1,10 @@
 import { exit } from 'node:process'
 import * as p from '@clack/prompts'
+import type { FriendshipFriend } from '../lib/type.js'
 import { api } from './api.js'
 import type { Scope, ScopeOptions } from './main.js'
 import { menuMain } from './menuMain.js'
+import { menuTournament } from './menuTournament.js'
 
 export const menuFriendships: Scope = async () => {
 	const action = await p.select({
@@ -23,18 +25,82 @@ const menuFriends: Scope = async () => {
 	const friends = await api.get('/friendships/friend')
 	if (!friends.length) {
 		p.log.warn('Sorry, You have no Friends !')
-	} else {
-		p.note(
-			friends
-				.map(
-					({ withUser: { name, isActive } }) =>
-						`${name.padEnd(16)}${isActive ? '[online]' : ''}`,
-				)
-				.join('\n'),
-			`My friends (${friends.length})`,
-		)
+		return menuFriendships
 	}
-	return menuFriendships
+
+	const action = await p.select({
+		message: `My friends (${friends.length})`,
+		options: [
+			{ label: 'Return', value: () => menuMain },
+			...friends.map((f) => {
+				const {
+					withUser: { name, isActive, tournament },
+				} = f
+				let label = name.padEnd(16)
+				if (tournament?.state === 'open') {
+					label += '[reachable]'
+				} else if (isActive) {
+					label += '[online]'
+				}
+				return {
+					label,
+					value: () => menuFriend(f),
+				}
+			}),
+		],
+	})
+	if (p.isCancel(action)) exit(0)
+
+	return action()
+}
+
+const menuFriend: Scope<[FriendshipFriend]> = async (friendship) => {
+	const options: ScopeOptions = [{ label: 'Return', value: menuFriends }]
+
+	const friend = friendship.withUser
+	const { tournament } = friend
+
+	if (tournament?.state === 'open') {
+		options.push({
+			label: 'Join',
+			value: async () => {
+				const res = await api.post('/tournaments/join', {
+					tournamentId: tournament.id,
+				})
+				if (!res.success) {
+					p.log.error('Tounament join failed')
+					return menuFriends
+				}
+				return menuTournament(tournament.id)
+			},
+		})
+	}
+
+	options.push({
+		label: 'Remove this friendship',
+		value: async () => {
+			const isConfirmed = await p.confirm({ message: 'Are you sure ?' })
+			if (p.isCancel(isConfirmed)) {
+				exit(0)
+			}
+			if (isConfirmed) {
+				await api.post('/friendships/delete', { friendshipId: friendship.id })
+				p.log.success(`${friendship.withUser.name} removed of your friendships`)
+			}
+			return menuFriends
+		},
+	})
+
+	const action = await p.select({
+		message: `${friendship.withUser.name}'s menu`,
+		options,
+	})
+
+	if (p.isCancel(action)) {
+		exit(0)
+	}
+
+	return action
 }
 
 const menuInvitationsSended: Scope = async () => {

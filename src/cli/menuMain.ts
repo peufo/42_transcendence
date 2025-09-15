@@ -8,8 +8,8 @@ import type { Scope, ScopeOptions } from './main.js'
 import { menuFriendships } from './menuFriendships.js'
 import {
 	menuNewTournament,
+	menuTournament,
 	testRenderStages,
-	useMenuTournament,
 } from './menuTournament.js'
 
 let user: UserWithTournament | undefined
@@ -29,7 +29,7 @@ export const menuMain: Scope = async () => {
 		if (tournamentId) {
 			options.push({
 				label: 'Return to tournament',
-				value: () => useMenuTournament(tournamentId),
+				value: () => menuTournament(tournamentId),
 			})
 			options.push({
 				label: 'Quit tournament',
@@ -45,7 +45,7 @@ export const menuMain: Scope = async () => {
 	}
 	options.push(
 		{ value: startGameLocal, label: 'Local game' },
-		{ value: exit, label: 'Exit' },
+		{ value: () => exit(0), label: 'Exit' },
 	)
 	const action = await p.select({
 		message: 'Main menu',
