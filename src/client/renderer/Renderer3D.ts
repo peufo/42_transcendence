@@ -23,12 +23,15 @@ export class Renderer3D extends Renderer {
 	private paddle2: BABYLON.AbstractMesh
 	private guiTexture: BABYLON.GUI.AdvancedDynamicTexture
 	private scoreText: BABYLON.GUI.TextBlock
+	private timerText: BABYLON.GUI.TextBlock
+	private gameOverText: BABYLON.GUI.TextBlock
 	private wallParticleSystem: BABYLON.ParticleSystem
 
 	constructor(element: HTMLElement, names: Record<Player, string>) {
 		super(element, names)
 		this.initAsync()
 		window.addEventListener('resize', () => this.babylonEngine.resize())
+		// TODO: waiting frame?
 	}
 
 	private initAsync = async () => {
@@ -37,8 +40,6 @@ export class Renderer3D extends Renderer {
 			this.camera = Graphics.createCamera(this.scene, this.canvas)
 			this.light = Graphics.createLights(this.scene)
 			Graphics.setupEnvironment(this.scene, this.camera)
-			console.log(this.user?.name)
-			console.log(this.playerNames)
 			const { ballMesh, paddle1, paddle2 } = await Graphics.createGameObjects(
 				this.scene,
 				this.user?.name === this.playerNames.p1
@@ -60,7 +61,7 @@ export class Renderer3D extends Renderer {
 				this.paddle2,
 			)
 			this.wallParticleSystem = Graphics.setupWallCollisionParticles(this.scene)
-			this.setupScore()
+			this.setupTexts()
 			this.babylonEngine.runRenderLoop(() => {
 				Graphics.updateGraphics(
 					this.interpolate.getState(),
@@ -83,7 +84,7 @@ export class Renderer3D extends Renderer {
 		this.scene.lightsEnabled = true
 	}
 
-	private setupScore = () => {
+	private setupTexts = () => {
 		this.guiTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI(
 			'UI',
 			true,
@@ -98,7 +99,42 @@ export class Renderer3D extends Renderer {
 			BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP
 		this.scoreText.textHorizontalAlignment =
 			BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
+		this.scoreText.outlineWidth = 4
+		this.scoreText.outlineColor = 'black'
+		this.scoreText.shadowColor = 'rgba(211, 174, 236, 0.7)'
+		this.scoreText.shadowOffsetX = 2
+		this.scoreText.shadowOffsetY = 2
 		this.guiTexture.addControl(this.scoreText)
+
+		this.timerText = new BABYLON.GUI.TextBlock()
+		this.timerText.color = 'red'
+		this.timerText.fontSize = 48
+		this.timerText.verticalAlignment =
+			BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP
+		this.timerText.textHorizontalAlignment =
+			BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
+		this.timerText.isVisible = false
+		this.timerText.outlineWidth = 4
+		this.timerText.outlineColor = 'black'
+		this.timerText.shadowColor = 'rgba(88, 56, 109, 0.7)'
+		this.timerText.shadowOffsetX = 2
+		this.timerText.shadowOffsetY = 2
+		this.guiTexture.addControl(this.timerText)
+
+		this.gameOverText = new BABYLON.GUI.TextBlock()
+		this.gameOverText.color = 'red'
+		this.gameOverText.fontSize = 48
+		this.gameOverText.verticalAlignment =
+			BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP
+		this.gameOverText.textHorizontalAlignment =
+			BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
+		this.gameOverText.isVisible = false
+		this.gameOverText.outlineWidth = 4
+		this.gameOverText.outlineColor = 'black'
+		this.gameOverText.shadowColor = 'rgba(61, 38, 77, 0.7)'
+		this.gameOverText.shadowOffsetX = 2
+		this.gameOverText.shadowOffsetY = 2
+		this.guiTexture.addControl(this.gameOverText)
 	}
 
 	clear() {
@@ -133,6 +169,12 @@ export class Renderer3D extends Renderer {
 	onGameEnd(data: GameOverData) {
 		super.onGameEnd(data)
 		this.scoreText.text = `${this.playerNames.p1}        ${this.scores.p1} : ${this.scores.p2}        ${this.playerNames.p2}`
+		const winner =
+			this.scores.p1 > this.scores.p2
+				? this.playerNames.p1
+				: this.playerNames.p2
+		this.gameOverText.isVisible = true
+		this.gameOverText.text = `GAME OVER\n${winner} won !`
 	}
 	onCollision(data: Collision): void {
 		Graphics.handleCollision(
@@ -145,10 +187,13 @@ export class Renderer3D extends Renderer {
 			this.wallParticleSystem,
 		)
 	}
-	onTimerTick(_data: number) {
-		// TODO: implement
+	onTimerTick(data: number) {
+		if (data === 0) {
+			this.timerText.isVisible = false
+		} else {
+			this.timerText.isVisible = true
+			this.timerText.text = `${data}`
+		}
 	}
-	onEngineStart() {
-		// TODO: implement
-	}
+	onEngineStart() {}
 }

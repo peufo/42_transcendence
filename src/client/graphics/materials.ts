@@ -27,11 +27,11 @@ export function createBallMaterial(
  */
 export function createBallMaterial(scene: BABYLON.Scene): BABYLON.PBRMaterial {
 	const ballMat = new BABYLON.PBRMaterial('ballMat', scene)
-	ballMat.albedoColor = new BABYLON.Color3(0.2, 0.2, 0.2)
-	ballMat.metallic = 0.8
-	ballMat.roughness = 0.2
-	ballMat.emissiveColor = new BABYLON.Color3(0.1, 0.1, 0.3) // Lueur bleue
-	ballMat.emissiveIntensity = 1.5
+	ballMat.albedoColor = new BABYLON.Color3(0.7, 0.1, 0.7)
+	ballMat.metallic = 0.5
+	ballMat.roughness = 0.4
+	ballMat.emissiveColor = new BABYLON.Color3(0.7, 0.1, 0.7) // Lueur bleue
+	ballMat.emissiveIntensity = 1
 
 	return ballMat
 }
@@ -55,7 +55,7 @@ export function createWallMaterial(scene: BABYLON.Scene): BABYLON.PBRMaterial {
 		scene,
 	)
 	mat.environmentIntensity = 2.5
-	mat.albedoColor = new BABYLON.Color3(0.2, 0.2, 0.2)
+	mat.albedoColor = new BABYLON.Color3(0.3, 0.3, 0.3)
 	mat.metallic = 0.8
 	mat.roughness = 0.3
 	mat.environmentIntensity = 1.8

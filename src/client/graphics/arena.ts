@@ -1,4 +1,5 @@
 import { scale } from './utils.js'
+
 export function createArena(
 	scene: BABYLON.Scene,
 	material: BABYLON.Material,
