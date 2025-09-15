@@ -63,6 +63,24 @@
 	@apply block flex gap-2 items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer;
 }
 
+.login-gradient {
+	background: linear-gradient(250deg, #4f29ce, rgb(209, 209, 209), #ff9d00);
+	background-size: 180% 180%;
+	animation: gradient-animation 7s ease infinite;
+}
+
+@keyframes gradient-animation {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
+
 @theme {
 	--animate-shakeX: shakeX 0.6s ease-in-out;
 

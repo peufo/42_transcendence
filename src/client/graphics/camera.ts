@@ -5,8 +5,8 @@ export function createCamera(
 	const camera = new BABYLON.ArcRotateCamera(
 		'camera',
 		0,
-		0,
-		100,
+		Math.PI / 5,
+		110,
 		new BABYLON.Vector3(0, 0, 0),
 		scene,
 	)

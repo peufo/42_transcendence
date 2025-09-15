@@ -3,17 +3,12 @@ customElements.define(
 	class extends HTMLElement {
 		connectedCallback() {
 			this.innerHTML = /*html*/ `
-        <div class="flex items-center justify-center min-h-screen">
-          <!-- <div class="w-screen h-screen">
-              <video class="w-[100%] h-[100%]" autoplay muted loop>
-                <source src="/public/video/output.mp4" type="video/mp4" width="1024" height="768">
-                Your browser doesn't support the video tag.
-          </div> -->
+      <div class="w-screen h-screen login-gradient">
+        <div class="fixed top-1/2 left-1/2 -translate-1/2 flex items-center justify-center">
           <div class="relative flex flex-col justify-center shadow-lg rounded-2xl border-2 border-indigo-600
                       px-6 py-10 sm:px-8 md:px-12 lg:px-16
                       w-full max-w-[95vw] sm:max-w-[500px] md:max-w-[700px] lg:max-w-[800px]
-                      min-h-[500px]">
-                      
+                      min-h-[500px]">      
             <!-- Titre -->
             <div class="sm:mx-auto sm:w-full sm:max-w-sm z-10">
               <h2 class="mt-10 text-center text-3xl sm:text-4xl tracking-tight text-indigo-600">
@@ -47,7 +42,7 @@ customElements.define(
                 </div>
               </form>
               <a href="/login/waiting/google">
-                <div class="btn btn-secondary rounded-lg transition-all cursor-pointer">
+                <div class="btn btn-secondary border-1 border-gray-400 rounded-lg transition-all cursor-pointer">
                   <div>Login with</div>
                     <div class="flex flex-row justify-around">
                     <div class="text-blue-500">G</div>
@@ -59,15 +54,16 @@ customElements.define(
                   </div>
                 </div>
                   </a>
-                  <a href="/signup" class="text-blue-400 text-sm hover:underline mt-4 block text-center">Create an account</a>
-                </div>
-                <h3 class="mt-4 text-center tracking-tight text-black text-gray-400">
+                  <a href="/signup" class="text-indigo-600 text-sm hover:underline mt-4 block text-center ">Create an account</a>
+                </div>        
+                 <h3 class="mt-4 text-center tracking-tight text-black">
                     A 42 school project by aloubry, jvoisard, alletond and lbaecher
                 </h3>
               </div>
             </div>
           </div>
         </div>
+      </div>
       `
 		}
 	},

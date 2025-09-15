@@ -10,7 +10,7 @@ export function toRenderPosition(
 	return new BABYLON.Vector3(
 		scale(pos.y + height / 2 - ARENA_HEIGHT / 2), // y devient x babylon
 		5,
-		scale(-(pos.x + width / 2 - ARENA_WIDTH / 2)), // x devient z babylon
+		scale(pos.x + width / 2 - ARENA_WIDTH / 2), // x devient z babylon
 	)
 }
 

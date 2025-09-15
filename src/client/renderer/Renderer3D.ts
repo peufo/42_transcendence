@@ -1,8 +1,10 @@
-import type {
-	Collision,
-	GameOverData,
-	RoundData,
-	State,
+import {
+	ARENA_HEIGHT,
+	type Collision,
+	type GameOverData,
+	type Player,
+	type RoundData,
+	type State,
 } from '../../lib/engine/index.js'
 import * as Graphics from '../graphics/index.js'
 import { Renderer } from './Renderer.js'
@@ -20,8 +22,8 @@ export class Renderer3D extends Renderer {
 	private scoreText: BABYLON.GUI.TextBlock
 	private wallParticleSystem: BABYLON.ParticleSystem
 
-	constructor(element: HTMLElement) {
-		super(element)
+	constructor(element: HTMLElement, names: Record<Player, string>) {
+		super(element, names)
 		this.initAsync()
 		window.addEventListener('resize', () => this.babylonEngine.resize())
 	}
@@ -32,8 +34,16 @@ export class Renderer3D extends Renderer {
 			this.camera = Graphics.createCamera(this.scene, this.canvas)
 			this.light = Graphics.createLights(this.scene)
 			Graphics.setupEnvironment(this.scene, this.camera)
+			console.log(this.user?.name)
+			console.log(this.playerNames)
 			const { ballMesh, paddle1, paddle2 } = await Graphics.createGameObjects(
 				this.scene,
+				this.user?.name === this.playerNames.p1
+					? new BABYLON.Color3(0.498, 0.133, 0.996)
+					: new BABYLON.Color3(0.996, 0.604, 0),
+				this.user?.name === this.playerNames.p2
+					? new BABYLON.Color3(0.498, 0.133, 0.996)
+					: new BABYLON.Color3(0.996, 0.604, 0),
 			)
 			this.ballMesh = ballMesh
 			this.paddle1 = paddle1
@@ -77,10 +87,10 @@ export class Renderer3D extends Renderer {
 			this.scene,
 		)
 		this.scoreText = new BABYLON.GUI.TextBlock()
-		this.scoreText.text = '0 : 0'
+		this.scoreText.text = `${this.playerNames.p1}        ${this.scores.p1} : ${this.scores.p2}        ${this.playerNames.p2}`
 		this.scoreText.color = 'blue'
-		this.scoreText.fontSize = 48
-		this.scoreText.top = '-440px'
+		this.scoreText.fontSize = 40
+		this.scoreText.top = `-${ARENA_HEIGHT / 2 - 24}px`
 		this.scoreText.verticalAlignment =
 			BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP
 		this.scoreText.textHorizontalAlignment =
@@ -115,11 +125,11 @@ export class Renderer3D extends Renderer {
 	}
 	onRoundEnd(data: RoundData) {
 		super.onRoundEnd(data)
-		this.scoreText.text = `${this.scores.p1} : ${this.scores.p2}`
+		this.scoreText.text = `${this.playerNames.p1}        ${this.scores.p1} : ${this.scores.p2}        ${this.playerNames.p2}`
 	}
 	onGameEnd(data: GameOverData) {
 		super.onGameEnd(data)
-		this.scoreText.text = `${this.scores.p1} : ${this.scores.p2}`
+		this.scoreText.text = `${this.playerNames.p1}        ${this.scores.p1} : ${this.scores.p2}        ${this.playerNames.p2}`
 	}
 	onCollision(data: Collision): void {
 		Graphics.handleCollision(

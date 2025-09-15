@@ -61,15 +61,14 @@ defineComponent('ft-pong-remote', () => {
 				`
 			return
 		}
-		renderer?.clear()
-		renderer = new Renderer3D(element)
 		channel?.close()
 		channel = socketChannel(
 			'matches',
 			{ matchId: match.id.toString() },
 			{
-				playerNames: (names) => {
-					renderer.setPlayerNames(names)
+				matchReady: (names) => {
+					renderer?.clear()
+					renderer = new Renderer3D(element, names)
 				},
 				onEngineEvent: (data) => {
 					renderer.onEngineEvent(data)

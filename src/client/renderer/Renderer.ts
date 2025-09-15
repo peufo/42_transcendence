@@ -21,18 +21,14 @@ export abstract class Renderer implements Required<EngineOptionsEvents> {
 	protected playerNames = { p1: 'Player 1', p2: 'Player 2' }
 	protected canvas: HTMLCanvasElement
 
-	constructor(element: HTMLElement) {
+	constructor(element: HTMLElement, names: Record<Player, string>) {
 		this.element = element
+		this.playerNames = names
 		this.canvas = document.createElement('canvas')
 		this.canvas.width = ARENA_WIDTH
 		this.canvas.height = ARENA_HEIGHT
 		this.canvas.classList.add('border')
 		this.element.appendChild(this.canvas)
-	}
-
-	setPlayerNames(names: Record<Player, string | undefined>) {
-		if (names.p1) this.playerNames.p1 = names.p1
-		if (names.p2) this.playerNames.p2 = names.p2
 	}
 
 	onEngineEvent(data: EngineEventData) {

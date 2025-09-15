@@ -1,8 +1,10 @@
 export function createPaddleMaterial(
 	scene: BABYLON.Scene,
+	color: BABYLON.Color3,
 ): BABYLON.PBRMaterial {
 	const mat = new BABYLON.PBRMaterial('iridescentPaddle', scene)
-	mat.albedoColor = new BABYLON.Color3(0.7, 0.7, 1)
+	console.log(color)
+	mat.albedoColor = color
 	mat.metallic = 1.0
 	mat.roughness = 0.1
 	mat.iridescence.isEnabled = true
@@ -54,10 +56,10 @@ export function createWallMaterial(scene: BABYLON.Scene): BABYLON.PBRMaterial {
 	)
 	mat.environmentIntensity = 2.5
 	mat.albedoColor = new BABYLON.Color3(0.2, 0.2, 0.2)
-	mat.metallic = 0.9
-	mat.roughness = 0.2
+	mat.metallic = 0.8
+	mat.roughness = 0.3
 	mat.environmentIntensity = 1.8
-	mat.specularIntensity = 1.5
+	mat.specularIntensity = 0.5
 
 	mat.iridescence.isEnabled = true
 	mat.iridescence.intensity = 1.2

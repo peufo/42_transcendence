@@ -125,9 +125,9 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 							.where(eq(matches.id, matchId))
 							.then(() => {
 								match.state = 'ongoing'
-								notify.matches(matchId, 'playerNames', {
-									p1: match.player1?.name,
-									p2: match.player2?.name,
+								notify.matches(matchId, 'matchReady', {
+									p1: match.player1?.name ?? 'Player 1',
+									p2: match.player2?.name ?? 'Player 2',
 								})
 								payload.engine.start()
 							})

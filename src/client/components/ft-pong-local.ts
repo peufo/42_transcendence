@@ -43,14 +43,14 @@ defineComponent('ft-pong-local', () => {
 			element.classList.add('grid', 'place-items-center')
 			const urlParams = new URLSearchParams(window.location.search)
 			const selectedRenderer = urlParams.get('renderer')
+			const names = {
+				p1: urlParams.get('player1') ?? 'Player 1',
+				p2: urlParams.get('player2') ?? 'Player 2',
+			}
 			renderer =
 				selectedRenderer === '3d'
-					? new Renderer3D(element)
-					: new Renderer2D(element)
-			renderer.setPlayerNames({
-				p1: urlParams.get('player1') ?? undefined,
-				p2: urlParams.get('player2') ?? undefined,
-			})
+					? new Renderer3D(element, names)
+					: new Renderer2D(element, names)
 			const pointsToWin = urlParams.get('points-to-win')
 			engine = new Engine({
 				pointsToWin: Number(pointsToWin),

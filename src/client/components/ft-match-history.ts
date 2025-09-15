@@ -75,9 +75,9 @@ customElements.define(
 						if (match.player1Score === match.player2Score) return ''
 						if (match.player1Score > match.player2Score) {
 							if (userIsPlayer1) return 'text-indigo-600 font-bold'
-							return 'text-red-400 font-bold'
+							return 'text-amber-600 font-bold'
 						}
-						if (userIsPlayer1) return 'text-red-400 font-bold'
+						if (userIsPlayer1) return 'text-amber-600 font-bold'
 						return 'text-indigo-600 font-bold'
 					}
 
@@ -155,7 +155,7 @@ function scoringGraph(match: Match, user: UserWithTournament): string {
 						<div>Won</div>
 					</div>
 					<div class="flex flex-col justify-center items-center">
-						<div class="bg-red-400 h-5 w-5 rounded"></div>
+						<div class="bg-amber-600 h-5 w-5 rounded"></div>
 						<div>Lost</div>
 					</div>
 				</div>
@@ -172,7 +172,7 @@ function scoringGraph(match: Match, user: UserWithTournament): string {
 									match.rounds[ralliesPerRound.indexOf(rallies)].scorer ===
 										'p2')
 									? 'bg-indigo-600'
-									: 'bg-red-400'
+									: 'bg-amber-600'
 							return `<div class="${color} w-6 rounded-t" style="height:${heightPercent}%;"></div>`
 						})
 						.join('')}
@@ -236,10 +236,10 @@ function detailedMatch(match: Match, user: UserWithTournament): string {
 				} else {
 					player2Score++
 					html += /*html*/ `
-						<div class= "text-red-400 text-center">
+						<div class= "text-amber-600 text-center">
 							${match.player2.name}
 						</div>
-						<div class= "text-red-400 text-center">
+						<div class= "text-amber-600 text-center">
 							${player1Score} - ${player2Score}
 						</div>
 						`
@@ -248,10 +248,10 @@ function detailedMatch(match: Match, user: UserWithTournament): string {
 				if (round.scorer === 'p1') {
 					player1Score++
 					html += /*html*/ `
-						<div class="text-red-400 text-center">
+						<div class="text-amber-600 text-center">
 							${match.player1.name}
 						</div>
-						<div class="text-red-400 text-center">
+						<div class="text-amber-600 text-center">
 							${player1Score} - ${player2Score}
 						</div>
 						`
@@ -326,7 +326,7 @@ function getWinner(match: Match, user: UserWithTournament) {
 		(user.name === match.player1.name && match.player1Score === -1)
 	)
 		return /*html*/ `
-			<div class="text-red-400 flex flex-row justify-center items-center font-bold text-2xl">Defeat by forfeit</div>
+			<div class="text-amber-600 flex flex-row justify-center items-center font-bold text-2xl">Defeat by forfeit</div>
 		`
 	else if (
 		(user.name === match.player1.name &&
@@ -339,6 +339,6 @@ function getWinner(match: Match, user: UserWithTournament) {
 		`
 	else
 		return /*html*/ `
-			<div class="text-red-400 flex flex-row justify-center items-center font-bold text-2xl">Defeat</div>
+			<div class="text-amber-600 flex flex-row justify-center items-center font-bold text-2xl">Defeat</div>
 		`
 }

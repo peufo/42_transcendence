@@ -9,6 +9,7 @@ import {
 	PADDLE_BASE_P1_POSITION,
 	PADDLE_BASE_P2_POSITION,
 	PADDLE_BASE_WIDTH,
+	type Player,
 	type RoundData,
 	type State,
 } from '../../lib/engine/index.js'
@@ -46,8 +47,8 @@ export class Renderer2D extends Renderer {
 	private ctx: CanvasRenderingContext2D
 	private lastFrameTime = 0
 
-	constructor(element: HTMLElement) {
-		super(element)
+	constructor(element: HTMLElement, names: Record<Player, string>) {
+		super(element, names)
 		const newCtx = this.canvas.getContext('2d')
 		if (!newCtx) throw new Error('Canvas context failed')
 		this.ctx = newCtx
@@ -109,6 +110,8 @@ export class Renderer2D extends Renderer {
 
 		// paddle
 		this.ctx.beginPath()
+		this.ctx.fillStyle =
+			this.user?.name === this.playerNames.p1 ? '#7f22fe' : '#fe9a00ff'
 		this.ctx.rect(
 			PADDLE_BASE_P1_POSITION.x,
 			state.p1,
@@ -117,6 +120,8 @@ export class Renderer2D extends Renderer {
 		)
 		this.ctx.fill()
 		this.ctx.beginPath()
+		this.ctx.fillStyle =
+			this.user?.name === this.playerNames.p2 ? '#7f22fe' : '#fe9a00'
 		this.ctx.rect(
 			PADDLE_BASE_P2_POSITION.x,
 			state.p2,
@@ -128,21 +133,12 @@ export class Renderer2D extends Renderer {
 		// scores
 		const fontSize = 40
 		this.ctx.font = `${fontSize}px sans-serif`
-		this.ctx.fillStyle =
-			this.user?.name === this.playerNames.p1 ? '#7f22fe' : '#ff2056'
-		this.ctx.fillText(
-			`${this.playerNames.p1} : ${this.scores.p1}`,
-			ARENA_WIDTH / 2 - ARENA_WIDTH / 4,
-			fontSize,
-		)
-		this.ctx.fillStyle =
-			this.user?.name === this.playerNames.p2 ? '#7f22fe' : '#ff2056'
-		this.ctx.fillText(
-			`${this.playerNames.p2} : ${this.scores.p2}`,
-			ARENA_WIDTH / 2 + ARENA_WIDTH / 4,
-			fontSize,
-		)
 		this.ctx.fillStyle = 'black'
+		this.ctx.fillText(
+			`${this.playerNames.p1}        ${this.scores.p1} : ${this.scores.p2}        ${this.playerNames.p2}`,
+			ARENA_WIDTH / 2,
+			fontSize,
+		)
 
 		// poks
 		this.poks.forEach((pok) => {
