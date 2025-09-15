@@ -4,20 +4,21 @@ export function createCamera(
 ): BABYLON.ArcRotateCamera {
 	const camera = new BABYLON.ArcRotateCamera(
 		'camera',
-		-Math.PI / 2,
-		Math.PI / 2.5,
+		0,
+		0,
 		100,
 		new BABYLON.Vector3(0, 0, 0),
 		scene,
 	)
 
-	/*
 	camera.lowerBetaLimit = 0.1
 	camera.upperBetaLimit = Math.PI / 2.2
-	camera.lowerRadiusLimit = 500
-	camera.upperRadiusLimit = 1000
-	
-	*/
+	camera.lowerRadiusLimit = 50
+	camera.upperRadiusLimit = 200
+
+	camera.inputs.clear()
+	camera.inputs.addMouseWheel()
+	camera.inputs.addPointers()
 	camera.attachControl(canvas, true)
 	return camera
 }

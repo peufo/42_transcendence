@@ -40,6 +40,7 @@ defineComponent('ft-page-lab', () => {
 			console.log('LABO RENDER')
 			renderCount++
 			return /*html*/ `
+					<ft-page-babylon-menu></ft-page-babylon-menu>
 					<h3>LABO</h3>
 					<h3>RENDERING: ${renderCount}</h3>
 					<ft-prout></ft-prout>

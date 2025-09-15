@@ -1,3 +1,5 @@
+import { getRandomArbitrary } from '../../lib/utils.js'
+
 export function setupEnvironment(
 	scene: BABYLON.Scene,
 	camera: BABYLON.Camera,
@@ -12,9 +14,10 @@ export function setupEnvironment(
 	pipeline.imageProcessingEnabled = true
 	pipeline.fxaaEnabled = true
 
+	const textures = ['cloud8k', 'garden8k', 'shanghai_16k']
 	if (!scene.getMeshByName('BackgroundSkybox')) {
 		const envTexture = BABYLON.CubeTexture.CreateFromPrefilteredData(
-			'/public/textures/polyhaven/cloud8k.env',
+			`/public/textures/polyhaven/${textures.at(getRandomArbitrary(0, 3))}.env`,
 			scene,
 		)
 		scene.environmentTexture = envTexture

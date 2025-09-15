@@ -44,16 +44,10 @@ export class Renderer2D extends Renderer {
 	private animationFrameId = 0
 	private poks: Pok[] = []
 	private ctx: CanvasRenderingContext2D
-	private canvas: HTMLCanvasElement
 	private lastFrameTime = 0
 
 	constructor(element: HTMLElement) {
 		super(element)
-		this.canvas = document.createElement('canvas')
-		this.canvas.setAttribute('width', ARENA_WIDTH.toString())
-		this.canvas.setAttribute('height', ARENA_HEIGHT.toString())
-		this.canvas.classList.add('border')
-		this.element.appendChild(this.canvas)
 		const newCtx = this.canvas.getContext('2d')
 		if (!newCtx) throw new Error('Canvas context failed')
 		this.ctx = newCtx
@@ -167,7 +161,7 @@ export class Renderer2D extends Renderer {
 	}
 
 	clear(): void {
-		this.element.removeChild(this.canvas)
+		this.canvas.remove()
 	}
 
 	onTick(data: State) {

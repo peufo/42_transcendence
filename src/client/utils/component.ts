@@ -12,7 +12,7 @@ export function defineComponent(
 	customElements.define(
 		name,
 		class extends HTMLElement {
-			private cleanEffect: CleanEffect | undefined | undefined
+			private cleanEffect: CleanEffect
 			private component = getComponent()
 
 			connectedCallback() {
@@ -23,7 +23,7 @@ export function defineComponent(
 				})
 			}
 			disconnectedCallback() {
-				this.cleanEffect?.()
+				this.cleanEffect()
 				this.component.onDestroy?.(this)
 			}
 		},

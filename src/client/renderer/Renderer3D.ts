@@ -9,7 +9,6 @@ import { Renderer } from './Renderer.js'
 
 export const RENDER_SCALE = 0.1
 export class Renderer3D extends Renderer {
-	private canvas: HTMLCanvasElement
 	private babylonEngine: BABYLON.Engine
 	private scene: BABYLON.Scene
 	private camera: BABYLON.ArcRotateCamera
@@ -23,14 +22,13 @@ export class Renderer3D extends Renderer {
 
 	constructor(element: HTMLElement) {
 		super(element)
-		element.classList.add('w-full', 'h-full')
-		this.initAsync(element)
+		this.initAsync()
 		window.addEventListener('resize', () => this.babylonEngine.resize())
 	}
 
-	private initAsync = async (element: HTMLElement) => {
+	private initAsync = async () => {
 		try {
-			this.initCanvasAndEngine(element)
+			this.initEngine()
 			this.camera = Graphics.createCamera(this.scene, this.canvas)
 			this.light = Graphics.createLights(this.scene)
 			Graphics.setupEnvironment(this.scene, this.camera)
@@ -50,18 +48,21 @@ export class Renderer3D extends Renderer {
 			)
 			this.wallParticleSystem = Graphics.setupWallCollisionParticles(this.scene)
 			this.setupScore()
-			this.babylonEngine.runRenderLoop(() => this.scene.render())
+			this.babylonEngine.runRenderLoop(() => {
+				Graphics.updateGraphics(
+					this.interpolate.getState(),
+					this.ballMesh,
+					this.paddle1,
+					this.paddle2,
+				)
+				this.scene.render()
+			})
 		} catch (error) {
 			console.error('Initialization failed:', error)
 		}
 	}
 
-	private initCanvasAndEngine = (element: HTMLElement) => {
-		this.canvas = document.createElement('canvas')
-		this.canvas.style.width = '100%'
-		this.canvas.style.height = '100%'
-		element.appendChild(this.canvas)
-
+	private initEngine = () => {
 		this.babylonEngine = new BABYLON.Engine(this.canvas, true, {
 			stencil: true,
 		})
@@ -87,7 +88,7 @@ export class Renderer3D extends Renderer {
 		this.guiTexture.addControl(this.scoreText)
 	}
 
-	disconnectedCallback() {
+	clear() {
 		if (this.scene.environmentTexture) {
 			const envTex = this.scene.environmentTexture
 			if (
@@ -102,7 +103,6 @@ export class Renderer3D extends Renderer {
 
 		const skybox = this.scene.getMeshByName('BackgroundSkybox')
 		skybox?.dispose()
-
 		this.babylonEngine.stopRenderLoop()
 		this.scene.dispose()
 		this.babylonEngine.dispose()
@@ -112,13 +112,6 @@ export class Renderer3D extends Renderer {
 
 	onTick(data: State): void {
 		super.onTick(data)
-		// TODO: not update graphics in ontick
-		Graphics.updateGraphics(
-			this.interpolate.getState(),
-			this.ballMesh,
-			this.paddle1,
-			this.paddle2,
-		)
 	}
 	onRoundEnd(data: RoundData) {
 		super.onRoundEnd(data)

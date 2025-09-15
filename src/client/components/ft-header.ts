@@ -5,7 +5,8 @@ import { $user } from '../utils/store.js'
 customElements.define(
 	'ft-header',
 	class extends HTMLElement {
-		private cleanEffect: CleanEffect | undefined
+		private cleanEffect: CleanEffect
+
 		connectedCallback() {
 			this.cleanEffect = createEffect(() => {
 				const user = $user.get()
@@ -19,7 +20,7 @@ customElements.define(
 			})
 		}
 		disconnectedCallback() {
-			this.cleanEffect?.()
+			this.cleanEffect()
 		}
 	},
 )
@@ -27,7 +28,7 @@ customElements.define(
 customElements.define(
 	'ft-user-menu',
 	class extends HTMLElement {
-		private cleanEffect: CleanEffect | undefined
+		private cleanEffect: CleanEffect
 
 		connectedCallback() {
 			this.cleanEffect = createEffect(() => {
@@ -36,7 +37,7 @@ customElements.define(
 		}
 
 		disconnectedCallback() {
-			this.cleanEffect?.()
+			this.cleanEffect()
 		}
 
 		render(): string {
