@@ -1,4 +1,3 @@
-import { myRendering, setMyRendering } from '../renderer/Renderer.js'
 import { $user } from '../utils/store.js'
 
 customElements.define(
@@ -16,11 +15,6 @@ customElements.define(
 
 			this.innerHTML = /*html*/ `
 				<div class="grid grid-cols-2 gap-3">
-					<label class="inline-flex items-center cursor-pointer col-span-2 flex flex-row items-center justify-center">
-						<input id="renderer" type="checkbox" class="sr-only peer" ${myRendering === '3D' ? 'checked' : ''}>
-						<div class="relative w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
-						<span class="ms-3 text-sm" id="render-type">${myRendering}</span>
-					</label>
 					<div class="flex flex-col gap-5 p-5 justify-evenly ring-2 ring-indigo-500 rounded-lg">
 						<div class="text-center">Local</div>
 						<a  href="/local/new" class="btn btn-primary">
@@ -38,15 +32,6 @@ customElements.define(
 					${activeTournamentButton}
 				</div>
 			`
-
-			const rendererCheckbox = this.querySelector<HTMLInputElement>('#renderer')
-			const renderSpan = this.querySelector<HTMLSpanElement>('#render-type')
-			if (!rendererCheckbox || !renderSpan) return
-			rendererCheckbox.addEventListener('click', () => {
-				const selection = rendererCheckbox.checked ? '3D' : '2D'
-				setMyRendering(selection)
-				renderSpan.innerHTML = selection
-			})
 		}
 	},
 )

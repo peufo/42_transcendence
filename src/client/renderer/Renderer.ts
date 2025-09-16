@@ -13,10 +13,12 @@ import {
 import { useInterpolate } from '../../lib/interpolate.js'
 import { $user } from '../utils/store.js'
 
-export let myRendering: '2D' | '3D' = '2D'
+export function getMyRendering() {
+	return (window.localStorage.getItem('rendering') ?? '2D') as '2D' | '3D'
+}
 
 export function setMyRendering(value: '2D' | '3D') {
-	myRendering = value
+	window.localStorage.setItem('rendering', value)
 }
 
 export abstract class Renderer implements Required<EngineOptionsEvents> {

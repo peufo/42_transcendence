@@ -1,5 +1,5 @@
 import { Engine } from '../../lib/engine/index.js'
-import { myRendering, type Renderer } from '../renderer/Renderer.js'
+import { getMyRendering, type Renderer } from '../renderer/Renderer.js'
 import { Renderer2D } from '../renderer/Renderer2D.js'
 import { Renderer3D } from '../renderer/Renderer3D.js'
 import { defineComponent } from '../utils/component.js'
@@ -47,7 +47,7 @@ defineComponent('ft-pong-local', () => {
 				p2: urlParams.get('player2') ?? 'Player 2',
 			}
 			renderer =
-				myRendering === '2D'
+				getMyRendering() === '2D'
 					? new Renderer2D(element, names)
 					: new Renderer3D(element, names)
 			const pointsToWin = urlParams.get('points-to-win')
