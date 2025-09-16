@@ -1,6 +1,12 @@
-import { eq, sql } from 'drizzle-orm'
+import { and, eq, sql } from 'drizzle-orm'
 import { Engine, type RoundData } from '../../../lib/engine/index.js'
-import { db, matches, rounds, users } from '../../db/index.js'
+import {
+	db,
+	matches,
+	rounds,
+	tournamentsParticipants,
+	users,
+} from '../../db/index.js'
 import type { DB } from '../../types.js'
 import {
 	tournamentGetStages,
@@ -69,6 +75,7 @@ export async function handleTournamentGameEnd(
 	const matchStageIndex = stages.findIndex((stage) =>
 		stage.find((m) => m.id === match.id),
 	)
+	console.log({ matchStageIndex })
 	if (matchStageIndex === -1) throw new Error('matchStage not found')
 	const isTournamentEnd = matchStageIndex + 1 === stages.length
 	if (isTournamentEnd) {
@@ -87,11 +94,22 @@ export async function handleTournamentGameEnd(
 		console.log('Should not happen')
 		return
 	}
+
+	const winnerParticipation = await db.query.tournamentsParticipants.findFirst({
+		where: and(
+			eq(tournamentsParticipants.tournamentId, match.tournamentId),
+			eq(tournamentsParticipants.userId, winnerId),
+		),
+	})
+	const winnerInitalScore = winnerParticipation?.isActive ? 0 : -1
+
 	await db
 		.update(matches)
 		.set({
-			player1Id: nextMatch.player1Id || winnerId,
-			player2Id: nextMatch.player1Id ? winnerId : null,
+			player1Id: nextMatch.player1Id ?? winnerId,
+			player2Id: nextMatch.player1Id ? winnerId : undefined,
+			player1Score: nextMatch.player1Score ?? winnerInitalScore,
+			player2Score: nextMatch.player1Id ? winnerInitalScore : undefined,
 		})
 		.where(eq(matches.id, nextMatch.id))
 	const updatedNextMatch = await db.query.matches.findFirst({
@@ -105,6 +123,21 @@ export async function handleTournamentGameEnd(
 		console.log('Should not happen')
 		return
 	}
+
+	console.log(updatedNextMatch)
+	const isNextMatchReady = !!(
+		updatedNextMatch.player1 && updatedNextMatch.player2
+	)
+	const isNextMatchHasGhost =
+		updatedNextMatch.player1Score === -1 || updatedNextMatch.player2Score === -1
+
+	if (isNextMatchHasGhost && isNextMatchReady) {
+		await handleTournamentGameEnd({
+			...updatedNextMatch,
+			tournamentId: match.tournamentId,
+		})
+	}
+
 	notify.tournaments(match.tournamentId, 'onMatchChange', {
 		match: updatedNextMatch,
 	})

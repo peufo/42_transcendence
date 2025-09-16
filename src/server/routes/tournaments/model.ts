@@ -1,13 +1,17 @@
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import type { Tournament, TournamentWithLookup } from '../../../lib/type.js'
-import { db, matches, tournaments } from '../../db/index.js'
+import {
+	db,
+	matches,
+	tournaments,
+	tournamentsParticipants,
+} from '../../db/index.js'
 import { server } from '../../server.js'
 import type { DB } from '../../types.js'
 import { userBasicColumns } from '../friendships/model.js'
 import { notify } from '../ws/controller.js'
 import {
 	createTournament,
-	deleteParticipant,
 	deleteTournament,
 	findTournament,
 	getUserActiveTournament,
@@ -48,6 +52,12 @@ export async function tournamentGetStages(tournamentId: number) {
 	})
 	if (!tournament) throw server.httpErrors.notFound()
 	return getMatchesByStages(tournament.numberOfPlayers, tournament.matches)
+}
+export function tournamentGetWithParticipants(tournamentId: number) {
+	return db.query.tournaments.findFirst({
+		where: eq(tournaments.id, tournamentId),
+		with: { participants: true },
+	})
 }
 
 function getMatchesByStages<M extends DB.Match>(
@@ -102,7 +112,6 @@ export async function tournamentJoin(
 	const participantInTournament = tournament.participants.find(
 		({ user }) => user.id === userId,
 	)
-	let joinTime = participantInTournament?.joinedAt
 	let nbParticipants = tournament.participants.length
 	if (!participantInTournament) {
 		if (nbParticipants >= tournament.numberOfPlayers) {
@@ -114,12 +123,15 @@ export async function tournamentJoin(
 			throw server.httpErrors.forbidden('The tournament is not open anymore.')
 		}
 		const participants = await insertParticipant(tournamentId, userId)
-		joinTime = participants.at(0)?.joinedAt
 		nbParticipants++
+		return {
+			tournament,
+			joinedAt: participants.at(0)?.joinedAt ?? new Date(),
+		}
 	}
 	return {
 		tournament,
-		joinedAt: joinTime ?? new Date(),
+		joinedAt: new Date(),
 	}
 }
 
@@ -133,19 +145,27 @@ export function tournamentUpdateState(
 		.where(eq(tournaments.id, tournamentId))
 }
 
-export function tournamentQuit(tournamentId: number, userId: number) {
-	return deleteParticipant(tournamentId, userId)
+export function tournamentQuitOngoing(tournamentId: number, userId: number) {
+	return db
+		.update(tournamentsParticipants)
+		.set({ isActive: false })
+		.where(
+			and(
+				eq(tournamentsParticipants.tournamentId, tournamentId),
+				eq(tournamentsParticipants.userId, userId),
+			),
+		)
 }
 
-export async function isTournamentEmptyAndOpen(
-	tournamentId: number,
-): Promise<boolean> {
-	const tournament = await db.query.tournaments.findFirst({
-		where: eq(tournaments.id, tournamentId),
-		with: { participants: true },
-	})
-	if (!tournament) return false
-	return tournament.state === 'open' && tournament.participants.length === 0
+export function tournamentQuitOpen(tournamentId: number, userId: number) {
+	return db
+		.delete(tournamentsParticipants)
+		.where(
+			and(
+				eq(tournamentsParticipants.tournamentId, tournamentId),
+				eq(tournamentsParticipants.userId, userId),
+			),
+		)
 }
 
 export async function tournamentStart(tournamentId: number) {

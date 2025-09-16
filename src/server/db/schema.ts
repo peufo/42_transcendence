@@ -99,6 +99,7 @@ export const tournamentsParticipants = sqliteTable(
 			.notNull()
 			.references(() => users.id),
 		joinedAt: int({ mode: 'timestamp' }).notNull().default(new Date()),
+		isActive: int({ mode: 'boolean' }).notNull().default(true),
 	},
 	(table) => [unique().on(table.tournamentId, table.userId)],
 )

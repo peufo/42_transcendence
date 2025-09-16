@@ -4,12 +4,13 @@ import { getSchema, permission, postSchema } from '../../utils/index.js'
 import { getUserBasic } from '../friendships/model.js'
 import { emitterMaps, notify, notifyFriends } from '../ws/controller.js'
 import {
-	isTournamentEmptyAndOpen,
 	tournamentCreate,
 	tournamentDelete,
 	tournamentGet,
+	tournamentGetWithParticipants,
 	tournamentJoin,
-	tournamentQuit,
+	tournamentQuitOngoing,
+	tournamentQuitOpen,
 	tournamentStart,
 } from './model.js'
 import { tournamentIdSchema, tournamentSchemaCreate } from './schema.js'
@@ -111,12 +112,20 @@ export const tournamentsRoute: FastifyPluginCallbackZod = (
 		async (req, res) => {
 			const { userId } = permission.session(res)
 			const { tournamentId } = req.body
-			await tournamentQuit(tournamentId, userId)
-			const user = await getUserBasic(userId)
+			const tournament = await tournamentGetWithParticipants(tournamentId)
+			if (!tournament) return res.notFound(`tournament doesnt exist`)
+			if (tournament.state === 'open') {
+				await tournamentQuitOpen(tournamentId, userId)
+				const user = await getUserBasic(userId)
+				notify.tournaments(tournamentId, 'onParticipantQuit', { user })
+			}
+			if (tournament.state === 'ongoing') {
+				await tournamentQuitOngoing(tournamentId, userId)
+			}
 			await notifyFriends(userId, 'onTournamentQuit', { userId: userId })
-			notify.tournaments(tournamentId, 'onParticipantQuit', { user })
-			if (await isTournamentEmptyAndOpen(tournamentId))
+			if (tournament.state === 'open' && tournament.participants.length === 0) {
 				await tournamentDelete(tournamentId)
+			}
 			return res.send({ success: true })
 		},
 	)

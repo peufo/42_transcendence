@@ -61,6 +61,7 @@ defineComponent('ft-pong-remote', () => {
 				`
 			return
 		}
+		// TODO: waiting html
 		channel?.close()
 		channel = socketChannel(
 			'matches',

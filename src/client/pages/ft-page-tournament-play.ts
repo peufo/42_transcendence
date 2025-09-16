@@ -13,6 +13,7 @@ import {
 	$user,
 } from '../utils/store.js'
 
+// TODO: remove ugly lab buttons
 const buttonsLab = Object.entries({
 	$user,
 	$tournament,

@@ -85,6 +85,7 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 					player2: true,
 				},
 			})
+
 			if (!match) {
 				socket.close(3000, 'Match not exist')
 				return
@@ -93,7 +94,9 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 				socket.close(3000, 'Match is over')
 				return
 			}
-
+			console.log(
+				`SOCKET CONNECTION TO MATCH ${match.id}, user ${session.userId}`,
+			)
 			let player: Player | null = null
 			if (session.userId === match.player1Id) player = 'p1'
 			else if (session.userId === match.player2Id) player = 'p2'
@@ -104,11 +107,9 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 
 			bindEmitterWithSocket('matches', matchId, socket, {
 				onOpen(payload) {
-					console.log('connection')
 					if (!payload) {
-						console.log('creating engine')
 						return {
-							engine: createMatchEngine(match),
+							engine: undefined,
 							player1Ready: player === 'p1',
 							player2Ready: player === 'p2',
 						}
@@ -120,6 +121,8 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 					if (player === 'p1') payload.player1Ready = true
 					if (player === 'p2') payload.player2Ready = true
 					if (payload.player1Ready && payload.player2Ready) {
+						console.log(`engine creation ${matchId}`)
+						payload.engine = createMatchEngine(match)
 						db.update(matches)
 							.set({ state: 'ongoing' })
 							.where(eq(matches.id, matchId))
@@ -129,7 +132,7 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 									p1: match.player1?.name ?? 'Player 1',
 									p2: match.player2?.name ?? 'Player 2',
 								})
-								payload.engine.start()
+								payload.engine?.start()
 							})
 					}
 					return payload
@@ -137,7 +140,7 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 				onClientEvent(payload, event) {
 					if (event.onPlayerInput) {
 						const { player, move, value } = event.onPlayerInput
-						payload?.engine.setInput(player, move, value)
+						payload?.engine?.setInput(player, move, value)
 					}
 				},
 				onClose(payload) {

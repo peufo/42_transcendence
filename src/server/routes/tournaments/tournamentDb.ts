@@ -21,7 +21,12 @@ export async function getUserActiveTournament(
 	const participations = db
 		.select()
 		.from(tournamentsParticipants)
-		.where(eq(tournamentsParticipants.userId, userId))
+		.where(
+			and(
+				eq(tournamentsParticipants.userId, userId),
+				eq(tournamentsParticipants.isActive, true),
+			),
+		)
 		.as('participations')
 	const results = await db
 		.select()
@@ -97,17 +102,6 @@ export async function insertParticipant(tournamentId: number, userId: number) {
 		.insert(tournamentsParticipants)
 		.values({ tournamentId, userId, joinedAt: new Date() })
 		.returning()
-}
-
-export async function deleteParticipant(tournamentId: number, userId: number) {
-	await db
-		.delete(tournamentsParticipants)
-		.where(
-			and(
-				eq(tournamentsParticipants.tournamentId, tournamentId),
-				eq(tournamentsParticipants.userId, userId),
-			),
-		)
 }
 
 export async function findParticipantsForTournament(tournamentId: number) {

@@ -14,6 +14,7 @@ defineComponent('ft-bracket', () => {
 		postRender(element) {
 			const match = $match.get()
 			if (match) {
+				// TODO: no smooth scroll, or better rendering granulariti
 				setTimeout(() => {
 					element.querySelector(`#match-${match?.id}`)?.scrollIntoView({
 						behavior: 'smooth',
@@ -112,7 +113,7 @@ defineComponent('ft-bracket', () => {
 					<div class="overflow-x-scroll rounded-md border border-gray-200 snap-x snap-mandatory">
 						${renderStages()}
 					</div>
-					${iParticipate && tournament.state !== 'finished' ? quitButton : ''}
+					${iParticipate ? quitButton : ''}
 				</aside>
             `
 		},

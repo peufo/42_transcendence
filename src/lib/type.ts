@@ -133,7 +133,7 @@ export type SocketChannels = {
 			matchReady: Record<Player, string>
 		}
 		serverPayload: {
-			engine: Engine
+			engine?: Engine
 			player1Ready: boolean
 			player2Ready: boolean
 		}
