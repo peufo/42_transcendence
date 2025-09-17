@@ -107,13 +107,19 @@ function getRounded(n: number) {
 
 type Cleaner = (format: ChalkInstance) => void
 
-function drawRect(x: number, y: number, w: number, h: number): Cleaner {
+function drawRect(
+	x: number,
+	y: number,
+	w: number,
+	h: number,
+	chalkFunc = chalk.bgMagentaBright,
+): Cleaner {
 	const startX = getRounded(getX(x))
 	const startY = getRounded(getY(y))
 	const width = Math.floor(getW(w))
 	const height = Math.floor(getH(h))
 	const endY = startY.value + height
-	const line = chalk.bgMagentaBright(' '.repeat(width))
+	const line = chalkFunc(' '.repeat(width))
 	for (let _y = startY.value; _y < endY; _y++) {
 		stdout.cursorTo(startX.value, _y)
 		stdout.write(line)
@@ -131,9 +137,8 @@ function drawRect(x: number, y: number, w: number, h: number): Cleaner {
 function useRenderBall() {
 	let cleaner: Cleaner = () => {}
 	return ({ b }: State) => {
-		// cleaner(chalk.bgHex('#eee'))
-		cleaner(chalk.reset)
-		cleaner = drawRect(b.x, b.y, BALL_BASE_SIZE, BALL_BASE_SIZE)
+		cleaner(chalk.reset) // change color if we want trail
+		cleaner = drawRect(b.x, b.y, BALL_BASE_SIZE, BALL_BASE_SIZE, chalk.bgBlue)
 	}
 }
 

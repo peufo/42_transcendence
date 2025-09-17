@@ -47,8 +47,14 @@ export const menuMain: Scope = async () => {
 		{ value: startGameLocal, label: 'Local game' },
 		{ value: () => exit(0), label: 'Exit' },
 	)
+	let message = 'Main menu'
+	const userName = api.user()?.name
+	if (userName) {
+		message += ` (${userName})`
+	}
+
 	const action = await p.select({
-		message: 'Main menu',
+		message,
 		options,
 	})
 	if (p.isCancel(action)) exit()

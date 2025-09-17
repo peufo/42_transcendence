@@ -1,22 +1,15 @@
 import { exit, stdin, stdout } from 'node:process'
-import { createInterface, emitKeypressEvents } from 'node:readline'
+import { createInterface } from 'node:readline'
 import * as p from '@clack/prompts'
 import chalk from 'chalk'
-import type {
-	EngineEventData,
-	EngineOptionsEvents,
-	Move,
-	Player,
-} from '../lib/engine/index.js'
 import { getAwaitingMatchFromStages } from '../lib/tournament.js'
-import type { Match } from '../lib/type.js'
-import type { ChannelSocket } from '../lib/useSocketChannels.js'
+import type { Match, TournamentWithLookup } from '../lib/type.js'
 import { api } from './api.js'
 import type { Scope } from './main.js'
 import { menuMain } from './menuMain.js'
-import { useRenderer } from './renderer.js'
-import { ensureSreenSize } from './resolution.js'
+import { menuMatchRemote } from './menuMatchRemote.js'
 import { socketChannelCLI } from './socketChannelCLI.js'
+import { wait } from './wait.js'
 
 export const menuNewTournament: Scope = async () => {
 	const numberOfPlayers = await p.select({
@@ -79,73 +72,17 @@ export const menuTournament: Scope<[number]> = async (tournamentId) => {
 			}
 		}
 
-		const renderTournamentOngoing = (match: Match | undefined) => {
-			if (!match) {
-				console.log('You have been eliminated') // TODO: fix
-				return
-			}
-
-			let matchChannel: ChannelSocket<'matches'>
+		function tryStartMatch() {
 			const userId = api.user()?.id
-			const player: Player = userId === match.player1Id ? 'p1' : 'p2'
-
-			ensureSreenSize().then(() => {
-				console.clear()
-				let renderer: Required<EngineOptionsEvents> & {
-					stop: () => void
-					onEngineEvent: (data: EngineEventData) => void
-				}
-				matchChannel = socketChannelCLI(
-					'matches',
-					{ matchId: match.id.toString() },
-					{
-						matchReady(_data) {
-							renderer = useRenderer()
-						},
-						onEngineEvent(data) {
-							renderer.onEngineEvent(data)
-						},
-					},
-				)
-			})
-
-			const setInput = (move: Move, value: boolean) => {
-				matchChannel.emit('onPlayerInput', { player, move, value })
+			if (!userId) {
+				throw new Error('User is not supposed to be here.')
 			}
-
-			const keyHandlers: Record<string, () => void> = {
-				w: () => {
-					setInput('up', true)
-					setInput('down', false)
-				},
-				s: () => {
-					setInput('up', false)
-					setInput('down', false)
-				},
-				x: () => {
-					setInput('up', false)
-					setInput('down', true)
-				},
-			}
-
-			function onKeyPress(key: string) {
-				console.log(key)
-				keyHandlers[key]?.()
-			}
-
-			// TODO: terminate ?
-			createInterface({ input: stdin, terminal: true })
-			emitKeypressEvents(stdin)
-			stdin.on('keypress', onKeyPress)
-		}
-
-		if (tournament.state === 'open') renderTournamentOpen()
-		if (tournament.state === 'ongoing') {
-			api.get('/tournaments', { tournamentId }).then((tournament) => {
-				const userId = api.user()?.id
-				if (!userId) return
+			renderStages([...tournament.stages].reverse())
+			wait(3000).then(() => {
 				const match = getAwaitingMatchFromStages(userId, tournament.stages)
-				renderTournamentOngoing(match)
+				if (match) {
+					terminate(() => menuMatchRemote(match))
+				}
 			})
 		}
 
@@ -166,60 +103,31 @@ export const menuTournament: Scope<[number]> = async (tournamentId) => {
 				onStart({ stages }) {
 					spinner.stop('Tournament starting')
 					tournament.stages = stages
-					renderStages([...tournament.stages].reverse())
-					const userId = api.user()?.id
-					if (!userId) {
-						throw new Error('User is not supposed to be here.')
-					}
-					const match = getAwaitingMatchFromStages(userId, stages)
-					renderTournamentOngoing(match)
-
-					// if (!myMatch) return
-					// setMatchId(myMatch.id)
-					// $stages.set(stages)
-					// $tournament.update((t) => {
-					// 	if (!t) return undefined
-					// 	return { ...t, state: 'ongoing' }
-					// })
+					tryStartMatch()
 				},
 				onMatchChange({ match }) {
-					const userId = api.user()?.id
-					if (!userId) {
-						throw new Error('User is not supposed to be here.')
-					}
-					if (
-						match.state === 'awaiting' &&
-						(match.player1Id === userId || match.player2Id === userId)
-					) {
-						// renderTournamentOngoing(match)
-					}
-
-					// console.log('onMatchChange')
-					// $stages.update((stages) => {
-					// 	const m = stages.flat().find((m) => m.id === match.id)
-					// 	if (!m) return stages
-					// 	Object.assign(m, match)
-					// 	if (
-					// 		m.player1Id === this.user?.id ||
-					// 		m.player2Id === this.user?.id
-					// 	) {
-					// 		setMatch(m)
-					// 	}
-					// 	return stages
-					// })
+					const m = tournament.stages.flat().find((m) => m.id === match.id)
+					if (m) Object.assign(m, match)
+					tryStartMatch()
 				},
-				onEnd(_data) {
-					// console.log('onEnd')
-					// toast.success('Tournament terminated')
-					// $tournament.update((t) => (!t ? t : { ...t, state: 'finished' }))
+				onEnd() {
+					terminate(() => menuTournamentFinished(tournament))
 				},
 			},
 		)
 
-		function terminate() {
+		if (tournament.state === 'open') renderTournamentOpen()
+		if (tournament.state === 'ongoing') {
+			tryStartMatch()
+		}
+		if (tournament.state === 'finished') {
+			terminate(() => menuTournamentFinished(tournament))
+		}
+
+		function terminate(nextScope: Scope = menuMain) {
 			tournamentChannel.close()
 			rl.off('SIGINT', terminate)
-			resolve(menuMain)
+			resolve(nextScope)
 		}
 
 		rl.once('SIGINT', terminate)
@@ -235,6 +143,24 @@ function renderStages(stages: Match[][], level = 0, index = 0) {
 		renderMatchVersus(stages[level][index], level)
 		renderStages(stages, level + 1, index * 2)
 	}
+}
+
+const menuTournamentFinished: Scope<[TournamentWithLookup]> = async (
+	tournament,
+) => {
+	renderStages([...tournament.stages].reverse())
+
+	const final = tournament.stages[tournament.stages.length - 1][0]
+	const winner =
+		final.player1Score > final.player2Score
+			? final.player1?.name
+			: final.player2?.name
+	const action = await p.select({
+		message: `${winner} won !`,
+		options: [{ label: 'Press enter to start tournament', value: menuMain }],
+	})
+	if (p.isCancel(action)) exit(0)
+	return action
 }
 
 function renderMatchVersus(match: Match | undefined, level: number) {

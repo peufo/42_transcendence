@@ -42,6 +42,7 @@ export function useSocketChannel(
 		}
 		const socket = createWebSocket(url)
 		socket.addEventListener('message', onMessage)
+
 		return {
 			close() {
 				socket.removeEventListener('message', onMessage)
