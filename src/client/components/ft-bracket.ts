@@ -113,7 +113,7 @@ defineComponent('ft-bracket', () => {
 					<div class="overflow-x-scroll rounded-md border border-gray-200 snap-x snap-mandatory">
 						${renderStages()}
 					</div>
-					${iParticipate ? quitButton : ''}
+					${iParticipate && tournament.state !== 'finished' ? quitButton : ''}
 				</aside>
             `
 		},

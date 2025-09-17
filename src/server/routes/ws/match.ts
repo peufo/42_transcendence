@@ -1,4 +1,4 @@
-import { and, eq, sql } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 import { Engine, type RoundData } from '../../../lib/engine/index.js'
 import {
 	db,
@@ -12,7 +12,7 @@ import {
 	tournamentGetStages,
 	tournamentUpdateState,
 } from '../tournaments/model.js'
-import { deleteEmitter, notify } from './controller.js'
+import { deleteEmitter, notify, notifyFriends } from './controller.js'
 
 export function createMatchEngine(match: DB.Match): Engine {
 	return new Engine({
@@ -68,6 +68,34 @@ export function createMatchEngine(match: DB.Match): Engine {
 export async function handleTournamentGameEnd(
 	match: DB.Match & { tournamentId: number },
 ) {
+	if (!match.player1Id || !match.player2Id) {
+		console.log('wtf')
+		return
+	}
+	// const matchParticipants = await db
+	// 	.select()
+	// 	.from(tournamentsParticipants)
+	// 	.where(
+	// 		and(
+	// 			eq(tournamentsParticipants.tournamentId, match.tournamentId),
+	// 			inArray(tournamentsParticipants.userId, [
+	// 				match.player1Id,
+	// 				match.player2Id,
+	// 			]),
+	// 		),
+	// 	)
+	const tournamentParticipants = await db
+		.select()
+		.from(tournamentsParticipants)
+		.where(eq(tournamentsParticipants.tournamentId, match.tournamentId))
+	tournamentParticipants.forEach((participant) => {
+		if (!participant.isActive) {
+			match.player1Score =
+				participant.userId === match.player1Id ? -1 : match.player1Score
+			match.player2Score =
+				participant.userId === match.player2Id ? -1 : match.player2Score
+		}
+	})
 	const winnerId =
 		match.player1Score > match.player2Score ? match.player1Id : match.player2Id
 	if (!winnerId) throw new Error('winner is not defined')
@@ -75,11 +103,17 @@ export async function handleTournamentGameEnd(
 	const matchStageIndex = stages.findIndex((stage) =>
 		stage.find((m) => m.id === match.id),
 	)
-	console.log({ matchStageIndex })
 	if (matchStageIndex === -1) throw new Error('matchStage not found')
 	const isTournamentEnd = matchStageIndex + 1 === stages.length
 	if (isTournamentEnd) {
 		await tournamentUpdateState(match.tournamentId, 'finished')
+		Promise.all(
+			tournamentParticipants.map((participant) => {
+				notifyFriends(participant.userId, 'onTournamentQuit', {
+					userId: participant.userId,
+				})
+			}),
+		)
 		notify.tournaments(match.tournamentId, 'onEnd', true)
 		return
 	}
@@ -95,12 +129,9 @@ export async function handleTournamentGameEnd(
 		return
 	}
 
-	const winnerParticipation = await db.query.tournamentsParticipants.findFirst({
-		where: and(
-			eq(tournamentsParticipants.tournamentId, match.tournamentId),
-			eq(tournamentsParticipants.userId, winnerId),
-		),
-	})
+	const winnerParticipation = tournamentParticipants.find(
+		(participant) => participant.userId === winnerId,
+	)
 	const winnerInitalScore = winnerParticipation?.isActive ? 0 : -1
 
 	await db
@@ -108,7 +139,7 @@ export async function handleTournamentGameEnd(
 		.set({
 			player1Id: nextMatch.player1Id ?? winnerId,
 			player2Id: nextMatch.player1Id ? winnerId : undefined,
-			player1Score: nextMatch.player1Score ?? winnerInitalScore,
+			player1Score: nextMatch.player1Id ? undefined : winnerInitalScore,
 			player2Score: nextMatch.player1Id ? winnerInitalScore : undefined,
 		})
 		.where(eq(matches.id, nextMatch.id))
@@ -124,7 +155,6 @@ export async function handleTournamentGameEnd(
 		return
 	}
 
-	console.log(updatedNextMatch)
 	const isNextMatchReady = !!(
 		updatedNextMatch.player1 && updatedNextMatch.player2
 	)

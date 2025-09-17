@@ -107,6 +107,7 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 
 			bindEmitterWithSocket('matches', matchId, socket, {
 				onOpen(payload) {
+					if (match.state !== 'awaiting') return payload
 					if (!payload) {
 						return {
 							engine: undefined,
@@ -144,12 +145,11 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 					}
 				},
 				onClose(payload) {
+					if (match.state !== 'awaiting') return payload
 					if (!payload) return undefined
-					if (match.state === 'awaiting') {
-						if (player === 'p1') payload.player1Ready = false
-						if (player === 'p2') payload.player2Ready = false
-						return payload
-					}
+					if (player === 'p1') payload.player1Ready = false
+					if (player === 'p2') payload.player2Ready = false
+					return payload
 				},
 			})
 		},
