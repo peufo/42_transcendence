@@ -50,7 +50,7 @@ function renderScreenSizeInfo() {
 	stdout.cursorTo(col, row + 1)
 	stdout.write(msgScreenCurrent)
 	stdout.cursorTo(0, stdout.rows)
-	stdout.write('  Welcome in Transcandence')
+	stdout.write('  Welcome to Transcendance')
 	stdout.cursorTo(stdout.columns, stdout.rows)
 }
 
