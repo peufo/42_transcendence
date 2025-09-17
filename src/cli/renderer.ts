@@ -24,6 +24,7 @@ import {
 	screenSizeIsOk,
 } from './resolution.js'
 
+// TODO: use more visible colors
 const PRIMARY_COLOR = '#4f39f6'
 const PRIMARY_COLOR_LIGHT = '#7c86ff'
 const FRAME_TIMEOUT = 1000 / 60
@@ -112,7 +113,7 @@ function drawRect(x: number, y: number, w: number, h: number): Cleaner {
 	const width = Math.floor(getW(w))
 	const height = Math.floor(getH(h))
 	const endY = startY.value + height
-	const line = chalk.bgBlack(' '.repeat(width))
+	const line = chalk.bgMagentaBright(' '.repeat(width))
 	for (let _y = startY.value; _y < endY; _y++) {
 		stdout.cursorTo(startX.value, _y)
 		stdout.write(line)
@@ -130,7 +131,8 @@ function drawRect(x: number, y: number, w: number, h: number): Cleaner {
 function useRenderBall() {
 	let cleaner: Cleaner = () => {}
 	return ({ b }: State) => {
-		cleaner(chalk.bgHex('#eee'))
+		// cleaner(chalk.bgHex('#eee'))
+		cleaner(chalk.reset)
 		cleaner = drawRect(b.x, b.y, BALL_BASE_SIZE, BALL_BASE_SIZE)
 	}
 }
