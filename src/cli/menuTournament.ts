@@ -1,6 +1,5 @@
 import { exit, stdin, stdout } from 'node:process'
 import { createInterface, emitKeypressEvents } from 'node:readline'
-import { DatabaseSync } from 'node:sqlite'
 import * as p from '@clack/prompts'
 import chalk from 'chalk'
 import type {
@@ -192,7 +191,7 @@ export const menuTournament: Scope<[number]> = async (tournamentId) => {
 						match.state === 'awaiting' &&
 						(match.player1Id === userId || match.player2Id === userId)
 					) {
-						renderTournamentOngoing(match)
+						// renderTournamentOngoing(match)
 					}
 
 					// console.log('onMatchChange')
