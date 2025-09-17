@@ -31,7 +31,6 @@ export class Renderer3D extends Renderer {
 		super(element, names)
 		this.initAsync()
 		window.addEventListener('resize', () => this.babylonEngine.resize())
-		// TODO: waiting frame?
 	}
 
 	private initAsync = async () => {

@@ -61,13 +61,18 @@ defineComponent('ft-pong-remote', () => {
 				`
 			return
 		}
-		// TODO: waiting html
+		element.innerHTML = /*html*/ `
+			<div class="flex flex-row col-span-2 justify-center items-center animate-bounce font-bold w-full">
+				Waiting for player
+			</div>
+		`
 		channel?.close()
 		channel = socketChannel(
 			'matches',
 			{ matchId: match.id.toString() },
 			{
 				matchReady: (names) => {
+					element.innerHTML = ''
 					renderer?.clear()
 					renderer =
 						getMyRendering() === '2D'

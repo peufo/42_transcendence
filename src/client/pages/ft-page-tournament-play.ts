@@ -13,24 +13,23 @@ import {
 	$user,
 } from '../utils/store.js'
 
-// TODO: remove ugly lab buttons
-const buttonsLab = Object.entries({
-	$user,
-	$tournament,
-	$stages,
-	$participants,
-	$match,
-}).map(([key, value]) => {
-	const btn = document.createElement('button')
-	btn.addEventListener('click', () => {
-		console.clear()
-		// biome-ignore lint/suspicious/noExplicitAny: va chier
-		value.update((v: any) => v)
-	})
-	btn.classList.add('btn', 'btn-border')
-	btn.innerHTML = key
-	return btn
-})
+// const buttonsLab = Object.entries({
+// 	$user,
+// 	$tournament,
+// 	$stages,
+// 	$participants,
+// 	$match,
+// }).map(([key, value]) => {
+// 	const btn = document.createElement('button')
+// 	btn.addEventListener('click', () => {
+// 		console.clear()
+// 		// biome-ignore lint/suspicious/noExplicitAny: va chier
+// 		value.update((v: any) => v)
+// 	})
+// 	btn.classList.add('btn', 'btn-border')
+// 	btn.innerHTML = key
+// 	return btn
+// })
 
 function setMatch(match: Match | undefined) {
 	const currentMatch = $match.get(false)
@@ -115,16 +114,16 @@ defineComponent('ft-page-tournament-play', () => {
 			const tournament = $tournament.get()
 			if (!tournament) return /*html*/ `<span>Tournament not found</span>`
 
-			const lab = /*html*/ `<div class="flex gap-2" id="lab"></div>`
+			// const lab = /*html*/ `<div class="flex gap-2" id="lab"></div>`
 
-			return `${lab}
+			return `
 			<h1 class="p-2 flex font-bold item-center justify-center">${tournament.createdByUser.name}'s tournament</h1>
 			<ft-tournament-${tournament.state}></ft-tournament-${tournament.state}>`
 		},
-		postRender(element) {
-			const lab = element.querySelector('#lab')
-			lab?.append(...buttonsLab)
-		},
+		// postRender(element) {
+		// 	const lab = element.querySelector('#lab')
+		// 	lab?.append(...buttonsLab)
+		// },
 	}
 })
 

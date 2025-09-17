@@ -53,18 +53,6 @@ export class Renderer2D extends Renderer {
 		if (!newCtx) throw new Error('Canvas context failed')
 		this.ctx = newCtx
 		this.ctx.textAlign = 'center'
-		this.renderWaitingFrame()
-	}
-
-	private renderWaitingFrame = () => {
-		this.ctx.clearRect(0, 0, ARENA_WIDTH, ARENA_HEIGHT)
-		const fontSize = 50
-		this.ctx.font = `${fontSize}px sans-serif`
-		this.ctx.fillText(
-			'Waiting for game to start',
-			ARENA_WIDTH / 2 + fontSize / 2,
-			ARENA_HEIGHT / 2 - fontSize,
-		)
 	}
 
 	private renderGameOver = () => {
