@@ -37,11 +37,8 @@ const menuFriends: Scope = async () => {
 					withUser: { name, isActive, tournament },
 				} = f
 				let label = name.padEnd(16)
-				if (tournament?.state === 'open') {
-					label += '[reachable]'
-				} else if (isActive) {
-					label += '[online]'
-				}
+				if (tournament) label += `[in ${tournament.state} tournament]`
+				label += isActive ? '[online]' : '[offline]'
 				return {
 					label,
 					value: () => menuFriend(f),

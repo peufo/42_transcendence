@@ -109,7 +109,10 @@ export async function getFriendshipsFriend(
 				.from(tournaments)
 				.innerJoin(
 					participations,
-					eq(tournaments.id, participations.tournamentId),
+					and(
+						eq(tournaments.id, participations.tournamentId),
+						eq(participations.isActive, true),
+					),
 				)
 				.where(ne(tournaments.state, 'finished'))
 			return values.map((friendship) => {

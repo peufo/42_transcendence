@@ -1,8 +1,8 @@
 import argon2 from 'argon2'
 import { drizzle } from 'drizzle-orm/libsql'
 import { seed } from 'drizzle-seed'
+import { getRandomAvatarPlaceholder } from '../../lib/utils.js'
 import { env } from '../env.js'
-import { getRandomAvatarPlaceholder } from '../routes/auth/model.js'
 import { tournamentJoin } from '../routes/tournaments/model.js'
 import {
 	friendships,

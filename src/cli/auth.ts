@@ -1,6 +1,7 @@
 import { exit } from 'node:process'
 import * as p from '@clack/prompts'
 import type { User } from '../lib/type.js'
+import { getRandomAvatarPlaceholder } from '../lib/utils.js'
 import {
 	type ApiOptions,
 	api,
@@ -72,7 +73,11 @@ async function getApiOptions(): Promise<ApiOptions> {
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({ name, password }),
+			body: JSON.stringify({
+				name,
+				password,
+				avatarPlaceholder: getRandomAvatarPlaceholder(),
+			}),
 		})
 
 		if (!res.ok) await handleApiError(res)
