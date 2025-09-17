@@ -145,6 +145,7 @@ customElements.define(
 function scoringGraph(match: Match, user: UserWithTournament): string {
 	const ralliesPerRound = match.rounds.map((r) => r.rallyCount)
 	const maxRallies = Math.max(...ralliesPerRound, 1)
+	console.log('ROUNDS:', match.rounds)
 	const html = /*html*/ `
 	<div class="flex flex-col justify-center items-center h-max-[100px]">
 		<div class="grid grid-cols-[2fr_10fr] grid-rows-[6fr_1fr]">
@@ -179,10 +180,19 @@ function scoringGraph(match: Match, user: UserWithTournament): string {
 			</div>
 			<div></div>
 			<div  class="flex flex-row justify-between items-center">
-				${match.rounds.map((r) => `<div class="text-center">${r.rallyCount}</div>`).join('')}
+				${match.rounds
+					.map((r) => {
+						const color =
+							(match.player1Id === user.id && r.scorer === 'p1') ||
+							(match.player2Id === user.id && r.scorer === 'p2')
+								? 'text-indigo-600'
+								: 'text-amber-600'
+						return `<div class="text-center ${color}">${r.rallyCount}</div>`
+					})
+					.join('')}
 			</div>
 			<div></div>
-			<div  class="flex flex-row justify-between items-center">
+			<div  class="flex flex-row justify-between items-cenSter">
 				${match.rounds.map((_, i) => `<div class="text-center">R${i + 1}</div>`).join('')}
 			</div>
 		</div>

@@ -1,12 +1,22 @@
 import { exit, stdin, stdout } from 'node:process'
-import { createInterface } from 'node:readline'
+import { createInterface, emitKeypressEvents } from 'node:readline'
+import { DatabaseSync } from 'node:sqlite'
 import * as p from '@clack/prompts'
 import chalk from 'chalk'
-// import { getAwaitingMatchFromStages } from '../lib/tournament.js'
+import type {
+	EngineEventData,
+	EngineOptionsEvents,
+	Move,
+	Player,
+} from '../lib/engine/index.js'
+import { getAwaitingMatchFromStages } from '../lib/tournament.js'
 import type { Match } from '../lib/type.js'
+import type { ChannelSocket } from '../lib/useSocketChannels.js'
 import { api } from './api.js'
 import type { Scope } from './main.js'
 import { menuMain } from './menuMain.js'
+import { useRenderer } from './renderer.js'
+import { ensureSreenSize } from './resolution.js'
 import { socketChannelCLI } from './socketChannelCLI.js'
 
 export const menuNewTournament: Scope = async () => {
@@ -18,6 +28,7 @@ export const menuNewTournament: Scope = async () => {
 
 	const { tournamentId } = await api.post('/tournaments/new', {
 		numberOfPlayers,
+		// TODO: make selectable ?
 		pointsToWin: {
 			final: 7,
 			semifinals: 5,
@@ -38,11 +49,106 @@ export const menuTournament: Scope<[number]> = async (tournamentId) => {
 	return new Promise((resolve) => {
 		const spinner = p.spinner()
 		const stateMessage = () => {
-			if (tournament.participants.length === tournament.numberOfPlayers)
-				return 'Ready to start'
-			return `Waiting for participants (${tournament.participants.length} / ${tournament.numberOfPlayers})`
+			tournament.participants.sort(
+				(prev, curr) =>
+					new Date(prev.joinedAt).getTime() - new Date(curr.joinedAt).getTime(),
+			)
+			const userId = api.user()?.id
+			if (
+				userId === tournament.participants[0].user.id &&
+				tournament.participants.length === tournament.numberOfPlayers
+			) {
+				return null
+			} else {
+				return `Waiting for participants (${tournament.participants.length} / ${tournament.numberOfPlayers})`
+			}
 		}
-		spinner.start(stateMessage())
+
+		const renderTournamentOpen = async (stopMessage?: string) => {
+			if (stopMessage) spinner.stop(stopMessage)
+			const message = stateMessage()
+			if (!message) {
+				await p.select({
+					message: 'Game ready to start',
+					options: [{ value: 'Press enter to start tournament' }],
+				})
+				await api.post('/tournaments/start', {
+					tournamentId,
+				})
+			} else {
+				spinner.start(message)
+			}
+		}
+
+		const renderTournamentOngoing = (match: Match | undefined) => {
+			if (!match) {
+				console.log('You have been eliminated') // TODO: fix
+				return
+			}
+
+			let matchChannel: ChannelSocket<'matches'>
+			const userId = api.user()?.id
+			const player: Player = userId === match.player1Id ? 'p1' : 'p2'
+
+			ensureSreenSize().then(() => {
+				console.clear()
+				let renderer: Required<EngineOptionsEvents> & {
+					stop: () => void
+					onEngineEvent: (data: EngineEventData) => void
+				}
+				matchChannel = socketChannelCLI(
+					'matches',
+					{ matchId: match.id.toString() },
+					{
+						matchReady(_data) {
+							renderer = useRenderer()
+						},
+						onEngineEvent(data) {
+							renderer.onEngineEvent(data)
+						},
+					},
+				)
+			})
+
+			const setInput = (move: Move, value: boolean) => {
+				matchChannel.emit('onPlayerInput', { player, move, value })
+			}
+
+			const keyHandlers: Record<string, () => void> = {
+				w: () => {
+					setInput('up', true)
+					setInput('down', false)
+				},
+				s: () => {
+					setInput('up', false)
+					setInput('down', false)
+				},
+				x: () => {
+					setInput('up', false)
+					setInput('down', true)
+				},
+			}
+
+			function onKeyPress(key: string) {
+				console.log(key)
+				keyHandlers[key]?.()
+			}
+
+			// TODO: terminate ?
+			createInterface({ input: stdin, terminal: true })
+			emitKeypressEvents(stdin)
+			stdin.on('keypress', onKeyPress)
+		}
+
+		if (tournament.state === 'open') renderTournamentOpen()
+		if (tournament.state === 'ongoing') {
+			api.get('/tournaments', { tournamentId }).then((tournament) => {
+				const userId = api.user()?.id
+				if (!userId) return
+				const match = getAwaitingMatchFromStages(userId, tournament.stages)
+				renderTournamentOngoing(match)
+			})
+		}
 
 		const tournamentChannel = socketChannelCLI(
 			'tournaments',
@@ -50,15 +156,13 @@ export const menuTournament: Scope<[number]> = async (tournamentId) => {
 			{
 				onParticipantJoin(data) {
 					tournament.participants.push(data)
-					spinner.stop(`${data.user.name} joined the tournament`)
-					spinner.start(stateMessage())
+					renderTournamentOpen(`${data.user.name} joined the tournament`)
 				},
 				onParticipantQuit(data) {
 					tournament.participants = tournament.participants.filter(
 						({ user }) => user.id !== data.user.id,
 					)
-					spinner.stop(`${data.user.name} leaved the tournament`)
-					spinner.start(stateMessage())
+					renderTournamentOpen(`${data.user.name} left the tournament`)
 				},
 				onStart({ stages }) {
 					spinner.stop('Tournament starting')
@@ -66,9 +170,10 @@ export const menuTournament: Scope<[number]> = async (tournamentId) => {
 					renderStages([...tournament.stages].reverse())
 					const userId = api.user()?.id
 					if (!userId) {
-						throw new Error("Wtf, you can't be here")
+						throw new Error('User is not supposed to be here.')
 					}
-					//const match = getAwaitingMatchFromStages(userId, stages)
+					const match = getAwaitingMatchFromStages(userId, stages)
+					renderTournamentOngoing(match)
 
 					// if (!myMatch) return
 					// setMatchId(myMatch.id)
@@ -78,7 +183,18 @@ export const menuTournament: Scope<[number]> = async (tournamentId) => {
 					// 	return { ...t, state: 'ongoing' }
 					// })
 				},
-				onMatchChange(_data) {
+				onMatchChange({ match }) {
+					const userId = api.user()?.id
+					if (!userId) {
+						throw new Error('User is not supposed to be here.')
+					}
+					if (
+						match.state === 'awaiting' &&
+						(match.player1Id === userId || match.player2Id === userId)
+					) {
+						renderTournamentOngoing(match)
+					}
+
 					// console.log('onMatchChange')
 					// $stages.update((stages) => {
 					// 	const m = stages.flat().find((m) => m.id === match.id)

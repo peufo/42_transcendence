@@ -2,6 +2,7 @@ import { stdout } from 'node:process'
 import chalk, { type ChalkInstance } from 'chalk'
 import {
 	BALL_BASE_SIZE,
+	type EngineEventData,
 	type EngineOptionsEvents,
 	PADDLE_BASE_HEIGHT,
 	PADDLE_BASE_P1_POSITION,
@@ -29,6 +30,7 @@ const FRAME_TIMEOUT = 1000 / 60
 
 export function useRenderer(): Required<EngineOptionsEvents> & {
 	stop: () => void
+	onEngineEvent: (data: EngineEventData) => void
 } {
 	const { getState, updateState } = useInterpolate()
 	let timeout: NodeJS.Timeout | null = null
@@ -85,6 +87,12 @@ export function useRenderer(): Required<EngineOptionsEvents> & {
 			renderScores(round.finalRound.scores, false)
 		},
 		onEngineStart() {},
+		onEngineEvent(data: EngineEventData) {
+			for (const eventName of Object.keys(data) as (keyof EngineEventData)[]) {
+				//@ts-ignore
+				this[eventName](data[eventName])
+			}
+		},
 	}
 }
 

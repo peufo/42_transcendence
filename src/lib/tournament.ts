@@ -17,6 +17,7 @@ export function getNextStage<M extends MatchBasic>(
 	})
 }
 
+// TODO: make able to join ongoing ?
 export function getAwaitingMatchFromStages(userId: number, stages: Match[][]) {
 	return stages.flat().find((m) => {
 		return (

@@ -101,6 +101,7 @@ async function main() {
 				tournamentId: f.default({
 					defaultValue: null,
 				}),
+				finishedAt: f.date({ minDate: '2000-01-01', maxDate: '2025-09-16' }),
 			},
 			count: 3000,
 		},
