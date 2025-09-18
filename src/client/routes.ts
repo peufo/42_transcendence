@@ -109,7 +109,6 @@ export const PAGES = {
 		pageData: ['/friendships/friend', '/friendships/invitation'],
 	},
 	'/login': { component: 'ft-page-login', isPublic: 'only' },
-	'/signup': { component: 'ft-page-signup', isPublic: 'only' },
 	'/stats': {
 		component: 'ft-page-stats',
 		pageData: ['/stats/me', '/stats/all'],

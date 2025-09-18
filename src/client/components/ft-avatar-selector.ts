@@ -28,19 +28,21 @@ customElements.define(
 
 		render() {
 			return /*html*/ `
-                <div class ="w-32 h-32">
-                    <img id="avatarPlaceholderImage" src="https://api.dicebear.com/9.x/avataaars/svg?seed=${this.seed}">
-                    <input type="hidden" name="avatarPlaceholder" id="avatarPlaceholderInput" value="https://api.dicebear.com/9.x/avataaars/svg?seed=${this.seed}">
-                </div>
-                <div class="flex justify-center p-2 gap-2">
-                    <button type="button" id="prev" class="btn btn-primary">
-                        <ft-icon name="arrow-left" class="fill-transparent h-5"></ft-icon>  
-                    </button>
-
-                    <button type="button" id="next" class="btn btn-primary">
-                        <ft-icon name="arrow-right" class="fill-transparent h-5"></ft-icon> 
-                    </button>
-                </div>
+				<div class="flex flex-col gap-2 items-center">
+					<div class ="w-28 h-28">
+						<img id="avatarPlaceholderImage" src="https://api.dicebear.com/9.x/avataaars/svg?seed=${this.seed}">
+						<input type="hidden" name="avatarPlaceholder" id="avatarPlaceholderInput" value="https://api.dicebear.com/9.x/avataaars/svg?seed=${this.seed}">
+					</div>
+					<div class="flex gap-2">
+						<button type="button" id="prev" class="btn btn-primary">
+							<ft-icon name="arrow-left" class="fill-transparent h-5"></ft-icon>  
+						</button>
+	
+						<button type="button" id="next" class="btn btn-primary">
+							<ft-icon name="arrow-right" class="fill-transparent h-5"></ft-icon> 
+						</button>
+					</div>
+				</div>
             `
 		}
 	},

@@ -1,70 +1,146 @@
-customElements.define(
-	'ft-page-login',
-	class extends HTMLElement {
-		connectedCallback() {
-			this.innerHTML = /*html*/ `
-      <div class="w-screen h-screen login-gradient">
-        <div class="fixed top-1/2 left-1/2 -translate-1/2 flex items-center justify-center">
-          <div class="relative flex flex-col justify-center shadow-lg rounded-2xl border-2 border-indigo-600
-                      px-6 py-10 sm:px-8 md:px-12 lg:px-16
+import { defineComponent } from '../utils/component.js'
+import { slide, transitionIn, transitionOut } from '../utils/transition.js'
+
+defineComponent('ft-page-login', () => {
+	return {
+		onLoad(element) {
+			let action: 'login' | 'signup' = 'login'
+			const buttonChangeAction = document.createElement('button')
+			buttonChangeAction.type = 'button'
+			buttonChangeAction.classList.add(
+				'w-full',
+				'cursor-pointer',
+				'hover:underline',
+			)
+			const elForm = element.querySelector('form')
+			const elSubmit = element.querySelector('button[type=submit]')
+			const elInputPassword =
+				element.querySelector<HTMLInputElement>('#password')
+			const elInputContainerConfirm = element.querySelector<HTMLDivElement>(
+				'#inputContainerConfirm',
+			)
+			const inputAvatarContainer = element.querySelector<HTMLDivElement>(
+				'#inputAvatarContainer',
+			)
+			if (
+				!elForm ||
+				!elSubmit ||
+				!elInputPassword ||
+				!elInputContainerConfirm ||
+				!inputAvatarContainer
+			) {
+				throw new Error('Html structure of component is not correct !')
+			}
+
+			const inputContainerConfirm = document.createElement('div')
+			inputContainerConfirm.innerHTML = /*html*/ `
+          <label for="confirm" class="font-medium text-black text-sm">Password</label>
+          <div class="mt-2">
+            <input type="password" name="confirm" id="confirm" autocomplete="new-password" class="input" />
+          </div>
+      `
+
+			const changeAction = () => {
+				action = action === 'login' ? 'signup' : 'login'
+				renderAction()
+			}
+
+			const renderAction = () => {
+				buttonChangeAction.innerText =
+					action === 'login' ? 'Create an account' : 'Already have an account ?'
+				elForm.action = `/auth/${action}`
+				elSubmit.innerHTML = `Sign ${action === 'login' ? 'in' : 'up'}`
+				elInputPassword.autocomplete =
+					action === 'login' ? 'current-password' : 'new-password'
+
+				if (action === 'login') {
+					transitionOut(elInputContainerConfirm, slide, 250).then(() => {
+						elInputContainerConfirm.classList.add('hidden')
+					})
+					transitionOut(inputAvatarContainer, slide, 250).then(() => {
+						inputAvatarContainer.classList.add('hidden')
+					})
+				} else {
+					elInputContainerConfirm.classList.remove('hidden')
+					transitionIn(elInputContainerConfirm, slide, 250)
+					inputAvatarContainer.classList.remove('hidden')
+					transitionIn(inputAvatarContainer, slide, 250)
+				}
+			}
+			renderAction()
+
+			buttonChangeAction.addEventListener('click', changeAction)
+			element
+				.querySelector('#actionBtnContainer')
+				?.appendChild(buttonChangeAction)
+			return () => {
+				buttonChangeAction.removeEventListener('click', changeAction)
+			}
+		},
+
+		render() {
+			return /*html*/ `
+        <div class="w-screen login-gradient grid place-content-center" style="height: calc(100vh - 55px);">
+          <div class="relative flex flex-col justify-center shadow-lg rounded-2xl border-2 border-indigo-600/25
+                      py-2 px-6 sm:px-8 md:px-12 lg:px-16
                       w-full max-w-[95vw] sm:max-w-[500px] md:max-w-[700px] lg:max-w-[800px]
-                      min-h-[500px]">      
+                      min-h-[500px] backdrop-blur-md bg-white/25">    
+
             <!-- Titre -->
-            <div class="sm:mx-auto sm:w-full sm:max-w-sm z-10">
-              <h2 class="mt-10 text-center text-3xl sm:text-4xl tracking-tight text-indigo-600">
-                Welcome to the Pong
-              </h2>
-            </div>
-
+            <h2 class="mt-10 text-center text-3xl sm:text-4xl tracking-tight text-indigo-600">
+              Welcome to the Pong
+            </h2>
+           
             <!-- Formulaire -->
-            <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm z-10">
-              <form method="post" action="/auth/login" class="space-y-6 text-base sm:text-lg md:text-xl">
-                <div>
-                  <label for="name" class="font-medium text-black">User name</label>
-                  <div class="mt-2">
-                    <input autofocus type="text" name="name" id="name" autocomplete="off"
-                      class="input w-full rounded-lg px-4 py-2 text-white bg-white/10 backdrop-blur-md placeholder-white/60 focus:outline-offset-2 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-blue-900 transition duration-300 " />
-                  </div>
-                </div>
-
-                <div>
-                  <label for="password" class="font-medium text-black">Password</label>
-                  <div class="mt-2">
-                    <input type="password" name="password" id="password" autocomplete="current-password"
-                     class="input w-full rounded-lg px-4 py-2 text-white bg-white/10 backdrop-blur-md placeholder-white/60 focus:outline-offset-2 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-blue-900 transition duration-300 "/>
-                  </div>
-                </div>
-                <div class="flex flex-col items-center">
-                  <button type="submit"
-                    class="btn btn-primary w-full py-2 mb-3 from-violet-600 to-indigo-600 hover:bg-blue-700 text-white rounded-lg transition-all cursor-pointer">
-                    Sign in
-                  </button>
-                </div>
-              </form>
-              <a href="/login/waiting/google">
-                <div class="btn btn-secondary border-1 border-gray-400 rounded-lg transition-all cursor-pointer">
-                  <div>Login with</div>
-                    <div class="flex flex-row justify-around">
-                    <div class="text-blue-500">G</div>
-                    <div class="text-red-500">o</div>
-                    <div class="text-yellow-500">o</div>
-                    <div class="text-blue-500">g</div>
-                    <div class="text-green-500">l</div>
-                    <div class="text-red-500">e</div>
-                  </div>
-                </div>
-                  </a>
-                  <a href="/signup" class="text-indigo-600 text-sm hover:underline mt-4 block text-center ">Create an account</a>
-                </div>        
-                 <h3 class="mt-4 text-center tracking-tight text-black">
-                    A 42 school project by aloubry, jvoisard, alletond and lbaecher
-                </h3>
+            <form method="post" class="mt-10 mb-6 text-base sm:text-lg md:text-xl">
+              <div id="inputAvatarContainer" class="mt-2 hidden">
+                  <ft-avatar-selector></ft-avatar-selector>
               </div>
-            </div>
+
+              <div class="mt-2">
+                <label for="name" class="font-medium text-black text-sm">User name</label>
+                <div class="mt-2">
+                  <input autofocus type="text" name="name" id="name" autocomplete="off" class="input" />
+                </div>
+              </div>
+
+              <div class="mt-2">
+                <label for="password" class="font-medium text-black text-sm">Password</label>
+                <div class="mt-2">
+                  <input type="password" name="password" id="password" class="input"/>
+                </div>
+              </div>
+
+              <div id="inputContainerConfirm" class="mt-2 hidden">
+                <label for="confirm" class="font-medium text-black text-sm">Confirm password</label>
+                <div class="mt-2">
+                  <input type="password" name="confirm" id="confirm" autocomplete="new-password" class="input" />
+                </div>
+              </div>
+
+              <div class="flex flex-row-reverse gap-6 flex-wrap mt-10">
+                <button type="submit" class="btn btn-primary shrink-0 grow"></button>
+                <a href="/login/waiting/google" class="btn shrink-0 grow">
+                  <div>Login with</div>
+                  <div class="flex flex-row justify-around">
+                    <span class="text-blue-500">G</span>
+                    <span class="text-red-500">o</span>
+                    <span class="text-yellow-500">o</span>
+                    <span class="text-blue-500">g</span>
+                    <span class="text-green-500">l</span>
+                    <span class="text-red-500">e</span>
+                  </div>
+                </a>
+              </div>
+            </form>
+
+            <div id="actionBtnContainer" class="text-center text-indigo-600 text-sm"></div>
+            <h3 class="mt-4 text-sm text-center tracking-tight text-black/60">
+              A 42 school project by aloubry, jvoisard, alletond and lbaecher
+            </h3>  
           </div>
         </div>
-      </div>
-      `
-		}
-	},
-)
+        `
+		},
+	}
+})

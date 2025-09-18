@@ -20,11 +20,13 @@ export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 		async (req, res) => {
 			const { name, password } = req.body
 			const authUser = await getAuthUser(name)
-			if (!authUser) return res.forbidden('Wrong username or password')
+			if (!authUser)
+				return res.forbidden('body/password Wrong username or password')
 			if (authUser.isOAuth2 === true || !authUser.passwordHash)
 				return res.forbidden('This user uses a google account to authenticate')
 			const passwordOk = await argon2.verify(authUser.passwordHash, password)
-			if (!passwordOk) return res.forbidden('Wrong username or password')
+			if (!passwordOk)
+				return res.forbidden('body/password Wrong username or password')
 			await setSessionCookie(authUser.id, res)
 			const { passwordHash, ...user } = authUser
 			res.send({ message: 'Connection success !', user })
