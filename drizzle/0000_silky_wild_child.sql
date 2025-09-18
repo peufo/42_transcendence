@@ -4,7 +4,7 @@ CREATE TABLE `friendships` (
 	`user2Id` integer NOT NULL,
 	`state` text DEFAULT 'invited' NOT NULL,
 	`createdBy` integer NOT NULL,
-	`createdAt` integer DEFAULT '"2025-09-11T23:20:41.559Z"' NOT NULL,
+	`createdAt` integer DEFAULT '"2025-09-18T19:30:36.109Z"' NOT NULL,
 	FOREIGN KEY (`user1Id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`user2Id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`createdBy`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action,
@@ -20,7 +20,7 @@ CREATE TABLE `matches` (
 	`player2Id` integer,
 	`player1Score` integer DEFAULT 0 NOT NULL,
 	`player2Score` integer DEFAULT 0 NOT NULL,
-	`scoreToWin` integer DEFAULT 3 NOT NULL,
+	`pointsToWin` integer DEFAULT 3 NOT NULL,
 	`tournamentId` integer,
 	`finishedAt` integer,
 	FOREIGN KEY (`player1Id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action,
@@ -50,7 +50,7 @@ CREATE TABLE `tournaments` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`numberOfPlayers` integer NOT NULL,
 	`state` text DEFAULT 'open' NOT NULL,
-	`createdAt` integer DEFAULT '"2025-09-11T23:20:41.559Z"' NOT NULL,
+	`createdAt` integer DEFAULT '"2025-09-18T19:30:36.109Z"' NOT NULL,
 	`createdBy` integer NOT NULL,
 	FOREIGN KEY (`createdBy`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
 );
@@ -58,7 +58,8 @@ CREATE TABLE `tournaments` (
 CREATE TABLE `tournaments_participants` (
 	`tournamentId` integer NOT NULL,
 	`userId` integer NOT NULL,
-	`joinedAt` integer DEFAULT '"2025-09-11T23:20:41.559Z"' NOT NULL,
+	`joinedAt` integer DEFAULT '"2025-09-18T19:30:36.109Z"' NOT NULL,
+	`isActive` integer DEFAULT true NOT NULL,
 	FOREIGN KEY (`tournamentId`) REFERENCES `tournaments`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
 );
@@ -70,8 +71,8 @@ CREATE TABLE `users` (
 	`passwordHash` text,
 	`hasAvatar` integer DEFAULT false NOT NULL,
 	`avatarPlaceholder` text NOT NULL,
-	`createdAt` integer DEFAULT '"2025-09-11T23:20:41.558Z"' NOT NULL,
-	`lastLogin` integer DEFAULT '"2025-09-11T23:20:41.558Z"' NOT NULL,
+	`createdAt` integer DEFAULT '"2025-09-18T19:30:36.109Z"' NOT NULL,
+	`lastLogin` integer DEFAULT '"2025-09-18T19:30:36.109Z"' NOT NULL,
 	`isActive` integer DEFAULT false NOT NULL,
 	`numberOfMatches` integer DEFAULT 0 NOT NULL,
 	`numberOfWin` integer DEFAULT 0 NOT NULL,

@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "e3359531-5ea3-4a69-a8bf-22b41e9b240d",
+  "id": "4ce77fdc-7520-4a67-ba54-75b5cb80b7b9",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "friendships": {
@@ -49,7 +49,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'\"2025-09-11T23:20:41.559Z\"'"
+          "default": "'\"2025-09-18T19:30:36.109Z\"'"
         }
       },
       "indexes": {
@@ -164,8 +164,8 @@
           "autoincrement": false,
           "default": 0
         },
-        "scoreToWin": {
-          "name": "scoreToWin",
+        "pointsToWin": {
+          "name": "pointsToWin",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -382,7 +382,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'\"2025-09-11T23:20:41.559Z\"'"
+          "default": "'\"2025-09-18T19:30:36.109Z\"'"
         },
         "createdBy": {
           "name": "createdBy",
@@ -435,7 +435,15 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'\"2025-09-11T23:20:41.559Z\"'"
+          "default": "'\"2025-09-18T19:30:36.109Z\"'"
+        },
+        "isActive": {
+          "name": "isActive",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": true
         }
       },
       "indexes": {
@@ -525,7 +533,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'\"2025-09-11T23:20:41.558Z\"'"
+          "default": "'\"2025-09-18T19:30:36.109Z\"'"
         },
         "lastLogin": {
           "name": "lastLogin",
@@ -533,7 +541,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'\"2025-09-11T23:20:41.558Z\"'"
+          "default": "'\"2025-09-18T19:30:36.109Z\"'"
         },
         "isActive": {
           "name": "isActive",

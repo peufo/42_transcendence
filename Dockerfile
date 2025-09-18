@@ -15,5 +15,6 @@ RUN pnpm run build
 FROM base
 COPY --from=build /app/node_modules /app/node_modules
 COPY --from=build /app/build /app/build
+COPY --from=build /app/drizzle /app/drizzle
 EXPOSE 8000
 CMD [ "pnpm", "start" ]
