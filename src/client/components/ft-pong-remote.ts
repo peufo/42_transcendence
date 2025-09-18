@@ -1,19 +1,17 @@
 import type { Move, Player } from '../../lib/engine/index.js'
 import type { ChannelSocket } from '../../lib/useSocketChannels.js'
-import { getMyRendering, type Renderer } from '../renderer/Renderer.js'
+import type { Renderer } from '../renderer/Renderer.js'
 import { Renderer2D } from '../renderer/Renderer2D.js'
 import { Renderer3D } from '../renderer/Renderer3D.js'
 import { socketChannel } from '../socketChannel.js'
 import { defineComponent } from '../utils/component.js'
-import { $match, $user } from '../utils/store.js'
+import { $match, $myRenderer, $user } from '../utils/store.js'
 import { toast } from './ft-toast.js'
 
 defineComponent('ft-pong-remote', () => {
-	let channel: ChannelSocket<'matches'>
-	let cleanInputs: (() => void) | undefined
 	let renderer: Renderer
 
-	function setupInputs(player: Player) {
+	function setupInputs(player: Player, channel: ChannelSocket<'matches'>) {
 		const setInput = (move: Move, value: boolean) => {
 			channel.emit('onPlayerInput', { player, move, value })
 		}
@@ -46,63 +44,63 @@ defineComponent('ft-pong-remote', () => {
 		}
 	}
 
-	const setup = (element: HTMLElement) => {
-		const user = $user.get()
-		const match = $match.get()
-		if (!user) {
-			element.innerHTML = /*html*/ `No user found`
-			return
-		}
-		if (!match) {
-			element.innerHTML = /*html*/ `
-				<div class="h-[100%] w-[100%] flex flex-row items-center justify-center">
-					You don't have any match.
-				</div>
-				`
-			return
-		}
-		element.innerHTML = /*html*/ `
-			<div class="flex flex-row col-span-2 justify-center items-center animate-bounce font-bold w-full">
-				Waiting for player
-			</div>
-		`
-		channel?.close()
-		channel = socketChannel(
-			'matches',
-			{ matchId: match.id.toString() },
-			{
-				matchReady: (names) => {
-					element.innerHTML = ''
-					renderer?.clear()
-					renderer =
-						getMyRendering() === '2D'
-							? new Renderer2D(element, names)
-							: new Renderer3D(element, names)
-				},
-				onEngineEvent: (data) => {
-					renderer.onEngineEvent(data)
-					if (data.onGameEnd !== undefined) {
-						toast.success('Game end')
-					}
-					if (data.onEngineStart !== undefined) {
-						toast.success('Game start')
-					}
-				},
-			},
-		)
-
-		const player: Player = user.id === match.player1Id ? 'p1' : 'p2'
-		cleanInputs?.()
-		cleanInputs = setupInputs(player)
-	}
-
 	return {
-		onDestroy() {
-			cleanInputs?.()
-			channel?.close()
+		onLoad() {
+			const user = $user.get()
+			const match = $match.get()
+			if (!match || !user) throw new Error('pa cool')
+
+			const player: Player = user.id === match.player1Id ? 'p1' : 'p2'
+			const channel = socketChannel(
+				'matches',
+				{ matchId: match.id.toString() },
+				{
+					onEngineEvent: (data) => {
+						renderer.onEngineEvent(data)
+						if (data.onGameEnd !== undefined) {
+							toast.success('Game end')
+						}
+						if (data.onEngineStart !== undefined) {
+							toast.success('Game start')
+						}
+					},
+				},
+			)
+			const cleanInputs = setupInputs(player, channel)
+			return () => {
+				cleanInputs()
+				channel.close()
+			}
+		},
+		render() {
+			const match = $match.get()
+			if (!match) {
+				return /*html*/ `
+					<div class="h-[100%] w-[100%] flex flex-row items-center justify-center">
+						You don't have any match.
+					</div>
+				`
+			}
+			if (match.state === 'awaiting') {
+				return /*html*/ `
+					<div class="flex flex-row col-span-2 justify-center items-center animate-bounce font-bold w-full">
+						Waiting for player
+					</div>
+				`
+			}
+			return ''
 		},
 		postRender(element) {
-			setup(element)
+			const match = $match.get()
+			if (match?.state !== 'ongoing' || !match?.player1 || !match?.player2) {
+				return
+			}
+			const names = { p1: match.player1.name, p2: match.player2.name }
+			renderer?.clear()
+			renderer =
+				$myRenderer.get() === '2D'
+					? new Renderer2D(element, names)
+					: new Renderer3D(element, names)
 		},
 	}
 })

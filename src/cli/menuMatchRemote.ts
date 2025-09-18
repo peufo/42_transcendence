@@ -1,11 +1,6 @@
 import { stdin } from 'node:process'
 import { createInterface, emitKeypressEvents } from 'node:readline'
-import type {
-	EngineEventData,
-	EngineOptionsEvents,
-	Move,
-	Player,
-} from '../lib/engine/index.js'
+import type { Move, Player } from '../lib/engine/index.js'
 import type { Match } from '../lib/type.js'
 import { api } from './api.js'
 import type { Scope } from './main.js'
@@ -19,17 +14,11 @@ export const menuMatchRemote: Scope<[Match]> = async (match) => {
 	return new Promise((resolve) => {
 		ensureSreenSize().then(() => {
 			console.clear()
-			let renderer: Required<EngineOptionsEvents> & {
-				stop: () => void
-				onEngineEvent: (data: EngineEventData) => void
-			}
+			const renderer = useRenderer()
 			const matchChannel = socketChannelCLI(
 				'matches',
 				{ matchId: match.id.toString() },
 				{
-					matchReady(_data) {
-						renderer = useRenderer()
-					},
 					onEngineEvent(data) {
 						renderer.onEngineEvent(data)
 						if (data.onGameEnd) {

@@ -2,7 +2,7 @@ import { exit, stdin, stdout } from 'node:process'
 import { createInterface } from 'node:readline'
 import * as p from '@clack/prompts'
 import chalk from 'chalk'
-import { getAwaitingMatchFromStages } from '../lib/tournament.js'
+import { getCurrentMatchFromStages } from '../lib/tournament.js'
 import type { Match, TournamentWithLookup } from '../lib/type.js'
 import { api } from './api.js'
 import type { Scope } from './main.js'
@@ -79,7 +79,7 @@ export const menuTournament: Scope<[number]> = async (tournamentId) => {
 			}
 			renderStages([...tournament.stages].reverse())
 			wait(3000).then(() => {
-				const match = getAwaitingMatchFromStages(userId, tournament.stages)
+				const match = getCurrentMatchFromStages(userId, tournament.stages)
 				if (match) {
 					terminate(() => menuMatchRemote(match))
 				}

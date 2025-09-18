@@ -109,12 +109,12 @@ defineComponent('ft-bracket', () => {
 			}
 
 			return /*html*/ `
-				<aside class="flex flex-col gap-4">
-					<div class="overflow-x-scroll rounded-md border border-gray-200 snap-x snap-mandatory">
+				<div class="flex flex-col gap-4">
+					<div class="overflow-x-scroll card snap-x snap-mandatory">
 						${renderStages()}
 					</div>
 					${iParticipate && tournament.state !== 'finished' ? quitButton : ''}
-				</aside>
+				</div>
             `
 		},
 	}

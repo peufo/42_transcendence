@@ -1,7 +1,6 @@
-import { getMyRendering, setMyRendering } from '../renderer/Renderer.js'
 import { getAvatarSrc } from '../utils/avatar.js'
 import { defineComponent } from '../utils/component.js'
-import { $user } from '../utils/store.js'
+import { $myRenderer, $user } from '../utils/store.js'
 
 const renderingIcons: Record<'2D' | '3D', string> = {
 	'2D': 'square-unit',
@@ -11,7 +10,7 @@ const renderingIcons: Record<'2D' | '3D', string> = {
 defineComponent('ft-header', () => ({
 	render() {
 		const user = $user.get()
-		const rendering = getMyRendering()
+		const rendering = $myRenderer.get(false)
 
 		return /*html*/ `
 				<header class="flex items-center p-2 pl-4 gap-2 border-b bg-white/50">
@@ -44,7 +43,7 @@ defineComponent('ft-header', () => ({
 		}
 		rendererCheckbox.addEventListener('click', () => {
 			const selection = rendererCheckbox.checked ? '3D' : '2D'
-			setMyRendering(selection)
+			$myRenderer.set(selection)
 			renderSpan.innerHTML = selection
 			renderIcon.setAttribute('name', renderingIcons[selection])
 		})

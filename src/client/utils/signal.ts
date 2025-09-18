@@ -45,8 +45,6 @@ export function createSignal<T>(initialValue: T): Signal<T> {
 		}
 		effect.signals.add(signal)
 		subscribes.add(effect)
-		// console.log('SUBSCRIBE COUNT: ', subscribes.size)
-		console.log(subscribes)
 		return value
 	}
 

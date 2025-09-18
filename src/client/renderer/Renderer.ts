@@ -11,15 +11,13 @@ import {
 	type State,
 } from '../../lib/engine/index.js'
 import { useInterpolate } from '../../lib/interpolate.js'
-import { $user } from '../utils/store.js'
+import { createEffect } from '../utils/signal.js'
+import { $myRenderer, $user } from '../utils/store.js'
 
-export function getMyRendering() {
-	return (window.localStorage.getItem('rendering') ?? '2D') as '2D' | '3D'
-}
-
-export function setMyRendering(value: '2D' | '3D') {
-	window.localStorage.setItem('rendering', value)
-}
+createEffect(() => {
+	const myRenderer = $myRenderer.get()
+	window.localStorage.setItem('rendering', myRenderer)
+})
 
 export abstract class Renderer implements Required<EngineOptionsEvents> {
 	protected element: HTMLElement

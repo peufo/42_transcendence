@@ -17,12 +17,17 @@ export function getNextStage<M extends MatchBasic>(
 	})
 }
 
-// TODO: make able to join ongoing ?
-export function getAwaitingMatchFromStages(userId: number, stages: Match[][]) {
-	return stages.flat().find((m) => {
-		return (
+export function getCurrentMatchFromStages(userId: number, stages: Match[][]) {
+	const stagesArray = stages.flat()
+	const ongoing = stagesArray.find(
+		(m) =>
 			(m.player1Id === userId || m.player2Id === userId) &&
-			m.state === 'awaiting'
-		)
-	})
+			m.state === 'ongoing',
+	)
+	if (ongoing) return ongoing
+	return stagesArray.find(
+		(m) =>
+			(m.player1Id === userId || m.player2Id === userId) &&
+			m.state === 'awaiting',
+	)
 }

@@ -130,7 +130,6 @@ export type SocketChannels = {
 		}
 		serverEvents: {
 			onEngineEvent: EngineEventData
-			matchReady: Record<Player, string>
 		}
 		serverPayload: {
 			engine?: Engine

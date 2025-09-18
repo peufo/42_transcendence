@@ -1,8 +1,9 @@
 import { Engine } from '../../lib/engine/index.js'
-import { getMyRendering, type Renderer } from '../renderer/Renderer.js'
+import type { Renderer } from '../renderer/Renderer.js'
 import { Renderer2D } from '../renderer/Renderer2D.js'
 import { Renderer3D } from '../renderer/Renderer3D.js'
 import { defineComponent } from '../utils/component.js'
+import { $myRenderer } from '../utils/store.js'
 
 defineComponent('ft-pong-local', () => {
 	let renderer: Renderer
@@ -39,15 +40,18 @@ defineComponent('ft-pong-local', () => {
 	}
 
 	return {
-		onLoad(element) {
+		// onLoad(element) {
+		// },
+		postRender(element) {
 			element.classList.add('grid', 'place-items-center')
 			const urlParams = new URLSearchParams(window.location.search)
 			const names = {
 				p1: urlParams.get('player1') ?? 'Player 1',
 				p2: urlParams.get('player2') ?? 'Player 2',
 			}
+			renderer?.clear()
 			renderer =
-				getMyRendering() === '2D'
+				$myRenderer.get() === '2D'
 					? new Renderer2D(element, names)
 					: new Renderer3D(element, names)
 			const pointsToWin = urlParams.get('points-to-win')

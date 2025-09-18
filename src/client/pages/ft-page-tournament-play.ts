@@ -1,4 +1,4 @@
-import { getAwaitingMatchFromStages } from '../../lib/tournament.js'
+import { getCurrentMatchFromStages } from '../../lib/tournament.js'
 import type { Match } from '../../lib/type.js'
 import type { ChannelSocket } from '../../lib/useSocketChannels.js'
 import { toast } from '../components/ft-toast.js'
@@ -7,6 +7,7 @@ import { getAvatarSrc } from '../utils/avatar.js'
 import { defineComponent } from '../utils/component.js'
 import {
 	$match,
+	$myRenderer,
 	$participants,
 	$stages,
 	$tournament,
@@ -33,8 +34,13 @@ import {
 
 function setMatch(match: Match | undefined) {
 	const currentMatch = $match.get(false)
-	if (!currentMatch || currentMatch.id !== match?.id) {
-		$match.set(match)
+	if (
+		!currentMatch ||
+		currentMatch.id !== match?.id ||
+		currentMatch.state !== match?.state
+	) {
+		console.log('setting to ', match)
+		$match.set(structuredClone(match))
 	}
 }
 
@@ -77,7 +83,7 @@ defineComponent('ft-page-tournament-play', () => {
 						$stages.set(stages)
 						const userId = $user.get(false)?.id
 						if (userId) {
-							const myMatch = getAwaitingMatchFromStages(userId, stages)
+							const myMatch = getCurrentMatchFromStages(userId, stages)
 							setMatch(myMatch)
 						}
 						$tournament.update((t) => {
@@ -86,13 +92,14 @@ defineComponent('ft-page-tournament-play', () => {
 						})
 					},
 					onMatchChange({ match }) {
-						console.log('onMatchChange')
+						console.log('onMatchChange', match)
 						const userId = $user.get(false)?.id
 						$stages.update((stages) => {
 							const m = stages.flat().find((m) => m.id === match.id)
 							if (!m) return stages
 							Object.assign(m, match)
 							if (m.player1Id === userId || m.player2Id === userId) {
+								console.log('TA MERE', m)
 								setMatch(m)
 							}
 							return stages
@@ -159,8 +166,8 @@ defineComponent('ft-tournament-open', () => {
 
 			const participantsCountColor =
 				participants.length === tournament.numberOfPlayers
-					? 'text-lime-400 font-bold a'
-					: 'text-gray-400'
+					? 'text-indigo-600 font-bold a'
+					: 'text-black'
 			const participantsCount = /*html*/ `
 			<div class="p-2 flex item-center justify-center ${participantsCountColor}">
 				${participants.length}
@@ -169,7 +176,7 @@ defineComponent('ft-tournament-open', () => {
 			`
 
 			const participantList = () => {
-				let html = /*html*/ `<div class="grid gap-3" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">`
+				let html = /*html*/ `<div class="grid gap-3" style="grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));">`
 				let number = 0
 				for (const participant of participants) {
 					html += /*html*/ `
@@ -211,7 +218,7 @@ defineComponent('ft-tournament-open', () => {
 				`
 
 			return /*html*/ `
-				<div class="flex flex-col gap-3 mt-10 sm:mx-auto sm:max-w-lg mx-4">
+				<div class="flex flex-col p-4 rounded-xl bg-white/25 border border-indigo-600/40 shadow gap-3 mt-10 sm:mx-auto sm:max-w-lg mx-4">
 					${participantsCount}
 					${participantList()}
 					${participationForm}
@@ -232,8 +239,10 @@ defineComponent('ft-tournament-ongoing', () => {
 			const user = $user.get(false)
 			if (!user) return 'pipi'
 			const stages = $stages.get(false)
-			const myMatch = getAwaitingMatchFromStages(user.id, stages)
+			const myMatch = getCurrentMatchFromStages(user.id, stages)
+			console.log('my match: ', myMatch)
 			setMatch(myMatch)
+			$myRenderer.get()
 
 			return /*html*/ `
 				<div class="grid grid-cols-4 gap-4 p-4 min-w-[1360px]">
