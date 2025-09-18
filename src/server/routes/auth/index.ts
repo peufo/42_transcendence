@@ -38,7 +38,7 @@ export const authRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 		postSchema('/auth/signup', signupSchema),
 		async (req, res) => {
 			const authUser = await getAuthUser(req.body.name)
-			if (authUser) return res.forbidden('User already exists.')
+			if (authUser) return res.forbidden('body/name User already exists.')
 			const user = await createUser(req.body)
 			await setSessionCookie(user.id, res)
 			res.send({ message: 'Signup success !', user })

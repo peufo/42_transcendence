@@ -1,37 +1,36 @@
-customElements.define(
-	'ft-avatar-selector',
-	class extends HTMLElement {
-		seed: number = 0
+import { defineComponent } from '../utils/component.js'
 
-		connectedCallback() {
-			this.innerHTML = this.render()
-			const avatarPlaceholderImage = this.querySelector<HTMLImageElement>(
+defineComponent('ft-avatar-selector', () => {
+	let seed = Math.random()
+
+	return {
+		onLoad(element) {
+			const avatarPlaceholderImage = element.querySelector<HTMLImageElement>(
 				'#avatarPlaceholderImage',
 			)
-			const avatarPlaceholderInput = this.querySelector<HTMLInputElement>(
+			const avatarPlaceholderInput = element.querySelector<HTMLInputElement>(
 				'#avatarPlaceholderInput',
 			)
 
 			if (avatarPlaceholderImage && avatarPlaceholderInput) {
-				this.querySelector('#next')?.addEventListener('click', () => {
-					this.seed++
-					avatarPlaceholderImage.src = `https://api.dicebear.com/9.x/avataaars/svg?seed=${this.seed}`
+				element.querySelector('#next')?.addEventListener('click', () => {
+					seed++
+					avatarPlaceholderImage.src = `https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}`
 					avatarPlaceholderInput.value = avatarPlaceholderImage.src
 				})
-				this.querySelector('#prev')?.addEventListener('click', () => {
-					this.seed--
-					avatarPlaceholderImage.src = `https://api.dicebear.com/9.x/avataaars/svg?seed=${this.seed}`
+				element.querySelector('#prev')?.addEventListener('click', () => {
+					seed--
+					avatarPlaceholderImage.src = `https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}`
 					avatarPlaceholderInput.value = avatarPlaceholderImage.src
 				})
 			}
-		}
-
+		},
 		render() {
 			return /*html*/ `
 				<div class="flex flex-col gap-2 items-center">
 					<div class ="w-28 h-28">
-						<img id="avatarPlaceholderImage" src="https://api.dicebear.com/9.x/avataaars/svg?seed=${this.seed}">
-						<input type="hidden" name="avatarPlaceholder" id="avatarPlaceholderInput" value="https://api.dicebear.com/9.x/avataaars/svg?seed=${this.seed}">
+						<img id="avatarPlaceholderImage" src="https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}">
+						<input type="hidden" name="avatarPlaceholder" id="avatarPlaceholderInput" value="https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}">
 					</div>
 					<div class="flex gap-2">
 						<button type="button" id="prev" class="btn btn-primary">
@@ -44,6 +43,6 @@ customElements.define(
 					</div>
 				</div>
             `
-		}
-	},
-)
+		},
+	}
+})
