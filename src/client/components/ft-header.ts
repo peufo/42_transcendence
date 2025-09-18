@@ -3,17 +3,31 @@ import { getAvatarSrc } from '../utils/avatar.js'
 import { defineComponent } from '../utils/component.js'
 import { $user } from '../utils/store.js'
 
+const renderingIcons: Record<'2D' | '3D', string> = {
+	'2D': 'square-unit',
+	'3D': 'box',
+}
+
 defineComponent('ft-header', () => ({
 	render() {
 		const user = $user.get()
+		const rendering = getMyRendering()
+
 		return /*html*/ `
-				<header class="flex items-center p-2 pl-4 gap-2 border-b border-indigo-100">
+				<header class="flex items-center p-2 pl-4 gap-2 border-b bg-white/50">
 					<a href="${user ? '/me' : '/'}" class="text-2xl text-indigo-600">Transcendance</a>
 					<div class="flex-grow"></div>
-					<label class="inline-flex items-center cursor-pointer col-span-2 flex flex-row items-center justify-center mr-2">
-						<input id="renderer" type="checkbox" class="sr-only peer" ${getMyRendering() === '3D' ? 'checked' : ''}>
-						<div class="relative w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-						<span class="ms-3 text-sm" id="render-type">${getMyRendering()}</span>
+					<label class="cursor-pointer col-span-2 flex flex-row items-center justify-center mr-10">
+						<input id="renderer" type="checkbox" class="sr-only peer" ${rendering === '3D' ? 'checked' : ''}>
+						<div class="relative w-11 h-6 bg-amber-600 rounded-full
+								peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white
+								after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300
+								after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600 mr-2">
+						</div>
+						<div class="flex flex-col items-center">
+							<ft-icon id="render-type-icon" name="${renderingIcons[rendering]}"></ft-icon>	
+							<span class="text-[0.6rem]" id="render-type-span">${rendering}</span>
+						</div>
 					</label>
 					<ft-user-menu></ft-user-menu>
 				</header>
@@ -22,12 +36,17 @@ defineComponent('ft-header', () => ({
 	postRender(element) {
 		const rendererCheckbox =
 			element.querySelector<HTMLInputElement>('#renderer')
-		const renderSpan = element.querySelector<HTMLSpanElement>('#render-type')
-		if (!rendererCheckbox || !renderSpan) return
+		const renderSpan =
+			element.querySelector<HTMLSpanElement>('#render-type-span')
+		const renderIcon = element.querySelector<HTMLElement>('#render-type-icon')
+		if (!rendererCheckbox || !renderSpan || !renderIcon) {
+			throw new Error('Html structure of component is not correct !')
+		}
 		rendererCheckbox.addEventListener('click', () => {
 			const selection = rendererCheckbox.checked ? '3D' : '2D'
 			setMyRendering(selection)
 			renderSpan.innerHTML = selection
+			renderIcon.setAttribute('name', renderingIcons[selection])
 		})
 	},
 }))

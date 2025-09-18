@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+:root {
+	--primary: #4f29ce;
+	--secondary: #ff9d00;
+}
+
 .btn {
 	@apply flex items-center bg-white gap-1 justify-center rounded-md px-3 py-1.5 text-sm/6 font-semibold shadow-xs focus-visible:outline-2 focus-visible:outline-offset-2 cursor-pointer;
 }
@@ -63,8 +68,13 @@
 	@apply block flex gap-2 items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer;
 }
 
-.login-gradient {
-	background: linear-gradient(250deg, #4f29ce, rgb(209, 209, 209), #ff9d00);
+.bg-gradient {
+	background: linear-gradient(
+		250deg,
+		var(--primary),
+		rgb(209, 209, 209),
+		var(--secondary)
+	);
 	background-size: 180% 180%;
 	animation: gradient-animation 7s ease infinite;
 }

@@ -6,7 +6,7 @@ export function defineComponent(
 		onLoad?:
 			| ((element: HTMLElement) => void)
 			| ((element: HTMLElement) => () => void)
-		postRender?: (element: HTMLElement) => void
+		postRender?: (element: HTMLElement) => void | Promise<void>
 		onDestroy?: (element: HTMLElement) => void
 		render?: () => string
 	},
@@ -21,13 +21,15 @@ export function defineComponent(
 			private component = getComponent()
 			private onDestroy: ReturnType<Required<typeof this.component>['onLoad']>
 
+			private effectFunction = () => {
+				if (this.component.render) this.innerHTML = this.component.render()
+				this.component.postRender?.(this)
+			}
+
 			constructor() {
 				super()
 				this.onDestroy = undefined
-				this.cleanEffect = createEffect(() => {
-					if (this.component.render) this.innerHTML = this.component.render()
-					this.component.postRender?.(this)
-				})
+				this.cleanEffect = createEffect(this.effectFunction)
 			}
 			connectedCallback() {
 				this.onDestroy = this.component.onLoad?.(this)
@@ -36,6 +38,9 @@ export function defineComponent(
 				this.cleanEffect()
 				this.component.onDestroy?.(this)
 				this.onDestroy?.()
+			}
+			attributeChangedCallback() {
+				this.effectFunction()
 			}
 		},
 	)

@@ -1,39 +1,40 @@
+import { defineComponent } from '../utils/component.js'
+
 const cache: Record<string, Promise<string>> = {}
 
-customElements.define(
+defineComponent(
 	'ft-icon',
-	class extends HTMLElement {
-		name: string
-		svgClass: string
+	() => {
+		let svgClass: string
 
-		connectedCallback() {
-			this.name = this.getAttribute('name') || 'file-x'
-			this.svgClass = this.classList.value
-			this.classList.remove(...this.classList)
-			this.classList.add('contents')
-			this.render()
-		}
-
-		async render() {
-			const iconUrl = `/public/icons/${this.getAttribute('name') || 'file-x'}.svg`
-			if (!cache[iconUrl]) {
-				cache[iconUrl] = fetch(iconUrl)
-					.then((res) => {
-						if (!res.ok) throw new Error(`Failed to load ${iconUrl}`)
-						return res.text()
-					})
-					.catch((err) => {
-						console.error(err)
-						return ''
-					})
-			}
-			const iconSVG = await cache[iconUrl]
-			if (!iconSVG) return
-			this.innerHTML = iconSVG
-			if (this.svgClass) {
-				const svg = this.querySelector('svg')
-				svg?.classList.add(...this.svgClass.split(' '))
-			}
+		return {
+			onLoad(element) {
+				svgClass = element.classList.value
+				element.classList.remove(...element.classList)
+				element.classList.add('contents')
+			},
+			async postRender(element) {
+				const iconUrl = `/public/icons/${element.getAttribute('name') || 'file-x'}.svg`
+				if (!cache[iconUrl]) {
+					cache[iconUrl] = fetch(iconUrl)
+						.then((res) => {
+							if (!res.ok) throw new Error(`Failed to load ${iconUrl}`)
+							return res.text()
+						})
+						.catch((err) => {
+							console.error(err)
+							return ''
+						})
+				}
+				const iconSVG = await cache[iconUrl]
+				if (!iconSVG) return
+				element.innerHTML = iconSVG
+				if (svgClass) {
+					const svg = element.querySelector('svg')
+					svg?.classList.add(...svgClass.split(' '))
+				}
+			},
 		}
 	},
+	'name',
 )

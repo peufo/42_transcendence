@@ -80,67 +80,65 @@ defineComponent('ft-page-login', () => {
 
 		render() {
 			return /*html*/ `
-        <div class="w-screen login-gradient grid place-content-center" style="height: calc(100vh - 55px);">
-          <div class="relative flex flex-col justify-center shadow-lg rounded-2xl border-2 border-indigo-600/25
-                      py-2 px-6 sm:px-8 md:px-12 lg:px-16
-                      w-full max-w-[95vw] sm:max-w-[500px] md:max-w-[700px] lg:max-w-[800px]
-                      min-h-[500px] backdrop-blur-md bg-white/25">    
+			<div class="m-auto mt-10 max-w-md flex flex-col justify-center shadow-lg rounded-2xl
+						border-2 border-indigo-600/25
+						py-2 px-6 sm:px-8 md:px-12 lg:px-16 backdrop-blur-md bg-white/25">    
 
-            <!-- Titre -->
-            <h2 class="mt-10 text-center text-3xl sm:text-4xl tracking-tight text-indigo-600">
-              Welcome to the Pong
-            </h2>
-           
-            <!-- Formulaire -->
-            <form method="post" class="mt-10 mb-6 text-base sm:text-lg md:text-xl">
-              <div id="inputAvatarContainer" class="mt-2 hidden">
-                  <ft-avatar-selector></ft-avatar-selector>
-              </div>
+				<!-- Titre -->
+				<h2 class="mt-10 text-center text-3xl sm:text-4xl tracking-tight text-indigo-600">
+				Welcome to the Pong
+				</h2>
+			
+				<!-- Formulaire -->
+				<form method="post" class="mt-10 mb-6 text-base sm:text-lg md:text-xl">
+				<div id="inputAvatarContainer" class="mt-2 hidden">
+					<ft-avatar-selector></ft-avatar-selector>
+				</div>
 
-              <div class="mt-2">
-                <label for="name" class="font-medium text-black text-sm">User name</label>
-                <div class="mt-2">
-                  <input autofocus type="text" name="name" id="name" autocomplete="off" class="input" />
-                </div>
-              </div>
+				<div class="mt-2">
+					<label for="name" class="font-medium text-black text-sm">User name</label>
+					<div class="mt-2">
+					<input autofocus type="text" name="name" id="name" autocomplete="off" class="input" />
+					</div>
+				</div>
 
-              <div class="mt-2">
-                <label for="password" class="font-medium text-black text-sm">Password</label>
-                <div class="mt-2">
-                  <input type="password" name="password" id="password" class="input"/>
-                </div>
-              </div>
+				<div class="mt-2">
+					<label for="password" class="font-medium text-black text-sm">Password</label>
+					<div class="mt-2">
+					<input type="password" name="password" id="password" class="input"/>
+					</div>
+				</div>
 
-              <div id="inputContainerConfirm" class="mt-2 hidden">
-                <label for="confirm" class="font-medium text-black text-sm">Confirm password</label>
-                <div class="mt-2">
-                  <input type="password" name="confirm" id="confirm" autocomplete="new-password" class="input" />
-                </div>
-              </div>
+				<div id="inputContainerConfirm" class="mt-2 hidden">
+					<label for="confirm" class="font-medium text-black text-sm">Confirm password</label>
+					<div class="mt-2">
+					<input type="password" name="confirm" id="confirm" autocomplete="new-password" class="input" />
+					</div>
+				</div>
 
-              <div class="flex flex-row-reverse gap-6 flex-wrap mt-10">
-                <button type="submit" class="btn btn-primary shrink-0 grow"></button>
-                <a href="/login/waiting/google" class="btn shrink-0 grow">
-                  <div>Login with</div>
-                  <div class="flex flex-row justify-around">
-                    <span class="text-blue-500">G</span>
-                    <span class="text-red-500">o</span>
-                    <span class="text-yellow-500">o</span>
-                    <span class="text-blue-500">g</span>
-                    <span class="text-green-500">l</span>
-                    <span class="text-red-500">e</span>
-                  </div>
-                </a>
-              </div>
-            </form>
+				<div class="flex flex-row-reverse gap-6 flex-wrap mt-10">
+					<button type="submit" class="btn btn-primary shrink-0 grow"></button>
+					<a href="/login/waiting/google" class="btn btn-border shrink-0 grow">
+					<div>Login with</div>
+					<div class="flex flex-row justify-around">
+						<span class="text-blue-500">G</span>
+						<span class="text-red-500">o</span>
+						<span class="text-yellow-500">o</span>
+						<span class="text-blue-500">g</span>
+						<span class="text-green-500">l</span>
+						<span class="text-red-500">e</span>
+					</div>
+					</a>
+				</div>
+				</form>
 
-            <div id="actionBtnContainer" class="text-center text-indigo-600 text-sm"></div>
-            <h3 class="mt-4 text-sm text-center tracking-tight text-black/60">
-              A 42 school project by aloubry, jvoisard, alletond and lbaecher
-            </h3>  
-          </div>
-        </div>
-        `
+				<div id="actionBtnContainer" class="text-center text-indigo-600 text-sm"></div>
+				<h3 class="mt-4 text-sm text-center tracking-tight text-black/60">
+				A 42 school project by aloubry, jvoisard and lbaecher
+				</h3>  
+			</div>
+		
+			`
 		},
 	}
 })

@@ -10,8 +10,8 @@ import {
 	type RouteApiPost,
 	type RoutePage,
 } from '../routes.js'
-// import { defineComponent } from '../utils/component.js'
-import { type CleanEffect, createEffect } from '../utils/signal.js'
+import { defineComponent } from '../utils/component.js'
+// import { type CleanEffect, createEffect } from '../utils/signal.js'
 import { $url, $user } from '../utils/store.js'
 import { slide, transitionIn, transitionOut } from '../utils/transition.js'
 import { toast } from './ft-toast.js'
@@ -25,135 +25,136 @@ function onPopState() {
 	$url.set(new URL(document.location.href))
 }
 
-// defineComponent('ft-router', () => {
-// 	function getPage(pathname: string) {
-// 		const routePage = pathname as RoutePage
-// 		const layoutData: RouteApiGet[] = []
-// 		if (!PAGES[routePage]) {
-// 			return {
-// 				component: 'ft-page-404',
-// 				isPublic: true,
-// 				layoutData,
-// 				pageData: [],
-// 			}
-// 		}
-// 		const page = PAGES[routePage] as PageOption
-// 		for (const [path, options] of Object.entries(PAGES)) {
-// 			if ('layoutData' in options && pathname.startsWith(path)) {
-// 				layoutData.push(...options.layoutData)
-// 			}
-// 		}
-// 		return { ...page, layoutData, pageData: page.pageData || [] }
-// 	}
+defineComponent('ft-router', () => {
+	function getPage(pathname: string) {
+		const routePage = pathname as RoutePage
+		const layoutData: RouteApiGet[] = []
+		if (!PAGES[routePage]) {
+			return {
+				component: 'ft-page-404',
+				isPublic: true,
+				layoutData,
+				pageData: [],
+			}
+		}
+		const page = PAGES[routePage] as PageOption
+		for (const [path, options] of Object.entries(PAGES)) {
+			if ('layoutData' in options && pathname.startsWith(path)) {
+				layoutData.push(...options.layoutData)
+			}
+		}
+		return { ...page, layoutData, pageData: page.pageData || [] }
+	}
 
-// 	return {
-// 		onLoad() {
-// 			console.log('ROUTER LOAD')
-// 			document.addEventListener('submit', onSubmitForm)
-// 			document.addEventListener('click', onClickLink)
-// 			window.addEventListener('popstate', onPopState)
-// 		},
-// 		render() {
-// 			console.log('ROUTER RENDER')
-// 			console.log('ROUTER GET URL')
-// 			const url = $url.get()
-// 			const page = getPage(url.pathname)
-
-// 			Promise.all(
-// 				page.layoutData.map((route) => api.get(route, url.search.slice(1))),
-// 			).then(() => {
-// 				console.log('ROUTER GET USER')
-// 				const user = $user.get()
-
-// 				if (!page.isPublic && !user) {
-// 					return goto(
-// 						new URL(`/login?redirectTo=${url.pathname}`, document.baseURI),
-// 					)
-// 				}
-// 				if (page.isPublic === 'only' && user) {
-// 					return goto(new URL(`/me`, document.baseURI))
-// 				}
-
-// 				Promise.all(
-// 					page.pageData.map((route) => api.get(route, url.search.slice(1))),
-// 				).then(() => {
-// 					this.innerHTML = /*html*/ `
-// 						<${page.component}></${page.component}>
-// 					`
-// 				})
-// 			})
-// 		},
-// 	}
-// })
-
-customElements.define(
-	'ft-router',
-	class extends HTMLElement {
-		private cleanEffect: CleanEffect
-
-		connectedCallback() {
-			console.log('ROUTER CONNECTED')
+	return {
+		onLoad() {
+			console.log('ROUTER LOAD')
 			document.addEventListener('submit', onSubmitForm)
 			document.addEventListener('click', onClickLink)
 			window.addEventListener('popstate', onPopState)
-			this.cleanEffect = createEffect(() => {
-				console.log('ROUTER RENDER')
-				console.log('ROUTER GET URL')
-				const url = $url.get()
-				const page = this.getPage(url.pathname)
+		},
+		postRender(element) {
+			console.log('ROUTER RENDER')
+			console.log('ROUTER GET URL')
+			const url = $url.get()
+			const page = getPage(url.pathname)
+
+			Promise.all(
+				page.layoutData.map((route) => api.get(route, url.search.slice(1))),
+			).then(() => {
+				console.log('ROUTER GET USER')
+				const user = $user.get()
+
+				if (!page.isPublic && !user) {
+					return goto(
+						new URL(`/login?redirectTo=${url.pathname}`, document.baseURI),
+					)
+				}
+				if (page.isPublic === 'only' && user) {
+					return goto(new URL(`/me`, document.baseURI))
+				}
 
 				Promise.all(
-					page.layoutData.map((route) => api.get(route, url.search.slice(1))),
+					page.pageData.map((route) => api.get(route, url.search.slice(1))),
 				).then(() => {
-					console.log('ROUTER GET USER')
-					const user = $user.get()
-
-					if (!page.isPublic && !user) {
-						return goto(
-							new URL(`/login?redirectTo=${url.pathname}`, document.baseURI),
-						)
-					}
-					if (page.isPublic === 'only' && user) {
-						return goto(new URL(`/me`, document.baseURI))
-					}
-
-					Promise.all(
-						page.pageData.map((route) => api.get(route, url.search.slice(1))),
-					).then(() => {
-						this.innerHTML = /*html*/ `
-							<${page.component}></${page.component}>
-						`
-					})
+					element.innerHTML = /*html*/ `
+						<${page.component}></${page.component}>
+					`
 				})
 			})
-		}
+		},
+	}
+})
 
-		disconnectedCallback() {
-			console.log('ROUTER DISCONNECTED')
-			this.cleanEffect()
-		}
+// customElements.define(
+// 	'ft-router',
+// 	class extends HTMLElement {
+// 		private cleanEffect: CleanEffect
 
-		getPage(pathname: string) {
-			const routePage = pathname as RoutePage
-			const layoutData: RouteApiGet[] = []
-			if (!PAGES[routePage]) {
-				return {
-					component: 'ft-page-404',
-					isPublic: true,
-					layoutData,
-					pageData: [],
-				}
-			}
-			const page = PAGES[routePage] as PageOption
-			for (const [path, options] of Object.entries(PAGES)) {
-				if ('layoutData' in options && pathname.startsWith(path)) {
-					layoutData.push(...options.layoutData)
-				}
-			}
-			return { ...page, layoutData, pageData: page.pageData || [] }
-		}
-	},
-)
+// 		connectedCallback() {
+// 			console.log('ROUTER CONNECTED')
+// 			document.addEventListener('submit', onSubmitForm)
+// 			document.addEventListener('click', onClickLink)
+// 			window.addEventListener('popstate', onPopState)
+// 			this.cleanEffect = createEffect(() => {
+// 				console.log('ROUTER RENDER')
+// 				console.log('ROUTER GET URL')
+// 				const url = $url.get()
+// 				const page = this.getPage(url.pathname)
+
+// 				Promise.all(
+// 					page.layoutData.map((route) => api.get(route, url.search.slice(1))),
+// 				).then(() => {
+// 					// TODO: remove all console.log
+// 					console.log('ROUTER GET USER')
+// 					const user = $user.get()
+
+// 					if (!page.isPublic && !user) {
+// 						return goto(
+// 							new URL(`/login?redirectTo=${url.pathname}`, document.baseURI),
+// 						)
+// 					}
+// 					if (page.isPublic === 'only' && user) {
+// 						return goto(new URL(`/me`, document.baseURI))
+// 					}
+
+// 					Promise.all(
+// 						page.pageData.map((route) => api.get(route, url.search.slice(1))),
+// 					).then(() => {
+// 						this.innerHTML = /*html*/ `
+// 							<${page.component}></${page.component}>
+// 						`
+// 					})
+// 				})
+// 			})
+// 		}
+
+// 		disconnectedCallback() {
+// 			console.log('ROUTER DISCONNECTED')
+// 			this.cleanEffect()
+// 		}
+
+// 		getPage(pathname: string) {
+// 			const routePage = pathname as RoutePage
+// 			const layoutData: RouteApiGet[] = []
+// 			if (!PAGES[routePage]) {
+// 				return {
+// 					component: 'ft-page-404',
+// 					isPublic: true,
+// 					layoutData,
+// 					pageData: [],
+// 				}
+// 			}
+// 			const page = PAGES[routePage] as PageOption
+// 			for (const [path, options] of Object.entries(PAGES)) {
+// 				if ('layoutData' in options && pathname.startsWith(path)) {
+// 					layoutData.push(...options.layoutData)
+// 				}
+// 			}
+// 			return { ...page, layoutData, pageData: page.pageData || [] }
+// 		}
+// 	},
+// )
 
 function findAnchor(eventTarget: EventTarget | null): HTMLAnchorElement | null {
 	let el: HTMLElement | null = eventTarget as HTMLElement
