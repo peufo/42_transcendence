@@ -1,10 +1,5 @@
 @import "tailwindcss";
 
-:root {
-	--primary: #4f29ce;
-	--secondary: #ff9d00;
-}
-
 .btn {
 	@apply flex items-center bg-white gap-1 justify-center rounded-md px-3 py-1.5 text-sm/6 font-semibold shadow-xs focus-visible:outline-2 focus-visible:outline-offset-2 cursor-pointer;
 }
@@ -73,25 +68,33 @@
 }
 
 .bg-gradient {
-	background: linear-gradient(
-		250deg,
-		var(--primary),
-		rgb(209, 209, 209),
-		var(--secondary)
+	background: radial-gradient(
+		circle,
+		oklch(92% 0.1 282.645) 0%,
+		oklch(92% 0.1 66.559) 100%
 	);
-	background-size: 180% 180%;
-	animation: gradient-animation 7s ease infinite;
+	background-size: 200% 200%;
+	animation: gradient-animation 20s ease-in-out infinite;
 }
 
 @keyframes gradient-animation {
 	0% {
-		background-position: 0% 50%;
+		background-position: 0% 0%;
 	}
-	50% {
-		background-position: 100% 50%;
+	20% {
+		background-position: 20% 180%;
+	}
+	40% {
+		background-position: 120% 120%;
+	}
+	60% {
+		background-position: 180% 220%;
+	}
+	80% {
+		background-position: 120% 40%;
 	}
 	100% {
-		background-position: 0% 50%;
+		background-position: 0% 0%;
 	}
 }
 

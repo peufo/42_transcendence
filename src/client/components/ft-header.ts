@@ -13,7 +13,7 @@ defineComponent('ft-header', () => ({
 		const rendering = $myRenderer.get(false)
 
 		return /*html*/ `
-				<header class="flex items-center p-2 pl-4 gap-2 border-b bg-white/50">
+				<header class="flex items-center p-2 pl-4 gap-2 bg-white/50">
 					<a href="${user ? '/me' : '/'}" class="text-2xl text-indigo-600">Transcendance</a>
 					<div class="flex-grow"></div>
 					<label class="cursor-pointer col-span-2 flex flex-row items-center justify-center mr-10">
