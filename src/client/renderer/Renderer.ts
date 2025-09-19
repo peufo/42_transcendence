@@ -24,16 +24,21 @@ export abstract class Renderer implements Required<EngineOptionsEvents> {
 	protected user = $user.get(false)
 	protected interpolate = useInterpolate()
 	protected scores: Scores = { p1: 0, p2: 0 }
-	protected playerNames = { p1: 'Player 1', p2: 'Player 2' }
+	protected playerNames: Record<Player, string>
 	protected canvas: HTMLCanvasElement
 
-	constructor(element: HTMLElement, names: Record<Player, string>) {
+	constructor(
+		element: HTMLElement,
+		names: Record<Player, string>,
+		scores: Scores,
+	) {
 		this.element = element
 		this.playerNames = names
+		this.scores = scores
 		this.canvas = document.createElement('canvas')
 		this.canvas.width = ARENA_WIDTH
 		this.canvas.height = ARENA_HEIGHT
-		this.canvas.classList.add('border')
+		this.canvas.classList.add('border', 'bg-white/50')
 		this.element.appendChild(this.canvas)
 	}
 
@@ -54,6 +59,5 @@ export abstract class Renderer implements Required<EngineOptionsEvents> {
 	}
 	abstract onCollision(data: Collision): void
 	abstract onTimerTick(data: number): void
-	abstract onEngineStart(): void
 	abstract clear(): void
 }

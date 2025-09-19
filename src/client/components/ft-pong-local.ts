@@ -52,8 +52,8 @@ defineComponent('ft-pong-local', () => {
 			renderer?.clear()
 			renderer =
 				$myRenderer.get() === '2D'
-					? new Renderer2D(element, names)
-					: new Renderer3D(element, names)
+					? new Renderer2D(element, names, { p1: 0, p2: 0 })
+					: new Renderer3D(element, names, { p1: 0, p2: 0 })
 			const pointsToWin = urlParams.get('points-to-win')
 			engine = new Engine({
 				pointsToWin: Number(pointsToWin),
@@ -62,7 +62,6 @@ defineComponent('ft-pong-local', () => {
 				onGameEnd: renderer.onGameEnd.bind(renderer),
 				onCollision: renderer.onCollision.bind(renderer),
 				onTimerTick: renderer.onTimerTick.bind(renderer),
-				onEngineStart: renderer.onEngineStart.bind(renderer),
 			})
 			engine.start()
 			cleanInputs = setupInputs()

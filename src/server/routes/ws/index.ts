@@ -129,7 +129,6 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 							.where(eq(matches.id, matchId))
 							.then(() => {
 								match.state = 'ongoing'
-								console.log(match)
 								if (match.tournamentId)
 									notify.tournaments(match.tournamentId, 'onMatchChange', {
 										match,

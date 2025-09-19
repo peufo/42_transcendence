@@ -42,7 +42,6 @@ export type EngineEventData = {
 	onGameEnd?: GameOverData
 	onCollision?: Collision
 	onTimerTick?: number
-	onEngineStart?: null
 }
 
 export type EngineOptionsEvents = {
@@ -204,7 +203,6 @@ export class Engine {
 	}
 
 	start() {
-		this.onEvent({ onEngineStart: null })
 		setTimeout(() => {
 			this.#newRound()
 		}, 500)

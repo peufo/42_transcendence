@@ -1,5 +1,4 @@
 import { getCurrentMatchFromStages } from '../../lib/tournament.js'
-import type { Match } from '../../lib/type.js'
 import type { ChannelSocket } from '../../lib/useSocketChannels.js'
 import { toast } from '../components/ft-toast.js'
 import { socketChannel } from '../socketChannel.js'
@@ -31,18 +30,6 @@ import {
 // 	btn.innerHTML = key
 // 	return btn
 // })
-
-function setMatch(match: Match | undefined) {
-	const currentMatch = $match.get(false)
-	if (
-		!currentMatch ||
-		currentMatch.id !== match?.id ||
-		currentMatch.state !== match?.state
-	) {
-		console.log('setting to ', match)
-		$match.set(structuredClone(match))
-	}
-}
 
 defineComponent('ft-page-tournament-play', () => {
 	let tournamentChannel: ChannelSocket<'tournaments'>
@@ -84,7 +71,7 @@ defineComponent('ft-page-tournament-play', () => {
 						const userId = $user.get(false)?.id
 						if (userId) {
 							const myMatch = getCurrentMatchFromStages(userId, stages)
-							setMatch(myMatch)
+							$match.set(myMatch)
 						}
 						$tournament.update((t) => {
 							if (!t) return undefined
@@ -92,15 +79,17 @@ defineComponent('ft-page-tournament-play', () => {
 						})
 					},
 					onMatchChange({ match }) {
-						console.log('onMatchChange', match)
+						console.log('onMatchChange')
 						const userId = $user.get(false)?.id
 						$stages.update((stages) => {
 							const m = stages.flat().find((m) => m.id === match.id)
 							if (!m) return stages
+							const isMyNewMatch =
+								(m.player1Id === userId || m.player2Id === userId) &&
+								m.state !== match.state
 							Object.assign(m, match)
-							if (m.player1Id === userId || m.player2Id === userId) {
-								console.log('TA MERE', m)
-								setMatch(m)
+							if (isMyNewMatch) {
+								$match.set(m)
 							}
 							return stages
 						})
@@ -240,8 +229,8 @@ defineComponent('ft-tournament-ongoing', () => {
 			if (!user) return 'pipi'
 			const stages = $stages.get(false)
 			const myMatch = getCurrentMatchFromStages(user.id, stages)
-			console.log('my match: ', myMatch)
-			setMatch(myMatch)
+			const currentMatch = $match.get(false)
+			if (currentMatch?.id !== myMatch?.id) $match.set(myMatch)
 			$myRenderer.get()
 
 			return /*html*/ `

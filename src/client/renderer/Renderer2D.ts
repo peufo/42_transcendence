@@ -11,6 +11,7 @@ import {
 	PADDLE_BASE_WIDTH,
 	type Player,
 	type RoundData,
+	type Scores,
 	type State,
 } from '../../lib/engine/index.js'
 import { getRandomArbitrary } from '../../lib/utils.js'
@@ -47,12 +48,17 @@ export class Renderer2D extends Renderer {
 	private ctx: CanvasRenderingContext2D
 	private lastFrameTime = 0
 
-	constructor(element: HTMLElement, names: Record<Player, string>) {
-		super(element, names)
+	constructor(
+		element: HTMLElement,
+		names: Record<Player, string>,
+		scores: Scores,
+	) {
+		super(element, names, scores)
 		const newCtx = this.canvas.getContext('2d')
 		if (!newCtx) throw new Error('Canvas context failed')
 		this.ctx = newCtx
 		this.ctx.textAlign = 'center'
+		this.animationFrameId = requestAnimationFrame(this.renderFrame)
 	}
 
 	private renderGameOver = () => {
@@ -180,8 +186,5 @@ export class Renderer2D extends Renderer {
 			this.renderTimer(data)
 			cancelAnimationFrame(this.animationFrameId)
 		}
-	}
-	onEngineStart() {
-		this.animationFrameId = requestAnimationFrame(this.renderFrame)
 	}
 }

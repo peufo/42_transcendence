@@ -87,7 +87,6 @@ export function useRenderer(): Required<EngineOptionsEvents> & {
 			renderGameEnd(round.finalRound.scores)
 			renderScores(round.finalRound.scores, false)
 		},
-		onEngineStart() {},
 		onEngineEvent(data: EngineEventData) {
 			for (const eventName of Object.keys(data) as (keyof EngineEventData)[]) {
 				//@ts-ignore

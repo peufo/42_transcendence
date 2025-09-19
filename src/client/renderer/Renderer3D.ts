@@ -7,6 +7,7 @@ import {
 	type GameOverData,
 	type Player,
 	type RoundData,
+	type Scores,
 	type State,
 } from '../../lib/engine/index.js'
 import * as Graphics from '../graphics/index.js'
@@ -27,8 +28,12 @@ export class Renderer3D extends Renderer {
 	private gameOverText: BABYLON.GUI.TextBlock
 	private wallParticleSystem: BABYLON.ParticleSystem
 
-	constructor(element: HTMLElement, names: Record<Player, string>) {
-		super(element, names)
+	constructor(
+		element: HTMLElement,
+		names: Record<Player, string>,
+		scores: Scores,
+	) {
+		super(element, names, scores)
 		this.initAsync()
 		window.addEventListener('resize', () => this.babylonEngine.resize())
 	}
@@ -194,5 +199,4 @@ export class Renderer3D extends Renderer {
 			this.timerText.text = `${data}`
 		}
 	}
-	onEngineStart() {}
 }

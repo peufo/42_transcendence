@@ -46,9 +46,9 @@ defineComponent('ft-pong-remote', () => {
 
 	return {
 		onLoad() {
-			const user = $user.get()
-			const match = $match.get()
-			if (!match || !user) throw new Error('pa cool')
+			const user = $user.get(false)
+			const match = $match.get(false)
+			if (!match || !user) throw new Error('no user or match')
 
 			const player: Player = user.id === match.player1Id ? 'p1' : 'p2'
 			const channel = socketChannel(
@@ -59,9 +59,6 @@ defineComponent('ft-pong-remote', () => {
 						renderer.onEngineEvent(data)
 						if (data.onGameEnd !== undefined) {
 							toast.success('Game end')
-						}
-						if (data.onEngineStart !== undefined) {
-							toast.success('Game start')
 						}
 					},
 				},
@@ -96,11 +93,12 @@ defineComponent('ft-pong-remote', () => {
 				return
 			}
 			const names = { p1: match.player1.name, p2: match.player2.name }
+			const scores = { p1: match.player1Score, p2: match.player2Score }
 			renderer?.clear()
 			renderer =
-				$myRenderer.get() === '2D'
-					? new Renderer2D(element, names)
-					: new Renderer3D(element, names)
+				$myRenderer.get(false) === '2D'
+					? new Renderer2D(element, names, scores)
+					: new Renderer3D(element, names, scores)
 		},
 	}
 })
