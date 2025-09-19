@@ -11,9 +11,9 @@ import { ensureSreenSize } from './resolution.js'
 import { socketChannelCLI } from './socketChannelCLI.js'
 
 export const menuMatchRemote: Scope<[Match]> = async (match) => {
+	console.log('pipi')
 	return new Promise((resolve) => {
 		ensureSreenSize().then(() => {
-			console.clear()
 			const renderer = useRenderer()
 			const matchChannel = socketChannelCLI(
 				'matches',

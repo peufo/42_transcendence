@@ -11,22 +11,51 @@ import { menuMatchRemote } from './menuMatchRemote.js'
 import { socketChannelCLI } from './socketChannelCLI.js'
 import { wait } from './wait.js'
 
+const stagesByPlayers: Record<number, string[]> = {
+	2: ['Final'],
+	4: ['Semifinals', 'Final'],
+	8: ['Quarterfinals', 'Semifinals', 'Final'],
+	16: ['Eighthfinals', 'Quarterfinals', 'Semifinals', 'Final'],
+}
+
+const defaultsScoresToWin: Record<string, number> = {
+	Final: 7,
+	Semifinals: 5,
+	Quarterfinals: 3,
+	Eighthfinals: 2,
+}
+
 export const menuNewTournament: Scope = async () => {
 	const numberOfPlayers = await p.select({
 		message: 'Number of player',
 		options: [2, 4, 8, 16].map((nb) => ({ label: nb.toString(), value: nb })),
 	})
 	if (p.isCancel(numberOfPlayers)) exit(0)
+	const pointsToWin: {
+		final?: number
+		semifinals?: number
+		quarterfinals?: number
+		eighthfinals?: number
+	} = {}
+
+	for (const stageName of stagesByPlayers[numberOfPlayers]) {
+		const key = stageName.toLowerCase() as
+			| 'final'
+			| 'semifinals'
+			| 'quarterfinals'
+			| 'eighthfinals'
+		const result = await p.select({
+			message: `Points to win in ${stageName}`,
+			options: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((nb) => ({ value: nb })),
+			initialValue: defaultsScoresToWin[stageName],
+		})
+		if (p.isCancel(result)) exit(0)
+		pointsToWin[key] = result
+	}
 
 	const { tournamentId } = await api.post('/tournaments/new', {
 		numberOfPlayers,
-		// TODO: make selectable ?
-		pointsToWin: {
-			final: 7,
-			semifinals: 5,
-			quarterfinals: 3,
-			eighthfinals: 2,
-		},
+		pointsToWin,
 	})
 
 	p.log.success('Tournament created')
@@ -60,10 +89,11 @@ export const menuTournament: Scope<[number]> = async (tournamentId) => {
 			if (stopMessage) spinner.stop(stopMessage)
 			const message = stateMessage()
 			if (!message) {
-				await p.select({
+				const r = await p.select({
 					message: 'Game ready to start',
 					options: [{ value: 'Press enter to start tournament' }],
 				})
+				if (p.isCancel(r)) exit(0)
 				await api.post('/tournaments/start', {
 					tournamentId,
 				})
