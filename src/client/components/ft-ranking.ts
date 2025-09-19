@@ -8,15 +8,7 @@ customElements.define(
 		private user = $user.get()
 
 		connectedCallback() {
-			this.classList.add(
-				'flex',
-				'flex-col',
-				'gap-3',
-				'border',
-				'border-gray-200',
-				'rounded-xl',
-				'p-5',
-			)
+			this.classList.add('flex', 'flex-col', 'gap-3', 'card', 'p-5')
 			createEffect(() => {
 				this.innerHTML = this.renderContent()
 			})
@@ -69,7 +61,7 @@ customElements.define(
 				}
 
 				html += /*html*/ `
-				<div class="flex items-center text-center p-2 border ${isCurrentUser ? 'border-indigo-500 border-2' : 'border-gray-200'}   rounded-xl">
+				<div class="flex items-center text-center p-2 card ${isCurrentUser ? 'border-indigo-500 border-2' : 'border-gray-200'}">
 					<div class="w-1/6 flex flex-row justify-center items-center">
 						`
 				switch (rank) {

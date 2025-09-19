@@ -3,21 +3,15 @@ import { getAvatarSrc } from '../utils/avatar.js'
 import { createEffect } from '../utils/signal.js'
 import { $matches, $user } from '../utils/store.js'
 
+// TODO: window can overflow when many scores
+
 customElements.define(
 	'ft-match-history',
 	class extends HTMLElement {
 		private user = $user.get()
 
 		connectedCallback() {
-			this.classList.add(
-				'flex',
-				'flex-col',
-				'gap-3',
-				'border',
-				'border-gray-200',
-				'rounded-xl',
-				'p-5',
-			)
+			this.classList.add('flex', 'flex-col', 'gap-3', 'card', 'p-5')
 			createEffect(() => {
 				const matches = $matches.get()
 				const matchesHead = matches
@@ -98,7 +92,7 @@ customElements.define(
 						day: '2-digit',
 					})
 					html += /*html*/ `
-						<div class="grid grid-cols-3 pl-4 p-2 items-center justify-center gap-2 border border-gray-200 rounded-xl cursor-pointer" id ="match-history-${match.id}">
+						<div class="grid grid-cols-3 pl-4 p-2 items-center justify-center gap-2 card cursor-pointer" id ="match-history-${match.id}">
 							${user1}
 							<div class="flex items-center justify-center gap-4">
 								${score1}

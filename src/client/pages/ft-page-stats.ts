@@ -14,7 +14,7 @@ customElements.define(
 				userContent += /*html*/ `
 					<div class="grid grid-cols-1 lg:grid-cols-2 grid-flow-row gap gap-4 p-10 max-w-7xl mx-auto">
 						<ft-overall-stats></ft-overall-stats>
-						<div class="flex flex-row justify-between border-1 border-gray-200 rounded-xl">
+						<div class="flex flex-row justify-between card">
 							<ft-goal-received-distribution></ft-goal-received-distribution>
 							<ft-goal-scored-distribution><ft-goal-scored-distribution>
 						</div>

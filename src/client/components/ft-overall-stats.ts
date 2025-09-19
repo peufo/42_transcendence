@@ -14,10 +14,8 @@ customElements.define(
 				'flex-flow',
 				'items-center',
 				'justify-center',
+				'card',
 				'gap-3',
-				'border',
-				'border-gray-200',
-				'rounded-xl',
 				'p-5',
 			)
 			createEffect(() => {
@@ -58,27 +56,27 @@ customElements.define(
 				return `${n}${suffix}`
 			}
 			const html = /*html*/ `
-			<div class="p-4 bg-white rounded-lg md:p-8" id="stats">
+			<div class="p-4 rounded-lg md:p-8" id="stats">
 				<dl class="grid max-w-screen-xl gap-8 mx-auto text-gray-900 sm:grid-cols-2 xl:grid-cols-3 md:grid-cols-3">
 					<div class="flex flex-col items-center justify-center">
 						<dt class="mb-2 text-3xl font-extrabold">${this.user.numberOfMatches}</dt>
-						<dd class="text-gray-500 dark:text-gray-400 whitespace-nowrap">Total match played</dd>
+						<dd class="whitespace-nowrap">Total match played</dd>
 					</div>
 					<div class="flex flex-col items-center justify-center">
 						<dt class="mb-2 text-3xl font-extrabold">${this.user.numberOfWin}</dt>
-						<dd class="text-gray-500 dark:text-gray-400 whitespace-nowrap">Total match won</dd>
+						<dd class="whitespace-nowrap">Total match won</dd>
 					</div>
 					<div class="flex flex-col items-center justify-center">
 						<dt class="mb-2 text-3xl font-extrabold">${winRate} %</dt>
-						<dd class="text-gray-500 dark:text-gray-400 whitespace-nowrap">Winrate</dd>
+						<dd class="whitespace-nowrap">Winrate</dd>
 					</div>
 					<div class="flex flex-col items-center justify-center">
 						<dt class="mb-2 text-3xl font-extrabold">${averageRally}</dt>
-						<dd class="text-gray-500 dark:text-gray-400 whitespace-nowrap">Average rally per round</dd>
+						<dd class="whitespace-nowrap">Average rally per round</dd>
 					</div>
 					<div class="flex flex-col items-center justify-center">
 						<dt class="mb-2 text-3xl font-extrabold">${formatOrdinals(rank)}</dt>
-						<dd class="text-gray-500 dark:text-gray-400 whitespace-nowrap">Rank</dd>
+						<dd class="whitespace-nowrap">Rank</dd>
 					</div>
 					<div class="flex flex-col items-center justify-center">
 						<dt class="mb-2 text-3xl font-extrabold">
@@ -87,7 +85,7 @@ customElements.define(
 							</div>
 						</dt>
 						<div class="flex flex-row justify-center items-center">
-							<dd class="text-gray-500 dark:text-gray-400 whitespace-nowrap">
+							<dd class="whitespace-nowrap">
 								League
 							</dd>
 							<div class="flex flex-row justify-center items-center relative group">

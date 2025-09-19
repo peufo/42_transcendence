@@ -4,5 +4,4 @@ build
 local.db
 .pnpm-store
 upload
-cli_app
 sea-prep.blob
