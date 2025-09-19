@@ -9,8 +9,8 @@
 	"packageManager": "pnpm@10.11.0",
 	"scripts": {
 		"prestart": "drizzle-kit migrate",
-		"start": "node ./cli-wrapper.mjs",
-		"cli": "node ./build/cli/main.js",
+		"start": "node ./build/server/main.js",
+		"cli": "node ./cli-wrapper.mjs",
 		"cli:build": "rm cli_app && run-s cli:*",
 		"cli:blob": "node --experimental-sea-config sea-config.json",
 		"cli:copy-node": "cp $(volta which node) cli_app",
