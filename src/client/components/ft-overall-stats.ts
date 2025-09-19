@@ -155,7 +155,7 @@ function getLeagueDiv(league: League): string {
 		</ft-icon>
 	`
 	const leagueNameDiv = /*html*/ `
-		<span class="font-bold text-2xl border-" style="color:${league.color}">
+		<span class="font-bold text-2xl" style="color:${league.color}">
 			${league.name}
 		</span>
 	`

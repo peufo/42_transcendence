@@ -84,8 +84,8 @@ defineComponent('ft-friends', () => ({
 			const removeBtn = /*html*/ `
 				<form method="post" action="/friendships/delete">
 					<input type="hidden" name="friendshipId" value="${friendship.id}" />
-					<button class="btn btn-red w-9 px-2!">
-						<ft-icon name="cancel" class="stroke-red-300"></ft-icon>
+					<button class="border-red-400 btn btn-red w-9 px-2!">
+						<ft-icon name="cancel" class="stroke-red-800"></ft-icon>
 					</button>
 				</form>`
 

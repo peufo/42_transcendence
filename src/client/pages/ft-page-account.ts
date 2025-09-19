@@ -12,7 +12,7 @@ customElements.define(
 			if (!user) return
 
 			const modifyPassword = /*html*/ `
-                <div class="border-2 border-blue-300 p-4 rounded-md">
+                <div class="border-2 border-indigo-300 p-4 rounded-md">
                     <div>
                         <label for="password" class="label">New password</label>
                         <div class="mt-2">
@@ -30,15 +30,15 @@ customElements.define(
 			this.innerHTML = /*html*/ `
                 <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
                     <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-                        <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
+                        <h2 class="text-center text-2xl/9 font-bold tracking-tight text-gray-900">
 						Update your information
 						</h2>
                     </div>
 
-                    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+                    <div class="card p-5 mt-5 sm:mx-auto sm:w-full sm:max-w-100">
                         <form method="post" action="/users/update" class="space-y-6" >
 
-						<div class="border-2 border-blue-300 p-4 rounded-md">
+						<div class="border-2 border-indigo-300 p-4 rounded-md">
                             <div>
                                 <label for="name" class="label">New username</label>
                                 <div class="mt-2">
@@ -56,10 +56,10 @@ customElements.define(
                         </form>
 					</div>
 
-                    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+                    <div class="card p-5 mt-5 sm:mx-auto sm:w-full sm:max-w-100">
                         <form method="post"  action="/users/update/avatar" c4lass="space-y-6" enctype="multipart/form-data">
 
-                        <div class="border-2 border-blue-300 p-4 rounded-md">
+                        <div class="border-2 border-indigo-300 p-4 rounded-md">
 							<div class= "">
                                 <label class="label" for="avatarFile">Upload your own avatar</label>
                                 <div class="mt-2">
