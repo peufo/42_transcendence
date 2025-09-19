@@ -61,7 +61,7 @@ customElements.define(
 				}
 
 				html += /*html*/ `
-				<div class="flex items-center text-center p-2 card ${isCurrentUser ? 'border-indigo-500 border-2' : 'border-gray-200'}">
+				<div class="flex items-center text-center p-2 card ${isCurrentUser ? '!border-indigo-500 !border-2' : ''}">
 					<div class="w-1/6 flex flex-row justify-center items-center">
 						`
 				switch (rank) {
@@ -91,7 +91,7 @@ customElements.define(
 			if (!user_in_top) {
 				html += /*html*/ `
 				<div class="flex items-center justify-center p-2 rounded-xl font-bold">...</div>
-				<div class="flex items-center text-center p-2 border-indigo-500 border-2 rounded-xl">
+				<div class="flex items-center text-center p-2 card !border-indigo-500 !border-2">
 					<div class="w-1/6 flex flex-row justify-center items-center">
 						<div class="flex flex-row w-5 h-5 items-center justify-center rounded-xl"> ${rank} </div>
 					</div>
