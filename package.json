@@ -9,7 +9,7 @@
 	"packageManager": "pnpm@10.11.0",
 	"scripts": {
 		"prestart": "drizzle-kit migrate",
-		"start": "node ./build/server/main.js",
+		"start": "node ./cli-wrapper.mjs",
 		"cli": "node ./build/cli/main.js",
 		"cli:build": "rm cli_app && run-s cli:*",
 		"cli:blob": "node --experimental-sea-config sea-config.json",

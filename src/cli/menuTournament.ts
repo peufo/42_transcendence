@@ -187,7 +187,7 @@ const menuTournamentFinished: Scope<[TournamentWithLookup]> = async (
 			: final.player2?.name
 	const action = await p.select({
 		message: `${winner} won !`,
-		options: [{ label: 'Press enter to start tournament', value: menuMain }],
+		options: [{ label: 'Press enter to leave', value: menuMain }],
 	})
 	if (p.isCancel(action)) exit(0)
 	return action
