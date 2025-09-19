@@ -13,7 +13,9 @@ import { socketChannelCLI } from './socketChannelCLI.js'
 export const menuMatchRemote: Scope<[Match]> = async (match) => {
 	return new Promise((resolve) => {
 		ensureSreenSize().then(() => {
-			const renderer = useRenderer()
+			const userId = api.user()?.id
+			const player: Player = userId === match.player1Id ? 'p1' : 'p2'
+			const renderer = useRenderer(player)
 			const matchChannel = socketChannelCLI(
 				'matches',
 				{ matchId: match.id.toString() },
@@ -26,9 +28,6 @@ export const menuMatchRemote: Scope<[Match]> = async (match) => {
 					},
 				},
 			)
-
-			const userId = api.user()?.id
-			const player: Player = userId === match.player1Id ? 'p1' : 'p2'
 
 			const setInput = (move: Move, value: boolean) => {
 				matchChannel.emit('onPlayerInput', { player, move, value })
@@ -56,15 +55,19 @@ export const menuMatchRemote: Scope<[Match]> = async (match) => {
 			const rl = createInterface({ input: stdin, terminal: true })
 			emitKeypressEvents(stdin)
 			stdin.on('keypress', onKeyPress)
+			rl.once('SIGINT', () => terminate(menuMain))
 
-			function terminate() {
+			function terminate(nextScope?: Scope) {
 				console.clear()
 				matchChannel.close()
 				rl.close()
 				renderer.stop()
 				stdin.off('keypress', onKeyPress)
+				if (nextScope) {
+					return resolve(nextScope)
+				}
 				if (match.tournamentId) {
-					resolve(menuTournament(match.tournamentId))
+					return resolve(menuTournament(match.tournamentId))
 				}
 				resolve(menuMain)
 			}

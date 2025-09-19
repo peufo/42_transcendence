@@ -8,6 +8,7 @@ import {
 	PADDLE_BASE_P1_POSITION,
 	PADDLE_BASE_P2_POSITION,
 	PADDLE_BASE_WIDTH,
+	type Player,
 	type Scores,
 	type State,
 } from '../lib/engine/index.js'
@@ -24,12 +25,15 @@ import {
 	screenSizeIsOk,
 } from './resolution.js'
 
-// TODO: use more visible colors
-const PRIMARY_COLOR = '#4f39f6'
-const PRIMARY_COLOR_LIGHT = '#7c86ff'
+const INDIGO = '#4f39f6'
+const INDIGO_LIGHT = '#7c86ff'
+const AMBER = '#e17100'
+const BLACK = '#000000'
+const TEAL = '#00b7a8'
+
 const FRAME_TIMEOUT = 1000 / 60
 
-export function useRenderer(): Required<EngineOptionsEvents> & {
+export function useRenderer(player?: Player): Required<EngineOptionsEvents> & {
 	stop: () => void
 	onEngineEvent: (data: EngineEventData) => void
 } {
@@ -42,7 +46,7 @@ export function useRenderer(): Required<EngineOptionsEvents> & {
 	}
 
 	const renderBall = useRenderBall()
-	const renderPaddles = useRenderPaddles()
+	const renderPaddles = useRenderPaddles(player)
 	const renderScores = useRenderScores()
 
 	async function render() {
@@ -137,11 +141,17 @@ function useRenderBall() {
 	let cleaner: Cleaner = () => {}
 	return ({ b }: State) => {
 		cleaner(chalk.reset) // change color if we want trail
-		cleaner = drawRect(b.x, b.y, BALL_BASE_SIZE, BALL_BASE_SIZE, chalk.bgBlue)
+		cleaner = drawRect(
+			b.x,
+			b.y,
+			BALL_BASE_SIZE,
+			BALL_BASE_SIZE,
+			chalk.bgHex(BLACK),
+		)
 	}
 }
 
-function useRenderPaddles() {
+function useRenderPaddles(player?: Player) {
 	let cleaner1: Cleaner = () => {}
 	let cleaner2: Cleaner = () => {}
 
@@ -153,12 +163,14 @@ function useRenderPaddles() {
 			p1,
 			PADDLE_BASE_WIDTH,
 			PADDLE_BASE_HEIGHT,
+			player === 'p1' ? chalk.bgHex(TEAL) : chalk.bgHex(AMBER),
 		)
 		cleaner2 = drawRect(
 			PADDLE_BASE_P2_POSITION.x - PADDLE_BASE_WIDTH / 2,
 			p2,
 			PADDLE_BASE_WIDTH,
 			PADDLE_BASE_HEIGHT,
+			player === 'p2' ? chalk.bgHex(TEAL) : chalk.bgHex(AMBER),
 		)
 	}
 }
@@ -168,7 +180,7 @@ function renderString(
 	y: number,
 	str: string,
 	{
-		color = PRIMARY_COLOR,
+		color = INDIGO,
 		resetBackground = true,
 		padLeft = 0,
 	}: { color?: string; resetBackground?: boolean; padLeft?: number } = {},
@@ -203,12 +215,12 @@ function useRenderScores() {
 	return (newScore?: Scores, resetBackground = true) => {
 		if (newScore) score = newScore
 		renderString(SCREEN_WIDTH / 2 - 20, 3, score.p1.toFixed().toString(), {
-			color: PRIMARY_COLOR_LIGHT,
+			color: INDIGO_LIGHT,
 			resetBackground,
 			padLeft: 2,
 		})
 		renderString(SCREEN_WIDTH / 2 + 10, 3, score.p2.toFixed().toString(), {
-			color: PRIMARY_COLOR_LIGHT,
+			color: INDIGO_LIGHT,
 			resetBackground,
 			padLeft: 2,
 		})
@@ -216,8 +228,8 @@ function useRenderScores() {
 }
 
 function renderInit() {
-	const vertical = chalk.bgHex(PRIMARY_COLOR)('  ')
-	const horizontal = chalk.bgHex(PRIMARY_COLOR)(' '.repeat(SCREEN_WIDTH))
+	const vertical = chalk.bgHex(INDIGO)('  ')
+	const horizontal = chalk.bgHex(INDIGO)(' '.repeat(SCREEN_WIDTH))
 	console.clear()
 	stdout.cursorTo(0, 0)
 	stdout.write(horizontal)
@@ -232,7 +244,7 @@ function renderInit() {
 }
 
 function renderGameEnd({ p1, p2 }: Scores) {
-	const line = chalk.bgHex(PRIMARY_COLOR)(' '.repeat(SCREEN_WIDTH))
+	const line = chalk.bgHex(INDIGO)(' '.repeat(SCREEN_WIDTH))
 	for (let y = 0; y < SCREEN_HEIGHT; y++) {
 		stdout.cursorTo(0, y)
 		stdout.write(line)
