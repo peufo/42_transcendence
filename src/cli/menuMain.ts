@@ -6,18 +6,14 @@ import { login, logout } from './auth.js'
 import { startGameLocal } from './gameLocal.js'
 import type { Scope, ScopeOptions } from './main.js'
 import { menuFriendships } from './menuFriendships.js'
-import {
-	menuNewTournament,
-	menuTournament,
-	testRenderStages,
-} from './menuTournament.js'
+import { menuNewTournament, menuTournament } from './menuTournament.js'
 
 let user: UserWithTournament | undefined
 
 export const menuMain: Scope = async () => {
 	const options: ScopeOptions = []
 
-	options.push({ label: 'prout', value: testRenderStages })
+	// options.push({ label: 'prout', value: testRenderStages })
 
 	if (!api.user()) {
 		options.push({ label: 'Login', value: login })
