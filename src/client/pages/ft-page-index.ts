@@ -1,23 +1,10 @@
-customElements.define(
-	'ft-page-index',
-	class extends HTMLElement {
-		connectedCallback() {
-			this.innerHTML = this.render()
-		}
-		render(): string {
-			return /*html*/ `
-				<div class="flex min-h-full flex-col justify-center p-6 lg:px-8">
-					<div class="flex flex-col gap-10 mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-						<div>
-							<h3 class="font-semibold text-xl text-gray-900 text-center my-8">
-								Welcome
-							</h3>
+import { defineComponent } from '../utils/component.js'
 
-							<ft-game-selection></ft-game-selection>
-						</div>
-					</div>
-				</div>
-			`
-		}
-	},
-)
+defineComponent('ft-page-index', () => ({
+	render: () => /*html*/ `
+		<div class="max-w-md mx-auto p-4 mt-6">
+			<ft-title></ft-title>
+			<ft-game-selection></ft-game-selection>
+		</div>
+	`,
+}))

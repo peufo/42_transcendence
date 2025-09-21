@@ -14,7 +14,9 @@ defineComponent('ft-header', () => ({
 
 		return /*html*/ `
 				<header class="flex items-center p-2 pl-4 gap-2 bg-white/50">
-					<a href="${user ? '/me' : '/'}" class="text-2xl text-indigo-600">Transcendance</a>
+					<a href="${user ? '/me' : '/'}" class="text-4xl text-indigo-600 font-pixel">
+						TRANSCENDANCE
+					</a>
 					<div class="flex-grow"></div>
 					<label class="cursor-pointer col-span-2 flex flex-row items-center justify-center mr-10">
 						<input id="renderer" type="checkbox" class="sr-only peer" ${rendering === '3D' ? 'checked' : ''}>
