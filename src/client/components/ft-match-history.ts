@@ -4,6 +4,7 @@ import { createEffect } from '../utils/signal.js'
 import { $matches, $user } from '../utils/store.js'
 
 // TODO: window can overflow when many scores
+// TODO: graph bars off center ?
 
 customElements.define(
 	'ft-match-history',
