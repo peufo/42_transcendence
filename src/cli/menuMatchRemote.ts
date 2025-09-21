@@ -10,6 +10,8 @@ import { useRenderer } from './renderer.js'
 import { ensureSreenSize } from './resolution.js'
 import { socketChannelCLI } from './socketChannelCLI.js'
 
+// TODO: weird exit
+
 export const menuMatchRemote: Scope<[Match]> = async (match) => {
 	return new Promise((resolve) => {
 		ensureSreenSize().then(() => {

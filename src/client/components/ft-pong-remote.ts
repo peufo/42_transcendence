@@ -85,7 +85,18 @@ defineComponent('ft-pong-remote', () => {
 					</div>
 				`
 			}
-			return ''
+			if (match.state === 'finished') {
+				return /*html*/ `
+					<div class="h-[100%] w-[100%] flex flex-row items-center justify-center">
+						Game over, ${match.player1Score > match.player2Score ? match.player1?.name : match.player2?.name} won
+					</div>
+				`
+			}
+			return /*html*/ `
+					<div class="flex flex-row items-center justify-center">
+						Points required to win the match: ${match.pointsToWin}
+					</div>
+				`
 		},
 		postRender(element) {
 			const match = $match.get()

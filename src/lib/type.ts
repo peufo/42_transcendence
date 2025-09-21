@@ -65,6 +65,7 @@ export type MatchBasic = {
 	player2Score: number
 	finishedAt: Date | null
 	tournamentId: number | null
+	pointsToWin: number
 }
 
 export type Match = MatchBasic & {
