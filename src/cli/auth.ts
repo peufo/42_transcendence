@@ -68,7 +68,6 @@ async function getApiOptions(): Promise<ApiOptions> {
 	s.start('Connection')
 	try {
 		const action = isSignin ? 'login' : 'signup'
-		// TODO: api.post ?
 		const res = await fetch(`${host}/auth/${action}`, {
 			method: 'post',
 			headers: {

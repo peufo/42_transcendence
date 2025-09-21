@@ -1,4 +1,4 @@
-type Signal<T> = {
+export type Signal<T> = {
 	get: Getter<T>
 	set: Setter<T>
 	update: Updater<T>

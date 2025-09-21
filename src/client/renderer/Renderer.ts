@@ -60,5 +60,4 @@ export abstract class Renderer implements Required<EngineOptionsEvents> {
 	abstract onCollision(data: Collision): void
 	abstract onTimerTick(data: number): void
 	abstract clear(): void
-	onEngineStart() {}
 }

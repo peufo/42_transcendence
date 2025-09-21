@@ -1,12 +1,8 @@
-import {
-	getCurrentMatchFromStages,
-	getCurrentStage,
-} from '../../lib/tournament.js'
+import { getCurrentStage } from '../../lib/tournament.js'
 import type { Match } from '../../lib/type.js'
 import { defineComponent } from '../utils/component.js'
 import {
 	$match,
-	$myRenderer,
 	$participants,
 	$stages,
 	$tournament,
@@ -33,10 +29,6 @@ defineComponent('ft-bracket', () => {
 					<input type="hidden" name="tournamentId" value="${tournament.id}" />
 					<input type="submit" value="Quit" class="btn btn-border">
 				</form>
-			`
-
-			const findMatchButton = /*html*/ `
-				<button id="find-match" class="btn btn-border">Find my match</button>
 			`
 
 			const currentStage = getCurrentStage(stages)
@@ -110,24 +102,14 @@ defineComponent('ft-bracket', () => {
 					<div class="overflow-x-scroll card snap-x snap-mandatory">
 						${renderStages()}
 					</div>
-					${iParticipate && tournament.state !== 'finished' ? findMatchButton : ''}
 					${iParticipate && tournament.state !== 'finished' ? quitButton : ''}
 				</div>
             `
 		},
 		postRender(element) {
 			const match = $match.get()
-			const stages = $stages.get()
 			const user = $user.get()
 			if (!user) return
-
-			const findMatchButton =
-				element.querySelector<HTMLButtonElement>('#find-match')
-			findMatchButton?.addEventListener('click', () => {
-				const myMatch = getCurrentMatchFromStages(user.id, stages)
-				$match.set(myMatch)
-				$myRenderer.update((value) => value) // TODO: reload du pauvre ?
-			})
 
 			if (match) {
 				// TODO: no smooth scroll, or better rendering granulariti

@@ -84,11 +84,21 @@ defineComponent('ft-page-tournament-play', () => {
 						$stages.update((stages) => {
 							const m = stages.flat().find((m) => m.id === match.id)
 							if (!m) return stages
-							const isMyMatch =
-								(m.player1Id === userId || m.player2Id === userId) &&
-								m.state !== match.state
+							const myCurrentMatch = $match.get(false)
+							console.log('changed match', match.id, match.state)
+							console.log(
+								'current match ',
+								myCurrentMatch?.id,
+								myCurrentMatch?.state,
+							)
+							const doIUpdate =
+								m.state !== match.state || myCurrentMatch?.id !== m.id
 							Object.assign(m, match)
-							if (isMyMatch) {
+							if (
+								(m.player1Id === userId || m.player2Id === userId) &&
+								doIUpdate
+							) {
+								console.log('setting match to ', m.id)
 								$match.set(m)
 							}
 							return stages
