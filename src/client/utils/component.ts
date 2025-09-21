@@ -8,7 +8,7 @@ export function defineComponent(
 			| ((element: HTMLElement) => () => void)
 		postRender?: (element: HTMLElement) => void | Promise<void>
 		onDestroy?: (element: HTMLElement) => void
-		render?: () => string
+		render?: (element: HTMLElement) => string
 	},
 	...props: string[]
 ) {
@@ -17,25 +17,23 @@ export function defineComponent(
 		class extends HTMLElement {
 			static observedAttributes = props
 
-			private cleanEffect: CleanEffect
+			private cleanEffect: CleanEffect | undefined
 			private component = getComponent()
-			private onDestroy: ReturnType<Required<typeof this.component>['onLoad']>
+			private onDestroy:
+				| ReturnType<Required<typeof this.component>['onLoad']>
+				| undefined
 
 			private effectFunction = () => {
-				if (this.component.render) this.innerHTML = this.component.render()
+				if (this.component.render) this.innerHTML = this.component.render(this)
 				this.component.postRender?.(this)
 			}
 
-			constructor() {
-				super()
-				this.onDestroy = undefined
-				this.cleanEffect = createEffect(this.effectFunction)
-			}
 			connectedCallback() {
 				this.onDestroy = this.component.onLoad?.(this)
+				this.cleanEffect = createEffect(this.effectFunction)
 			}
 			disconnectedCallback() {
-				this.cleanEffect()
+				this.cleanEffect?.()
 				this.component.onDestroy?.(this)
 				this.onDestroy?.()
 			}

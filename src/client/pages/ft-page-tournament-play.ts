@@ -1,16 +1,18 @@
-import { getCurrentMatchFromStages } from '../../lib/tournament.js'
+import { getCurrentMatchFromMap } from '../../lib/tournament.js'
 import type { ChannelSocket } from '../../lib/useSocketChannels.js'
 import { toast } from '../components/ft-toast.js'
 import { socketChannel } from '../socketChannel.js'
 import { getAvatarSrc } from '../utils/avatar.js'
 import { defineComponent } from '../utils/component.js'
+import { createSignal } from '../utils/signal.js'
 import {
-	$match,
+	$matchId,
+	$matchState,
 	$myRenderer,
 	$participants,
-	$stages,
 	$tournament,
 	$user,
+	matchMap,
 } from '../utils/store.js'
 
 // const buttonsLab = Object.entries({
@@ -67,42 +69,44 @@ defineComponent('ft-page-tournament-play', () => {
 					onStart({ stages }) {
 						console.log('onStart')
 						toast.success('Tournament starting')
-						$stages.set(stages)
+
+						for (const match of stages.flat()) {
+							const store = matchMap.get(match.id)
+							if (store) store.set(match)
+							else matchMap.set(match.id, createSignal(match))
+						}
+						console.log('onStart', matchMap)
+
 						const userId = $user.get(false)?.id
 						if (userId) {
-							const myMatch = getCurrentMatchFromStages(userId, stages)
-							$match.set(myMatch)
+							const myMatch = getCurrentMatchFromMap(userId, matchMap)
+							$matchId.set(myMatch?.id)
+							$matchState.set(myMatch?.state)
 						}
 						$tournament.update((t) => {
 							if (!t) return undefined
-							return { ...t, state: 'ongoing' }
+							return {
+								...t,
+								state: 'ongoing',
+								stages: stages.map((stage) => stage.map((m) => m.id)),
+							}
 						})
 					},
 					onMatchChange({ match }) {
 						console.log('onMatchChange')
 						const userId = $user.get(false)?.id
-						$stages.update((stages) => {
-							const m = stages.flat().find((m) => m.id === match.id)
-							if (!m) return stages
-							const myCurrentMatch = $match.get(false)
-							console.log('changed match', match.id, match.state)
-							console.log(
-								'current match ',
-								myCurrentMatch?.id,
-								myCurrentMatch?.state,
-							)
-							const doIUpdate =
-								m.state !== match.state || myCurrentMatch?.id !== m.id
-							Object.assign(m, match)
-							if (
-								(m.player1Id === userId || m.player2Id === userId) &&
-								doIUpdate
-							) {
-								console.log('setting match to ', m.id)
-								$match.set(m)
+						if (
+							userId &&
+							(match.player1Id === userId || match.player2Id === userId)
+						) {
+							if (match?.id !== $matchId.get(false)) {
+								$matchId.set(match.id)
 							}
-							return stages
-						})
+							if (matchMap.get(match.id)?.get().state !== match.state) {
+								$matchState.set(match.state)
+							}
+						}
+						matchMap.get(match.id)?.update((m) => ({ ...m, ...match }))
 					},
 					onEnd() {
 						console.log('onEnd')
@@ -236,11 +240,12 @@ defineComponent('ft-tournament-ongoing', () => {
 		render() {
 			console.log('TOURNAMENT ONGOING RENDER')
 			const user = $user.get(false)
-			if (!user) return 'pipi'
-			const stages = $stages.get(false)
-			const myMatch = getCurrentMatchFromStages(user.id, stages)
-			const currentMatch = $match.get(false)
-			if (currentMatch?.id !== myMatch?.id) $match.set(myMatch)
+			if (!user) return 'no user'
+			const myMatch = getCurrentMatchFromMap(user.id, matchMap)
+			if ($matchId.get(false) !== myMatch?.id) {
+				$matchId.set(myMatch?.id)
+				$matchState.set(myMatch?.state)
+			}
 			$myRenderer.get()
 
 			return /*html*/ `
@@ -260,8 +265,11 @@ defineComponent('ft-tournament-finished', () => {
 		},
 		render() {
 			console.log('TOURNAMENT FINISHED RENDER')
-			const stages = $stages.get()
-			const final = stages[stages.length - 1][0]
+			const tournament = $tournament.get(false)
+			if (!tournament || !tournament.stages) return 'error'
+			const finalId = tournament.stages[tournament.stages.length - 1][0]
+			const final = matchMap.get(finalId)?.get(false)
+			if (!final) return 'error'
 			const user = $user.get()
 			if (!user) return 'No user'
 			const IWin =

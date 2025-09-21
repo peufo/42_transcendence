@@ -7,13 +7,39 @@ import { Renderer3D } from '../renderer/Renderer3D.js'
 import { socketChannel } from '../socketChannel.js'
 import { defineComponent } from '../utils/component.js'
 import { createSignal } from '../utils/signal.js'
-import { $match, $myRenderer, $user } from '../utils/store.js'
+import {
+	$matchId,
+	$matchState,
+	$myRenderer,
+	$user,
+	matchMap,
+} from '../utils/store.js'
 import { toast } from './ft-toast.js'
 
 defineComponent('ft-pong-remote', () => {
+	return {
+		render() {
+			const matchId = $matchId.get()
+
+			if (!matchId) {
+				return /*html*/ `
+					<div class="h-[100%] w-[100%] flex flex-row items-center justify-center">
+						You don't have any match.
+					</div>
+				`
+			}
+			return /*html*/ `
+				<ft-pong-remote-render match-id="${matchId}"></ft-pong-remote-render>
+			`
+		},
+	}
+})
+
+defineComponent('ft-pong-remote-render', () => {
 	let renderer: Renderer
 	let cleanup: (() => void) | undefined
 	const isConnected = createSignal<boolean>(false)
+	let matchId: number
 
 	const renderAwaiting = (match: Match) => {
 		const connectBtn = /*html*/ `
@@ -38,10 +64,11 @@ defineComponent('ft-pong-remote', () => {
 
 	function connectChannel() {
 		const user = $user.get(false)
-		const match = $match.get(false)
+		const match = matchMap.get(matchId)?.get(false)
 		if (!match || !user) return
 		isConnected.set(true)
 		const player: Player = user.id === match.player1Id ? 'p1' : 'p2'
+
 		const channel = socketChannel(
 			'matches',
 			{ matchId: match.id.toString() },
@@ -96,23 +123,24 @@ defineComponent('ft-pong-remote', () => {
 	}
 
 	return {
+		onLoad(element) {
+			matchId = +(element.getAttribute('match-id') ?? -1)
+			if (matchId === -1) {
+				throw new Error('match-id attribute required in ft-pong-remote-render')
+			}
+		},
 		onDestroy() {
 			if (cleanup) cleanup()
 		},
 		render() {
-			const match = $match.get()
+			const matchState = $matchState.get()
+			const match = matchMap.get(matchId)?.get(false)
+			if (!match) throw new Error('matchId should find match in matchMap')
 
-			if (!match) {
-				return /*html*/ `
-					<div class="h-[100%] w-[100%] flex flex-row items-center justify-center">
-						You don't have any match.
-					</div>
-				`
-			}
-			if (match.state === 'awaiting') {
+			if (matchState === 'awaiting') {
 				return renderAwaiting(match)
 			}
-			if (match.state === 'finished') {
+			if (matchState === 'finished') {
 				return /*html*/ `
 					<div class="h-[100%] w-[100%] flex flex-row items-center justify-center">
 						Game over, ${match.player1Score > match.player2Score ? match.player1?.name : match.player2?.name} won
@@ -122,7 +150,10 @@ defineComponent('ft-pong-remote', () => {
 			return ''
 		},
 		postRender(element) {
-			const match = $match.get()
+			const matchState = $matchState.get()
+			const match = matchMap.get(matchId)?.get(false)
+			if (!match) throw new Error('matchId should find match in matchMap')
+
 			const connectBtn =
 				element.querySelector<HTMLButtonElement>('#connect-btn')
 			if (connectBtn) {
@@ -131,7 +162,7 @@ defineComponent('ft-pong-remote', () => {
 				})
 			}
 
-			if (match?.state !== 'ongoing' || !match?.player1 || !match?.player2) {
+			if (matchState !== 'ongoing' || !match?.player1 || !match?.player2) {
 				return
 			}
 			const names = { p1: match.player1.name, p2: match.player2.name }

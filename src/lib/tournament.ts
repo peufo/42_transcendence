@@ -1,3 +1,4 @@
+import type { Signal } from '../client/utils/signal.js'
 import type { Match, MatchBasic } from './type.ts'
 
 export function getCurrentStage<M extends MatchBasic>(
@@ -17,17 +18,24 @@ export function getNextStage<M extends MatchBasic>(
 	})
 }
 
-export function getCurrentMatchFromStages(userId: number, stages: Match[][]) {
-	const stagesArray = stages.flat()
-	const ongoing = stagesArray.find(
+export function getCurrentMatch(userId: number, matches: Match[]) {
+	const ongoing = matches.find(
 		(m) =>
 			(m.player1Id === userId || m.player2Id === userId) &&
 			m.state === 'ongoing',
 	)
 	if (ongoing) return ongoing
-	return stagesArray.find(
+	return matches.find(
 		(m) =>
 			(m.player1Id === userId || m.player2Id === userId) &&
 			m.state === 'awaiting',
 	)
+}
+
+export function getCurrentMatchFromMap(
+	userId: number,
+	matches: Map<number, Signal<Match>>,
+) {
+	const matchesArray = [...matches.values()].map((m) => m.get(false))
+	return getCurrentMatch(userId, matchesArray)
 }

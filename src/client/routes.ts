@@ -1,4 +1,5 @@
 import type { RoutesGet, RoutesPost } from '../lib/type.js'
+import { createSignal } from './utils/signal.js'
 import * as store from './utils/store.js'
 import {
 	avatarUpload,
@@ -40,9 +41,15 @@ export const API_GET: {
 	'/stats/me': store.$matches.set,
 	'/stats/all': store.$rankedUsers.set,
 	'/tournaments': (t) => {
-		store.$tournament.set(t)
+		store.$tournament.set({
+			...t,
+			stages: t.stages.map((stage) => stage.map((m) => m.id)),
+		})
 		store.$participants.set(t.participants)
-		store.$stages.set(t.stages)
+		store.matchMap.clear()
+		for (const match of t.stages.flat()) {
+			store.matchMap.set(match.id, createSignal(match))
+		}
 	},
 }
 
