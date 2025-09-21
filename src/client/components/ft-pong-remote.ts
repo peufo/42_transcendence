@@ -48,7 +48,7 @@ defineComponent('ft-pong-remote', () => {
 		onLoad() {
 			const user = $user.get(false)
 			const match = $match.get(false)
-			if (!match || !user) throw new Error('no user or match')
+			if (!match || !user) return
 
 			const player: Player = user.id === match.player1Id ? 'p1' : 'p2'
 			const channel = socketChannel(
@@ -56,10 +56,19 @@ defineComponent('ft-pong-remote', () => {
 				{ matchId: match.id.toString() },
 				{
 					onEngineEvent: (data) => {
-						renderer.onEngineEvent(data)
+						if (
+							data.onEngineStart !== undefined &&
+							match.state === 'awaiting'
+						) {
+							$match.update((m) => {
+								if (!m) return m
+								return { ...m, state: 'ongoing' }
+							})
+						}
 						if (data.onGameEnd !== undefined) {
 							toast.success('Game end')
 						}
+						renderer.onEngineEvent(data)
 					},
 				},
 			)
@@ -71,6 +80,7 @@ defineComponent('ft-pong-remote', () => {
 		},
 		render() {
 			const match = $match.get()
+
 			if (!match) {
 				return /*html*/ `
 					<div class="h-[100%] w-[100%] flex flex-row items-center justify-center">
@@ -100,6 +110,7 @@ defineComponent('ft-pong-remote', () => {
 		},
 		postRender(element) {
 			const match = $match.get()
+
 			if (match?.state !== 'ongoing' || !match?.player1 || !match?.player2) {
 				return
 			}
