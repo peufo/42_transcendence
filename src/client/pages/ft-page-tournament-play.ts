@@ -128,8 +128,8 @@ defineComponent('ft-page-tournament-play', () => {
 			// const lab = /*html*/ `<div class="flex gap-2" id="lab"></div>`
 
 			return `
-			<h1 class="p-2 flex font-bold item-center justify-center text-xl">${tournament.createdByUser.name}'s tournament</h1>
-			<ft-tournament-${tournament.state}></ft-tournament-${tournament.state}>`
+				<ft-tournament-${tournament.state}></ft-tournament-${tournament.state}>
+			`
 		},
 		// postRender(element) {
 		// 	const lab = element.querySelector('#lab')
@@ -184,7 +184,7 @@ defineComponent('ft-tournament-open', () => {
 				let number = 0
 				for (const participant of participants) {
 					html += /*html*/ `
-						<div class="flex p-2 items-center gap-2 border border-gray-500 rounded-xl">
+						<div class="flex p-2 items-center gap-2 card">
 							<div class="w-1/10 pl-2 font-bold">${number + 1}</div>
 							<div class="w-9/10 flex flex-row gap-2 items-center">
 								<img src="${getAvatarSrc(participant.user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
@@ -197,7 +197,7 @@ defineComponent('ft-tournament-open', () => {
 				const numberOfPlayers = tournament?.numberOfPlayers || 0
 				while (number < numberOfPlayers) {
 					html += /*html*/ `
-						<div class="flex p-2 justify-center items-center gap-2 border border-gray-500 rounded-xl">
+						<div class="flex p-2 justify-center items-center gap-2 card">
 							<div class="w-9/10 flex items-center justify-center animate-pulse text-indigo-500"
 								style="animation-delay: ${number * 80}ms;">
 								... Waiting for players ...
@@ -222,7 +222,8 @@ defineComponent('ft-tournament-open', () => {
 				`
 
 			return /*html*/ `
-				<div class="flex flex-col p-4 rounded-xl bg-white/25 border border-indigo-600/40 shadow gap-3 mt-10 sm:mx-auto sm:max-w-lg mx-4">
+				<ft-title>${tournament.createdByUser.name}'s tournament</ft-title>
+				<div class="flex flex-col p-4 card gap-3 mt-10 sm:mx-auto sm:max-w-lg mx-4">
 					${participantsCount}
 					${participantList()}
 					${participationForm}
@@ -241,7 +242,8 @@ defineComponent('ft-tournament-ongoing', () => {
 		render() {
 			console.log('TOURNAMENT ONGOING RENDER')
 			const user = $user.get(false)
-			if (!user) return 'no user'
+			const tournament = $tournament.get(false)
+			if (!user || !tournament) return 'no user or tournament'
 			const myMatch = getCurrentMatchFromMap(user.id, matchMap)
 			if ($matchId.get(false) !== myMatch?.id) {
 				$matchId.set(myMatch?.id)
@@ -250,7 +252,10 @@ defineComponent('ft-tournament-ongoing', () => {
 
 			return /*html*/ `
 				<div class="grid grid-cols-4 gap-4 p-4 min-w-[1360px]">
-					<ft-bracket></ft-bracket>
+					<div>
+						<ft-title size-class="text-2xl">${tournament.createdByUser.name}'s tournament</ft-title>
+						<ft-bracket></ft-bracket>
+					</div>
 					<ft-pong-remote></ft-pong-remote>
 				</div>
 			`
@@ -279,6 +284,7 @@ defineComponent('ft-tournament-finished', () => {
 			const color = IWin ? 'text-indigo-600 animate-bounce' : 'text-black'
 
 			return /*html*/ `
+				<ft-title>${tournament.createdByUser.name}'s tournament</ft-title>
 				<div class="flex flex-col justify-center items-center gap-10">
 					<div class="flex flex-col justify-center items-center gap-10">
 						<div>

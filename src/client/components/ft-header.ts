@@ -25,7 +25,7 @@ defineComponent('ft-header', () => ({
 								after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600 mr-2">
 						</div>
 						<div class="flex flex-col items-center">
-							<ft-icon id="render-type-icon" name="${renderingIcons[rendering]}"></ft-icon>	
+							<ft-icon id="render-type-icon" class="h-5" name="${renderingIcons[rendering]}"></ft-icon>	
 							<span class="text-[0.6rem]" id="render-type-span">${rendering}</span>
 						</div>
 					</label>

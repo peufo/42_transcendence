@@ -45,9 +45,10 @@ defineComponent('ft-users', () => ({
 	render() {
 		const users = $users.get()
 		if (!users || !users.length) return ''
-		let html = /*html*/ `
-			<div class="text-center">Wow! You are so popular that all users are already your friends!</div>
-		`
+		// let html = /*html*/ `
+		// 	<div class="text-center">Wow! You are so popular that all users are already your friends!</div>
+		// `
+		let html = ''
 		for (const user of users) {
 			html += /*html*/ `
 				<div class="flex p-2 items-center gap-2 card rounded-xl">
@@ -221,7 +222,7 @@ customElements.define(
 			return /*html*/ `
                 <div class="py-8 flex items-center gap-2">
                     <img src="${getAvatarSrc(user)}" alt="Avatar de l'utilisateur" class="h-12 w-12 rounded">
-                    <h3 class="font-semibold text-xl text-gray-900 ">
+                    <h3 class="font-semibold text-xl text-gray-900 break-all">
                         ${user.name}
                     </h3>
 

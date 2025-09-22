@@ -12,7 +12,6 @@ import {
 defineComponent('ft-bracket-match', () => {
 	return {
 		render(element) {
-			console.log('render ft-bracket-match')
 			const user = $user.get()
 			const currentMatchId = $matchId.get()
 			const matchId = +(element.getAttribute('match-id') || -1)

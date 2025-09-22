@@ -1,40 +1,49 @@
 import { defineComponent } from '../utils/component.js'
 
-defineComponent('ft-title', () => ({
-	render: () => /*html*/ `
-		<h2 class="font-pixel absolute w-full left-0 -z-10 text-4xl text-amber-600/50">
-			ENTER IN THE GAME
-		</h2>
-		<h2 class="font-pixel text-4xl text-indigo-600">
-			ENTER IN THE GAME
-		</h2>
-	`,
-	postRender(element) {
-		element.classList.add('relative', 'text-center', 'my-6', 'block')
-		const bg = element.querySelector<HTMLHeadElement>('h2.absolute')
-		if (!bg) {
-			throw new Error('Component structure error')
-		}
-		const delta = { x: 0, y: 0 }
-		const divider = 80
+defineComponent('ft-title', () => {
+	let content = ''
+	let sizeClass = ''
 
-		const getOrigin = () => {
-			const rect = element.getBoundingClientRect()
-			return {
-				x: rect.x + rect.width / 2,
-				y: rect.y + rect.height / 2,
+	return {
+		onLoad(element) {
+			content = element.innerHTML.toUpperCase() || 'ENTER IN THE GAME'
+			sizeClass = element.getAttribute('size-class') || 'text-4xl'
+		},
+		render: () => /*html*/ `
+			<h2 class="font-pixel absolute w-full left-0 -z-10 text-amber-600/50 ${sizeClass}">
+				${content}
+			</h2>
+			<h2 class="font-pixel text-indigo-600 ${sizeClass}">
+				${content}
+			</h2>
+		`,
+		postRender(element) {
+			element.classList.add('relative', 'text-center', 'my-6', 'block')
+			const bg = element.querySelector<HTMLHeadElement>('h2.absolute')
+			if (!bg) {
+				throw new Error('Component structure error')
 			}
-		}
+			const delta = { x: 0, y: 0 }
+			const divider = 80
 
-		const trackMousePosition = ({ x, y }: MouseEvent) => {
-			const origin = getOrigin()
-			delta.x = (x - origin.x) / divider
-			delta.y = (y - origin.y) / divider
-			bg.style.translate = `${-delta.x}px ${-delta.y}px`
-		}
-		document.addEventListener('mousemove', trackMousePosition)
-		// return () => { // TODO: necessaire ?
-		// 	document.removeEventListener('mousemove', trackMousePosition)
-		// }
-	},
-}))
+			const getOrigin = () => {
+				const rect = element.getBoundingClientRect()
+				return {
+					x: rect.x + rect.width / 2,
+					y: rect.y + rect.height / 2,
+				}
+			}
+
+			const trackMousePosition = ({ x, y }: MouseEvent) => {
+				const origin = getOrigin()
+				delta.x = (x - origin.x) / divider
+				delta.y = (y - origin.y) / divider
+				bg.style.translate = `${-delta.x}px ${-delta.y}px`
+			}
+			document.addEventListener('mousemove', trackMousePosition)
+			// return () => { // TODO: necessaire ?
+			// 	document.removeEventListener('mousemove', trackMousePosition)
+			// }
+		},
+	}
+})

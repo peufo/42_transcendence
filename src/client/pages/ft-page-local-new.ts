@@ -9,10 +9,11 @@ customElements.define(
 			const pointsToWinDefault = '3'
 
 			this.innerHTML = /*html*/ `
-                <div class="max-w-lg m-auto flex flex-col gap-6 ring-2 ring-indigo-500 rounded-lg mt-5 p-5">
-                    <div>
-                        <h1 class="flex flex-row justify-center items-center font-bold mb-5">Game settings</h1>
-                        <form id="local-form" class="grid grid-cols-[1fr,2fr] gap-5">
+				<div class="max-w-md mx-auto p-4 mt-6">
+					<ft-title>LOCAL GAME SETTINGS</ft-title>
+	
+					<div class="flex flex-col gap-6 card p-5">
+						<form id="local-form" class="grid grid-cols-[1fr,2fr] gap-5">
 							<label for="player-1-name" class="whitespace-nowrap flex flex-row items-center">Player 1</label>
 							<input name="player-1-name" type="text" placeholder="${player1Default}" maxlength="24"
 								class="input rounded-lg px-4 py-2 text-white bg-white/10 backdrop-blur-md placeholder-white/60 focus:outline-offset-2 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-blue-900 transition duration-300 ">
@@ -25,18 +26,20 @@ customElements.define(
 								<span class="h-auto w-15" id="points-to-win-info"></span>
 							</div>
 							<input class="btn btn-border col-span-2" type="submit" id="submit-button" value="Play">
-                        </form>
-                    </div>
-
-					<div class="grid grid-cols-[1fr_1fr_4fr] justify-center items-center">
-						<div class="text-center">Player 1</div>
-						<div class="text-center">(Left)</div>
-						<div>Use W/S or A/D to move.</div>
-						<div class="text-center">Player 2</div>
-						<div class="text-center">(Right)</div>
-						<div>Use I/K or J/L to move.</div>
+						</form>
+					   
+	
+						<div class="grid grid-cols-[1fr_1fr_4fr] justify-center items-center">
+							<div class="text-center">Player 1</div>
+							<div class="text-center">(Left)</div>
+							<div>Use W/S or A/D to move.</div>
+							<div class="text-center">Player 2</div>
+							<div class="text-center">(Right)</div>
+							<div>Use I/K or J/L to move.</div>
+						</div>
 					</div>
-                </div>
+				</div>
+
 			`
 
 			const pointsToWin: HTMLInputElement | null =

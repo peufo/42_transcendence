@@ -19,7 +19,13 @@ import { toast } from './ft-toast.js'
 defineComponent('ft-pong-remote', () => {
 	return {
 		onLoad(element) {
-			element.classList.add('col-span-3', 'flex', 'flex-row', 'justify-center')
+			element.classList.add(
+				'col-span-3',
+				'flex',
+				'flex-row',
+				'justify-center',
+				'pt-8',
+			)
 		},
 		render() {
 			console.log('render ft-pong-remote')
