@@ -3,6 +3,7 @@ import { defineComponent } from '../utils/component.js'
 defineComponent('ft-title', () => {
 	let content = ''
 	let sizeClass = ''
+	let cleanup: (() => void) | undefined
 
 	return {
 		onLoad(element) {
@@ -40,10 +41,14 @@ defineComponent('ft-title', () => {
 				delta.y = (y - origin.y) / divider
 				bg.style.translate = `${-delta.x}px ${-delta.y}px`
 			}
+
 			document.addEventListener('mousemove', trackMousePosition)
-			// return () => { // TODO: necessaire ?
-			// 	document.removeEventListener('mousemove', trackMousePosition)
-			// }
+			cleanup = () => {
+				document.removeEventListener('mousemove', trackMousePosition)
+			}
+		},
+		onDestroy() {
+			cleanup?.()
 		},
 	}
 })

@@ -2,6 +2,8 @@ import { defineComponent } from '../utils/component.js'
 import { slide, transitionIn, transitionOut } from '../utils/transition.js'
 
 defineComponent('ft-page-login', () => {
+	let cleanup: (() => void) | undefined
+
 	return {
 		render() {
 			return /*html*/ `
@@ -130,9 +132,12 @@ defineComponent('ft-page-login', () => {
 			element
 				.querySelector('#actionBtnContainer')
 				?.appendChild(buttonChangeAction)
-			// return () => { // TODO: necessaire ?
-			// 	buttonChangeAction.removeEventListener('click', changeAction)
-			// }
+			cleanup = () => {
+				buttonChangeAction.removeEventListener('click', changeAction)
+			}
+		},
+		onDestroy() {
+			cleanup?.()
 		},
 	}
 })
