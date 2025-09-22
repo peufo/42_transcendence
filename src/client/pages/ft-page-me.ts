@@ -45,7 +45,9 @@ defineComponent('ft-users', () => ({
 	render() {
 		const users = $users.get()
 		if (!users || !users.length) return ''
-		let html = ''
+		let html = /*html*/ `
+			<div class="text-center">Wow! You are so popular that all users are already your friends!</div>
+		`
 		for (const user of users) {
 			html += /*html*/ `
 				<div class="flex p-2 items-center gap-2 card rounded-xl">

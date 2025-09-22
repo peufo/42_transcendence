@@ -27,10 +27,14 @@ customElements.define(
 							<input class="btn btn-border col-span-2" type="submit" id="submit-button" value="Play">
                         </form>
                     </div>
-					
-					<div class="flex flex-col justify-center items-center gap-2">
-						<div>Player 1 (L): Use W/S or A/D to move.</div>
-						<div>Player 2 (R): Use I/K or J/L to move.</div>
+
+					<div class="grid grid-cols-[1fr_1fr_4fr] justify-center items-center">
+						<div class="text-center">Player 1</div>
+						<div class="text-center">(Left)</div>
+						<div>Use W/S or A/D to move.</div>
+						<div class="text-center">Player 2</div>
+						<div class="text-center">(Right)</div>
+						<div>Use I/K or J/L to move.</div>
 					</div>
                 </div>
 			`
