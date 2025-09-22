@@ -116,11 +116,18 @@ export async function loadApiOptions() {
 			p.log.error(`Session file corrupted: ${SAVE_FILE}`)
 			await rm(SAVE_FILE)
 			p.log.info('Session file deleted')
-			api.setOptions({})
 			return
 		}
 		p.log.success(`Session loaded from ${SAVE_FILE}`)
-		api.setOptions(res.data)
+		try {
+			api.setOptions(res.data)
+			await api.get('/auth/user')
+		} catch {
+			api.setOptions({})
+			p.log.error('Session connection failed')
+			await rm(SAVE_FILE)
+			p.log.info('Session file deleted')
+		}
 	} catch (err: unknown) {
 		if (err instanceof Error) p.log.error(`${err.name}: ${err.message}`)
 		return
