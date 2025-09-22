@@ -58,6 +58,7 @@ defineComponent('ft-pong-remote-render', () => {
 		`
 
 		const infos = /*html*/ `
+			<div class="flex flex-row justify-center items-center w-full">${match.player1?.name} (left) VS ${match.player2?.name} (right)</div>
 			<div class="flex flex-row justify-center items-center w-full">Points required to win the match: ${match.pointsToWin}</div>
 		`
 

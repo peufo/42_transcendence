@@ -29,7 +29,7 @@ customElements.define(
 			if (matches.length === 0) {
 				const html = /*html*/ `
 					<h2 class="flex flex-row p-2 items-center justify-center gap-2 font-bold">Best scoring zones</h2>
-					<div class="flex pl-4 p-2 items-center justify-around gap-2">
+					<div class="flex pl-4 p-2 items-center justify-center gap-2">
 					Not enough matches to calculate statistics.
 					</div>
 				`
@@ -42,7 +42,7 @@ customElements.define(
 					Best scoring zones
 					<div class="relative group inline-block">
 						<ft-icon name="message-circle-question" class="mb-3"></ft-icon>
-						<div class="absolute left-1/2 top-full transform -translate-x-1/2 p-4 border border-gray-400 rounded-2xl bg-white shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 z-12 h-auto w-100">
+						<div class="absolute left-1/2 top-full transform -translate-x-1/2 p-4 !border !border-gray-400 backdrop-blur-sm card shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 z-12 h-auto w-100">
 							This graph displays the zones where you scored the most goals. The more blue a zone is, the more you generally score there.
 						</div>
 					</div>

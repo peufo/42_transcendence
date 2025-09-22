@@ -50,7 +50,7 @@ defineComponent('ft-users', () => ({
 			html += /*html*/ `
 				<div class="flex p-2 items-center gap-2 card rounded-xl">
 					<img src="${getAvatarSrc(user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
-					<span>${user.name}</span>
+					<span class="break-all">${user.name}</span>
 					<div class="flex-grow"></div>
 					<form method="post" action="/friendships/new" class="btn btn-border">
 						<input type="hidden" name="invitedUserId" value="${user.id}" />
@@ -115,7 +115,7 @@ defineComponent('ft-friends', () => ({
 							></div>
 							<img src="${getAvatarSrc(friend)}" alt="Avatar de l'utilisateur" class="rounded">
 						</div>
-                        <span>${friend.name}</span>
+                        <span class="break-all">${friend.name}</span>
 						<div class="flex-grow"></div>
 						${joinButtons}
                         ${removeBtn}
@@ -189,7 +189,7 @@ defineComponent('ft-invitations', () => ({
 				<div class="flex p-2 items-center gap-2 card">
 				<img src="${getAvatarSrc(invitation.withUser)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
 					<div class="flex flex-col">
-						<span>${invitation.withUser.name}</span>
+						<span class="break-all">${invitation.withUser.name}</span>
 						<span class="text-xs text-gray-900 leading-3">
 							${createdByMe ? 'Sent' : 'Received'} at ${formater.format(invitation.createdAt)}
 						</span>

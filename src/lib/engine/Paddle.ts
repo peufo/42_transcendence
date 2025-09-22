@@ -9,7 +9,6 @@ import { Vector2 } from './Vector2.js'
 
 export class Paddle {
 	#position: Vector2
-	#speed = PADDLE_BASE_SPEED
 
 	get position() {
 		return this.#position
@@ -20,7 +19,7 @@ export class Paddle {
 	}
 
 	move(direction: Move) {
-		const displ = TICK_INTERVAL * this.#speed
+		const displ = TICK_INTERVAL * PADDLE_BASE_SPEED
 		if (direction === 'up') {
 			this.#position.y -= displ
 			if (this.#position.y < 0) {

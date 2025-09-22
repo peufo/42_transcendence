@@ -74,7 +74,7 @@ export const BALL_BASE_POSITION = new Vector2(
 )
 
 // Paddle properties
-export const PADDLE_BASE_SPEED = 0.55
+export const PADDLE_BASE_SPEED = BALL_MAX_SPEED / 2
 export const PADDLE_BASE_HEIGHT = ARENA_HEIGHT / 5
 export const PADDLE_BASE_WIDTH = BALL_BASE_SIZE
 const PADDLE_OFFSET_FROM_WALL = PADDLE_BASE_WIDTH * 4

@@ -130,7 +130,7 @@ const leagues: League[] = [
 	{ name: 'Summit', color: '#CC04A6', icon: 'mountain', threshold: 20 },
 	{ name: 'Ruby', color: '#E0115F', icon: 'diamond', threshold: 40 },
 	{ name: 'Storm', color: '#04B1C9', icon: 'tornado', threshold: 60 },
-	{ name: 'Mist', color: '#C9D6DF', icon: 'cloud', threshold: 80 },
+	{ name: 'Rain', color: '#4940c5ff', icon: 'cloud', threshold: 80 },
 	{ name: 'Bud', color: '#7AC74F', icon: 'sprout', threshold: 100 },
 ] as const
 
@@ -203,7 +203,7 @@ function getLeagueModal(): string {
 		`
 
 	const modal = /*html*/ `
-		<div class="absolute left-1/2 top-full transform -translate-x-1/2 p-4 border border-gray-400 rounded-2xl bg-white shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 z-10 flex justify-center items-center">
+		<div class="absolute left-1/2 top-full transform -translate-x-1/2 p-4 rounded-2xl card !border-2 !border-gray-600/70 backdrop-blur-md shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 z-10 flex justify-center items-center">
 			${leagueList}
 		</div>
 	`

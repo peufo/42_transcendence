@@ -40,8 +40,6 @@ defineComponent('ft-pong-local', () => {
 	}
 
 	return {
-		// onLoad(element) {
-		// },
 		postRender(element) {
 			element.classList.add('grid', 'place-items-center')
 			const urlParams = new URLSearchParams(window.location.search)

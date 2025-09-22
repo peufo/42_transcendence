@@ -83,7 +83,7 @@ customElements.define(
 					<div class="w-1/6 flex justify-center items-center">
 						<img src="${getAvatarSrc(userRanked)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
 					</div>
-					<div class="w-2/6 flex justify-center items-center ${nameColor}">${userRanked.name}</div>
+					<div class="w-2/6 flex justify-center items-center break-all text-center ${nameColor}">${userRanked.name}</div>
 					<div class="w-2/6 flex justify-center items-center">${userRanked.numberOfGoals}</div>
 				</div>`
 				rank++
@@ -98,7 +98,7 @@ customElements.define(
 					<div class="w-1/6 flex justify-center items-center">
 						<img src="${getAvatarSrc(this.user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
 					</div>
-					<div class="w-2/6 flex justify-center items-center font-bold">${this.user.name}</div>
+					<div class="w-2/6 flex justify-center items-center font-bold break-all text-center">${this.user.name}</div>
 					<div class="w-2/6 flex justify-center items-center">${this.user.numberOfGoals}</div>
 				</div>
 				`

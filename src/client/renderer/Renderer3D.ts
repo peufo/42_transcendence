@@ -95,7 +95,7 @@ export class Renderer3D extends Renderer {
 			this.scene,
 		)
 		this.scoreText = new BABYLON.GUI.TextBlock()
-		this.scoreText.text = `${this.playerNames.p1}        ${this.scores.p1} : ${this.scores.p2}        ${this.playerNames.p2}`
+		this.scoreText.text = `${this.scores.p1} : ${this.scores.p2}`
 		this.scoreText.color = 'blue'
 		this.scoreText.fontSize = 40
 		this.scoreText.top = `-${ARENA_HEIGHT / 2 - 24}px`
@@ -168,11 +168,11 @@ export class Renderer3D extends Renderer {
 	}
 	onRoundEnd(data: RoundData) {
 		super.onRoundEnd(data)
-		this.scoreText.text = `${this.playerNames.p1}        ${this.scores.p1} : ${this.scores.p2}        ${this.playerNames.p2}`
+		this.scoreText.text = `${this.scores.p1} : ${this.scores.p2}`
 	}
 	onGameEnd(data: GameOverData) {
 		super.onGameEnd(data)
-		this.scoreText.text = `${this.playerNames.p1}        ${this.scores.p1} : ${this.scores.p2}        ${this.playerNames.p2}`
+		this.scoreText.text = `${this.scores.p1} : ${this.scores.p2}`
 		const winner =
 			this.scores.p1 > this.scores.p2
 				? this.playerNames.p1

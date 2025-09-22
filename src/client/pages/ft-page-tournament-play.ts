@@ -184,11 +184,11 @@ defineComponent('ft-tournament-open', () => {
 				let number = 0
 				for (const participant of participants) {
 					html += /*html*/ `
-						<div class="flex p-2 items-center gap-2 border border-gray-200 rounded-xl">
+						<div class="flex p-2 items-center gap-2 border border-gray-500 rounded-xl">
 							<div class="w-1/10 pl-2 font-bold">${number + 1}</div>
 							<div class="w-9/10 flex flex-row gap-2 items-center">
 								<img src="${getAvatarSrc(participant.user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
-								<div class="break-words flex-1 min-w-0">${participant.user.name}</div>
+								<div class="break-all text-center">${participant.user.name}</div>
 							</div>
 						</div>
 					`
@@ -197,7 +197,7 @@ defineComponent('ft-tournament-open', () => {
 				const numberOfPlayers = tournament?.numberOfPlayers || 0
 				while (number < numberOfPlayers) {
 					html += /*html*/ `
-						<div class="flex p-2 justify-center items-center gap-2 border border-gray-200 rounded-xl">
+						<div class="flex p-2 justify-center items-center gap-2 border border-gray-500 rounded-xl">
 							<div class="w-9/10 flex items-center justify-center animate-pulse text-indigo-500"
 								style="animation-delay: ${number * 80}ms;">
 								... Waiting for players ...

@@ -129,7 +129,7 @@ export class Renderer2D extends Renderer {
 		this.ctx.font = `${fontSize}px sans-serif`
 		this.ctx.fillStyle = 'black'
 		this.ctx.fillText(
-			`${this.playerNames.p1}        ${this.scores.p1} : ${this.scores.p2}        ${this.playerNames.p2}`,
+			`${this.scores.p1} : ${this.scores.p2}`,
 			ARENA_WIDTH / 2,
 			fontSize,
 		)

@@ -3,9 +3,6 @@ import { getAvatarSrc } from '../utils/avatar.js'
 import { createEffect } from '../utils/signal.js'
 import { $matches, $user } from '../utils/store.js'
 
-// TODO: window can overflow when many scores
-// TODO: graph bars off center ?
-
 customElements.define(
 	'ft-match-history',
 	class extends HTMLElement {
@@ -52,12 +49,12 @@ customElements.define(
 					const user1 = /*html*/ `
 						<div class="flex p-2 items-center gap-2">
 							<img src="${getAvatarSrc(match.player1)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
-							<span class="break-words w-full">${match.player1.name}</span>
+							<span class="break-all">${match.player1.name}</span>
 						</div>
 					`
 					const user2 = /*html*/ `
 						<div class="flex p-2 items-center justify-end gap-2">
-							<span class="break-words w-full">${match.player2.name}</span>
+							<span class="break-all">${match.player2.name}</span>
 							<img src="${getAvatarSrc(match.player2)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
 						</div>
 					`
@@ -105,30 +102,33 @@ customElements.define(
 							</div>
 							${user2}
 						</div>
-						<!-- TODO : PADDING OF MODAL -->
-						<div class="flex-col p-5 hidden shadow-2xl gap-3 justify-center rounded-2xl absolute overflow-scroll top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border-2 bg-white border-gray-200 w-max z-[10] max-h-[75%] max-w-[25%]" id="modal-match-${match.id}">
-							<div class="flex-1 flex flex-row justify-around items-center pb-2">
-								<h2 class="flex flex-row justify-center items-center font-bold">Detailed match</h2>
-							</div>
-							<div class="absolute top-0 end-0 m-2 btn btn-secondary border-2 border-gray-200 cursor-pointer" id="cross-${match.id}">
+						<div class="flex flex-col p-6 hidden !shadow-2xl gap-3 justify-center absolute top-1/2 
+						left-1/2 transform -translate-x-1/2 -translate-y-1/2 card !border-3 !border-gray-600/70 backdrop-blur-md z-[10] max-h-[75vh] 
+						min-w-[33vw] max-w-[50vw] overflow-scroll" id="modal-match-${match.id}">
+							<div class="flex-none relative p-4 rounded-xl shadow-lg">
+								<h2 class="text-center font-bold">Detailed match</h2>
+								<div class="absolute top-2 right-2 btn btn-secondary border-2 border-gray-200 cursor-pointer" id="cross-${match.id}">
 									<ft-icon name="x" class="h-4 w-4"></ft-icon>
 								</div>
-							<div class="text-center">${formater.format(match.finishedAt)}</div>
-							<div>
-							${getWinner(match, this.user)}
 							</div>
-							<div class="flex flex-row justify-around items-center">
-								<div class="flex flex-row justify-center items-center">
-									<img class="h-15 w-15" src="${match.player1.avatarPlaceholder}" alt="Player1 avatar">
-									<div class="flex-5 p-4">${match.player1.name}</div>
+							<div class="flex-1 overflow-scroll p-5 space-y-4">
+								<div class="text-center">${formater.format(match.finishedAt)}</div>
+								<div>
+								${getWinner(match, this.user)}
 								</div>
-								<div class="font-bold">VS</div>
-								<div class="flex flex-row justify-center items-center">
-									<div class="flex-5 p-4">${match.player2.name}</div>
-									<img class="h-15 w-15" src="${match.player2.avatarPlaceholder}" alt="Player2 avatar">
+								<div class="flex flex-row justify-around items-center">
+									<div class="flex-[9/20] flex flex-row justify-center items-center w-full">
+										<img class="h-15 w-15" src="${match.player1.avatarPlaceholder}" alt="Player1 avatar">
+										<div class="flex-5 p-4 break-all text-center">${match.player1.name}</div>
+									</div>
+									<div class="flex-[2/20] font-bold">VS</div>
+									<div class="flex-[9/20] flex flex-row justify-center items-center w-full">
+										<div class="flex-5 p-4 break-all text-center">${match.player2.name}</div>
+										<img class="h-15 w-15" src="${match.player2.avatarPlaceholder}" alt="Player2 avatar">
+									</div>
 								</div>
+								${detailedMatch(match, this.user)}
 							</div>
-							${detailedMatch(match, this.user)}
 						</div>
 					`
 				}
@@ -144,15 +144,15 @@ function scoringGraph(match: Match, user: UserWithTournament): string {
 	const html = /*html*/ `
 	<div class="flex flex-col justify-center items-center h-max-[100px]">
 		<div class="grid grid-cols-[2fr_10fr] grid-rows-[6fr_1fr]">
-			<div class="h-[100%] pr-2">
-				<div class="flex flex-col justify-evenly items-center h-[100%] pr-2">
+			<div class="h-[100%] pr-4">
+				<div class="flex flex-col justify-evenly items-center h-[100%]">
 					<div class="flex flex-col justify-center items-center">
 						<div class="bg-indigo-600 h-5 w-5 rounded" ></div>
-						<div>Won</div>
+						<div class="text-xs text-center">Won</div>
 					</div>
 					<div class="flex flex-col justify-center items-center">
 						<div class="bg-amber-600 h-5 w-5 rounded"></div>
-						<div>Lost</div>
+						<div class="text-xs text-center">Lost</div>
 					</div>
 				</div>
 			</div>
@@ -165,11 +165,11 @@ function scoringGraph(match: Match, user: UserWithTournament): string {
 								(match.player2Id === user.id && r.scorer === 'p2')
 									? 'bg-indigo-600'
 									: 'bg-amber-600'
-							return `<div class="${color} w-6 rounded-t border border-white" style="height:${heightPercent}%;"></div>`
+							return `<div class="${color} w-6 rounded-t border" style="height:${heightPercent}%;"></div>`
 						})
 						.join('')}
 			</div>
-			<div></div>
+			<div class="text-center text-xs pr-4"></div>
 			<div  class="flex flex-row justify-between items-center">
 				${match.rounds
 					.map((r) => {
@@ -178,13 +178,13 @@ function scoringGraph(match: Match, user: UserWithTournament): string {
 							(match.player2Id === user.id && r.scorer === 'p2')
 								? 'text-indigo-600'
 								: 'text-amber-600'
-						return `<div class="text-center w-6 ${color}">${r.rallyCount}</div>`
+						return `<div class="text-center text-xs w-6 ${color}">${r.rallyCount}</div>`
 					})
 					.join('')}
 			</div>
-			<div></div>
-			<div  class="flex flex-row justify-between items-cenSter">
-				${match.rounds.map((_, i) => `<div class="text-center">R${i + 1}</div>`).join('')}
+			<div class="text-center text-xs pr-4"></div>
+			<div  class="flex flex-row justify-between items-center">
+				${match.rounds.map((_, i) => `<div class="text-center w-6 text-xs">${i + 1}</div>`).join('')}
 			</div>
 		</div>
 	</div>
@@ -238,7 +238,7 @@ function detailedMatch(match: Match, user: UserWithTournament): string {
 					player2Score++
 					html += /*html*/ `
 						<div class= "text-amber-600 text-center">
-							${match.player2.name}
+							Them
 						</div>
 						<div class= "text-amber-600 text-center">
 							${player1Score} - ${player2Score}
@@ -250,7 +250,7 @@ function detailedMatch(match: Match, user: UserWithTournament): string {
 					player1Score++
 					html += /*html*/ `
 						<div class="text-amber-600 text-center">
-							${match.player1.name}
+							Them
 						</div>
 						<div class="text-amber-600 text-center">
 							${player1Score} - ${player2Score}
@@ -277,7 +277,7 @@ function detailedMatch(match: Match, user: UserWithTournament): string {
 	html += /*html*/ `
 		<div class="flex flex-row h-[100%] w-[100%] justify-center items-center gap-2">
 			<div class="flex-1 h-[1px] bg-black"></div>
-			<div class="flex-1 text-center whitespace-nowrap" >Rally per round</div>
+			<div class="flex-1 text-center whitespace-nowrap" >Rally count per round</div>
 			<div class="flex-1 h-[1px] bg-black"></div>
 		</div>
 	`
