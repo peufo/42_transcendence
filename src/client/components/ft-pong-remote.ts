@@ -28,8 +28,8 @@ defineComponent('ft-pong-remote', () => {
 
 			if (!matchId) {
 				return /*html*/ `
-					<div class="h-[100%] w-[100%] flex flex-row items-center justify-center text-amber-600 text-xl font-bold">
-						You have been eliminated.
+					<div class="h-[100%] w-[100%] flex flex-row items-center justify-center text-amber-600 text-2xl font-bold">
+						You have been eliminated. Nice try!
 					</div>
 				`
 			}
