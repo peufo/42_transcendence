@@ -85,6 +85,10 @@ defineComponent('ft-pong-remote-render', () => {
 					renderer.onEngineEvent(data)
 				},
 			},
+			(err) => {
+				toast.error(err)
+				renderer?.clear()
+			},
 		)
 
 		function setupInputs(player: Player, channel: ChannelSocket<'matches'>) {

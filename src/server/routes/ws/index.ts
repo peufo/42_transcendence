@@ -94,9 +94,6 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 				socket.close(3000, 'Match is over')
 				return
 			}
-			console.log(
-				`SOCKET CONNECTION TO MATCH ${match.id}, user ${session.userId}`,
-			)
 			let player: Player | null = null
 			if (session.userId === match.player1Id) player = 'p1'
 			else if (session.userId === match.player2Id) player = 'p2'
@@ -106,8 +103,13 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 			}
 
 			bindEmitterWithSocket('matches', matchId, socket, {
+				autoDestroyDisable: true,
 				onOpen(payload) {
-					if (match.state !== 'awaiting') return payload
+					if (match.state !== 'awaiting') {
+						if (payload) return payload
+						socket.close(3000, 'payload no longer exists')
+						return
+					}
 					if (!payload) {
 						return {
 							engine: undefined,
@@ -122,7 +124,6 @@ export const wsRoute: FastifyPluginCallbackZod = (server, _options, done) => {
 					if (player === 'p1') payload.player1Ready = true
 					if (player === 'p2') payload.player2Ready = true
 					if (payload.player1Ready && payload.player2Ready) {
-						console.log(`engine creation ${matchId}`)
 						payload.engine = createMatchEngine(match)
 						db.update(matches)
 							.set({ state: 'ongoing' })

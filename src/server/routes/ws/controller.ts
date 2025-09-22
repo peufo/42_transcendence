@@ -59,6 +59,7 @@ export function bindEmitterWithSocket<Channel extends keyof SocketChannels>(
 		) => void
 		onClose?: (payload: ServerPayload<Channel>) => ServerPayload<Channel>
 		onDestroy?: (payload: ServerPayload<Channel>) => void
+		autoDestroyDisable?: boolean
 	} = {},
 ) {
 	const emitter = getEmitter(channel, emitterKey, options)
@@ -68,19 +69,19 @@ export function bindEmitterWithSocket<Channel extends keyof SocketChannels>(
 	}
 	emitter.events.on('message', sender)
 	emitter.sockets.add(socket)
-	if (options.onClientEvent) {
-		socket.on('message', (rawData) => {
-			const data = JSON.parse(
-				rawData.toString('utf-8'),
-			) as SocketChannels[Channel]['clientEvents']
-			options.onClientEvent?.(emitter.payload, data)
-		})
+	const handleClientMessage = (rawData: WebSocket.RawData) => {
+		const data = JSON.parse(
+			rawData.toString('utf-8'),
+		) as SocketChannels[Channel]['clientEvents']
+		options.onClientEvent?.(emitter.payload, data)
 	}
-	socket.on('close', (_message) => {
+	if (options.onClientEvent) socket.on('message', handleClientMessage)
+	socket.once('close', (_message) => {
 		if (options.onClose) emitter.payload = options.onClose(emitter.payload)
+		if (options.onClientEvent) socket.off('message', handleClientMessage)
 		emitter.events.off('message', sender)
 		emitter.sockets.delete(socket)
-		if (!emitter.sockets.size) {
+		if (!emitter.sockets.size && !options.autoDestroyDisable) {
 			deleteEmitter(channel, emitterKey)
 			if (options.onDestroy) options.onDestroy(emitter.payload)
 		}

@@ -28,6 +28,7 @@ export function useSocketChannel(
 				data: ServerEvents<Channel>[EventName],
 			) => void
 		},
+		onError?: (reason: string) => void,
 	): ChannelSocket<Channel> {
 		const searchParams = new URLSearchParams(Object.entries(query || {}))
 		const [protocol, host] = origin.split('//')
@@ -42,6 +43,9 @@ export function useSocketChannel(
 		}
 		const socket = createWebSocket(url)
 		socket.addEventListener('message', onMessage)
+		socket.addEventListener('close', ({ code, reason }) => {
+			if (code === 3000) onError?.(reason)
+		})
 
 		return {
 			close() {
