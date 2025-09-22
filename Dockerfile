@@ -1,20 +1,12 @@
-FROM node:24-alpine3.22 AS base
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
+FROM oven/bun:1.2.22-alpine
+RUN apk add --no-cache bash
 RUN apk add --no-cache openssl
+RUN apk add --no-cache nodejs
+RUN apk add --no-cache npm
 RUN openssl req -x509 -newkey rsa:2048 -nodes -keyout ssl.key -out ssl.cert -sha256 -days 365 -subj "/C=CH/ST=Vaud/L=Lausanne/O=42/OU=Transcendance/CN=localhost"
 COPY . /app
 WORKDIR /app
-RUN corepack install
-
-FROM base AS build
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
-RUN pnpm run build
-
-FROM base
-COPY --from=build /app/node_modules /app/node_modules
-COPY --from=build /app/build /app/build
-COPY --from=build /app/drizzle /app/drizzle
+RUN bun install
+RUN bun run build
 EXPOSE 8000
-CMD [ "pnpm", "start" ]
+CMD [ "bun", "start" ]
