@@ -52,12 +52,12 @@ customElements.define(
 					const user1 = /*html*/ `
 						<div class="flex p-2 items-center gap-2">
 							<img src="${getAvatarSrc(match.player1)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
-							<span>${match.player1.name}</span>
+							<span class="break-words w-full">${match.player1.name}</span>
 						</div>
 					`
 					const user2 = /*html*/ `
 						<div class="flex p-2 items-center justify-end gap-2">
-							<span>${match.player2.name}</span>
+							<span class="break-words w-full">${match.player2.name}</span>
 							<img src="${getAvatarSrc(match.player2)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
 						</div>
 					`
@@ -78,12 +78,12 @@ customElements.define(
 
 					const score1 = /*html*/ `
 						<span class="${getScoreClass(match.player1Id)}">
-							${match.player1Score}
+							${match.player1Score === -1 ? 'Forfeit' : match.player1Score}
 						</span>
 					`
 					const score2 = /*html*/ `
 						<span class="${getScoreClass(match.player2Id)}">
-							${match.player2Score}
+							${match.player2Score === -1 ? 'Forfeit' : match.player2Score}
 						</span>
 					`
 					const formater = new Intl.DateTimeFormat('en-US', {
@@ -105,7 +105,8 @@ customElements.define(
 							</div>
 							${user2}
 						</div>
-						<div class="flex-col p-5 hidden shadow-2xl gap-3 justify-center rounded-2xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border-2 bg-white border-gray-200 w-max z-[10]" id="modal-match-${match.id}">
+						<!-- TODO : PADDING OF MODAL -->
+						<div class="flex-col p-5 hidden shadow-2xl gap-3 justify-center rounded-2xl absolute overflow-scroll top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border-2 bg-white border-gray-200 w-max z-[10] max-h-[75%] max-w-[25%]" id="modal-match-${match.id}">
 							<div class="flex-1 flex flex-row justify-around items-center pb-2">
 								<h2 class="flex flex-row justify-center items-center font-bold">Detailed match</h2>
 							</div>
@@ -140,7 +141,6 @@ customElements.define(
 function scoringGraph(match: Match, user: UserWithTournament): string {
 	const ralliesPerRound = match.rounds.map((r) => r.rallyCount)
 	const maxRallies = Math.max(...ralliesPerRound, 1)
-	console.log('ROUNDS:', match.rounds)
 	const html = /*html*/ `
 	<div class="flex flex-col justify-center items-center h-max-[100px]">
 		<div class="grid grid-cols-[2fr_10fr] grid-rows-[6fr_1fr]">
@@ -157,19 +157,15 @@ function scoringGraph(match: Match, user: UserWithTournament): string {
 				</div>
 			</div>
 				<div class="flex justify-between items-end">
-				 ${ralliesPerRound
-						.map((rallies) => {
-							const heightPercent = (rallies / maxRallies) * 100
+				 ${match.rounds
+						.map((r) => {
+							const heightPercent = (r.rallyCount / maxRallies) * 100
 							const color =
-								(match.player1Id === user.id &&
-									match.rounds[ralliesPerRound.indexOf(rallies)].scorer ===
-										'p1') ||
-								(match.player2Id === user.id &&
-									match.rounds[ralliesPerRound.indexOf(rallies)].scorer ===
-										'p2')
+								(match.player1Id === user.id && r.scorer === 'p1') ||
+								(match.player2Id === user.id && r.scorer === 'p2')
 									? 'bg-indigo-600'
 									: 'bg-amber-600'
-							return `<div class="${color} w-6 rounded-t" style="height:${heightPercent}%;"></div>`
+							return `<div class="${color} w-6 rounded-t border border-white" style="height:${heightPercent}%;"></div>`
 						})
 						.join('')}
 			</div>
@@ -182,7 +178,7 @@ function scoringGraph(match: Match, user: UserWithTournament): string {
 							(match.player2Id === user.id && r.scorer === 'p2')
 								? 'text-indigo-600'
 								: 'text-amber-600'
-						return `<div class="text-center ${color}">${r.rallyCount}</div>`
+						return `<div class="text-center w-6 ${color}">${r.rallyCount}</div>`
 					})
 					.join('')}
 			</div>

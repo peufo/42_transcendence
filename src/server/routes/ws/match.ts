@@ -96,6 +96,18 @@ export async function handleTournamentGameEnd(
 				participant.userId === match.player2Id ? -1 : match.player2Score
 		}
 	})
+	if (match.player1Score === -1 || match.player2Score === -1) {
+		await db
+			.update(matches)
+			.set({
+				player1Score: match.player1Score,
+				player2Score: match.player2Score,
+			})
+			.where(eq(matches.id, match.id))
+		notify.tournaments(match.tournamentId, 'onMatchChange', {
+			match,
+		})
+	}
 	const winnerId =
 		match.player1Score > match.player2Score ? match.player1Id : match.player2Id
 	if (!winnerId) throw new Error('winner is not defined')
@@ -161,16 +173,16 @@ export async function handleTournamentGameEnd(
 	const isNextMatchHasGhost =
 		updatedNextMatch.player1Score === -1 || updatedNextMatch.player2Score === -1
 
+	notify.tournaments(match.tournamentId, 'onMatchChange', {
+		match: updatedNextMatch,
+	})
+
 	if (isNextMatchHasGhost && isNextMatchReady) {
 		await handleTournamentGameEnd({
 			...updatedNextMatch,
 			tournamentId: match.tournamentId,
 		})
 	}
-
-	notify.tournaments(match.tournamentId, 'onMatchChange', {
-		match: updatedNextMatch,
-	})
 }
 
 async function updateNumberOfGoals(match: DB.Match) {

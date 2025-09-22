@@ -53,7 +53,7 @@ customElements.define(
 			const formatOrdinals = (n: number) => {
 				const rule = pr.select(n)
 				const suffix = suffixes.get(rule)
-				return `${n}${suffix}`
+				return `${suffix}`
 			}
 			const html = /*html*/ `
 			<div class="p-4 rounded-lg md:p-8" id="stats">
@@ -75,7 +75,10 @@ customElements.define(
 						<dd class="whitespace-nowrap">Average rally per round</dd>
 					</div>
 					<div class="flex flex-col items-center justify-center">
-						<dt class="mb-2 text-3xl font-extrabold">${formatOrdinals(rank)}</dt>
+						<dt class="mb-2 text-3xl font-extrabold flex flex-row">
+							<div>${rank}</div>
+							<div class="text-xl">${formatOrdinals(rank)}</div>
+						</dt>
 						<dd class="whitespace-nowrap">Rank</dd>
 					</div>
 					<div class="flex flex-col items-center justify-center">

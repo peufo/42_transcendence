@@ -1,7 +1,15 @@
 import { defineComponent } from '../utils/component.js'
 
 defineComponent('ft-title', () => ({
-	onLoad(element) {
+	render: () => /*html*/ `
+		<h2 class="font-pixel absolute w-full left-0 -z-10 text-4xl text-amber-600/50">
+			ENTER IN THE GAME
+		</h2>
+		<h2 class="font-pixel text-4xl text-indigo-600">
+			ENTER IN THE GAME
+		</h2>
+	`,
+	postRender(element) {
 		element.classList.add('relative', 'text-center', 'my-6', 'block')
 		const bg = element.querySelector<HTMLHeadElement>('h2.absolute')
 		if (!bg) {
@@ -25,16 +33,8 @@ defineComponent('ft-title', () => ({
 			bg.style.translate = `${-delta.x}px ${-delta.y}px`
 		}
 		document.addEventListener('mousemove', trackMousePosition)
-		return () => {
-			document.removeEventListener('mousemove', trackMousePosition)
-		}
+		// return () => { // TODO: necessaire ?
+		// 	document.removeEventListener('mousemove', trackMousePosition)
+		// }
 	},
-	render: () => /*html*/ `
-		<h2 class="font-pixel absolute w-full left-0 -z-10 text-4xl text-amber-600/50">
-			ENTER IN THE GAME
-		</h2>
-		<h2 class="font-pixel text-4xl text-indigo-600">
-			ENTER IN THE GAME
-		</h2>
-	`,
 }))

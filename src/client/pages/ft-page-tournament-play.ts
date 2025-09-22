@@ -8,7 +8,6 @@ import { createSignal } from '../utils/signal.js'
 import {
 	$matchId,
 	$matchState,
-	$myRenderer,
 	$participants,
 	$tournament,
 	$user,
@@ -100,9 +99,11 @@ defineComponent('ft-page-tournament-play', () => {
 							(match.player1Id === userId || match.player2Id === userId)
 						) {
 							if (match?.id !== $matchId.get(false)) {
+								console.log('setting new match id ', match.id)
 								$matchId.set(match.id)
+								$matchState.set(match.state)
 							}
-							if (matchMap.get(match.id)?.get().state !== match.state) {
+							if (matchMap.get(match.id)?.get(false).state !== match.state) {
 								$matchState.set(match.state)
 							}
 						}
@@ -187,7 +188,7 @@ defineComponent('ft-tournament-open', () => {
 							<div class="w-1/10 pl-2 font-bold">${number + 1}</div>
 							<div class="w-9/10 flex flex-row gap-2 items-center">
 								<img src="${getAvatarSrc(participant.user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
-								<div>${participant.user.name}</div>
+								<div class="break-words flex-1 min-w-0">${participant.user.name}</div>
 							</div>
 						</div>
 					`
@@ -246,7 +247,6 @@ defineComponent('ft-tournament-ongoing', () => {
 				$matchId.set(myMatch?.id)
 				$matchState.set(myMatch?.state)
 			}
-			$myRenderer.get()
 
 			return /*html*/ `
 				<div class="grid grid-cols-4 gap-4 p-4 min-w-[1360px]">

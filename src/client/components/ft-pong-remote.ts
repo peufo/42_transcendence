@@ -18,8 +18,13 @@ import { toast } from './ft-toast.js'
 
 defineComponent('ft-pong-remote', () => {
 	return {
+		onLoad(element) {
+			element.classList.add('col-span-3', 'flex', 'flex-row', 'justify-center')
+		},
 		render() {
+			console.log('render ft-pong-remote')
 			const matchId = $matchId.get()
+			$myRenderer.get()
 
 			if (!matchId) {
 				return /*html*/ `
@@ -29,7 +34,7 @@ defineComponent('ft-pong-remote', () => {
 				`
 			}
 			return /*html*/ `
-				<ft-pong-remote-render match-id="${matchId}"></ft-pong-remote-render>
+				<ft-pong-remote-render match-id="${matchId}" class="flex flex-col items-center"></ft-pong-remote-render>
 			`
 		},
 	}
@@ -43,17 +48,17 @@ defineComponent('ft-pong-remote-render', () => {
 
 	const renderAwaiting = (match: Match) => {
 		const connectBtn = /*html*/ `
-			<button id="connect-btn" class="btn btn-primary">Connect</button>
+			<button id="connect-btn" class="btn btn-primary flex flex-row justify-center items-center mt-4">Connect</button>
 		`
 
 		const waiting = /*html*/ `
-			<div class="flex flex-row col-span-2 justify-center items-center animate-bounce font-bold w-full">
+			<div class="flex flex-row justify-center items-center animate-bounce font-bold w-full">
 				Waiting for player
 			</div>
 		`
 
 		const infos = /*html*/ `
-			<div>Points required to win the match: ${match.pointsToWin}</div>
+			<div class="flex flex-row justify-center items-center w-full">Points required to win the match: ${match.pointsToWin}</div>
 		`
 
 		return /*html*/ `
@@ -133,6 +138,7 @@ defineComponent('ft-pong-remote-render', () => {
 			if (cleanup) cleanup()
 		},
 		render() {
+			console.log('render ft-pong-remote-render')
 			const matchState = $matchState.get()
 			const match = matchMap.get(matchId)?.get(false)
 			if (!match) throw new Error('matchId should find match in matchMap')
@@ -167,6 +173,7 @@ defineComponent('ft-pong-remote-render', () => {
 			}
 			const names = { p1: match.player1.name, p2: match.player2.name }
 			const scores = { p1: match.player1Score, p2: match.player2Score }
+			if (!isConnected.get(false)) connectChannel()
 			renderer?.clear()
 			renderer =
 				$myRenderer.get(false) === '2D'

@@ -12,11 +12,12 @@ import {
 defineComponent('ft-bracket-match', () => {
 	return {
 		render(element) {
+			console.log('render ft-bracket-match')
 			const user = $user.get()
 			const currentMatchId = $matchId.get()
-			const matchId = +(element.getAttribute('matchId') || -1)
+			const matchId = +(element.getAttribute('match-id') || -1)
 			if (matchId === -1) {
-				throw new Error('matchId attribute is required')
+				throw new Error('match-id attribute is required')
 			}
 			const match = matchMap.get(matchId)?.get()
 			if (!match) {
@@ -40,24 +41,20 @@ defineComponent('ft-bracket-match', () => {
 					: ''
 
 			return /*html*/ `
-				<div
-					id="match-${match.id}"
-					class="bg-white border border-gray-200 rounded-md ${highlightClasses}"
-					
-				>
+				<div id="match-${match.id}" class="bg-white border border-gray-200 rounded-md ${highlightClasses}">
 					<div class="grid grid-cols-7 p-1 items-center justify-items-center">
-						<div class="text-xs break-word text-center col-span-3 ${colorP1}">
+						<div class="text-xs break-words text-center col-span-3 w-full ${colorP1}">
 							${match.player1 ? match.player1.name : '?'}
 						</div>
 						<ft-icon name="zap" class="h-3 scale-x-75 rotate-12"></ft-icon>
-						<div class="text-xs break-word text-center col-span-3 ${colorP2}">
+						<div class="text-xs break-words text-center col-span-3 w-full ${colorP2}">
 							${match.player2 ? match.player2.name : '?'}
 						</div>
 					</div>
 					<div class="grid grid-cols-7 p-1 items-center justify-items-center">
-						<span class="text-xs col-span-3">${match.player1Score}</span>
+						<span class="text-xs col-span-3">${match.player1Score === -1 ? 'Forfeit' : match.player1Score}</span>
 						${matchIcons[match.state]}
-						<span class="text-xs col-span-3">${match.player2Score}</span>
+						<span class="text-xs col-span-3">${match.player2Score === -1 ? 'Forfeit' : match.player2Score}</span>
 					</div>
 				</div>
 			`
@@ -68,6 +65,7 @@ defineComponent('ft-bracket-match', () => {
 defineComponent('ft-bracket', () => {
 	return {
 		render() {
+			console.log('ft-bracket')
 			const tournament = $tournament.get()
 			const user = $user.get()
 			const participants = $participants.get()
@@ -102,7 +100,7 @@ defineComponent('ft-bracket', () => {
 			const renderStage = (stage: number[]) => {
 				const matchElements = stage.map(
 					(matchId) => /*html*/ `
-						<ft-bracket-match matchId=${matchId}></ft-bracket-match>
+						<ft-bracket-match match-id=${matchId}></ft-bracket-match>
 					`,
 				)
 				const stageNames = ['Final', 'Semi', 'Quarter', 'Eight']

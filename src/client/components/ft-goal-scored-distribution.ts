@@ -84,14 +84,24 @@ function convertToPercentage(goalTakenY: number[]): number[] {
 function drawRectangle(values: number[], mode: string): string {
 	let html = '<div class="flex flex-col items-center">'
 	const maxValue = Math.max(...values)
+	const targetColors = {
+		conceded: { r: 187, g: 77, b: 0 },
+		scored: { r: 67, g: 45, b: 215 },
+	}
 	for (const value of values) {
-		let color = ''
-		if (mode === 'conceded')
-			color = `rgb(255, ${255 - Math.floor((value * 255) / maxValue)}, ${255 - Math.floor((value * 255) / maxValue)})`
-		else
-			color = `rgb(${255 - Math.floor((value * 255) / maxValue)}, ${255 - Math.floor((value * 255) / maxValue)}, 255)`
+		let r: number, g: number, b: number
+		const factor = value / maxValue
+		if (mode === 'conceded') {
+			r = Math.floor(255 + factor * (targetColors.conceded.r - 255))
+			g = Math.floor(255 + factor * (targetColors.conceded.g - 255))
+			b = Math.floor(255 + factor * (targetColors.conceded.b - 255))
+		} else {
+			r = Math.floor(255 + factor * (targetColors.scored.r - 255))
+			g = Math.floor(255 + factor * (targetColors.scored.g - 255))
+			b = Math.floor(255 + factor * (targetColors.scored.b - 255))
+		}
 		html += /*html*/ `
-		<div class="w-1 h-1 rounded-full" style="background-color:${color}"></div>
+		<div class="w-1 h-1 rounded-full" style="background-color:rgb(${r}, ${g}, ${b})"></div>
 		`
 	}
 	html += '</div>'
