@@ -28,8 +28,8 @@ defineComponent('ft-pong-remote', () => {
 
 			if (!matchId) {
 				return /*html*/ `
-					<div class="h-[100%] w-[100%] flex flex-row items-center justify-center">
-						You don't have any match.
+					<div class="h-[100%] w-[100%] flex flex-row items-center justify-center text-amber-600 text-xl font-bold">
+						You have been eliminated.
 					</div>
 				`
 			}
@@ -52,14 +52,13 @@ defineComponent('ft-pong-remote-render', () => {
 		`
 
 		const waiting = /*html*/ `
-			<div class="flex flex-row justify-center items-center animate-bounce font-bold w-full">
+			<div class="flex flex-row justify-center items-center animate-bounce font-bold w-full text-2xl">
 				Waiting for player
 			</div>
 		`
 
 		const infos = /*html*/ `
-			<div class="flex flex-row justify-center items-center w-full">${match.player1?.name} (left) VS ${match.player2?.name} (right)</div>
-			<div class="flex flex-row justify-center items-center w-full">Points required to win the match: ${match.pointsToWin}</div>
+			<div class="flex flex-row justify-center items-center w-full mt-15 mb-10">Points required to win the match: ${match.pointsToWin}</div>
 		`
 
 		return /*html*/ `

@@ -128,7 +128,7 @@ defineComponent('ft-page-tournament-play', () => {
 			// const lab = /*html*/ `<div class="flex gap-2" id="lab"></div>`
 
 			return `
-			<h1 class="p-2 flex font-bold item-center justify-center">${tournament.createdByUser.name}'s tournament</h1>
+			<h1 class="p-2 flex font-bold item-center justify-center text-xl">${tournament.createdByUser.name}'s tournament</h1>
 			<ft-tournament-${tournament.state}></ft-tournament-${tournament.state}>`
 		},
 		// postRender(element) {
