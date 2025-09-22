@@ -1,5 +1,5 @@
+import { createEffect } from '../../lib/signal.js'
 import type { Match, UserBasic, UserStats } from '../../lib/type.js'
-import { createEffect } from '../utils/signal.js'
 import { $matches, $rankedUsers, $user } from '../utils/store.js'
 
 customElements.define(

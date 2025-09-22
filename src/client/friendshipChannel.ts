@@ -1,7 +1,7 @@
+import { createEffect } from '../lib/signal.js'
 import type { ChannelSocket } from '../lib/useSocketChannels.js'
 import { toast } from './components/ft-toast.js'
 import { socketChannel } from './socketChannel.js'
-import { createEffect } from './utils/signal.js'
 import {
 	$friendshipsFriend,
 	$friendshipsInvitation,

@@ -1,6 +1,6 @@
 import { ARENA_HEIGHT } from '../../lib/engine/index.js'
+import { createEffect } from '../../lib/signal.js'
 import type { Match, UserBasic } from '../../lib/type.js'
-import { createEffect } from '../utils/signal.js'
 import { $matches, $user } from '../utils/store.js'
 
 customElements.define(

@@ -1,3 +1,4 @@
+import { createSignal, type Signal } from '../../lib/signal.js'
 import type {
 	FriendshipFriend,
 	FriendshipInvitation,
@@ -8,7 +9,6 @@ import type {
 	UserStats,
 	UserWithTournament,
 } from '../../lib/type.js'
-import { createSignal, type Signal } from './signal.js'
 
 export const $url = createSignal<URL>(new URL(document.location.href))
 export const $user = createSignal<UserWithTournament | undefined>(undefined)

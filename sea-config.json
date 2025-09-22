@@ -1,4 +1,0 @@
-{
-	"main": "./cli-wrapper.mjs",
-	"output": "sea-prep.blob" 
-}

@@ -1,5 +1,5 @@
+import { createSignal } from '../../lib/signal.js'
 import { defineComponent } from '../utils/component.js'
-import { createSignal } from '../utils/signal.js'
 
 const $valueA = createSignal(1)
 const $valueB = createSignal(1)

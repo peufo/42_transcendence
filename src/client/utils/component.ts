@@ -1,4 +1,4 @@
-import { type CleanEffect, createEffect } from './signal.js'
+import { type CleanEffect, createEffect } from '../../lib/signal.js'
 
 export function defineComponent(
 	name: string,

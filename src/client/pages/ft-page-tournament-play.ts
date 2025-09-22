@@ -1,10 +1,10 @@
+import { createSignal } from '../../lib/signal.js'
 import { getCurrentMatchFromMap } from '../../lib/tournament.js'
 import type { ChannelSocket } from '../../lib/useSocketChannels.js'
 import { toast } from '../components/ft-toast.js'
 import { socketChannel } from '../socketChannel.js'
 import { getAvatarSrc } from '../utils/avatar.js'
 import { defineComponent } from '../utils/component.js'
-import { createSignal } from '../utils/signal.js'
 import {
 	$matchId,
 	$matchState,

@@ -1,6 +1,6 @@
+import { createEffect } from '../../lib/signal.js'
 import type { Match } from '../../lib/type.js'
 import { defineComponent } from '../utils/component.js'
-import { createEffect } from '../utils/signal.js'
 import {
 	$matchId,
 	$participants,

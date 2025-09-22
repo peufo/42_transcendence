@@ -1,4 +1,5 @@
 import type { Move, Player } from '../../lib/engine/index.js'
+import { createSignal } from '../../lib/signal.js'
 import type { Match } from '../../lib/type.js'
 import type { ChannelSocket } from '../../lib/useSocketChannels.js'
 import type { Renderer } from '../renderer/Renderer.js'
@@ -6,7 +7,6 @@ import { Renderer2D } from '../renderer/Renderer2D.js'
 import { Renderer3D } from '../renderer/Renderer3D.js'
 import { socketChannel } from '../socketChannel.js'
 import { defineComponent } from '../utils/component.js'
-import { createSignal } from '../utils/signal.js'
 import {
 	$matchId,
 	$matchState,

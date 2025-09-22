@@ -11,7 +11,7 @@ import {
 	type RoutePage,
 } from '../routes.js'
 import { defineComponent } from '../utils/component.js'
-// import { type CleanEffect, createEffect } from '../utils/signal.js'
+// import { type CleanEffect, createEffect } from '../../lib/signal.js'
 import { $url, $user } from '../utils/store.js'
 import { slide, transitionIn, transitionOut } from '../utils/transition.js'
 import { toast } from './ft-toast.js'

@@ -1,5 +1,5 @@
+import { createEffect } from '../../lib/signal.js'
 import { getAvatarSrc } from '../utils/avatar.js'
-import { createEffect } from '../utils/signal.js'
 import { $rankedUsers, $user } from '../utils/store.js'
 
 customElements.define(

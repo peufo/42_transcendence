@@ -11,7 +11,7 @@ import {
 	type State,
 } from '../../lib/engine/index.js'
 import { useInterpolate } from '../../lib/interpolate.js'
-import { createEffect } from '../utils/signal.js'
+import { createEffect } from '../../lib/signal.js'
 import { $myRenderer, $user } from '../utils/store.js'
 
 createEffect(() => {

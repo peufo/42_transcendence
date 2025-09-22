@@ -2,7 +2,7 @@ import {
 	type CleanEffect,
 	createEffect,
 	createSignal,
-} from '../utils/signal.js'
+} from '../../lib/signal.js'
 
 type ToastType = 'info' | 'success' | 'error'
 type ToastOption = {

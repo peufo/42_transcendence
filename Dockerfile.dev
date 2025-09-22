@@ -1,7 +1,4 @@
-FROM node:24-alpine3.22 AS base
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
+FROM oven/bun:canary-alpine
 RUN apk add --no-cache zsh
 RUN apk add --no-cache bash
 RUN apk add --no-cache curl
@@ -9,7 +6,5 @@ RUN apk add --no-cache git
 RUN apk add --no-cache openssl
 RUN openssl req -x509 -newkey rsa:2048 -nodes -keyout ssl.key -out ssl.cert -sha256 -days 365 -subj "/C=CH/ST=Vaud/L=Lausanne/O=42/OU=Transcendance/CN=localhost"
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-RUN echo 'alias pn="pnpm"' >> ~/.zshrc
-RUN echo 'alias px="pnpx"' >> ~/.zshrc
 WORKDIR /app
 ENTRYPOINT [ "/bin/zsh" ]

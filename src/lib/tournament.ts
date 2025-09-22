@@ -1,4 +1,4 @@
-import type { Signal } from '../client/utils/signal.js'
+import type { Signal } from '../lib/signal.ts'
 import type { Match, MatchBasic } from './type.ts'
 
 export function getCurrentStage<M extends MatchBasic>(

@@ -1,6 +1,6 @@
+import { createEffect } from '../../lib/signal.js'
 import type { Match, UserWithTournament } from '../../lib/type.js'
 import { getAvatarSrc } from '../utils/avatar.js'
-import { createEffect } from '../utils/signal.js'
 import { $matches, $user } from '../utils/store.js'
 
 customElements.define(

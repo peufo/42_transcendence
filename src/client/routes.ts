@@ -1,5 +1,5 @@
+import { createSignal } from '../lib/signal.js'
 import type { RoutesGet, RoutesPost } from '../lib/type.js'
-import { createSignal } from './utils/signal.js'
 import * as store from './utils/store.js'
 import {
 	avatarUpload,
