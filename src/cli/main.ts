@@ -7,6 +7,8 @@ import * as p from '@clack/prompts'
 import { api, loadApiOptions } from './api.js'
 import { menuMain } from './menuMain.js'
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0' // unsafe but necessary for self signed
+
 p.intro('Welcome to transcendance')
 await loadApiOptions()
 

@@ -18,6 +18,7 @@ export const menuMatchRemote: Scope<[Match]> = async (match) => {
 
 	rl.once('SIGINT', onCancel)
 	await ensureSreenSize()
+	console.clear()
 
 	return new Promise((resolve) => {
 		const userId = api.user()?.id
