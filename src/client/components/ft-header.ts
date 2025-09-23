@@ -18,6 +18,7 @@ defineComponent('ft-header', () => ({
 						TRANSCENDANCE
 					</a>
 					<div class="flex-grow"></div>
+					<a href="/downloads" class="btn btn-border mr-10">Download CLI</a>
 					<label class="cursor-pointer col-span-2 flex flex-row items-center justify-center mr-10">
 						<input id="renderer" type="checkbox" class="sr-only peer" ${rendering === '3D' ? 'checked' : ''}>
 						<div class="relative w-11 h-6 bg-amber-600 rounded-full

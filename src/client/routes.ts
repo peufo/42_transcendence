@@ -132,6 +132,10 @@ export const PAGES = {
 		component: 'ft-page-redirect-google',
 		isPublic: 'only',
 	},
+	'/downloads': {
+		component: 'ft-page-downloads',
+		isPublic: true,
+	},
 } as const satisfies Record<string, PageOption>
 
 function redirectAfterLogin() {

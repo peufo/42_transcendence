@@ -44,10 +44,9 @@ defineComponent('ft-users', () => ({
 	},
 	render() {
 		const users = $users.get()
-		if (!users || !users.length) return ''
-		// let html = /*html*/ `
-		// 	<div class="text-center">Wow! You are so popular that all users are already your friends!</div>
-		// `
+		if (!users || !users.length) {
+			return /*html*/ `<div class="text-center">Wow! You are so popular that all users are already your friends!</div>`
+		}
 		let html = ''
 		for (const user of users) {
 			html += /*html*/ `
@@ -59,7 +58,7 @@ defineComponent('ft-users', () => ({
 						<input type="hidden" name="invitedUserId" value="${user.id}" />
 						<input type="submit" value="Invite" />
 					</form>
-
+					
 				</div>
 			`
 		}
