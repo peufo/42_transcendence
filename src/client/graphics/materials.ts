@@ -3,7 +3,6 @@ export function createPaddleMaterial(
 	color: BABYLON.Color3,
 ): BABYLON.PBRMaterial {
 	const mat = new BABYLON.PBRMaterial('iridescentPaddle', scene)
-	console.log(color)
 	mat.albedoColor = color
 	mat.metallic = 1.0
 	mat.roughness = 0.1
@@ -39,7 +38,7 @@ export function createBallMaterial(scene: BABYLON.Scene): BABYLON.PBRMaterial {
 /*
 export function createWallMaterial(scene: BABYLON.Scene): BABYLON.StandardMaterial {
 	const arenaMat = new BABYLON.StandardMaterial('arenaMat', scene)
-	
+
 	arenaMat.diffuseColor = new BABYLON.Color3(0.2, 0.2, 0.2) // couleur sombre
 	arenaMat.emissiveColor = new BABYLON.Color3(0.03, 0.03, 0.03) // effet lumineux
 	arenaMat.roughness = 1

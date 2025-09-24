@@ -28,7 +28,6 @@ defineComponent('ft-pong-remote', () => {
 			)
 		},
 		render() {
-			console.log('render ft-pong-remote')
 			const matchId = $matchId.get()
 			$myRenderer.get()
 
@@ -148,7 +147,6 @@ defineComponent('ft-pong-remote-render', () => {
 			if (cleanup) cleanup()
 		},
 		render() {
-			console.log('render ft-pong-remote-render')
 			const matchState = $matchState.get()
 			const match = matchMap.get(matchId)?.get(false)
 			if (!match) throw new Error('matchId should find match in matchMap')

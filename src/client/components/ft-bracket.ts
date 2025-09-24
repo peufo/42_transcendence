@@ -64,7 +64,6 @@ defineComponent('ft-bracket-match', () => {
 defineComponent('ft-bracket', () => {
 	return {
 		render() {
-			console.log('ft-bracket')
 			const tournament = $tournament.get()
 			const user = $user.get()
 			const participants = $participants.get()

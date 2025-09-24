@@ -37,7 +37,6 @@ defineComponent('ft-page-tournament-play', () => {
 
 	return {
 		onLoad() {
-			console.log('TOURNAMENT PLAY LOAD')
 			const tournamentId =
 				new URLSearchParams(document.location.search).get('tournamentId') || ''
 
@@ -46,7 +45,6 @@ defineComponent('ft-page-tournament-play', () => {
 				{ tournamentId },
 				{
 					onParticipantJoin(newParticipant) {
-						console.log('onParticipantJoin')
 						toast.success(`${newParticipant.user.name} joined the tournament !`)
 						$participants.update((participants) => {
 							const isParticipantExist = participants.find(
@@ -57,7 +55,6 @@ defineComponent('ft-page-tournament-play', () => {
 						})
 					},
 					onParticipantQuit(participant) {
-						console.log('onParticipantQuit')
 						toast.error(`${participant.user.name} left the tournament !`)
 						$participants.update((participants) => {
 							return participants.filter(
@@ -66,7 +63,6 @@ defineComponent('ft-page-tournament-play', () => {
 						})
 					},
 					onStart({ stages }) {
-						console.log('onStart')
 						toast.success('Tournament starting')
 
 						for (const match of stages.flat()) {
@@ -74,7 +70,6 @@ defineComponent('ft-page-tournament-play', () => {
 							if (store) store.set(match)
 							else matchMap.set(match.id, createSignal(match))
 						}
-						console.log('onStart', matchMap)
 
 						const userId = $user.get(false)?.id
 						if (userId) {
@@ -92,14 +87,12 @@ defineComponent('ft-page-tournament-play', () => {
 						})
 					},
 					onMatchChange({ match }) {
-						console.log('onMatchChange')
 						const userId = $user.get(false)?.id
 						if (
 							userId &&
 							(match.player1Id === userId || match.player2Id === userId)
 						) {
 							if (match?.id !== $matchId.get(false)) {
-								console.log('setting new match id ', match.id)
 								$matchId.set(match.id)
 								$matchState.set(match.state)
 							}
@@ -110,7 +103,6 @@ defineComponent('ft-page-tournament-play', () => {
 						matchMap.get(match.id)?.update((m) => ({ ...m, ...match }))
 					},
 					onEnd() {
-						console.log('onEnd')
 						toast.success('Tournament finished')
 						$tournament.update((t) => (!t ? t : { ...t, state: 'finished' }))
 					},
@@ -121,7 +113,6 @@ defineComponent('ft-page-tournament-play', () => {
 			tournamentChannel.close()
 		},
 		render() {
-			console.log('TOURNAMENT PLAY RENDER')
 			const tournament = $tournament.get()
 			if (!tournament) return /*html*/ `<span>Tournament not found</span>`
 
@@ -140,11 +131,7 @@ defineComponent('ft-page-tournament-play', () => {
 
 defineComponent('ft-tournament-open', () => {
 	return {
-		onLoad() {
-			console.log('TOURNAMENT OPEN LOAD')
-		},
 		render() {
-			console.log('TOURNAMENT OPEN RENDER')
 			const tournament = $tournament.get()
 			const user = $user.get()
 			if (!tournament) return /*html*/ `<span>Tournament not found</span>`
@@ -236,11 +223,7 @@ defineComponent('ft-tournament-open', () => {
 
 defineComponent('ft-tournament-ongoing', () => {
 	return {
-		onLoad() {
-			console.log('TOURNAMENT ONGOING LOAD')
-		},
 		render() {
-			console.log('TOURNAMENT ONGOING RENDER')
 			const user = $user.get(false)
 			const tournament = $tournament.get(false)
 			if (!user || !tournament) return 'no user or tournament'
@@ -265,11 +248,7 @@ defineComponent('ft-tournament-ongoing', () => {
 
 defineComponent('ft-tournament-finished', () => {
 	return {
-		onLoad() {
-			console.log('TOURNAMENT FINISHED LOAD')
-		},
 		render() {
-			console.log('TOURNAMENT FINISHED RENDER')
 			const tournament = $tournament.get(false)
 			if (!tournament || !tournament.stages) return 'error'
 			const finalId = tournament.stages[tournament.stages.length - 1][0]

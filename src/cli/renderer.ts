@@ -30,6 +30,7 @@ const INDIGO_LIGHT = '#7c86ff'
 const AMBER = '#e17100'
 const BLACK = '#000000'
 const TEAL = '#00b7a8'
+const PINK = '#f502f5'
 
 const FRAME_TIMEOUT = 1000 / 60
 
@@ -146,7 +147,7 @@ function useRenderBall() {
 			b.y,
 			BALL_BASE_SIZE,
 			BALL_BASE_SIZE,
-			chalk.bgHex(BLACK),
+			chalk.bgHex(PINK),
 		)
 	}
 }

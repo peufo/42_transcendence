@@ -69,7 +69,6 @@ export async function handleTournamentGameEnd(
 	match: DB.Match & { tournamentId: number },
 ) {
 	if (!match.player1Id || !match.player2Id) {
-		console.log('wtf')
 		return
 	}
 	// const matchParticipants = await db
@@ -137,7 +136,7 @@ export async function handleTournamentGameEnd(
 	)
 	const nextMatch = nextStage.at(nextMatchIndex)
 	if (!nextMatch) {
-		console.log('Should not happen')
+		console.error('Should not happen')
 		return
 	}
 
@@ -163,7 +162,7 @@ export async function handleTournamentGameEnd(
 		},
 	})
 	if (!updatedNextMatch) {
-		console.log('Should not happen')
+		console.error('Should not happen')
 		return
 	}
 
