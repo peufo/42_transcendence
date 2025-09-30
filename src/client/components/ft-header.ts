@@ -15,7 +15,7 @@ defineComponent('ft-header', () => ({
 		return /*html*/ `
 				<header class="flex items-center p-2 pl-4 gap-2 bg-white/50">
 					<a href="${user ? '/me' : '/'}" class="text-4xl text-indigo-600 font-pixel">
-						TRANSCENDANCE
+						TRANSCENDENCE
 					</a>
 					<div class="flex-grow"></div>
 					<a href="/downloads" class="btn btn-border mr-10">Download CLI</a>
@@ -26,7 +26,7 @@ defineComponent('ft-header', () => ({
 								after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600 mr-2">
 						</div>
 						<div class="flex flex-col items-center">
-							<ft-icon id="render-type-icon" class="h-5" name="${renderingIcons[rendering]}"></ft-icon>	
+							<ft-icon id="render-type-icon" class="h-5" name="${renderingIcons[rendering]}"></ft-icon>
 							<span class="text-[0.6rem]" id="render-type-span">${rendering}</span>
 						</div>
 					</label>

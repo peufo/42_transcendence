@@ -56,7 +56,7 @@ defineComponent('ft-users', () => ({
 					<div class="flex-grow"></div>
 					<form method="post" action="/friendships/new">
 						<input type="hidden" name="invitedUserId" value="${user.id}" />
-						<input type="submit" value="Invite" class"btn btn-border"/>
+						<input class="btn btn-border" type="submit" value="Invite"/>
 					</form>
 
 				</div>
