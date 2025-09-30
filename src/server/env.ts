@@ -17,6 +17,7 @@ if (!process.env.FILE_CERT || !process.env.FILE_KEY) {
 
 export const env = {
 	PORT: +(process.env.PORT || 8000),
+	DOMAIN: process.env.DOMAIN || 'localhost',
 	MEDIA_DIR: process.env.MEDIA_DIR || './upload',
 	APP_HOST: process.env.APP_HOST || '0.0.0.0',
 	DB_FILE_NAME: process.env.DB_FILE_NAME,
