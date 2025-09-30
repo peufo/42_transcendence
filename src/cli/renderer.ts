@@ -28,7 +28,6 @@ import {
 const INDIGO = '#4f39f6'
 const INDIGO_LIGHT = '#7c86ff'
 const AMBER = '#e17100'
-const BLACK = '#000000'
 const TEAL = '#00b7a8'
 const PINK = '#f502f5'
 
