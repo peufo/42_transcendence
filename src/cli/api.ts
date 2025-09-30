@@ -8,7 +8,7 @@ import type { RoutesGet, RoutesPost, User } from '../lib/type.js'
 const DEFAULT_HOST = 'https://localhost:8000'
 
 const HOME = process.env.HOME || ''
-const SAVE_FILE = path.resolve(HOME, '.transcendance.json')
+const SAVE_FILE = path.resolve(HOME, '.transcendence.json')
 
 export type ApiOptions = Partial<{
 	host: string

@@ -54,11 +54,11 @@ defineComponent('ft-users', () => ({
 					<img src="${getAvatarSrc(user)}" alt="Avatar de l'utilisateur" class="h-8 w-8 rounded">
 					<span class="break-all">${user.name}</span>
 					<div class="flex-grow"></div>
-					<form method="post" action="/friendships/new" class="btn btn-border">
+					<form method="post" action="/friendships/new">
 						<input type="hidden" name="invitedUserId" value="${user.id}" />
-						<input type="submit" value="Invite" />
+						<input type="submit" value="Invite" class"btn btn-border"/>
 					</form>
-					
+
 				</div>
 			`
 		}
