@@ -46,7 +46,7 @@ const oauth2Options = {
 		auth: googleAuthConfig,
 	},
 	startRedirectPath: '/auth/oauth/google',
-	callbackUri: `https://${env.DOMAIN}:${env.PORT}/auth/oauth/google/callback`,
+	callbackUri: `https://${env.HOST}/auth/oauth/google/callback`,
 }
 
 export const server = fastify({
@@ -97,7 +97,7 @@ export function startServer() {
 		reply.sendFile('index.html')
 	})
 
-	server.listen({ port: env.PORT, host: env.APP_HOST }, (err, address) => {
+	server.listen({ port: env.PORT, host: '0.0.0.0' }, (err, address) => {
 		if (err) {
 			console.error(err)
 			process.exit(1)
